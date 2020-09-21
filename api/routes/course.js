@@ -1,6 +1,6 @@
 import express from "express";
 const course = express.Router();
-import Course from "../../models/Course";
+import Course from "../models/Course";
 
 course.get("/", (req, res, next) => {
   Course.find()

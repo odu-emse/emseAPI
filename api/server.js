@@ -17,9 +17,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Router imports
-import course from "./routes/api/course";
-import modules from "./routes/api/modules";
-import users from "./routes/api/users";
+import course from "./routes/course";
+import modules from "./routes/modules";
+import users from "./routes/users";
 
 //Database configuration
 database();
@@ -29,15 +29,15 @@ app.use("/api/modules", modules);
 app.use("/api/course", course);
 app.use("/api/users", users);
 
-//Serve static assets if in prod
-if (process.env.NODE_ENV === "production") {
-  //set static dir
-  app.use(express.static("client/build"));
+// //Serve static assets if in prod
+// if (process.env.NODE_ENV === "production") {
+//   //set static dir
+//   app.use(express.static("client/build"));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-  });
-}
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+//   });
+// }
 
 const port = process.env.PORT;
 

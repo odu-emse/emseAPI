@@ -1,6 +1,6 @@
 import express from "express";
 const modules = express.Router();
-import Module from "../../models/Module";
+import Module from "../models/Module";
 import aws from "aws-sdk";
 import passport from "passport";
 

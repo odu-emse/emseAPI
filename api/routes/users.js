@@ -1,11 +1,11 @@
 import express from "express";
 const users = express.Router();
-import User from "../../models/User";
+import User from "../models/User";
 import bcrypt from "bcryptjs";
 require("dotenv").config();
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
-import UserVerify from "../../models/UserVerify";
+import UserVerify from "../models/UserVerify";
 
 //Authenticator
 users.get("/verify", (req, res, next) => {
