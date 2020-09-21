@@ -1,0 +1,111 @@
+Table student {
+  _id id
+  firstName string
+  lastName string
+  middleName string
+  password password
+  passwordConf password
+  dob date
+  adviser obj [ref: > instructor._id]
+  degree string
+  //this object stores a list of unique IDs 
+  //of modules that the student has registered for
+  modulesTaken obj [ref: > module._id]
+  active boolean
+  admitted boolean
+  probation boolean
+  group string
+  probationExpires date
+  personalWebsite string
+  phoneNumber int
+}
+
+Table userVerify {
+  _id id
+  expires date
+  user boolean
+  token id [ref: > student._id,  ref: > instructor._id, ref: > assistant._id]
+  dateSent date
+}
+
+Table module {
+  _id id
+  moduleName string
+  moduleNumber int
+  description string
+  duration int
+  remaining int
+  cdLink string
+  numSlides int
+  instructor id [ref: > instructor._id]
+  done boolean
+  continue boolean
+  rating array
+  keywords array
+  hasAssignment boolean
+  assignment array [ref: > assignment._id]
+  hasPreTest boolean
+  hasPostTest boolean
+  enrolled int
+  preTest array [ref: > preTest._id]
+  postTest array [ref: > postTest._id]
+  parentCourse obj [ref: > course._id]
+}
+
+Table course {
+  _id id
+  courseName string
+  courseNumber int
+  description string
+  numberOfModules int
+  difficulty float
+  childModules array [ref: > module._id]
+  keywords array
+}
+
+Table assignment{
+  _id id
+}
+
+Table preTest{
+  _id id
+}
+
+Table postTest{
+  _id id
+}
+
+Table instructor {
+  _id id
+  firstName string
+  lastName string
+  middleName string
+  email string
+  password password
+  passwordConf password
+  title string
+  officeLocation string
+  officeHours int
+  phone int
+  contactPolicy string
+  background string
+  researchInterest string
+  selectedPapersAndPublications string
+  personalWebsite string
+  philosophy string
+  assistant array [ref: > assistant._id]
+  coursesOffered array [ref: > course._id]
+  active boolean
+  group string
+}
+
+Table assistant {
+    _id id
+    firstName string
+    lastName string
+    middleName string
+    email string
+    supervisors array [ref: > instructor._id]
+    active boolean
+    group string
+}
