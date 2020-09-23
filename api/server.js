@@ -20,6 +20,7 @@ app.use(passport.session());
 import course from "./routes/course";
 import modules from "./routes/modules";
 import users from "./routes/users";
+import search from "./routes/search";
 
 //Database configuration
 database();
@@ -28,6 +29,7 @@ database();
 app.use("/api/modules", modules);
 app.use("/api/course", course);
 app.use("/api/users", users);
+app.use("/api/search", search);
 
 // //Serve static assets if in prod
 // if (process.env.NODE_ENV === "production") {
