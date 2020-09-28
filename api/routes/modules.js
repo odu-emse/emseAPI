@@ -57,7 +57,7 @@ modules.get("/", (req, res, next) => {
 });
 
 modules.get("/:moduleId", (req, res, next) => {
-  if (req.params.moduleId.length < 3) {
+  if (req.params.moduleId.length <= 3) {
     next();
   }
   const id = req.params.moduleId;
