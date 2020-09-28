@@ -1,7 +1,5 @@
-import express from "express";
-import path from "path";
+import express from "express";import path from "path";
 import passport from "passport";
-import Cors from "cors";
 import { database } from "./config/db";
 
 require("./config/passport");
@@ -9,7 +7,6 @@ require("./config/passport");
 const app = express();
 
 //Middleware
-app.use(Cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -21,6 +18,7 @@ import course from "./routes/course";
 import modules from "./routes/modules";
 import users from "./routes/users";
 import search from "./routes/search";
+import pos from './routes/planOfStudy'
 
 //Database configuration
 database();
@@ -30,16 +28,8 @@ app.use("/api/modules", modules);
 app.use("/api/course", course);
 app.use("/api/users", users);
 app.use("/api/search", search);
+app.use("/api/plan", pos);
 
-// //Serve static assets if in prod
-// if (process.env.NODE_ENV === "production") {
-//   //set static dir
-//   app.use(express.static("client/build"));
-
-//   app.get("*", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-//   });
-// }
 
 const port = process.env.PORT;
 
