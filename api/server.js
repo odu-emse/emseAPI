@@ -1,12 +1,15 @@
-import express from "express";import path from "path";
+import express from "express";
+import path from "path";
 import passport from "passport";
 import { database } from "./config/db";
+import Cors from "cors";
 
 require("./config/passport");
 
 const app = express();
 
 //Middleware
+app.use(Cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -18,7 +21,7 @@ import course from "./routes/course";
 import modules from "./routes/modules";
 import users from "./routes/users";
 import search from "./routes/search";
-import pos from './routes/planOfStudy'
+import pos from "./routes/planOfStudy";
 
 //Database configuration
 database();
@@ -29,7 +32,6 @@ app.use("/api/course", course);
 app.use("/api/users", users);
 app.use("/api/search", search);
 app.use("/api/plan", pos);
-
 
 const port = process.env.PORT;
 
