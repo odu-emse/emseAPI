@@ -8,9 +8,14 @@ search.post("/", (req, res, next) => {
 
 	Course.find({ courseNumber: query })
 		.then(data => {
-			if (!data || data.length === 0) {
+			if (!data) {
 				return res.status(400).json({
 					conf: "failed",
+				});
+			} else if (data.length === 0) {
+				return res.status(200).json({
+					error: "No results found",
+					data: [],
 				});
 			} else {
 				res.json({
