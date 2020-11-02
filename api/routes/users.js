@@ -1,6 +1,7 @@
 import express from "express";
 const users = express.Router();
 import User from "../models/User";
+import Module from "../models/Module";
 import bcrypt from "bcryptjs";
 require("dotenv").config();
 import jwt from "jsonwebtoken";
@@ -240,4 +241,37 @@ users.get("/:id", (req, res, next) => {
 		});
 });
 
+users.put("/:id", async (req, res, next) => {
+	const { id } = req.params;
+	const { module } = req.query;
+	const account = await User.findById(id);
+	const mod = await Module.findById(module);
+	account.updateOne(
+		{
+			$push: {
+				modulesAdded: module,
+			},
+		},
+		(err, result) => {
+			if (err) {
+				res.status(400).json({ error: err });
+			} else {
+				mod.updateOne(
+					{
+						$push: {
+							enrolled: id,
+						},
+					},
+					(err, results) => {
+						if (err) {
+							res.status(400).json({ error: err });
+						} else {
+							res.status(200).end();
+						}
+					}
+				);
+			}
+		}
+	);
+});
 export default users;
