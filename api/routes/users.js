@@ -244,34 +244,45 @@ users.get("/:id", (req, res, next) => {
 users.put("/:id", async (req, res, next) => {
 	const { id } = req.params;
 	const { module } = req.query;
-	const account = await User.findById(id);
-	const mod = await Module.findById(module);
-	account.updateOne(
-		{
-			$push: {
-				modulesAdded: module,
-			},
-		},
-		(err, result) => {
-			if (err) {
-				res.status(400).json({ error: err });
-			} else {
-				mod.updateOne(
-					{
-						$push: {
-							enrolled: id,
-						},
-					},
-					(err, results) => {
-						if (err) {
-							res.status(400).json({ error: err });
-						} else {
-							res.status(200).end();
-						}
-					}
-				);
-			}
+	try {
+		const account = await User.findById(id);
+		const mod = await Module.findById(module);
+		if (account.modulesAdded.includes(module)) {
+			res.status(400).json({
+				error: "This module is already added to your account",
+			});
 		}
-	);
+		account.updateOne(
+			{
+				$push: {
+					modulesAdded: module,
+				},
+			},
+			(err, result) => {
+				if (err) {
+					res.status(400).json({ error: err });
+				} else {
+					mod.updateOne(
+						{
+							$push: {
+								enrolled: id,
+							},
+						},
+						(err, results) => {
+							if (err) {
+								res.status(400).json({
+									error: err,
+								});
+							} else {
+								res.status(200).end();
+							}
+						}
+					);
+				}
+			}
+		);
+	} catch (error) {
+		res.status(500).json({ error });
+	}
 });
 export default users;
