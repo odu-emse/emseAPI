@@ -69,6 +69,7 @@ users.post("/register", (req, res, next) => {
 	const {
 		firstName,
 		lastName,
+		middleName,
 		email,
 		password,
 		passwordConf,
@@ -82,6 +83,7 @@ users.post("/register", (req, res, next) => {
 				const newUser = new User({
 					firstName,
 					lastName,
+					middleName,
 					email,
 					password,
 					passwordConf,
