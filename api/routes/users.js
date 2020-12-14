@@ -16,32 +16,38 @@ users.get("/verify", (req, res, next) => {
 		if (token !== "null") {
 			jwt.verify(token, process.env.jwtSecret, (err, result) => {
 				if (err) {
-					res.status(400);
-					console.error(err);
-					next();
-				}
-				User.findById(result.id)
-					.then(data => {
-						if (!data) {
-							res.status(400);
-						} else {
-							res.status(200).json({
-								authenticated: true,
-								data,
-							});
-						}
-					})
-					.catch(err => {
-						res.status(400);
-						console.error(err);
-						next();
+					return res.status(400).json({
+						error: err,
 					});
+				} else {
+					User.findById(result.sub)
+						.then(data => {
+							if (!data) {
+								return res.status(400).json({
+									error: "User not found",
+								});
+							} else {
+								return res.status(200).json({
+									authenticated: true,
+									data,
+								});
+							}
+						})
+						.catch(err => {
+							console.error(err);
+							return res.status(400).json({ error: err });
+						});
+				}
 			});
 		} else {
-			return res.status(401);
+			return res.status(401).json({
+				error: "You are not logged in",
+			});
 		}
 	} else {
-		return res.status(401);
+		return res.status(401).json({
+			error: "Internal server error",
+		});
 	}
 });
 
@@ -238,8 +244,7 @@ users.get("/:id", (req, res, next) => {
 			res.status(200).json({ user });
 		})
 		.catch(err => {
-			res.status(400).send({ error: err });
-			next();
+			return res.status(400).json({ error: err });
 		});
 });
 
