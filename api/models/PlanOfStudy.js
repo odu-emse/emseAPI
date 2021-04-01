@@ -1,26 +1,42 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
-let ObjectId = mongoose.Schema.ObjectId
+let ObjectId = mongoose.Schema.ObjectId;
 
 const PlanOfStudy = new mongoose.Schema({
-	courses:[{
-		trim: true,
-		type: ObjectId,
-		required: true
-	}],
-	certificates: [{
-		default: "",
-		type: ObjectId,
-	}],
-	degrees: [{
-		default: "",
-		type: ObjectId,
-	}],
 	student: {
-		trim: true,
+		required: true,
 		type: ObjectId,
-		required: true
-	}
-})
+	},
+	modules: [
+		{
+			identifier: {
+				type: ObjectId,
+				required: true,
+			},
+			progress: {
+				type: Number,
+				default: 0,
+			},
+		},
+	],
+	grades: [
+		{
+			assignment: {
+				trim: true,
+				type: ObjectId,
+			},
+			grade: {
+				trim: true,
+				type: Number,
+			},
+		},
+	],
+	degree: {
+		type: ObjectId,
+	},
+	adviser: {
+		type: ObjectId,
+	},
+});
 
-export default mongoose.model("PlanOfStudy", PlanOfStudy)
+export default mongoose.model("PlanOfStudy", PlanOfStudy);

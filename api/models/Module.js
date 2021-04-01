@@ -1,33 +1,27 @@
 import mongoose from "mongoose";
 
 const Module = new mongoose.Schema({
-	parentCourseID: {
-		type: String,
-		trim: true,
-		default: "",
-	},
 	moduleNumber: {
 		type: Number,
-		default: 0,
+		required: true,
 	},
 	moduleName: {
 		type: String,
 		trim: true,
-		default: "",
+		required: true,
 	},
-	description: {
+	objective: {
 		type: String,
 		trim: true,
-		default: "",
+		required: true,
 	},
 	duration: {
 		type: Number,
 		default: 0,
 	},
-	cdLink: {
+	intro: {
 		type: String,
 		trim: true,
-		default: "./",
 	},
 	numSlides: {
 		type: Number,
@@ -45,18 +39,16 @@ const Module = new mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
-	assignments: [],
-	hasPreTest: {
-		type: Boolean,
-		default: false,
-	},
-	preTest: { type: String },
-	hasPostTest: {
-		type: Boolean,
-		default: false,
-	},
-	postTest: { type: String },
-	enrolled: [],
+	assignments: [
+		{
+			type: mongoose.SchemaTypes.ObjectId,
+		},
+	],
+	enrolled: [
+		{
+			type: mongoose.SchemaTypes.ObjectId,
+		},
+	],
 });
 
 export default mongoose.model("Module", Module);

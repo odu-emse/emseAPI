@@ -4,22 +4,21 @@ const Course = new mongoose.Schema({
 	courseName: {
 		type: String,
 		trim: true,
-		default: "",
+		required: true,
 	},
 	courseNumber: {
 		type: Number,
-		default: 0,
+		required: true,
 	},
 	description: {
 		type: String,
 		default: "",
 	},
-	difficulty: {
-		type: Number,
-		default: 0,
-	},
-	containingModules: [
+	modules: [
 		//contains the _id for each module that's covered by this course
+		{
+			type: mongoose.SchemaTypes.ObjectId,
+		},
 	],
 	keywords: [String],
 });

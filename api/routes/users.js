@@ -1,7 +1,6 @@
 import express from "express";
 const users = express.Router();
 import User from "../models/User";
-import Module from "../models/Module";
 import bcrypt from "bcryptjs";
 require("dotenv").config();
 import jwt from "jsonwebtoken";
@@ -50,26 +49,6 @@ users.get("/verify", (req, res, next) => {
 		});
 	}
 });
-
-//-------------------------DEV debug helper route----------------------------------------
-users.get("/", (req, res, next) => {
-	User.find()
-		.then(data => {
-			if (!data) {
-				return res.status(404).end;
-			} else {
-				res.status(200).json({
-					conf: "success",
-					data: data,
-				});
-			}
-		})
-		.catch(err => {
-			console.error(err);
-			next();
-		});
-});
-//-------------------------End of DEV debug helper route---------------------------------
 
 users.post("/register", (req, res, next) => {
 	const {
@@ -248,48 +227,5 @@ users.get("/:id", (req, res, next) => {
 		});
 });
 
-users.put("/:id", async (req, res, next) => {
-	const { id } = req.params;
-	const { module } = req.query;
-	try {
-		const account = await User.findById(id);
-		const mod = await Module.findById(module);
-		if (account.modulesAdded.includes(module)) {
-			res.status(400).json({
-				error: "This module is already added to your account",
-			});
-		}
-		account.updateOne(
-			{
-				$push: {
-					modulesAdded: module,
-				},
-			},
-			(err, result) => {
-				if (err) {
-					res.status(400).json({ error: err });
-				} else {
-					mod.updateOne(
-						{
-							$push: {
-								enrolled: id,
-							},
-						},
-						(err, results) => {
-							if (err) {
-								res.status(400).json({
-									error: err,
-								});
-							} else {
-								res.status(200).end();
-							}
-						}
-					);
-				}
-			}
-		);
-	} catch (error) {
-		res.status(500).json({ error });
-	}
-});
+users.put("/:id", async (req, res, next) => {});
 export default users;

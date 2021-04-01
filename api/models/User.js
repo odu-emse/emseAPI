@@ -4,10 +4,12 @@ const User = new mongoose.Schema({
 	firstName: {
 		type: String,
 		trim: true,
+		required: true,
 	},
 	lastName: {
 		type: String,
 		trim: true,
+		required: true,
 	},
 	middleName: {
 		type: String,
@@ -16,17 +18,7 @@ const User = new mongoose.Schema({
 	},
 	dob: {
 		type: Date,
-		default: "",
-	},
-	degree: {
-		type: String,
-		trim: true,
-		default: "",
-	},
-	adviser: {
-		type: String,
-		trim: true,
-		default: "",
+		default: Date.now(),
 	},
 	email: {
 		type: String,
@@ -43,19 +35,9 @@ const User = new mongoose.Schema({
 		trim: true,
 		required: true,
 	},
-	modulesAdded: [],
-	classNeeded: [],
-	probation: {
-		type: Boolean,
-		default: false,
-	},
-	probationExpire: {
-		type: Date,
-		default: Date.now,
-	},
-	admitted: {
-		type: Boolean,
-		default: false,
+	planOfStudy: {
+		type: mongoose.SchemaTypes.ObjectId,
+		required: true,
 	},
 	active: {
 		type: Boolean,
