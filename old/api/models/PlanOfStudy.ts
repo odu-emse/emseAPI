@@ -12,7 +12,8 @@ export class PlanOfStudy {
 	id?: string;
 
 	@Field(() => User)
-	student!: string;
+	@prop({ required: true })
+	student!: Ref<User>;
 
 	@Field(() => Module)
 	@prop({ required: true })

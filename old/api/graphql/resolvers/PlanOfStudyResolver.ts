@@ -1,18 +1,7 @@
 //package imports
-import { compare, hash } from "bcryptjs";
-import {
-	Resolver,
-	Mutation,
-	Arg,
-	Query,
-	ObjectType,
-	Field,
-	Ctx,
-} from "type-graphql";
+import { Resolver, Mutation, Arg, Query } from "type-graphql";
 
 // custom imports
-import { createAccessToken, createRefreshToken } from "../auth";
-import { Context } from "../Context";
 import { PlanOfStudyModel, PlanOfStudy } from "../../models/PlanOfStudy";
 
 @Resolver()

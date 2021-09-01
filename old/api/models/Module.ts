@@ -1,6 +1,6 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 import { Ref } from "../graphql/types";
-import { Field, ID, Int, ObjectType } from "type-graphql";
+import { Field, Float, ID, Int, ObjectType } from "type-graphql";
 import { Assignment } from "./Assignment";
 import { Instructor } from "./Instructor";
 
@@ -9,7 +9,7 @@ export class Module {
 	@Field(() => ID)
 	id?: string;
 
-	@Field()
+	@Field(() => Int)
 	@prop({ required: true })
 	moduleNumber!: number;
 
@@ -17,45 +17,49 @@ export class Module {
 	@prop({ required: true })
 	moduleName!: string;
 
-	@Field()
+	@Field(type => String)
 	@prop()
-	objective?: string;
+	// objective!: string;
+	description!: string;
+
+	@Field(type => Int)
+	@prop({ default: 0 })
+	duration!: number;
+
+	// Not present in DB document so throws error when fetching
+	// TODO: Need to insert this new field in all DB documents
+	// @Field()
+	// @prop({ required: true })
+	// intro!: string;
 
 	@Field()
 	@prop({ default: 0 })
-	duration?: number;
-
-	@Field()
-	@prop({ required: true })
-	intro?: string;
-
-	@Field()
-	@prop({ default: 0 })
-	numSlides?: number;
+	numSlides!: number;
 
 	@Field(() => Instructor)
 	@prop()
 	instructor?: Ref<Instructor>;
 
-	@Field(type => [Int])
+	@Field(type => [Float])
 	@prop()
 	rating!: [number];
 
 	@Field(type => [String])
 	@prop()
-	keywords?: [string];
+	keywords!: [string];
 
 	@Field()
 	@prop()
-	hasAssignment?: boolean;
+	hasAssignment!: boolean;
 
 	@Field(() => Assignment)
 	@prop()
 	assignments?: Ref<Assignment>[];
 
-	@Field()
+	// holds a list of user IDs who are enrolled
+	@Field(type => [String])
 	@prop()
-	enrolled?: number;
+	enrolled!: [string];
 }
 
 export const ModuleModel = getModelForClass(Module);

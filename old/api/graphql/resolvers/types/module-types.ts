@@ -38,5 +38,5 @@ export class ModuleInput implements Partial<Module> {
 	assignments!: [ObjectId];
 
 	@Field()
-	enrolled!: number;
+	enrolled!: [string];
 }

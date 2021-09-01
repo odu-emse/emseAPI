@@ -6,6 +6,7 @@ import { buildSchema } from "type-graphql";
 import { UserResolver } from "./graphql/resolvers/UserResolver";
 import cors from "cors";
 import { PlanOfStudyResolver } from "./graphql/resolvers/PlanOfStudyResolver";
+import { ProgramResolver } from "./graphql/resolvers/ProgramResolver";
 
 (async () => {
 	const app = Express();
@@ -22,7 +23,7 @@ import { PlanOfStudyResolver } from "./graphql/resolvers/PlanOfStudyResolver";
 
 		const apolloServer = new ApolloServer({
 			schema: await buildSchema({
-				resolvers: [UserResolver, PlanOfStudyResolver],
+				resolvers: [UserResolver, PlanOfStudyResolver, ProgramResolver],
 				emitSchemaFile: true,
 			}),
 			context: ({ req, res }) => ({ req, res }),
