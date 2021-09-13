@@ -1,8 +1,11 @@
-/node_modules/
+node_modules
+# Keep environment variables out of version control
 .env
+
 .DS_Store
-/.idea
-/build
-/.vscode
-.vercel
+
+.idea/
+
 dist/
+
+.vercel/

@@ -1,15 +1,13 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
 import { PoSModule } from "./pos/pos.module";
 import { GraphQLModule } from "@nestjs/graphql";
-import { FooResolver } from "./app.resolver";
 import { UserService } from "./user/user.service";
 import { UserResolver } from "./user/user.resolver";
 import { PoSService } from "./pos/pos.service";
 import { PlanOfStudyResolver } from "./pos/pos.resolver";
+import { PostModule } from "./posts/posts.module";
 require("dotenv").config();
 
 @Module({
@@ -18,14 +16,16 @@ require("dotenv").config();
 			autoSchemaFile: "schema.gql",
 			debug: true,
 			playground: true,
+			typePaths: ["./**/*.graphql"],
 		}),
-		MongooseModule.forRoot(process.env.MongoURI || "", {
+		MongooseModule.forRoot(process.env.DATABASE_URL || "", {
 			useNewUrlParser: true,
 		}),
 		UserModule,
-		PoSModule,
+		// PoSModule,
+		// PostModule,
 	],
-	controllers: [AppController],
-	providers: [AppService, FooResolver],
+	controllers: [],
+	providers: [],
 })
 export class AppModule {}
