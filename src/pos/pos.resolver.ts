@@ -7,29 +7,23 @@ import {
 	Mutation,
 } from "@nestjs/graphql";
 import { UserService } from "../user/user.service";
-import { User } from "../user/user.schema";
-import {
-	PlanOfStudy,
-	CreatePlanOfStudyInput,
-	FindPlanOfStudyInput,
-} from "./pos.schema";
 import { PoSService } from "./pos.service";
 
-@Resolver(() => PlanOfStudy)
+@Resolver("PlanOfStudy")
 export class PlanOfStudyResolver {
 	constructor(
-		private planService: PoSService,
-		private userService: UserService
+		private readonly planService: PoSService,
+		private readonly userService: UserService
 	) {}
 
-	@Query(() => [PlanOfStudy]) // <-- what will the query return?
-	async plans /* <-- Query name */() {
-		return this.planService.findMany(); // Resolve the query
+	@Query("plans")
+	async plans() {
+		return this.planService.findMany();
 	}
 
-	@Query(() => PlanOfStudy)
-	async plan(@Args("input") { student }: FindPlanOfStudyInput) {
-		return this.planService.findById(student);
+	@Query("plan")
+	async plan(@Args("input") { student }) {
+		return this.planService.findByStudentID(student);
 	}
 
 	// @Mutation(() => PlanOfStudy)

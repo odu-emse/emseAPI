@@ -1,5 +1,5 @@
 import { User, UserSchema } from "./../user/user.schema";
-import { PlanOfStudyResolver } from "../../old/api/graphql/resolvers/PlanOfStudyResolver";
+import { PlanOfStudyResolver } from "./pos.resolver";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Module } from "@nestjs/common";
 import { PoSService } from "./pos.service";

@@ -17,7 +17,7 @@ export class PlanOfStudy {
 		ref: "User",
 	})
 	@Field(() => User)
-	student!: User;
+	student!: User | string;
 
 	// @Field(() => Module)
 	// @Prop({ required: true })
@@ -41,13 +41,7 @@ export const PoSSchema = SchemaFactory.createForClass(PlanOfStudy);
 PoSSchema.index({ author: 1 });
 
 @InputType()
-export class CreatePlanOfStudyInput {
-	@Field(() => ID)
-	student!: string;
-}
-
-@InputType()
-export class FindPlanOfStudyInput {
+export class PlanOfStudyInput {
 	@Field(() => ID)
 	student!: string;
 }

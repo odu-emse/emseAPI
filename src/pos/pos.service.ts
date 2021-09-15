@@ -1,28 +1,36 @@
 import { Injectable } from "@nestjs/common";
-import { Model } from "mongoose";
-import { InjectModel } from "@nestjs/mongoose";
-import { FindPlanOfStudyInput, PlanOfStudy, PoSDocument } from "./pos.schema";
+import { PrismaService } from "../prisma.service";
+import { Prisma, PlanOfStudy } from "@prisma/client";
 
 @Injectable()
 export class PoSService {
-	constructor(
-		@InjectModel(PlanOfStudy.name) private posModel: Model<PoSDocument>
-	) {}
+	constructor(private prisma: PrismaService) {}
 
-	async findMany() {
-		console.log(this.posModel.findById("60086f631457a473bcb85937"));
-		return this.posModel.find().lean();
+	// ✅ Find all plans recorded in the system
+	async findMany(): Promise<PlanOfStudy[]> {
+		const plans = await this.prisma.planOfStudy.findMany();
+		return plans;
 	}
 
-	async findById(id: string) {
-		return this.posModel.findById(id).lean();
+	// Find a plan based on it's document ID
+	async findByPlanId(id: string): Promise<PlanOfStudy | null> {
+		const res = await this.prisma.planOfStudy.findUnique({
+			where: {
+				id,
+			},
+		});
+		return res;
 	}
 
-	async findByStudent(studentID: FindPlanOfStudyInput) {
-		return this.posModel.findById({ student: studentID }).lean();
-	}
+	// TODO: figure out why this is not working
+	// Find a plan based on the student's ID associated with the document
+	async findByStudentID(student: string) {
+		const res = await this.prisma.planOfStudy.findUnique({
+			where: {
+				id: student,
+			},
+		});
 
-	// async createPlan(plan: CreatePlanOfStudyInput) {
-	// 	return this.posModel.create(plan.student);
-	// }
+		return res;
+	}
 }

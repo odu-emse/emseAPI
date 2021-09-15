@@ -7,13 +7,11 @@ import { UserService } from "./user/user.service";
 import { UserResolver } from "./user/user.resolver";
 import { PoSService } from "./pos/pos.service";
 import { PlanOfStudyResolver } from "./pos/pos.resolver";
-import { PostModule } from "./posts/posts.module";
 require("dotenv").config();
 
 @Module({
 	imports: [
 		GraphQLModule.forRoot({
-			autoSchemaFile: "schema.gql",
 			debug: true,
 			playground: true,
 			typePaths: ["./**/*.graphql"],
@@ -22,8 +20,7 @@ require("dotenv").config();
 			useNewUrlParser: true,
 		}),
 		UserModule,
-		// PoSModule,
-		// PostModule,
+		PoSModule,
 	],
 	controllers: [],
 	providers: [],

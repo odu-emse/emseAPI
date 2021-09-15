@@ -10,7 +10,7 @@ export type UserDocument = User & mongoose.Document;
 export class User {
 	@Field(() => ID)
 	@Prop()
-	_id!: string;
+	id!: string;
 
 	@Field()
 	@Prop({ required: true })
@@ -29,10 +29,6 @@ export class User {
 	prefix?: string;
 
 	@Field()
-	@Prop()
-	dob?: Date;
-
-	@Field()
 	@Prop({ required: true })
 	email?: string;
 
@@ -42,22 +38,24 @@ export class User {
 	@Prop({ required: true })
 	passwordConf?: string;
 
-	@Field(() => PlanOfStudy)
-	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: "PlanOfStudy" })
-	planOfStudy?: PlanOfStudy;
+	// @Field(() => PlanOfStudy)
+	// @Prop({
+	// 	required: true,
+	// 	type: mongoose.Schema.Types.ObjectId,
+	// 	ref: "PlanOfStudy",
+	// })
+	// planOfStudy?: PlanOfStudy;
 
-	@Field()
-	@Prop()
-	group?: string;
+	// @Field()
+	// @Prop()
+	// group?: string;
 
-	@Field()
-	@Prop({ default: false })
-	active?: boolean;
+	// @Field()
+	// @Prop({ default: false })
+	// active?: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.index({ usr: 1 });
 
 @InputType()
 export class CreateUserInput {
@@ -65,23 +63,23 @@ export class CreateUserInput {
 	firstName!: string;
 
 	@Field()
-	lastName?: string;
+	lastName!: string;
 
 	@Field()
-	middleName?: string;
+	middleName!: string;
 
 	@Field()
-	prefix?: string;
+	prefix!: string;
+
+	// @Field()
+	// dob?: Date;
 
 	@Field()
-	dob?: Date;
+	email!: string;
 
 	@Field()
-	email?: string;
+	password!: string;
 
 	@Field()
-	password?: string;
-
-	@Field()
-	passwordConf?: string;
+	passwordConf!: string;
 }

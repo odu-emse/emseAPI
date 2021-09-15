@@ -6,14 +6,12 @@ import { PlanOfStudy, PoSSchema } from "../pos/pos.schema";
 import { UserService } from "./user.service";
 import { UserResolver } from "./user.resolver";
 import { PlanOfStudyResolver } from "../pos/pos.resolver";
+import { PrismaService } from "../prisma.service";
 
 @Module({
 	imports: [
-		MongooseModule.forFeature([
-			{ name: PlanOfStudy.name, schema: PoSSchema },
-			{ name: User.name, schema: UserSchema },
-		]),
+		MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
 	],
-	providers: [UserService, PoSService, UserResolver, PlanOfStudyResolver],
+	providers: [UserService, UserResolver, PrismaService],
 })
 export class UserModule {}

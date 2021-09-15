@@ -1,0 +1,48 @@
+type User {
+	_id: String
+	email: String
+	createdAt: String
+	firstName: String
+	lastName: String
+	middleName: String
+	prefix: String
+	password: String
+	passwordConf: String
+	isAdmin: Boolean
+}
+
+type Error {
+	message: String
+}
+
+input NewUser {
+	email: String!
+	firstName: String!
+	lastName: String!
+	middleName: String!
+	prefix: String
+	password: String!
+	passwordConf: String!
+}
+
+input UpdateUser {
+	_id: ID!
+	email: String
+	firstName: String
+	lastName: String
+	middleName: String
+	prefix: String
+	password: String
+	passwordConf: String
+}
+
+type Query {
+	user(id: ID!): User
+	users: [User!]!
+}
+
+type Mutation {
+	deleteUser(id: ID!): User
+	createUser(input: NewUser): User!
+	updateUser(input: UpdateUser): User
+}

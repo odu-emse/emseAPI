@@ -1,0 +1,18 @@
+type PlanOfStudy {
+	_id: String
+	studentID: String!
+}
+
+input NewPlan {
+	studentID: String!
+}
+
+input UpdatePlan {
+	_id: ID!
+	studentID: String!
+}
+
+type Query {
+	plan(student: ID!): PlanOfStudy
+	plans: [PlanOfStudy!]!
+}

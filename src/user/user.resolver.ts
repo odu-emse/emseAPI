@@ -1,34 +1,52 @@
-import {
-	Resolver,
-	Query,
-	ResolveField,
-	Parent,
-	Mutation,
-	Args,
-} from "@nestjs/graphql";
-import { PoSService } from "../pos/pos.service";
-import { User, CreateUserInput } from "./user.schema";
+import { Resolver, Query, Args, Mutation, ResolveField } from "@nestjs/graphql";
+import { NewUser, User, UpdateUser } from "src/gql/graphql";
 import { UserService } from "./user.service";
 
-@Resolver(() => User)
+@Resolver("User")
 export class UserResolver {
-	constructor(
-		private userService: UserService,
-		private planService: PoSService
-	) {}
+	constructor(private readonly userService: UserService) {}
 
-	@Query(() => [User])
+	// Get all users
+	@Query("users")
 	async users() {
-		return this.userService.findMany();
+		try {
+			const res = await this.userService.users();
+			return res;
+		} catch (error) {
+			if (error)
+				throw new Error(
+					"An error occurred while trying to execute your query"
+				);
+		}
 	}
 
-	@Mutation(() => User)
-	async createUser(@Args("input") input: CreateUserInput) {
-		return this.userService.createUser(input);
+	// Get a single user
+	@Query("user")
+	async user(@Args("id") args: string) {
+		try {
+			const res = await this.userService.user(args);
+			return res;
+		} catch (error) {
+			if (error)
+				throw new Error(
+					"An error occurred while trying to execute your query"
+				);
+		}
 	}
 
-	// @ResolveField()
-	// async plans(@Parent() parent: User) {
-	// 	return this.planService.findByStudent(parent._id);
-	// }
+	@Mutation("createUser")
+	async createUser(@Args("input") args: NewUser) {
+		const res = await this.userService.registerUser(args);
+		return res;
+	}
+
+	@Mutation("updateUser")
+	async update(@Args("input") args: UpdateUser) {
+		return this.userService.updateUser(args);
+	}
+
+	@Mutation("deleteUser")
+	async delete(@Args("id") args: string) {
+		return this.userService.deleteUser(args);
+	}
 }
