@@ -12,7 +12,7 @@ export class NewPlan {
 }
 
 export class UpdatePlan {
-    _id: string;
+    id: string;
     studentID: string;
 }
 
@@ -27,7 +27,7 @@ export class NewUser {
 }
 
 export class UpdateUser {
-    _id: string;
+    id: string;
     email?: string;
     firstName?: string;
     lastName?: string;
@@ -38,8 +38,8 @@ export class UpdateUser {
 }
 
 export class PlanOfStudy {
-    _id?: string;
-    studentID: string;
+    id?: string;
+    studentID?: string;
 }
 
 export abstract class IQuery {
@@ -53,7 +53,7 @@ export abstract class IQuery {
 }
 
 export class User {
-    _id?: string;
+    id?: string;
     email?: string;
     createdAt?: string;
     firstName?: string;

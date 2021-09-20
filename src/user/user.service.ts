@@ -72,7 +72,7 @@ export class UserService {
 	// Update a user
 	async updateUser(params: UpdateUser): Promise<User> {
 		const {
-			_id,
+			id,
 			email,
 			firstName,
 			lastName,
@@ -85,7 +85,7 @@ export class UserService {
 		//check if password from db is same as changing it to
 		return this.prisma.user.update({
 			where: {
-				id: _id,
+				id,
 			},
 			data: {
 				...(email && { email }),

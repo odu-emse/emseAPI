@@ -1,6 +1,6 @@
 type PlanOfStudy {
-	_id: String
-	studentID: String!
+	id: String
+	studentID: String
 }
 
 input NewPlan {
@@ -8,11 +8,11 @@ input NewPlan {
 }
 
 input UpdatePlan {
-	_id: ID!
+	id: ID!
 	studentID: String!
 }
 
 type Query {
 	plan(student: ID!): PlanOfStudy
-	plans: [PlanOfStudy!]!
+	plans: [PlanOfStudy!]
 }

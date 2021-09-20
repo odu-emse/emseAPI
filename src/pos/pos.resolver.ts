@@ -18,12 +18,18 @@ export class PlanOfStudyResolver {
 
 	@Query("plans")
 	async plans() {
-		return this.planService.findMany();
+		const res = this.planService.findMany();
+		return res;
 	}
 
 	@Query("plan")
-	async plan(@Args("input") { student }) {
-		return this.planService.findByStudentID(student);
+	async plan(@Args("studentID") studentID: string) {
+		return this.planService.findByStudentID(studentID);
+	}
+
+	@Query("planByID")
+	async planByID(@Args("id") arg: string) {
+		return this.planService.findByPlanId(arg);
 	}
 
 	// @Mutation(() => PlanOfStudy)

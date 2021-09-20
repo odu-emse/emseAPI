@@ -1,5 +1,5 @@
 type User {
-	_id: String
+	id: String
 	email: String
 	createdAt: String
 	firstName: String
@@ -26,7 +26,7 @@ input NewUser {
 }
 
 input UpdateUser {
-	_id: ID!
+	id: ID!
 	email: String
 	firstName: String
 	lastName: String

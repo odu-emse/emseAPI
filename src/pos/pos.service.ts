@@ -24,10 +24,10 @@ export class PoSService {
 
 	// TODO: figure out why this is not working
 	// Find a plan based on the student's ID associated with the document
-	async findByStudentID(student: string) {
-		const res = await this.prisma.planOfStudy.findUnique({
+	async findByStudentID(studentID: string): Promise<PlanOfStudy | null> {
+		const res = await this.prisma.planOfStudy.findFirst({
 			where: {
-				id: student,
+				studentID: studentID,
 			},
 		});
 
