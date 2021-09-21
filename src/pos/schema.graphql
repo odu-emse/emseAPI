@@ -13,6 +13,7 @@ input UpdatePlan {
 }
 
 type Query {
-	plan(student: ID!): PlanOfStudy
+	plan(studentID: ID!): PlanOfStudy
 	plans: [PlanOfStudy!]
+	planByID(id: String!): PlanOfStudy
 }
