@@ -13,7 +13,7 @@ require("dotenv").config();
 	imports: [
 		GraphQLModule.forRoot({
 			debug: true,
-			playground: true,
+			//playground: true,
 			typePaths: ["./**/*.graphql"],
 		}),
 		MongooseModule.forRoot(process.env.DATABASE_URL || "", {

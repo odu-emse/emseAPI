@@ -4,6 +4,7 @@ WORKDIR /usr/src/app
 
 #copy folder director to docker container
 COPY package.json ./
+COPY prisma/. /usr/src/app/prisma/.
 
 #install typescript
 #RUN npm install typescript
@@ -11,12 +12,13 @@ COPY package.json ./
 RUN npm i
 
 RUN npm install -g @nestjs/cli prisma
-
+RUN npx prisma generate
 COPY . .
+
 
 FROM base as production
 
-CMD ["npx", "prisma generate"]
+#CMD ["npx", "prisma generate"]
 
 
 #EXPOSE 4000

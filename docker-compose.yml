@@ -14,7 +14,7 @@ services:
       - "4000:4000"
     volumes:
     - ./src:/usr/src/app/src
-    - ./logs:/root/.npm/_logs
+    #- ./build:/usr/src/app/build #for debugging
     networks:
       - empiNetwork
     command: npm run dev

@@ -13,3 +13,6 @@ img:
 	docker image ls
 encn:
 	docker exec -it back_end_api bash
+reup:
+	make rebuild
+	make up
