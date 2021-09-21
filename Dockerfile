@@ -10,11 +10,13 @@ COPY package.json ./
 #RUN npx @nestjs/cli
 RUN npm i
 
-RUN npm install -g @nestjs/cli
+RUN npm install -g @nestjs/cli prisma
 
 COPY . .
 
 FROM base as production
+
+CMD ["npx", "prisma generate"]
 
 
 #EXPOSE 4000
