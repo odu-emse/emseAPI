@@ -4,14 +4,17 @@ WORKDIR /usr/src/app
 
 #copy folder director to docker container
 COPY package.json ./
-COPY prisma/. /usr/src/app/prisma/.
 
+#For schema
+COPY prisma/. /usr/src/app/prisma/.
+#COPY ts*.json ./
+COPY .env ./
 #install typescript
 #RUN npm install typescript
 #RUN npx @nestjs/cli
 RUN npm i
 
-RUN npm install -g @nestjs/cli prisma
+RUN npm install -g @nestjs/cli
 RUN npx prisma generate
 COPY . .
 

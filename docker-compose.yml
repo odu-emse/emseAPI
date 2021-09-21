@@ -13,8 +13,10 @@ services:
     ports: 
       - "4000:4000"
     volumes:
+    #-  .:/usr/src/app/.
     - ./src:/usr/src/app/src
     #- ./build:/usr/src/app/build #for debugging
+    - ./dist:/usr/src/app/dist
     networks:
       - empiNetwork
     command: npm run dev
