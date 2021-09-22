@@ -43,9 +43,11 @@ export class PlanOfStudy {
 }
 
 export abstract class IQuery {
-    abstract plan(student: string): PlanOfStudy | Promise<PlanOfStudy>;
+    abstract plan(studentID: string): PlanOfStudy | Promise<PlanOfStudy>;
 
     abstract plans(): PlanOfStudy[] | Promise<PlanOfStudy[]>;
+
+    abstract planByID(id?: string): PlanOfStudy | Promise<PlanOfStudy>;
 
     abstract user(id: string): User | Promise<User>;
 
