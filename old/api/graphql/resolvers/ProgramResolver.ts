@@ -28,22 +28,22 @@ export const SearchResultUnion = createUnionType({
 export class ProgramResolver {
 	@Query(_returns => [Module], { nullable: false })
 	async getModules(): Promise<Module[]> {
-		return await ModuleModel.find();
+		return ModuleModel.find();
 	}
 
 	@Query(_returns => [Course], { nullable: false })
 	async getCourses(): Promise<Course[]> {
-		return await CourseModel.find();
+		return CourseModel.find();
 	}
 
 	@Query(_returns => Module, { nullable: true })
 	async getModuleByID(@Arg("id") id: string) {
-		return await ModuleModel.findById({ _id: id });
+		return ModuleModel.findById({ _id: id });
 	}
 
 	@Query(_returns => Module, { nullable: true })
 	async getModuleByTitle(@Arg("title") title: string) {
-		return await ModuleModel.find({ moduleName: title });
+		return ModuleModel.find({ moduleName: title });
 	}
 
 	@Query(_returns => [SearchResultUnion], { nullable: true })

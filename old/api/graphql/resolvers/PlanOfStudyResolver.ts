@@ -8,7 +8,7 @@ import { PlanOfStudyModel, PlanOfStudy } from "../../models/PlanOfStudy";
 export class PlanOfStudyResolver {
 	@Query(_returns => PlanOfStudy, { nullable: true })
 	async getPlan(@Arg("studentID") id: string) {
-		return await PlanOfStudyModel.findOne({ student: id });
+		return PlanOfStudyModel.findOne({ student: id });
 	}
 
 	@Query(_returns => [PlanOfStudy], { nullable: false })

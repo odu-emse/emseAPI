@@ -29,12 +29,12 @@ class LoginResponse {
 export class UserResolver {
 	@Query(_returns => User, { nullable: false })
 	async getUser(@Arg("id") id: string) {
-		return await UserModel.findById({ _id: id });
+		return UserModel.findById({ _id: id });
 	}
 
 	@Query(_returns => [User], { nullable: false })
 	async getUsers(): Promise<User[]> {
-		return await UserModel.find();
+		return UserModel.find();
 	}
 
 	@Mutation(() => LoginResponse)
