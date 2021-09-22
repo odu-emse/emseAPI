@@ -7,16 +7,15 @@ COPY package.json ./
 
 #For schema
 COPY prisma/. /usr/src/app/prisma/.
-#COPY ts*.json ./
+COPY ts*.json ./
 COPY .env ./
-#install typescript
-#RUN npm install typescript
-#RUN npx @nestjs/cli
+COPY ./src /usr/src/app/src/
+#install all dependency from package.json
 RUN npm i
 
 RUN npm install -g @nestjs/cli
 RUN npx prisma generate
-COPY . .
+#COPY . .
 
 
 FROM base as production
