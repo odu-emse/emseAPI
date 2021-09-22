@@ -16,13 +16,9 @@ RUN npm i
 RUN npm install -g @nestjs/cli
 RUN npx prisma generate
 #COPY . .
-
-
 FROM base as production
 
 #CMD ["npx", "prisma generate"]
-
-
 #EXPOSE 4000
 #RUN npm run dev
 #Ran in docker-compose file
