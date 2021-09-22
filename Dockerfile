@@ -1,17 +1,25 @@
-FROM node:14.17.6
+FROM node:14.17.6 as base
 
 WORKDIR /usr/src/app
 
 #copy folder director to docker container
-COPY . .
+COPY package.json ./
 
-#install typescript
-#RUN npm install typescript
-#RUN npx @nestjs/cli
+#For schema
+COPY prisma/. /usr/src/app/prisma/.
+COPY ts*.json ./
+COPY .env ./
+COPY ./src /usr/src/app/src/
+#install all dependency from package.json
+RUN npm i
+
 RUN npm install -g @nestjs/cli
-RUN npm install
+RUN npx prisma generate
+#COPY . .
+FROM base as production
 
-EXPOSE 4000
+#CMD ["npx", "prisma generate"]
+#EXPOSE 4000
 #RUN npm run dev
-
-CMD ["npm", "run", "dev"]
+#Ran in docker-compose file
+#CMD ["npm", "run", "dev"]

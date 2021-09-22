@@ -1,0 +1,5 @@
+#Would be ignored by docker
+/dist
+#Docker ignores whatever node_modules folder in parent directory
+/node_modules
+/build

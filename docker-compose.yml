@@ -5,12 +5,21 @@ services:
     container_name: back_end_api
     build: 
       context: .
+      dockerfile: Dockerfile
+      target: base
     tty: true
+    expose:
+      - '4000'
     ports: 
       - "4000:4000"
     volumes:
-    - .:/usr/src/app/.
+    - ./src:/usr/src/app/src  #major
+    - ./logs:/root/.npm/_logs # use this for logs debugging
+    #- ./nodu_modules:/usr/src/app/node_modules #using this node_module debugging
+    #- .:/usr/src/app/build #for debugging
+    #- ./dist:/usr/src/app/dist # for debugging
     networks:
       - empiNetwork
+    command: npm run dev
 networks:
   empiNetwork:  
