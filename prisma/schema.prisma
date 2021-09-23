@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["mongodb"]
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  binaryTargets   = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -63,18 +63,18 @@ model Token {
 }
 
 model Module {
-  id            String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  moduleNumber  Int      @unique
-  moduleName    String   @unique
-  description   String
-  duration      Float
-  intro         String
-  numSlides     Int
-  rating        Int[]
-  keywords      String[]
-  hasAssignment Boolean
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now()) @updatedAt
+  id           String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  moduleNumber Int      @unique
+  moduleName   String   @unique
+  description  String
+  duration     Float?
+  intro        String
+  numSlides    Int?
+  rating       Int[]
+  keywords     String[]
+  instructor   String   @db.ObjectId
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
   // assignments   Assignment[]
   // instructor    Account       @relation(fields: [instructorID], references: [id])
   // instructorID  String        @unique @db.ObjectId
@@ -147,11 +147,10 @@ enum TokenType {
   API
 }
 
-
 model Post {
-    id        String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    title     String
-    content   String
-    published Boolean  @default(false)
-    createdAt DateTime @default(now())
+  id        String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

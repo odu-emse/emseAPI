@@ -1,0 +1,60 @@
+type Module {
+	id: ID!
+	instructor: ID!
+	moduleName: String!
+	moduleNumber: Int!
+	intro: String!
+	description: String!
+	feedback: [Int]
+	keywords: [String]
+	assignments: [ID]
+	enrolled: [ID]
+	createdAt: String
+	updatedAt: String
+	numSlides: Int
+	duration: Float
+}
+
+type Error {
+	message: String
+}
+
+type Query {
+	modules: [Module!]!
+	module(id: ID!): Module
+}
+
+input NewModule {
+	id: ID!
+	instructor: ID!
+	moduleName: String!
+	moduleNumber: Int!
+	intro: String!
+	description: String!
+	keywords: [String]
+	assignments: [ID]
+	createdAt: String
+	updatedAt: String
+	numSlides: Int
+	duration: Float
+}
+
+input UpdateModule {
+	id: ID!
+	instructor: ID
+	moduleName: String
+	moduleNumber: Int
+	intro: String
+	description: String
+	feedback: [Int]
+	keywords: [String]
+	assignments: [ID]
+	enrolled: [ID]
+	updatedAt: String
+}
+
+type Mutation {
+	deleteModule(id: ID!): User
+	addModule(input: NewModule): Module!
+	updateModule(input: UpdateModule): Module
+}

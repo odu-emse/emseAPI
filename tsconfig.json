@@ -16,5 +16,6 @@
 		"baseUrl": "./",
 		"incremental": true,
 		"skipLibCheck": true
-	}
+	},
+	"exclude": ["node_modules"]
 }

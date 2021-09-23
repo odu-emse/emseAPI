@@ -6,6 +6,10 @@
 		"start": "nest start",
 		"dev": "nest start --watch",
 		"build": "nest build",
+		"generate": " &&  && ",
+		"tsc": "tsc --excludeDirectories node_modules src/gql/generate-typings.ts",
+		"typings": "node src/gql/generate-typings.js",
+		"prisma": "npx prisma generate",
 		"release": "standard-version"
 	},
 	"dependencies": {
