@@ -20,7 +20,7 @@ export class UserService {
 				id,
 			},
 		});
-		console.log(user)
+		
 		return user;
 	}
 
@@ -66,6 +66,7 @@ export class UserService {
 			passwordConf: hashedPasswordConf,
 		};
 		
+		///Avoids duplicate value(email) if the exist already
 		if (get === null){
 			const res = await this.prisma.user.create({
 				data: payload,
@@ -108,23 +109,20 @@ export class UserService {
 	}
 
 	// delete a user
-	async deleteUser(id: string): Promise<User| null> {
-		//const res = this.user(id);
-		//console.log(res.then(function(result)));
-		console.log(this.user(id));
-		return this.user(id);
-		/*
-		console.log(res);
-		if( res == null){
-			return `The user with ${id}, does not exit`;
-			//return new Error(`The user with ${id}, does not exit` );
-		}
-		return "ste";
+	async deleteUser(id: string): Promise<User | Error> {
+
+		const res = await this.user(id).then((data)=> {
+			return data
+		})
 		
+		if( res === null){
+			return new Error (`The user with ${id}, does not exist`);
+		}
+
 		return this.prisma.user.delete({
-			where: {
+			where:{
 				id,
 			}
-		});*/
+		});
 	}
 }
