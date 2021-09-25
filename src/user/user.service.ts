@@ -20,20 +20,12 @@ export class UserService {
 				id,
 			},
 		});
+		console.log(user)
 		return user;
 	}
 
 	// Create a user
 	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
-		//find out if there is a duplicate user
-		const get = await this.prisma.user.findMany({
-			where: {
-				email: data.email,
-			},
-		});
-
-		console.log(get);
-
 		const {
 			id,
 			email,
@@ -45,11 +37,21 @@ export class UserService {
 			passwordConf,
 		} = data;
 
+		const safeEmail = email.toLowerCase();
+		//find out if there is a duplicate user
+		const get = await this.prisma.user.findUnique({
+			where: {
+				email: safeEmail,
+			},
+		});
+
+		
+
 		if (password !== passwordConf) {
 			throw new Error("Passwords provided are not matching...");
 		}
 
-		const safeEmail = email.toLowerCase();
+		
 		const hashedPassword = await hash(password, 10);
 		const hashedPasswordConf = hashedPassword;
 
@@ -63,10 +65,16 @@ export class UserService {
 			password: hashedPassword,
 			passwordConf: hashedPasswordConf,
 		};
-		const res = await this.prisma.user.create({
-			data: payload,
-		});
-		return res;
+		
+		if (get === null){
+			const res = await this.prisma.user.create({
+				data: payload,
+			});
+			
+			return res;
+		}
+		
+		return new Error("User has an account already.");
 	}
 
 	// Update a user
@@ -100,11 +108,23 @@ export class UserService {
 	}
 
 	// delete a user
-	async deleteUser(id: string): Promise<User> {
+	async deleteUser(id: string): Promise<User| null> {
+		//const res = this.user(id);
+		//console.log(res.then(function(result)));
+		console.log(this.user(id));
+		return this.user(id);
+		/*
+		console.log(res);
+		if( res == null){
+			return `The user with ${id}, does not exit`;
+			//return new Error(`The user with ${id}, does not exit` );
+		}
+		return "ste";
+		
 		return this.prisma.user.delete({
 			where: {
 				id,
-			},
-		});
+			}
+		});*/
 	}
 }
