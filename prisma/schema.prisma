@@ -27,6 +27,8 @@ model User {
   tokens           Token[]
   feedback         ModuleFeedback[]
   assignmentGraded AssignmentResult[] @relation(name: "graded")
+
+  @@index([email])
 }
 
 model PlanOfStudy {
