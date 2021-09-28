@@ -29,7 +29,6 @@ model User {
   tokens           Token[]
   feedback         ModuleFeedback[]
   assignmentGraded AssignmentResult[] @relation(name: "graded")
-
 }
 
 model PlanOfStudy {

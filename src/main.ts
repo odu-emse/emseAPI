@@ -1,6 +1,8 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import cookieParser from "cookie-parser";
+import * as Sentry from "@sentry/node";
+import * as Tracing from "@sentry/tracing";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -11,5 +13,30 @@ async function bootstrap() {
 	await app.listen(process.env.PORT || "", () =>
 		console.log(`🕵️‍♂️ Listening on port ${process.env.PORT}...`)
 	);
+
+	Sentry.init({
+		dsn:
+			"https://d7d1b5e63fd145218bf3971031bae0cd@o1009779.ingest.sentry.io/5974128",
+
+		// Set tracesSampleRate to 1.0 to capture 100%
+		// of transactions for performance monitoring.
+		// We recommend adjusting this value in production
+		tracesSampleRate: 1.0,
+	});
+
+	const transaction = Sentry.startTransaction({
+		op: "test",
+		name: "My First Test Transaction",
+	});
+
+	setTimeout(() => {
+		try {
+			console.log("sentry.io works.");
+		} catch (e) {
+			Sentry.captureException(e);
+		} finally {
+			transaction.finish();
+		}
+	}, 99);
 }
 bootstrap();
