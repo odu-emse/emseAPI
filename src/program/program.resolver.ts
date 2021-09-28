@@ -19,8 +19,8 @@ export class ProgramResolver {
 	}
 
 	// Get a single module based on module's ID
-	@Query("user")
-	async user(@Args("id") args: string) {
+	@Query("module")
+	async module(@Args("id") args: string) {
 		try {
 			const res = await this.programService.module(args);
 			return res;
@@ -33,21 +33,23 @@ export class ProgramResolver {
 	}
 
 	// Add a module to the db with all required initial fields
-	@Mutation("addModule")
-	async create(@Args("input") args: NewModule) {
-		const res = await this.programService.addModule(args);
+	// @Mutation("addModule")
+	// async create(@Args("input") args: NewModule) {
+	// 	const res = await this.programService.addModule(args);
+	// 	return res;
+	// }
+
+	// Update a single module's data in the db
+	@Mutation("updateModule")
+	async update(@Args("input") args: UpdateModule) {
+		const res = await this.programService.updateModule(args);
 		return res;
 	}
 
-	// Update a single module's data in the db
-	@Mutation("updateUser")
-	async update(@Args("input") args: UpdateModule) {
-		return this.programService.updateModule(args);
-	}
-
 	// Delete a module from db
-	@Mutation("deleteUser")
+	@Mutation("deleteModule")
 	async delete(@Args("id") args: string) {
-		return this.programService.deleteModule(args);
+		const res = await this.programService.deleteModule(args);
+		return res;
 	}
 }

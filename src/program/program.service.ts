@@ -12,11 +12,28 @@ export class ProgramService {
 	}
 
 	async module(id: string): Promise<Module> {
-		return this.prisma.module.findFirst({
-			where: {
-				id,
-			},
-		});
+		//find module based on id
+		if (id.length === 24) {
+			const res = await this.prisma.module.findFirst({
+				where: {
+					id,
+				},
+			});
+			return res;
+		}
+		//find module based on CRN if we choose to implement such field
+		else if (id.length <= 12 && id.length >= 5) {
+			//return based on CRN if we will have CRNs
+		}
+		//find module based on moduleNumber
+		else {
+			const res = await this.prisma.module.findFirst({
+				where: {
+					moduleNumber: parseInt(id),
+				},
+			});
+			return res;
+		}
 	}
 
 	async addModule(data: Prisma.ModuleCreateInput): Promise<Module | Error> {
