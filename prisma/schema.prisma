@@ -16,10 +16,12 @@ model User {
   firstName    String
   lastName     String
   middleName   String?
-  prefix       String?
+  // prefix       String?  --   We were on the fence about how we were doing prefixes before so its not in for now
   password     String
   passwordConf String
   isAdmin      Boolean  @default(false)
+  role         UserRole?
+  isActive     Boolean @default(false)
 
   // Relation fields
   social           Social?            @relation(name: "social")
@@ -27,14 +29,19 @@ model User {
   tokens           Token[]
   feedback         ModuleFeedback[]
   assignmentGraded AssignmentResult[] @relation(name: "graded")
+
 }
 
 model PlanOfStudy {
-  id                String             @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id                String             @id @default(dbgenerated()) @map("_id") @db.ObjectId     
   student           User?              @relation(name: "plan", fields: [studentID], references: [id])
   studentID         String?            @db.ObjectId
+  // ill figure advisors out later, my brain needs a rest
+  // advisor           User?              @relation(fields: [advisorId], references:[id])
+  // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[] @relation(name: "results")
+  courses           CourseEnrollment[]
 }
 
 model Social {
@@ -51,15 +58,20 @@ model Social {
 model Token {
   id         String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
   createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  type       TokenType
-  emailToken String?   @unique // Only used for short lived email tokens
   valid      Boolean   @default(true)
   expiration DateTime
 
   // Relation fields
   user   User   @relation(fields: [userId], references: [id])
   userId String @db.ObjectId
+}
+
+model Course {
+  id          String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  name        String
+  enrollment  CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
+  modules     Module[]
+
 }
 
 model Module {
@@ -70,20 +82,15 @@ model Module {
   duration      Float
   intro         String
   numSlides     Int
-  rating        Int[]
   keywords      String[]
-  hasAssignment Boolean
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
-  // assignments   Assignment[]
-  // instructor    Account       @relation(fields: [instructorID], references: [id])
-  // instructorID  String        @unique @db.ObjectId
-  // student       PlanOfStudy[]
 
   // Relation fields
-  members     ModuleEnrollment[]
-  assignments Assignment[]
-  feedback    ModuleFeedback[]
+  members       ModuleEnrollment[]
+  assignments   Assignment[]
+  feedback      ModuleFeedback[]
+  parentCourses Course[]
 }
 
 model ModuleFeedback {
@@ -100,7 +107,7 @@ model ModuleFeedback {
 model ModuleEnrollment {
   id         String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
   enrolledAt DateTime @default(now())
-  role       UserRole
+  role       UserRole //Allow for instructors, graders and students to take part in the module.
 
   // Relation Fields
   module   Module      @relation(fields: [moduleId], references: [id])
@@ -109,11 +116,20 @@ model ModuleEnrollment {
   planId   String      @db.ObjectId
 }
 
+model CourseEnrollment {
+  id          String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  student     PlanOfStudy @relation(fields: [studentId], references: [id])
+  studentId   String      @db.ObjectId
+  enrolledAt  DateTime    @default(now())
+
+  course      Course      @relation(fields: [courseId], references: [id])
+  courseId    String      @db.ObjectId
+}
+
 model Assignment {
   id        String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
   updatedAt DateTime @updatedAt
   name      String
-  date      DateTime
   dueAt     DateTime
 
   // Relation Fields
@@ -130,7 +146,7 @@ model AssignmentResult {
   // Relation Fields
   studentId    String      @db.ObjectId
   student      PlanOfStudy @relation(name: "results", fields: [studentId], references: [id])
-  graderId     String      @db.ObjectId
+  graderId     String      @db.ObjectId //Same thing as the advisor, issue here, technically this should work but there is now a reference in User that doesnt need to exist maybe a module enrollment relation works better?
   gradedBy     User        @relation(name: "graded", fields: [graderId], references: [id])
   assignmentId String      @db.ObjectId
   assignment   Assignment  @relation(fields: [assignmentId], references: [id])
@@ -142,16 +158,17 @@ enum UserRole {
   GRADER
 }
 
-enum TokenType {
-  EMAIL // used as a short lived token sent to the user's email
-  API
-}
+// Dont need this anymore since we arent doing API Tokens
+// enum TokenType {
+//   EMAIL // used as a short lived token sent to the user's email
+//   API
+// }
 
-
-model Post {
-    id        String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    title     String
-    content   String
-    published Boolean  @default(false)
-    createdAt DateTime @default(now())
-}
+// I have no clue what this is for, wasnt in the Req. Document so its getting commented out unless it breaks something when i do
+// model Post {
+//     id        String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+//     title     String
+//     content   String
+//     published Boolean  @default(false)
+//     createdAt DateTime @default(now())
+// }
