@@ -16,6 +16,35 @@ export class UpdatePlan {
     studentID: string;
 }
 
+export class NewModule {
+    id: string;
+    instructor: string;
+    moduleName: string;
+    moduleNumber: number;
+    intro: string;
+    description: string;
+    keywords?: string[];
+    assignments?: string[];
+    createdAt?: string;
+    updatedAt?: string;
+    numSlides?: number;
+    duration?: number;
+}
+
+export class UpdateModule {
+    id: string;
+    instructor?: string;
+    moduleName?: string;
+    moduleNumber?: number;
+    intro?: string;
+    description?: string;
+    feedback?: number[];
+    keywords?: string[];
+    assignments?: string[];
+    enrolled?: string[];
+    updatedAt?: string;
+}
+
 export class NewUser {
     email: string;
     firstName: string;
@@ -47,11 +76,50 @@ export abstract class IQuery {
 
     abstract plans(): PlanOfStudy[] | Promise<PlanOfStudy[]>;
 
-    abstract planByID(id?: string): PlanOfStudy | Promise<PlanOfStudy>;
+    abstract planByID(id: string): PlanOfStudy | Promise<PlanOfStudy>;
+
+    abstract modules(): Module[] | Promise<Module[]>;
+
+    abstract module(id: string): Module | Promise<Module>;
 
     abstract user(id: string): User | Promise<User>;
 
     abstract users(): User[] | Promise<User[]>;
+}
+
+export class Module {
+    id: string;
+    instructor: string;
+    moduleName: string;
+    moduleNumber: number;
+    intro: string;
+    description: string;
+    feedback?: number[];
+    keywords?: string[];
+    assignments?: string[];
+    enrolled?: string[];
+    createdAt?: string;
+    updatedAt?: string;
+    numSlides?: number;
+    duration?: number;
+}
+
+export class Error {
+    message?: string;
+}
+
+export abstract class IMutation {
+    abstract deleteModule(id: string): User | Promise<User>;
+
+    abstract addModule(input?: NewModule): Module | Promise<Module>;
+
+    abstract updateModule(input?: UpdateModule): Module | Promise<Module>;
+
+    abstract deleteUser(id: string): User | Promise<User>;
+
+    abstract createUser(input?: NewUser): User | Promise<User>;
+
+    abstract updateUser(input?: UpdateUser): User | Promise<User>;
 }
 
 export class User {
@@ -65,16 +133,4 @@ export class User {
     password?: string;
     passwordConf?: string;
     isAdmin?: boolean;
-}
-
-export class Error {
-    message?: string;
-}
-
-export abstract class IMutation {
-    abstract deleteUser(id: string): User | Promise<User>;
-
-    abstract createUser(input?: NewUser): User | Promise<User>;
-
-    abstract updateUser(input?: UpdateUser): User | Promise<User>;
 }
