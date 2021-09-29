@@ -11,9 +11,9 @@ COPY ts*.json ./
 COPY .env ./
 COPY ./src /usr/src/app/src/
 #install all dependency from package.json
-RUN npm i
+RUN yarn
 
-RUN npm install -g @nestjs/cli
+RUN yarn global add @nestjs/cli
 RUN npx prisma generate
 #COPY . .
 FROM base as production

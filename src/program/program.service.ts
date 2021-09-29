@@ -11,7 +11,7 @@ export class ProgramService {
 		return this.prisma.module.findMany();
 	}
 
-	async module(id: string): Promise<Module> {
+	async module(id: string): Promise<Module | null> {
 		//find module based on id
 		if (id.length === 24) {
 			const res = await this.prisma.module.findFirst({
@@ -22,9 +22,9 @@ export class ProgramService {
 			return res;
 		}
 		//find module based on CRN if we choose to implement such field
-		else if (id.length <= 12 && id.length >= 5) {
-			//return based on CRN if we will have CRNs
-		}
+		// else if (id.length <= 12 && id.length >= 5) {
+		// 	//return based on CRN if we will have CRNs
+		// }
 		//find module based on moduleNumber
 		else {
 			const res = await this.prisma.module.findFirst({

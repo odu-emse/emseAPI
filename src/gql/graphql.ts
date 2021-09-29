@@ -7,6 +7,12 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export enum UserRole {
+    STUDENT = "STUDENT",
+    TEACHER = "TEACHER",
+    GRADER = "GRADER"
+}
+
 export class NewPlan {
     studentID: string;
 }
@@ -18,17 +24,19 @@ export class UpdatePlan {
 
 export class NewModule {
     id: string;
-    instructor: string;
-    moduleName: string;
     moduleNumber: number;
-    intro: string;
+    moduleName: string;
     description: string;
+    duration: number;
+    intro: string;
+    numSlides: number;
     keywords?: string[];
+    createdAt: string;
+    updatedAt: string;
     assignments?: string[];
-    createdAt?: string;
-    updatedAt?: string;
-    numSlides?: number;
-    duration?: number;
+    members: ModuleEnrollment[];
+    feedback?: string[];
+    parentCourses?: string[];
 }
 
 export class UpdateModule {
@@ -106,6 +114,14 @@ export class Module {
 
 export class Error {
     message?: string;
+}
+
+export class ModuleEnrollment {
+    id: string;
+    enrolledAt: string;
+    role: UserRole;
+    module: string;
+    plan: string;
 }
 
 export abstract class IMutation {

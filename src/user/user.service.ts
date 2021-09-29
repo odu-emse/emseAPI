@@ -32,7 +32,7 @@ export class UserService {
 			firstName,
 			lastName,
 			middleName,
-			prefix,
+			// prefix,
 			password,
 			passwordConf,
 		} = data;
@@ -61,7 +61,7 @@ export class UserService {
 			firstName,
 			lastName,
 			middleName,
-			prefix,
+			// prefix,
 			password: hashedPassword,
 			passwordConf: hashedPasswordConf,
 		};

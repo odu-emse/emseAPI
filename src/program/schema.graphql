@@ -1,3 +1,9 @@
+enum UserRole {
+	STUDENT
+	TEACHER
+	GRADER
+}
+
 type Module {
 	id: ID!
 	instructor: ID!
@@ -24,19 +30,30 @@ type Query {
 	module(id: ID!): Module
 }
 
+input ModuleEnrollment {
+	id: ID!
+	enrolledAt: String!
+	role: UserRole!
+	module: ID!
+	plan: ID!
+}
+
 input NewModule {
 	id: ID!
-	instructor: ID!
-	moduleName: String!
 	moduleNumber: Int!
-	intro: String!
+	moduleName: String!
 	description: String!
+	duration: Float!
+	intro: String!
+	numSlides: Int!
 	keywords: [String]
+	createdAt: String!
+	updatedAt: String!
+
 	assignments: [ID]
-	createdAt: String
-	updatedAt: String
-	numSlides: Int
-	duration: Float
+	members: [ModuleEnrollment]!
+	feedback: [ID]
+	parentCourses: [ID]
 }
 
 input UpdateModule {
