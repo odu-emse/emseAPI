@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, User } from "@prisma/client";
-import { NewUser, UpdateUser } from "src/gql/graphql";
+import { NewUser, UpdateUser } from "gql/graphql";
 import { hash } from "bcryptjs";
 
 @Injectable()

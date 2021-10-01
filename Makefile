@@ -20,3 +20,6 @@ reup:
 	make nocache
 	make build
 	make up
+regen:
+	docker exec -i back_end_api npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
+	docker exec -i back_end_api npx prisma generate
