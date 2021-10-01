@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, User } from "@prisma/client";
-import { NewUser, UpdateUser } from "gql/graphql";
+import { NewUser, UpdateUser, LoginUser, Token} from "gql/graphql";
 import { hash } from "bcryptjs";
 
 @Injectable()
@@ -124,5 +124,9 @@ export class UserService {
 				id,
 			}
 		});
+	}
+	async loginUser(params: LoginUser ): Promise< Token | null>{
+		console.log(params)
+		return null
 	}
 }
