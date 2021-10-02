@@ -1,5 +1,5 @@
 import { Resolver, Query, Args, Mutation, ResolveField } from "@nestjs/graphql";
-import { NewUser, User, UpdateUser } from "gql/graphql";
+import { NewUser, User, UpdateUser, LoginUser } from "gql/graphql";
 import { UserService } from "./user.service";
 
 @Resolver("User")
@@ -30,6 +30,19 @@ export class UserResolver {
 			if (error)
 				throw new Error(
 					"An error occurred while trying to execute your query"
+				);
+		}
+	}
+	//login user
+	@Query("login")
+	async login(@Args("input") args: LoginUser){
+		try {
+			const res = await this.userService.loginUser(args);
+			return res
+		} catch (error) {
+			if(error)
+				throw new Error(
+					"An error occured while trying to executre your query"
 				);
 		}
 	}
