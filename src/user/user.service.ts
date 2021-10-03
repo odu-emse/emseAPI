@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, User } from "@prisma/client";
 import { NewUser, UpdateUser, LoginUser, Token} from "gql/graphql";
-import { hash } from "bcryptjs";
+import { hash,compare } from "bcryptjs";
 
 @Injectable()
 export class UserService {
@@ -23,7 +23,7 @@ export class UserService {
 		
 		return user;
 	}
-
+	
 	// Create a user
 	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
 		const {
@@ -108,7 +108,7 @@ export class UserService {
 		});
 	}
 
-	// delete a user
+	// delete a user by id
 	async deleteUser(id: string): Promise<User | Error> {
 
 		const res = await this.user(id).then((data)=> {
@@ -125,8 +125,39 @@ export class UserService {
 			}
 		});
 	}
-	async loginUser(params: LoginUser ): Promise< Token | null>{
+	async tokenUser(id: string): Promise<Token| Error>{
+		console.log (id)
+		return new Error (`In progress development`)
+	}
+	async loginUser(params: LoginUser ): Promise< Token | null| Error>{
 		console.log(params)
-		return null
+		const { email,
+			password,
+		} = params;
+		const safeEmail = email.toLowerCase();
+
+		const res = await this.prisma.user.findUnique({
+			where:{
+				email:safeEmail,
+			},
+			
+		});
+		
+		//Check if user exits
+		if(res!==null){
+
+			const v = await compare(password, res.password)
+			if(v){
+				// Call token function to genereate login token per id
+				const usrauth_token = this.tokenUser(res.id)
+				return usrauth_token
+			}else{
+				return new Error (`Password is incorrect please try again.`)
+			}
+			
+
+		}
+
+		return new Error (`This ${email}, does not exist`) ;
 	}
 }

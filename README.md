@@ -52,7 +52,7 @@ Build container from scratch with no cache
 $ make reup
 ```
 #### Generate types
-Once any schema.graphql is updated, must run this command to generate new typings in the container.
+Once any schema.graphql is updated, you must run this command to generate new typings in the container.
 ```shell script
 $ make regen
 ```
