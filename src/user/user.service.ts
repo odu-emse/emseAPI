@@ -3,10 +3,12 @@ import { PrismaService } from "../prisma.service";
 import { Prisma, User } from "@prisma/client";
 import { NewUser, UpdateUser, LoginUser, Token} from "gql/graphql";
 import { hash,compare } from "bcryptjs";
-
+import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private readonly jwtService: JwtService) {}
 
 	// Get all users
 	async users(): Promise<User[]> {
@@ -125,7 +127,7 @@ export class UserService {
 			}
 		});
 	}
-	async tokenUser(id: string): Promise<Token| Error>{
+	async tokenUser(id:string): Promise<Token| Error>{
 		console.log (id)
 		return new Error (`In progress development`)
 	}
@@ -149,6 +151,7 @@ export class UserService {
 			const v = await compare(password, res.password)
 			if(v){
 				// Call token function to genereate login token per id
+				console.log(typeof(res))
 				const usrauth_token = this.tokenUser(res.id)
 				return usrauth_token
 			}else{
