@@ -4,21 +4,30 @@ enum UserRole {
 	GRADER
 }
 
+type ModuleEnrollment {
+	id: ID!
+	enrolledAt: String!
+	role: UserRole!
+	module: Module!
+	plan: ID!
+}
+
 type Module {
 	id: ID!
-	instructor: ID!
-	moduleName: String!
 	moduleNumber: Int!
-	intro: String!
+	moduleName: String!
 	description: String!
-	feedback: [Int]
-	keywords: [String]
-	assignments: [ID]
-	enrolled: [ID]
-	createdAt: String
-	updatedAt: String
-	numSlides: Int
-	duration: Float
+	duration: Float!
+	intro: String!
+	numSlides: Int!
+	keywords: [String!]!
+	createdAt: String!
+	updatedAt: String!
+
+	# assignments: [ID]
+	members: [ModuleEnrollment!]!
+	# feedback: [ID]
+	# parentCourses: [ID]
 }
 
 type Error {
@@ -30,30 +39,14 @@ type Query {
 	module(id: ID!): Module
 }
 
-input ModuleEnrollment {
-	id: ID!
-	enrolledAt: String!
-	role: UserRole!
-	module: ID!
-	plan: ID!
-}
-
 input NewModule {
-	id: ID!
 	moduleNumber: Int!
 	moduleName: String!
 	description: String!
 	duration: Float!
 	intro: String!
 	numSlides: Int!
-	keywords: [String]
-	createdAt: String!
-	updatedAt: String!
-
-	assignments: [ID]
-	members: [ModuleEnrollment]!
-	feedback: [ID]
-	parentCourses: [ID]
+	keywords: [String!]!
 }
 
 input UpdateModule {

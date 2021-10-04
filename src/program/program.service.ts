@@ -43,7 +43,7 @@ export class ProgramService {
 				moduleNumber: data.moduleNumber,
 			},
 		});
-		if (get) {
+		if (get.length !== 0) {
 			throw new Error("Module already exisits.");
 		} else {
 			const {
