@@ -1,18 +1,33 @@
+enum UserRole {
+	STUDENT
+	TEACHER
+	GRADER
+}
+
+type ModuleEnrollment {
+	id: ID!
+	enrolledAt: String!
+	role: UserRole!
+	module: Module!
+	plan: ID!
+}
+
 type Module {
 	id: ID!
-	instructor: ID!
-	moduleName: String!
 	moduleNumber: Int!
-	intro: String!
+	moduleName: String!
 	description: String!
-	feedback: [Int]
-	keywords: [String]
-	assignments: [ID]
-	enrolled: [ID]
-	createdAt: String
-	updatedAt: String
-	numSlides: Int
-	duration: Float
+	duration: Float!
+	intro: String!
+	numSlides: Int!
+	keywords: [String!]!
+	createdAt: String!
+	updatedAt: String!
+
+	assignments: [ID!]
+	members: [ModuleEnrollment!]
+	feedback: [ID!]
+	parentCourses: [ID!]!
 }
 
 type Error {
@@ -25,32 +40,25 @@ type Query {
 }
 
 input NewModule {
-	id: ID!
-	instructor: ID!
-	moduleName: String!
 	moduleNumber: Int!
-	intro: String!
+	moduleName: String!
 	description: String!
-	keywords: [String]
-	assignments: [ID]
-	createdAt: String
-	updatedAt: String
-	numSlides: Int
-	duration: Float
+	duration: Float!
+	intro: String!
+	numSlides: Int!
+	keywords: [String!]!
 }
 
 input UpdateModule {
 	id: ID!
-	instructor: ID
 	moduleName: String
 	moduleNumber: Int
 	intro: String
 	description: String
-	feedback: [Int]
-	keywords: [String]
-	assignments: [ID]
-	enrolled: [ID]
-	updatedAt: String
+	duration: Float
+	numSlides: Int
+	
+	keywords: [String!]
 }
 
 type Mutation {

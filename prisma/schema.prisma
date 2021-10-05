@@ -127,7 +127,7 @@ model CourseEnrollment {
 
 model Assignment {
   id        String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
   name      String
   dueAt     DateTime
 

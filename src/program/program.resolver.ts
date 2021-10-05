@@ -33,11 +33,11 @@ export class ProgramResolver {
 	}
 
 	// Add a module to the db with all required initial fields
-	// @Mutation("addModule")
-	// async create(@Args("input") args: NewModule) {
-	// 	const res = await this.programService.addModule(args);
-	// 	return res;
-	// }
+	@Mutation("addModule")
+	async create(@Args("input") args: NewModule) { 
+		const res = await this.programService.addModule(args);
+		return res;
+	}
 
 	// Update a single module's data in the db
 	@Mutation("updateModule")
