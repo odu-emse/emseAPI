@@ -51,16 +51,18 @@ input NewModule {
 
 input UpdateModule {
 	id: ID!
-	instructor: ID
 	moduleName: String
 	moduleNumber: Int
 	intro: String
 	description: String
-	feedback: [Int]
+	duration: Float
+	numSlides: Int
+
+	feedback: [ID]
 	keywords: [String]
 	assignments: [ID]
-	enrolled: [ID]
-	updatedAt: String
+	members: [ModuleEnrollment]
+	courses: [ID]
 }
 
 type Mutation {
