@@ -68,11 +68,27 @@ export class ProgramService {
 	}
 
 	async updateModule(data: UpdateModule): Promise<Module> {
+		const {
+			id,
+			moduleNumber,
+			moduleName,
+			description,
+			duration,
+			numSlides,
+			keywords,
+		} = data
 		return this.prisma.module.update({
 			where: {
 				id: data.id,
 			},
-			data: {},
+			data: {
+				...(moduleNumber && {moduleNumber}),
+				...(moduleName && {moduleName}),
+				...(description && {description}),
+				...(duration && {duration}),
+				...(numSlides && {numSlides}),
+				...(keywords && {keywords}),
+			},
 		});
 	}
 

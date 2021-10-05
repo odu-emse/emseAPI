@@ -57,12 +57,8 @@ input UpdateModule {
 	description: String
 	duration: Float
 	numSlides: Int
-
-	feedback: [ID]
-	keywords: [String]
-	assignments: [ID]
-	members: [ModuleEnrollment]
-	courses: [ID]
+	
+	keywords: [String!]
 }
 
 type Mutation {
