@@ -24,10 +24,10 @@ type Module {
 	createdAt: String!
 	updatedAt: String!
 
-	# assignments: [ID]
-	members: [ModuleEnrollment!]!
-	# feedback: [ID]
-	# parentCourses: [ID]
+	assignments: [ID!]
+	members: [ModuleEnrollment!]
+	feedback: [ID!]
+	parentCourses: [ID!]!
 }
 
 type Error {
