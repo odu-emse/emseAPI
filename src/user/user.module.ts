@@ -6,9 +6,15 @@ import { UserService } from "./user.service";
 import { UserResolver } from "./user.resolver";
 import { PlanOfStudyResolver } from "../pos/pos.resolver";
 import { PrismaService } from "../prisma.service";
-
 @Module({
-	imports:[JwtModule.register({ secret: 'hard!to-guess_secret' })],
+	imports:[
+		JwtModule.register({
+			secret: process.env.jwtSecret,
+			signOptions: {
+				expiresIn: process.env.jwtExpire,
+			}
+		})
+	],
 	providers: [UserService, UserResolver, PrismaService],
 })
 export class UserModule {}

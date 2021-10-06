@@ -127,10 +127,7 @@ export class UserService {
 			}
 		});
 	}
-	async tokenUser(id:string): Promise<Token| Error>{
-		console.log (id)
-		return new Error (`In progress development`)
-	}
+
 	async loginUser(params: LoginUser ): Promise< Token | null| Error>{
 		console.log(params)
 		const { email,
@@ -148,12 +145,18 @@ export class UserService {
 		//Check if user exits
 		if(res!==null){
 
-			const v = await compare(password, res.password)
-			if(v){
+			const val = await compare(password, res.password)
+			if(val){
 				// Call token function to genereate login token per id
-				console.log(typeof(res))
-				const usrauth_token = this.tokenUser(res.id)
-				return usrauth_token
+				const { 
+					id,
+				}= res 
+				const usrauth_token =  await this.jwtService.sign({id})
+				const token =  {
+					id: res.id,
+					token: usrauth_token,	
+				}
+				return token
 			}else{
 				return new Error (`Password is incorrect please try again.`)
 			}

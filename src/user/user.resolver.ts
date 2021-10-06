@@ -41,6 +41,7 @@ export class UserResolver {
 			return res
 		} catch (error) {
 			if(error)
+				console.log(error)
 				throw new Error(
 					"An error occured while trying to executre your query"
 				);
