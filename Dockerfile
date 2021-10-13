@@ -5,15 +5,32 @@ WORKDIR /usr/src/app
 #copy folder director to docker container
 COPY package.json ./
 
-#For schema
+
+#For schema back end
 COPY prisma/. /usr/src/app/prisma/.
 COPY ts*.json ./
 COPY .env ./
-COPY ./src /usr/src/app/src/
-#install all dependency from package.json
-RUN yarn
 
-RUN yarn global add @nestjs/cli
+#For schema front end
+#COPY src/gql/generate-typings.ts usr/src/app/src/gql/.
+#For Generate typings
+#COPY scr/gql/generate-types.ts /usr/src/app/src/gql/.
+
+RUN npm i
+COPY gql/. /usr/src/app/gql/.
+RUN npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
+#RUN node /usr/src/app/gql/generate-typings.js
+
+#Generates new types based on graphql changes
+#COPY ./src/*/schema.graphql .
+#COPY scr/gql/generate-types.ts /usr/src/app/src/gql/.
+#RUN npm install -g ts-node typescript '@types/node'
+#RUN tsc /usr/src/generate-types.ts
+#RUN node /usr/src/generate-types.js
+#install all dependency from package.json
+#install nestjs client globally to run nestjs on the termnal
+RUN npm install -g @nestjs/cli
+#install
 RUN npx prisma generate
 #COPY . .
 FROM base as production

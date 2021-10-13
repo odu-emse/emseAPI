@@ -13,13 +13,18 @@ services:
     ports: 
       - "4000:4000"
     volumes:
-    - ./src:/usr/src/app/src  #major
-    - ./logs:/root/.npm/_logs # use this for logs debugging
-    #- ./nodu_modules:/usr/src/app/node_modules #using this node_module debugging
-    #- .:/usr/src/app/build #for debugging
-    #- ./dist:/usr/src/app/dist # for debugging
+      #- ./:/usr/src/app/src/.
+      #- ./src/.:/usr/src/app/src/.
+      - ./src:/usr/src/app/src  #major
+      #- ./:/usr/src/app/
+      #- ./logs:/root/.npm/_logs # use this for logs debugging
+      #- ./nodu_modules:/usr/src/app/node_modules #using this node_module debugging
+      #- .:/usr/src/app/build #for debugging
+      #- ./dist:/usr/src/app/dist # for debugging
+    #command: 
     networks:
       - empiNetwork
-    command: npm run dev
+    command: > 
+      bash -c "node /usr/src/app/gql/generate-typings.js && npm run dev"
 networks:
   empiNetwork:  

@@ -1,12 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, User } from "@prisma/client";
-import { NewUser, UpdateUser } from "src/gql/graphql";
-import { hash } from "bcryptjs";
-
+import { NewUser, UpdateUser, LoginUser, Token} from "gql/graphql";
+import { hash,compare } from "bcryptjs";
+import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService) {}
+	constructor(
+		private prisma: PrismaService,
+		private readonly jwtService: JwtService) {}
 
 	// Get all users
 	async users(): Promise<User[]> {
@@ -23,7 +25,7 @@ export class UserService {
 		
 		return user;
 	}
-
+	
 	// Create a user
 	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
 		const {
@@ -108,7 +110,7 @@ export class UserService {
 		});
 	}
 
-	// delete a user
+	// delete a user by id
 	async deleteUser(id: string): Promise<User | Error> {
 
 		const res = await this.user(id).then((data)=> {
@@ -124,5 +126,44 @@ export class UserService {
 				id,
 			}
 		});
+	}
+
+	async loginUser(params: LoginUser ): Promise< Token | null| Error>{
+		console.log(params)
+		const { email,
+			password,
+		} = params;
+		const safeEmail = email.toLowerCase();
+
+		const res = await this.prisma.user.findUnique({
+			where:{
+				email:safeEmail,
+			},
+			
+		});
+		
+		//Check if user exits
+		if(res!==null){
+
+			const val = await compare(password, res.password)
+			if(val){
+				// Call token function to genereate login token per id
+				const { 
+					id,
+				}= res 
+				const usrauth_token =  await this.jwtService.sign({id})
+				const token =  {
+					id: res.id,
+					token: usrauth_token,	
+				}
+				return token
+			}else{
+				return new Error (`Password is incorrect please try again.`)
+			}
+			
+
+		}
+
+		return new Error (`This ${email}, does not exist`) ;
 	}
 }

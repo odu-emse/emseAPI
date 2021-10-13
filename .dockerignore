@@ -3,3 +3,5 @@
 #Docker ignores whatever node_modules folder in parent directory
 /node_modules
 /build
+/gql/*.js
+/gql/graphql*
