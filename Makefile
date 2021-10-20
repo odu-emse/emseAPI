@@ -23,3 +23,5 @@ regen:
 	docker exec -i back_end_api npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
 	docker exec -i back_end_api node /usr/src/app/gql/generate-typings.js
 	docker exec -i back_end_api npx prisma generate
+prune:
+	docker system prune --all

@@ -1,4 +1,4 @@
-import { UpdateModule } from "./../gql/graphql";
+import { UpdateModule } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { Module } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
