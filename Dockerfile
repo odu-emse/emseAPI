@@ -18,7 +18,7 @@ COPY .env ./
 #COPY scr/gql/generate-types.ts /usr/src/app/src/gql/.
 #install yarn globbalyy
 
-RUN yarn install
+RUN yarn
 COPY gql/. /usr/src/app/gql/.
 RUN npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
 #RUN node /usr/src/app/gql/generate-typings.js
