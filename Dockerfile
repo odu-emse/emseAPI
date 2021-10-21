@@ -2,6 +2,7 @@ FROM node:14.17.6 as base
 
 WORKDIR /usr/src/app
 
+
 #copy folder director to docker container
 COPY package.json ./
 
@@ -15,8 +16,9 @@ COPY .env ./
 #COPY src/gql/generate-typings.ts usr/src/app/src/gql/.
 #For Generate typings
 #COPY scr/gql/generate-types.ts /usr/src/app/src/gql/.
+#install yarn globbalyy
 
-RUN npm i
+RUN yarn
 COPY gql/. /usr/src/app/gql/.
 RUN npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
 #RUN node /usr/src/app/gql/generate-typings.js
@@ -29,7 +31,7 @@ RUN npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
 #RUN node /usr/src/generate-types.js
 #install all dependency from package.json
 #install nestjs client globally to run nestjs on the termnal
-RUN npm install -g @nestjs/cli
+RUN yarn global add @nestjs/cli
 #install
 RUN npx prisma generate
 #COPY . .

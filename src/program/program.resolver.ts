@@ -1,4 +1,4 @@
-import { NewModule, UpdateModule } from "./../gql/graphql";
+import { NewModule, UpdateModule } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 
