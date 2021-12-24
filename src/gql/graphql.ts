@@ -1,6 +1,6 @@
 
 /*
- * ------------------------------------------------------
+ * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
  * -------------------------------------------------------
  */
@@ -23,34 +23,24 @@ export class UpdatePlan {
 }
 
 export class NewModule {
-    id: string;
     moduleNumber: number;
     moduleName: string;
     description: string;
     duration: number;
     intro: string;
     numSlides: number;
-    keywords?: string[];
-    createdAt: string;
-    updatedAt: string;
-    assignments?: string[];
-    members: ModuleEnrollment[];
-    feedback?: string[];
-    parentCourses?: string[];
+    keywords: string[];
 }
 
 export class UpdateModule {
     id: string;
-    instructor?: string;
-    moduleName?: string;
-    moduleNumber?: number;
-    intro?: string;
-    description?: string;
-    feedback?: number[];
-    keywords?: string[];
-    assignments?: string[];
-    enrolled?: string[];
-    updatedAt?: string;
+    moduleName?: Nullable<string>;
+    moduleNumber?: Nullable<number>;
+    intro?: Nullable<string>;
+    description?: Nullable<string>;
+    duration?: Nullable<number>;
+    numSlides?: Nullable<number>;
+    keywords?: Nullable<string[]>;
 }
 
 export class NewUser {
@@ -58,95 +48,97 @@ export class NewUser {
     firstName: string;
     lastName: string;
     middleName: string;
-    prefix?: string;
+    prefix?: Nullable<string>;
     password: string;
     passwordConf: string;
 }
 
 export class UpdateUser {
     id: string;
-    email?: string;
-    firstName?: string;
-    lastName?: string;
-    middleName?: string;
-    prefix?: string;
-    password?: string;
-    passwordConf?: string;
+    email?: Nullable<string>;
+    firstName?: Nullable<string>;
+    lastName?: Nullable<string>;
+    middleName?: Nullable<string>;
+    prefix?: Nullable<string>;
+    password?: Nullable<string>;
+    passwordConf?: Nullable<string>;
 }
 
 export class PlanOfStudy {
-    id?: string;
-    studentID?: string;
+    id?: Nullable<string>;
+    studentID?: Nullable<string>;
 }
 
 export abstract class IQuery {
-    abstract plan(studentID: string): PlanOfStudy | Promise<PlanOfStudy>;
+    abstract plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
 
-    abstract plans(): PlanOfStudy[] | Promise<PlanOfStudy[]>;
+    abstract plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
 
-    abstract planByID(id: string): PlanOfStudy | Promise<PlanOfStudy>;
+    abstract planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
 
     abstract modules(): Module[] | Promise<Module[]>;
 
-    abstract module(id: string): Module | Promise<Module>;
+    abstract module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
 
-    abstract user(id: string): User | Promise<User>;
+    abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract users(): User[] | Promise<User[]>;
-}
-
-export class Module {
-    id: string;
-    instructor: string;
-    moduleName: string;
-    moduleNumber: number;
-    intro: string;
-    description: string;
-    feedback?: number[];
-    keywords?: string[];
-    assignments?: string[];
-    enrolled?: string[];
-    createdAt?: string;
-    updatedAt?: string;
-    numSlides?: number;
-    duration?: number;
-}
-
-export class Error {
-    message?: string;
 }
 
 export class ModuleEnrollment {
     id: string;
     enrolledAt: string;
     role: UserRole;
-    module: string;
+    module: Module;
     plan: string;
 }
 
+export class Module {
+    id: string;
+    moduleNumber: number;
+    moduleName: string;
+    description: string;
+    duration: number;
+    intro: string;
+    numSlides: number;
+    keywords: string[];
+    createdAt: string;
+    updatedAt: string;
+    assignments?: Nullable<Nullable<string>[]>;
+    members?: Nullable<Nullable<ModuleEnrollment>[]>;
+    feedback?: Nullable<Nullable<string>[]>;
+    parentCourses?: Nullable<Nullable<string>[]>;
+}
+
+export class Error {
+    message?: Nullable<string>;
+}
+
 export abstract class IMutation {
-    abstract deleteModule(id: string): User | Promise<User>;
+    abstract deleteModule(id: string): Nullable<User> | Promise<Nullable<User>>;
 
-    abstract addModule(input?: NewModule): Module | Promise<Module>;
+    abstract addModule(input?: Nullable<NewModule>): Module | Promise<Module>;
 
-    abstract updateModule(input?: UpdateModule): Module | Promise<Module>;
+    abstract updateModule(input?: Nullable<UpdateModule>): Nullable<Module> | Promise<Nullable<Module>>;
 
-    abstract deleteUser(id: string): User | Promise<User>;
+    abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 
-    abstract createUser(input?: NewUser): User | Promise<User>;
+    abstract createUser(input?: Nullable<NewUser>): User | Promise<User>;
 
-    abstract updateUser(input?: UpdateUser): User | Promise<User>;
+    abstract updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
 }
 
 export class User {
-    id?: string;
-    email?: string;
-    createdAt?: string;
-    firstName?: string;
-    lastName?: string;
-    middleName?: string;
-    prefix?: string;
-    password?: string;
-    passwordConf?: string;
-    isAdmin?: boolean;
+    id?: Nullable<string>;
+    email?: Nullable<string>;
+    createdAt?: Nullable<string>;
+    firstName?: Nullable<string>;
+    lastName?: Nullable<string>;
+    middleName?: Nullable<string>;
+    prefix?: Nullable<string>;
+    password?: Nullable<string>;
+    passwordConf?: Nullable<string>;
+    isAdmin?: Nullable<boolean>;
 }
+
+type Nullable<T> = T | null;
