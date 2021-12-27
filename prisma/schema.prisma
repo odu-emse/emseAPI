@@ -68,6 +68,7 @@ model Token {
 model Course {
   id          String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
+  
   enrollment  CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
   modules     Module[]
 

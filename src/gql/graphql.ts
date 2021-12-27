@@ -43,6 +43,10 @@ export class UpdateModule {
     keywords?: Nullable<string[]>;
 }
 
+export class CourseInput {
+    name: string;
+}
+
 export class NewUser {
     email: string;
     firstName: string;
@@ -80,6 +84,8 @@ export abstract class IQuery {
 
     abstract module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
 
+    abstract courses(): Course[] | Promise<Course[]>;
+
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract users(): User[] | Promise<User[]>;
@@ -93,6 +99,46 @@ export class ModuleEnrollment {
     plan: string;
 }
 
+export class AssignmentResult {
+    id: string;
+    sumbittedAt: string;
+    result: number;
+    student?: Nullable<string>;
+    gradedBy?: Nullable<string>;
+    assignment?: Nullable<Assignment>;
+}
+
+export class Assignment {
+    id: string;
+    updatedAt: string;
+    name: string;
+    dueAt?: Nullable<string>;
+    module?: Nullable<Module>;
+    assignmentResults?: Nullable<Nullable<AssignmentResult>[]>;
+}
+
+export class ModuleFeedback {
+    id: string;
+    feedback: string;
+    rating: number;
+    student?: Nullable<string>;
+    module?: Nullable<Module>;
+}
+
+export class CourseEnrollment {
+    id: string;
+    enrolledAt: string;
+    student?: Nullable<string>;
+    course?: Nullable<Course>;
+}
+
+export class Course {
+    id: string;
+    name: string;
+    enrollment?: Nullable<Nullable<CourseEnrollment>[]>;
+    modules?: Nullable<Nullable<Module>[]>;
+}
+
 export class Module {
     id: string;
     moduleNumber: number;
@@ -104,10 +150,10 @@ export class Module {
     keywords: string[];
     createdAt: string;
     updatedAt: string;
-    assignments?: Nullable<Nullable<string>[]>;
+    assignments?: Nullable<Nullable<Assignment>[]>;
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
-    feedback?: Nullable<Nullable<string>[]>;
-    parentCourses?: Nullable<Nullable<string>[]>;
+    feedback?: Nullable<Nullable<ModuleFeedback>[]>;
+    parentCourses?: Nullable<Nullable<Course>[]>;
 }
 
 export class Error {
@@ -115,11 +161,17 @@ export class Error {
 }
 
 export abstract class IMutation {
-    abstract deleteModule(id: string): Nullable<User> | Promise<Nullable<User>>;
+    abstract deleteModule(id: string): Nullable<string> | Promise<Nullable<string>>;
 
     abstract addModule(input?: Nullable<NewModule>): Module | Promise<Module>;
 
     abstract updateModule(input?: Nullable<UpdateModule>): Nullable<Module> | Promise<Nullable<Module>>;
+
+    abstract deleteCourse(id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
+
+    abstract updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
 
     abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 

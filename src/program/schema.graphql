@@ -7,9 +7,55 @@ enum UserRole {
 type ModuleEnrollment {
 	id: ID!
 	enrolledAt: String!
+
 	role: UserRole!
 	module: Module!
 	plan: ID!
+}
+
+type AssignmentResult {
+	id: ID!
+	sumbittedAt: String!
+	result: Float!
+
+	student: ID
+	gradedBy: ID
+	assignment: Assignment
+}
+
+type Assignment {
+	id: ID!
+	updatedAt: String!
+	name: String!
+	dueAt: String
+
+	module: Module
+	assignmentResults: [AssignmentResult]
+}
+
+type ModuleFeedback {
+	id: ID!
+	feedback: String!
+	rating: Int!
+
+	student: ID
+	module: Module
+}
+
+type CourseEnrollment {
+	id: ID!
+	enrolledAt: String!
+
+	student: ID
+	course: Course
+}
+
+type Course {
+	id: ID!
+	name: String!
+
+	enrollment: [CourseEnrollment]
+	modules: [Module]
 }
 
 type Module {
@@ -24,10 +70,10 @@ type Module {
 	createdAt: String!
 	updatedAt: String!
 
-	assignments: [ID]
+	assignments: [Assignment]
 	members: [ModuleEnrollment]
-	feedback: [ID]
-	parentCourses: [ID]
+	feedback: [ModuleFeedback]
+	parentCourses: [Course]
 }
 
 type Error {
@@ -37,6 +83,7 @@ type Error {
 type Query {
 	modules: [Module!]!
 	module(id: ID!): Module
+	courses: [Course!]!
 }
 
 input NewModule {
@@ -61,8 +108,16 @@ input UpdateModule {
 	keywords: [String!]
 }
 
+input CourseInput {
+	name: String!
+}
+
 type Mutation {
-	deleteModule(id: ID!): User
+	deleteModule(id: ID!): ID
 	addModule(input: NewModule): Module!
 	updateModule(input: UpdateModule): Module
+
+	deleteCourse(id: ID!): ID
+	addCourse(input: CourseInput): Course!
+	updateCourse(id: ID!, input: CourseInput): Course
 }
