@@ -1,4 +1,4 @@
-import { NewModule, UpdateModule } from "./../gql/graphql";
+import { CourseInput, NewModule, UpdateModule } from "./../gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 
@@ -32,6 +32,17 @@ export class ProgramResolver {
 		}
 	}
 
+	// Get multiple Courses
+	@Query("courses")
+	async courses() {
+		try {
+			const res = this.programService.courses();
+			return res;
+		} catch (error) {
+			throw new Error("An error occurred while trying to execute your query");
+		}
+	}
+
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
 	async create(@Args("input") args: NewModule) { 
@@ -50,6 +61,27 @@ export class ProgramResolver {
 	@Mutation("deleteModule")
 	async delete(@Args("id") args: string) {
 		const res = await this.programService.deleteModule(args);
+		return res;
+	} 
+
+	// Add a Course to the db with a course name
+	@Mutation("addCourse")
+	async createCourse(@Args("input") args: CourseInput) {
+		const res = await this.programService.addCourse(args);
+		return res;
+	}
+
+	// Update a course name
+	@Mutation("updateCourse")
+	async updateCourse(@Args("id") id: string, @Args("input") args: CourseInput) {
+		const res = await this.programService.updateCourse(id, args);
+		return res;
+	}
+
+	// Delete a course based on ID
+	@Mutation("deleteCourse")
+	async deleteCourse(@Args("id") id: string) {
+		const res = await this.programService.deleteCourse(id);
 		return res;
 	}
 }

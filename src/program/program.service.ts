@@ -1,12 +1,14 @@
-import { UpdateModule } from "./../gql/graphql";
+import { CourseInput, UpdateModule } from "./../gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module } from "@prisma/client";
+import { Module, Course } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class ProgramService {
 	constructor(private prisma: PrismaService) {}
+
+	/// Queries
 	async modules(): Promise<Module[]> {
 		return this.prisma.module.findMany();
 	}
@@ -35,6 +37,12 @@ export class ProgramService {
 			return res;
 		}
 	}
+
+	async courses(): Promise<Course[]> {
+		return this.prisma.course.findMany();
+	}
+
+	//Mutations
 
 	async addModule(data: Prisma.ModuleCreateInput): Promise<Module | Error> {
 		//find out if there is a duplicate user
@@ -97,6 +105,51 @@ export class ProgramService {
 			where: {
 				id,
 			},
+		});
+	}
+
+	async addCourse(data: Prisma.CourseCreateInput): Promise<Course | Error> {
+		//find out if there is a duplicate course
+		// const get = await this.prisma.course.findMany({
+		// 	where: {
+		// 		name: data.name,
+		// 	},
+		// });
+		// if (get.length !== 0) {
+		// 	throw new Error("Course Already exists with provided name");
+		// }
+		// else {
+			const {
+				id,
+				name,
+				enrollment,
+				modules
+			} = data
+			return this.prisma.course.create({
+				data,
+			});
+		// }
+	} 
+
+	async updateCourse(id: string, data: CourseInput): Promise<Course> {
+		const {
+			name
+		} = data
+		return this.prisma.course.update({
+			where: {
+				id: id,
+			},
+			data: {
+				...(name && {name})
+			}
+		});
+	}
+
+	async deleteCourse(id: string) {
+		return this.prisma.course.delete({
+			where: {
+				id,
+			}
 		});
 	}
 }
