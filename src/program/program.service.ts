@@ -1,6 +1,6 @@
-import { CourseInput, UpdateModule } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, UpdateModule } from "./../gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module, Course } from "@prisma/client";
+import { Module, Course, Assignment } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
 
@@ -40,6 +40,19 @@ export class ProgramService {
 
 	async courses(): Promise<Course[]> {
 		return this.prisma.course.findMany();
+	}
+
+	async assignments(): Promise<Assignment[]> {
+		return this.prisma.assignment.findMany();
+	}
+
+	async assignment(id: string): Promise <Assignment | null> {
+		const res = await this.prisma.assignment.findFirst({
+			where: {
+				id
+			}
+		});
+		return res;
 	}
 
 	//Mutations
@@ -119,15 +132,15 @@ export class ProgramService {
 		// 	throw new Error("Course Already exists with provided name");
 		// }
 		// else {
-			const {
-				id,
-				name,
-				enrollment,
-				modules
-			} = data
-			return this.prisma.course.create({
-				data,
-			});
+		const {
+			id,
+			name,
+			enrollment,
+			modules
+		} = data
+		return this.prisma.course.create({
+			data,
+		});
 		// }
 	} 
 
@@ -151,5 +164,43 @@ export class ProgramService {
 				id,
 			}
 		});
+	}
+
+	async deleteAssignment(id: string) {
+		return this.prisma.assignment.delete({
+			where: {
+				id,
+			}
+		});
+	}
+ 
+	async addAssignment(data: Prisma.AssignmentCreateInput): Promise<Assignment | Error> {
+		const {
+			id,
+			updatedAt,
+			name,
+			dueAt,
+			module,
+			assignmentResults,
+		} = data;
+		return this.prisma.assignment.create({
+			data
+		});
+	}
+
+	async updateAssignment(id: string, data: AssignmentInput): Promise<Assignment> {
+		const {
+			name,
+			dueAt
+		} = data;
+		return this.prisma.assignment.update({
+			where: {
+				id: id,
+			},
+			data: {
+				...(name && {name}),
+				...(dueAt && {dueAt})
+			}
+		})
 	}
 }

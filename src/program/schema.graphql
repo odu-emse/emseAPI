@@ -84,6 +84,8 @@ type Query {
 	modules: [Module!]!
 	module(id: ID!): Module
 	courses: [Course!]!
+	assignments: [Assignment!]!
+	assignment(id: ID!): Assignment
 }
 
 input NewModule {
@@ -108,6 +110,16 @@ input UpdateModule {
 	keywords: [String!]
 }
 
+input NewAssignment {
+	name: String!
+	dueAt: String!
+}
+
+input AssignmentInput {
+	name: String
+	dueAt: String
+}
+
 input CourseInput {
 	name: String!
 }
@@ -120,4 +132,8 @@ type Mutation {
 	deleteCourse(id: ID!): ID
 	addCourse(input: CourseInput): Course!
 	updateCourse(id: ID!, input: CourseInput): Course
+
+	deleteAssignment(id: ID!): ID
+	addAssignment(input: NewAssignment): Assignment!
+	updateAssignment(id: ID!, input: AssignmentInput): Assignment
 }

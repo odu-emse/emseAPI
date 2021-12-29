@@ -43,6 +43,16 @@ export class UpdateModule {
     keywords?: Nullable<string[]>;
 }
 
+export class NewAssignment {
+    name: string;
+    dueAt: string;
+}
+
+export class AssignmentInput {
+    name?: Nullable<string>;
+    dueAt?: Nullable<string>;
+}
+
 export class CourseInput {
     name: string;
 }
@@ -85,6 +95,10 @@ export abstract class IQuery {
     abstract module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
 
     abstract courses(): Course[] | Promise<Course[]>;
+
+    abstract assignments(): Assignment[] | Promise<Assignment[]>;
+
+    abstract assignment(id: string): Nullable<Assignment> | Promise<Nullable<Assignment>>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 
@@ -172,6 +186,12 @@ export abstract class IMutation {
     abstract addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
 
     abstract updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
+
+    abstract deleteAssignment(id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
+
+    abstract updateAssignment(id: string, input?: Nullable<AssignmentInput>): Nullable<Assignment> | Promise<Nullable<Assignment>>;
 
     abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 

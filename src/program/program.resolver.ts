@@ -1,6 +1,7 @@
-import { CourseInput, NewModule, UpdateModule } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, NewAssignment, NewModule, UpdateModule } from "./../gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
+import { query } from "express";
 
 @Resolver()
 export class ProgramResolver {
@@ -43,6 +44,30 @@ export class ProgramResolver {
 		}
 	}
 
+	// Get an assignment by its id
+	@Query("assignment")
+	async assignment(@Args("id") args: string) {
+		try {
+			const res = await this.programService.assignment(args);
+			return res;
+		} catch (error) {
+			throw new Error("An error occurred while trying to execute your query");
+		}
+	}
+
+	// Get multiple assignments from the db
+	@Query("assignments")
+	async assignments() {
+		try {
+			const res = this.programService.assignments();
+			return res;
+		} catch (error) {
+			throw new Error("An error occurred while trying to execute your query");
+		}
+	}
+
+	// Mutations
+
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
 	async create(@Args("input") args: NewModule) { 
@@ -80,8 +105,29 @@ export class ProgramResolver {
 
 	// Delete a course based on ID
 	@Mutation("deleteCourse")
-	async deleteCourse(@Args("id") id: string) {
-		const res = await this.programService.deleteCourse(id);
+	async deleteCourse(@Args("id") args: string) {
+		const res = await this.programService.deleteCourse(args);
+		return res;
+	}
+
+	// Delete an assignment from DB
+	@Mutation("deleteAssignment")
+	async deleteAssignment(@Args("id") args: string) {
+		const res = await this.programService.deleteAssignment(args);
+		return res;
+	}
+
+	// Add an assignment
+	@Mutation("addAssignment")
+	async createAssignment(@Args("input") args: NewAssignment) {
+		const res = await this.programService.addAssignment(args);
+		return res;
+	}
+
+	// Update an assignment in the db
+	@Mutation("updateAssignment")
+	async updateAssignment(@Args("id") id: string, @Args("input") args: AssignmentInput) {
+		const res = await this.programService.updateAssignment(id, args);
 		return res;
 	}
 }
