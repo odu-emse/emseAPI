@@ -108,11 +108,12 @@ input UpdateModule {
 	numSlides: Int
 	
 	keywords: [String!]
+	assignment: NewAssignment
 }
 
 input NewAssignment {
 	name: String!
-	dueAt: String!
+	dueAt: String
 }
 
 input AssignmentInput {
@@ -133,7 +134,4 @@ type Mutation {
 	addCourse(input: CourseInput): Course!
 	updateCourse(id: ID!, input: CourseInput): Course
 
-	deleteAssignment(id: ID!): ID
-	addAssignment(input: NewAssignment): Assignment!
-	updateAssignment(id: ID!, input: AssignmentInput): Assignment
 }

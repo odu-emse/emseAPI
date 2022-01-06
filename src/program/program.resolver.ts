@@ -1,6 +1,7 @@
 import { AssignmentInput, CourseInput, NewAssignment, NewModule, UpdateModule } from "./../gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
+import { Prisma } from "@prisma/client";
 import { query } from "express";
 
 @Resolver()
@@ -110,24 +111,24 @@ export class ProgramResolver {
 		return res;
 	}
 
-	// Delete an assignment from DB
-	@Mutation("deleteAssignment")
-	async deleteAssignment(@Args("id") args: string) {
-		const res = await this.programService.deleteAssignment(args);
-		return res;
-	}
+	// // Delete an assignment from DB
+	// @Mutation("deleteAssignment")
+	// async deleteAssignment(@Args("id") args: string) {
+	// 	const res = await this.programService.deleteAssignment(args);
+	// 	return res;
+	// }
 
-	// Add an assignment
-	@Mutation("addAssignment")
-	async createAssignment(@Args("input") args: NewAssignment) {
-		const res = await this.programService.addAssignment(args);
-		return res;
-	}
+	// // Add an assignment
+	// @Mutation("addAssignment")
+	// async createAssignment(@Args("input") args: Prisma.AssignmentCreateInput) {
+	// 	const res = await this.programService.addAssignment(args); 
+	// 	return res; 
+	// }
 
-	// Update an assignment in the db
-	@Mutation("updateAssignment")
-	async updateAssignment(@Args("id") id: string, @Args("input") args: AssignmentInput) {
-		const res = await this.programService.updateAssignment(id, args);
-		return res;
-	}
+	// // Update an assignment in the db
+	// @Mutation("updateAssignment")
+	// async updateAssignment(@Args("id") id: string, @Args("input") args: AssignmentInput) {
+	// 	const res = await this.programService.updateAssignment(id, args);
+	// 	return res;
+	// }
 }

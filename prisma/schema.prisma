@@ -134,7 +134,7 @@ model Assignment {
 
   // Relation Fields
   moduleId          String             @db.ObjectId
-  module            Module?             @relation(fields: [moduleId], references: [id])
+  module            Module             @relation(fields: [moduleId], references: [id])
   assignmentResults AssignmentResult[]
 }
 

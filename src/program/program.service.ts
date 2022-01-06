@@ -10,7 +10,11 @@ export class ProgramService {
 
 	/// Queries
 	async modules(): Promise<Module[]> {
-		return this.prisma.module.findMany();
+		return this.prisma.module.findMany({
+			include: {
+				assignments: true,
+			}
+		});
 	}
 
 	async module(id: string): Promise<Module | null> {
@@ -20,6 +24,9 @@ export class ProgramService {
 				where: {
 					id,
 				},
+				include: {
+					assignments: true,
+				}
 			});
 			return res;
 		}
@@ -50,6 +57,9 @@ export class ProgramService {
 		const res = await this.prisma.assignment.findFirst({
 			where: {
 				id
+			},
+			include: {
+				module: true,
 			}
 		});
 		return res;
@@ -97,7 +107,25 @@ export class ProgramService {
 			duration,
 			numSlides,
 			keywords,
+			assignment, 
 		} = data
+
+		let assignmentPayload = {};
+		if (assignment) {
+			// assignmentPayload.
+			assignmentPayload = {
+				createMany: {
+					data: [
+						{
+							name: assignment.name,
+							dueAt: assignment.dueAt,
+						}
+					]
+					
+				}
+			}
+		}
+
 		return this.prisma.module.update({
 			where: {
 				id: data.id,
@@ -109,6 +137,7 @@ export class ProgramService {
 				...(duration && {duration}),
 				...(numSlides && {numSlides}),
 				...(keywords && {keywords}),
+				assignments: assignmentPayload
 			},
 		});
 	}
@@ -166,41 +195,4 @@ export class ProgramService {
 		});
 	}
 
-	async deleteAssignment(id: string) {
-		return this.prisma.assignment.delete({
-			where: {
-				id,
-			}
-		});
-	}
- 
-	async addAssignment(data: Prisma.AssignmentCreateInput): Promise<Assignment | Error> {
-		const {
-			id,
-			updatedAt,
-			name,
-			dueAt,
-			module,
-			assignmentResults,
-		} = data;
-		return this.prisma.assignment.create({
-			data
-		});
-	}
-
-	async updateAssignment(id: string, data: AssignmentInput): Promise<Assignment> {
-		const {
-			name,
-			dueAt
-		} = data;
-		return this.prisma.assignment.update({
-			where: {
-				id: id,
-			},
-			data: {
-				...(name && {name}),
-				...(dueAt && {dueAt})
-			}
-		})
-	}
 }
