@@ -119,6 +119,7 @@ input NewAssignment {
 input AssignmentInput {
 	name: String
 	dueAt: String
+	module: ID
 }
 
 input CourseInput {
@@ -126,12 +127,15 @@ input CourseInput {
 }
 
 type Mutation {
-	deleteModule(id: ID!): ID
+	deleteModule(id: ID!): Module
 	addModule(input: NewModule): Module!
 	updateModule(input: UpdateModule): Module
 
 	deleteCourse(id: ID!): ID
 	addCourse(input: CourseInput): Course!
 	updateCourse(id: ID!, input: CourseInput): Course
+
+	deleteAssignment(module: ID!, id: ID!): Module
+	updateAssignment(id: ID!, input: AssignmentInput): Assignment
 
 }

@@ -50,7 +50,11 @@ export class ProgramService {
 	}
 
 	async assignments(): Promise<Assignment[]> {
-		return this.prisma.assignment.findMany();
+		return this.prisma.assignment.findMany({
+			include: {
+				module: true
+			}
+		});
 	}
 
 	async assignment(id: string): Promise <Assignment | null> {
@@ -119,9 +123,11 @@ export class ProgramService {
 						{
 							name: assignment.name,
 							dueAt: assignment.dueAt,
+							// module: {
+							// 	connect: id
+							// }
 						}
-					]
-					
+					],
 				}
 			}
 		}
@@ -139,13 +145,22 @@ export class ProgramService {
 				...(keywords && {keywords}),
 				assignments: assignmentPayload
 			},
+			include: {
+				assignments: true
+			}
 		});
 	}
 
 	async deleteModule(id: string) {
+		await this.prisma.assignment.deleteMany({
+			where: {
+				moduleId: id
+			}
+		});
+
 		return this.prisma.module.delete({
 			where: {
-				id,
+				id: id
 			},
 		});
 	}
@@ -193,6 +208,38 @@ export class ProgramService {
 				id,
 			}
 		});
+	}
+
+	async deleteAssignment(module: string, id: string) {
+		// Do something here to disconnect an assignment from a module
+		return this.prisma.module.update({
+			where: {
+				id: module
+			},
+			data: {
+				assignments: {
+					deleteMany: [{id: id}]
+				}
+			}
+		})
+	}
+
+	async updateAssignment(id: string, data: AssignmentInput) {
+		const {
+			name,
+			dueAt,
+			// Look into moving assignments between courses through this.
+			module
+		} = data;
+		return this.prisma.assignment.update({
+			where: {
+				id: id,
+			},
+			data: {
+				...(name && {name}),
+				...(dueAt && {dueAt})
+			}
+		})
 	}
 
 }

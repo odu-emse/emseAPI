@@ -112,11 +112,11 @@ export class ProgramResolver {
 	}
 
 	// // Delete an assignment from DB
-	// @Mutation("deleteAssignment")
-	// async deleteAssignment(@Args("id") args: string) {
-	// 	const res = await this.programService.deleteAssignment(args);
-	// 	return res;
-	// }
+	@Mutation("deleteAssignment")
+	async deleteAssignment(@Args("module") args: string, @Args("id") id: string) {
+		const res = await this.programService.deleteAssignment(args, id);
+		return res;
+	}
 
 	// // Add an assignment
 	// @Mutation("addAssignment")
@@ -125,10 +125,10 @@ export class ProgramResolver {
 	// 	return res; 
 	// }
 
-	// // Update an assignment in the db
-	// @Mutation("updateAssignment")
-	// async updateAssignment(@Args("id") id: string, @Args("input") args: AssignmentInput) {
-	// 	const res = await this.programService.updateAssignment(id, args);
-	// 	return res;
-	// }
+	// Update an assignment in the db
+	@Mutation("updateAssignment")
+	async updateAssignment(@Args("id") id: string, @Args("input") args: AssignmentInput) {
+		const res = await this.programService.updateAssignment(id, args);
+		return res;
+	}
 }
