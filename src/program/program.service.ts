@@ -13,6 +13,7 @@ export class ProgramService {
 		return this.prisma.module.findMany({
 			include: {
 				assignments: true,
+				parentCourses: true
 			}
 		});
 	}
@@ -26,6 +27,8 @@ export class ProgramService {
 				},
 				include: {
 					assignments: true,
+					// parentCourses: true
+
 				}
 			});
 			return res;
@@ -46,7 +49,11 @@ export class ProgramService {
 	}
 
 	async courses(): Promise<Course[]> {
-		return this.prisma.course.findMany();
+		return this.prisma.course.findMany({
+			include: {
+				modules: true
+			}
+		});
 	}
 
 	async assignments(): Promise<Assignment[]> {
@@ -71,6 +78,7 @@ export class ProgramService {
 
 	//Mutations
 
+	/// Create a new module
 	async addModule(data: Prisma.ModuleCreateInput): Promise<Module | Error> {
 		//find out if there is a duplicate user
 		const get = await this.prisma.module.findMany({
@@ -102,6 +110,7 @@ export class ProgramService {
 		}
 	}
 
+	/// Modify a modules data or add an assignment here
 	async updateModule(data: UpdateModule): Promise<Module> {
 		const {
 			id,
@@ -111,10 +120,12 @@ export class ProgramService {
 			duration,
 			numSlides,
 			keywords,
-			assignment, 
+			assignment,
 		} = data
 
 		let assignmentPayload = {};
+
+		//Add assignments 
 		if (assignment) {
 			// assignmentPayload.
 			assignmentPayload = {
@@ -129,7 +140,7 @@ export class ProgramService {
 						}
 					],
 				}
-			}
+			};	
 		}
 
 		return this.prisma.module.update({
@@ -143,14 +154,16 @@ export class ProgramService {
 				...(duration && {duration}),
 				...(numSlides && {numSlides}),
 				...(keywords && {keywords}),
-				assignments: assignmentPayload
+				assignments: assignmentPayload,
 			},
 			include: {
-				assignments: true
+				assignments: true,
+				// parentCourses: true 
 			}
 		});
 	}
 
+	/// Remove a module and all of its assignments
 	async deleteModule(id: string) {
 		await this.prisma.assignment.deleteMany({
 			where: {
@@ -165,27 +178,32 @@ export class ProgramService {
 		});
 	}
 
-	async addCourse(data: Prisma.CourseCreateInput): Promise<Course | Error> {
-		//find out if there is a duplicate course
-		// const get = await this.prisma.course.findMany({
-		// 	where: {
-		// 		name: data.name,
-		// 	},
-		// });
-		// if (get.length !== 0) {
-		// 	throw new Error("Course Already exists with provided name");
-		// }
-		// else {
-		const {
-			id,
-			name,
-			enrollment,
-			modules
-		} = data
-		return this.prisma.course.create({
-			data,
-		});
-		// }
+	/// Create a course and assign an initial module to that course
+	async addCourse(moduleId: string, data: Prisma.CourseCreateInput): Promise<Course | Error> {
+		//Probably need some error checking here to make sure the module actually exists
+		
+		//Make a new course
+		return await this.prisma.course.create({
+			data: {
+				// Set the name
+				name: data.name,
+				//Set the list of modules
+				modules: {
+					//Create new object for this field
+					create: [
+						{
+							//Set the module property of this field
+							module: {
+								//To be a connection to the module with the ID provided in parameter
+								connect: {
+									id: moduleId
+								}
+							}
+						}
+					]
+				}
+			}
+		})
 	} 
 
 	async updateCourse(id: string, data: CourseInput): Promise<Course> {
@@ -210,6 +228,7 @@ export class ProgramService {
 		});
 	}
 
+	/// Remove an assignment from a module
 	async deleteAssignment(module: string, id: string) {
 		// Do something here to disconnect an assignment from a module
 		return this.prisma.module.update({
@@ -224,6 +243,7 @@ export class ProgramService {
 		})
 	}
 
+	/// Change an assignments data
 	async updateAssignment(id: string, data: AssignmentInput) {
 		const {
 			name,

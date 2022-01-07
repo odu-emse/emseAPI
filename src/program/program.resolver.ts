@@ -90,10 +90,10 @@ export class ProgramResolver {
 		return res;
 	} 
 
-	// Add a Course to the db with a course name
+	// // Add a Course to the db with a course name
 	@Mutation("addCourse")
-	async createCourse(@Args("input") args: CourseInput) {
-		const res = await this.programService.addCourse(args);
+	async createCourse(@Args("module") id: string, @Args("input") args: CourseInput) {
+		const res = await this.programService.addCourse(id, args);
 		return res;
 	}
 
