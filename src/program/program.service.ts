@@ -1,6 +1,6 @@
 import { AssignmentInput, CourseInput, UpdateModule } from "./../gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module, Course, Assignment } from "@prisma/client";
+import { Module, Course, Assignment, ModuleInCourse } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
 
@@ -74,6 +74,15 @@ export class ProgramService {
 			}
 		});
 		return res;
+	}
+
+	async moduleInCourses(): Promise<ModuleInCourse[]> {
+		return this.prisma.moduleInCourse.findMany({
+			// include: {
+			// 	// module: true,
+			// 	// course: true
+			// }
+		});
 	}
 
 	//Mutations
@@ -220,12 +229,27 @@ export class ProgramService {
 		});
 	}
 
-	async deleteCourse(id: string) {
-		return this.prisma.course.delete({
+	async deleteCourse(id: string): Promise<Course> {
+		await this.prisma.course.update({
 			where: {
-				id,
+				id
+			},
+			data: {
+				modules: {
+					deleteMany: {}
+				}
+			},
+			include: {
+				modules: true
 			}
 		});
+
+		return await this.prisma.course.delete({
+			where: {
+				id
+			}
+		});
+
 	}
 
 	/// Remove an assignment from a module

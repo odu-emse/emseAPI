@@ -93,6 +93,7 @@ type Query {
 	courses: [Course!]!
 	assignments: [Assignment!]!
 	assignment(id: ID!): Assignment
+	moduleInCourses: [ModuleInCourse!]!
 }
 
 input NewModule {
@@ -138,7 +139,7 @@ type Mutation {
 	addModule(input: NewModule): Module!
 	updateModule(input: UpdateModule): Module
 
-	deleteCourse(id: ID!): Module
+	deleteCourse(id: ID!): Course
 	addCourse(module: ID!, input: CourseInput): Course!
 	updateCourse(id: ID!, input: CourseInput): Course
 

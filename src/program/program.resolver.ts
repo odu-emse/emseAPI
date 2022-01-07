@@ -67,6 +67,16 @@ export class ProgramResolver {
 		}
 	}
 
+	@Query("moduleInCourses")
+	async moduleInCourses() {
+		try {
+			const res = await this.programService.moduleInCourses();
+			return res;
+		} catch (error) {
+			throw new Error("Could not fetch moduleInCourses");
+		}
+	}
+
 	// Mutations
 
 	// Add a module to the db with all required initial fields
