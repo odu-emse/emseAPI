@@ -55,7 +55,7 @@ type Course {
 	name: String!
 
 	enrollment: [CourseEnrollment]
-	modules: [Module]
+	modules: [ModuleInCourse]
 }
 
 type Module {
@@ -73,7 +73,14 @@ type Module {
 	assignments: [Assignment]
 	members: [ModuleEnrollment]
 	feedback: [ModuleFeedback]
-	parentCourses: [Course]
+	parentCourses: [ModuleInCourse]
+}
+
+type ModuleInCourse {
+	id: ID!
+
+	module: Module
+	course: Course
 }
 
 type Error {
@@ -131,8 +138,8 @@ type Mutation {
 	addModule(input: NewModule): Module!
 	updateModule(input: UpdateModule): Module
 
-	deleteCourse(id: ID!): ID
-	addCourse(input: CourseInput): Course!
+	deleteCourse(id: ID!): Module
+	addCourse(module: ID!, input: CourseInput): Course!
 	updateCourse(id: ID!, input: CourseInput): Course
 
 	deleteAssignment(module: ID!, id: ID!): Module

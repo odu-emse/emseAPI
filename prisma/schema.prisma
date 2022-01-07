@@ -65,12 +65,22 @@ model Token {
   userId String @db.ObjectId
 }
 
+model ModuleInCourse {
+  id        String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+
+  module    Module  @relation(fields: [moduleId], references: [id])
+  moduleId  String
+
+  course    Course  @relation(fields: [courseId], references: [id])
+  courseId  String
+}
+
 model Course {
   id          String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
   
   enrollment  CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
-  modules     Module[]
+  modules     ModuleInCourse[]
 
 }
 
@@ -90,8 +100,10 @@ model Module {
   members       ModuleEnrollment[]
   assignments   Assignment[]
   feedback      ModuleFeedback[]
-  parentCourses Course[]
+  parentCourses ModuleInCourse[]
 }
+
+
 
 model ModuleFeedback {
   id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
