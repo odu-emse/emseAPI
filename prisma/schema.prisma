@@ -20,7 +20,7 @@ model User {
   password     String
   passwordConf String
   isAdmin      Boolean  @default(false)
-  role         UserRole?
+  // role         UserRole?
   isActive     Boolean @default(false)
 
   // Relation fields

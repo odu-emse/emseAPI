@@ -9,6 +9,13 @@ type User {
 	password: String
 	passwordConf: String
 	isAdmin: Boolean
+	isActive: Boolean
+
+	social: ID
+	plan: ID
+	tokens: [ID!]
+	feedback: [ID!]
+	assignmentGraded: [ID!]
 }
 
 type Error {
@@ -34,6 +41,8 @@ input UpdateUser {
 	prefix: String
 	password: String
 	passwordConf: String
+	isAdmin: Boolean
+	isActive: Boolean
 }
 
 type Query {

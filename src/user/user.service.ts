@@ -89,6 +89,8 @@ export class UserService {
 			prefix,
 			password,
 			passwordConf,
+			isAdmin,
+			isActive
 		} = params;
 		//check if passwords provided match
 		//check if password from db is same as changing it to
@@ -104,6 +106,8 @@ export class UserService {
 				...(prefix && { prefix }),
 				...(password && { password }),
 				...(passwordConf && { passwordConf }),
+				...(isAdmin && {isAdmin}),
+				...(isActive && {isActive})
 			},
 		});
 	}
