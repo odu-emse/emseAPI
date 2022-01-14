@@ -10,7 +10,11 @@ export class UserService {
 
 	// Get all users
 	async users(): Promise<User[]> {
-		return this.prisma.user.findMany({});
+		return this.prisma.user.findMany({
+			include: {
+				feedback: true
+			}
+		});
 	}
 
 	// Get a single user based on ID
@@ -19,6 +23,9 @@ export class UserService {
 			where: {
 				id,
 			},
+			include: {
+				feedback: true
+			}
 		});
 		
 		return user;

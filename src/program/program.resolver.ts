@@ -1,4 +1,4 @@
-import { AssignmentInput, CourseInput, NewAssignment, NewModule, UpdateModule } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, NewModule, UpdateModule } from "./../gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
@@ -77,6 +77,26 @@ export class ProgramResolver {
 		}
 	}
 
+	@Query("moduleFeedbacks")
+	async moduleFeedbacks() {
+		try {
+			const res = await this.programService.moduleFeedbacks();
+			return res;
+		} catch (error) {
+			throw new Error("Could not fetch ModuleFeedback")
+		}
+	}
+
+	@Query("moduleFeedback")
+	async moduleFeedback(@Args("id") id: string) {
+		try {
+			const res = await this.programService.moduleFeedback(id);
+			return res;
+		} catch (error) {
+			throw new Error("Could not fetch ModuleFeedback with id: " + id);
+		}
+	}
+
 	// Mutations
 
 	// Add a module to the db with all required initial fields
@@ -128,17 +148,44 @@ export class ProgramResolver {
 		return res;
 	}
 
-	// // Add an assignment
-	// @Mutation("addAssignment")
-	// async createAssignment(@Args("input") args: Prisma.AssignmentCreateInput) {
-	// 	const res = await this.programService.addAssignment(args); 
-	// 	return res; 
-	// }
-
 	// Update an assignment in the db
 	@Mutation("updateAssignment")
 	async updateAssignment(@Args("id") id: string, @Args("input") args: AssignmentInput) {
 		const res = await this.programService.updateAssignment(id, args);
 		return res;
+	}
+
+	/// Add module feedback
+	@Mutation("addModuleFeedback")
+	async addModuleFeedback(@Args("moduleId") moduleId: string, @Args("userId") userId: string, @Args("input") data: Prisma.ModuleFeedbackCreateInput) {
+		try {
+			const res = await this.programService.addModuleFeedback(moduleId, userId, data);
+			return res;
+		} catch(error) {
+			throw new Error("Could not add ModuleFeedback");
+		}
+
+	}
+
+	/// Update a modulefeedback
+	@Mutation("updateModuleFeedback")
+	async updateModuleFeedback(@Args("id") id: string, @Args("input") data: ModuleFeedbackUpdate) {
+		try {
+			const res = await this.programService.updateModuleFeedback(id, data);
+			return res;
+		} catch (error) {
+			throw new Error("Could not update ModuleFeedback with id: " + id);
+		}
+	}
+
+	/// Delete a ModuleFeedback
+	@Mutation("deleteModuleFeedback")
+	async deleteModuleFeedback(@Args("id") id: string) {
+		try {
+			const res = await this.programService.deleteModuleFeedback(id);
+			return res;
+		} catch (error) {
+			throw new Error("Could not delete ModuleFeedback with id: " + id);
+		}
 	}
 }

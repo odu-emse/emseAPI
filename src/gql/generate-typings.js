@@ -5,6 +5,6 @@ var path_1 = require("path");
 var definitionsFactory = new graphql_1.GraphQLDefinitionsFactory();
 definitionsFactory.generate({
     typePaths: ["./src/*/schema.graphql"],
-    path: path_1.join(process.cwd(), "src/gql/graphql.ts"),
+    path: (0, path_1.join)(process.cwd(), "src/gql/graphql.ts"),
     outputAs: "class"
 });

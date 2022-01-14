@@ -1,6 +1,6 @@
-import { AssignmentInput, CourseInput, UpdateModule } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, UpdateModule } from "./../gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module, Course, Assignment, ModuleInCourse } from "@prisma/client";
+import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
 
@@ -13,7 +13,12 @@ export class ProgramService {
 		return this.prisma.module.findMany({
 			include: {
 				assignments: true,
-				parentCourses: true
+				parentCourses: true,
+				feedback: {
+					include: {
+						student: true
+					}
+				}
 			}
 		});
 	}
@@ -27,8 +32,8 @@ export class ProgramService {
 				},
 				include: {
 					assignments: true,
+					feedback: true,
 					// parentCourses: true
-
 				}
 			});
 			return res;
@@ -83,6 +88,27 @@ export class ProgramService {
 			// 	// course: true
 			// }
 		});
+	}
+
+	async moduleFeedbacks(): Promise<ModuleFeedback[]> {
+		return this.prisma.moduleFeedback.findMany({
+			include: {
+				student: true,
+				module: true	
+			}
+		})
+	}
+
+	async moduleFeedback(id: string): Promise<ModuleFeedback | null> {
+		return this.prisma.moduleFeedback.findFirst({
+			where: {
+				id
+			},
+			include: {
+				student: true,
+				module: true
+			}
+		})
 	}
 
 	//Mutations
@@ -285,5 +311,57 @@ export class ProgramService {
 			}
 		})
 	}
+
+	/// Create a module feedback and link it to the user and module
+	async addModuleFeedback(moduleId: string, userId: string, input: Prisma.ModuleFeedbackCreateInput) {
+		return this.prisma.module.update({
+			where: {
+				id: moduleId
+			},
+			data: {
+				feedback: {
+					createMany: {
+						data: [
+							{
+								feedback: input.feedback,
+								rating: input.rating,
+								studentId: userId
+							}
+						]
+					} 
+				}
+			},
+			include: {
+				feedback: true
+			}
+		})
+	}
+
+	/// Update a module feedback
+	async updateModuleFeedback(id: string, input: ModuleFeedbackUpdate): Promise<ModuleFeedback> {
+		const {
+			feedback,
+			rating
+		} = input
+		return this.prisma.moduleFeedback.update({
+			where: {
+				id
+			},
+			data: {
+				...(feedback && {feedback}),
+				...(rating && {rating})
+			}
+		})
+	}
+
+	/// Delete a ModuleFeedback
+	async deleteModuleFeedback(id: string): Promise<ModuleFeedback> {
+		return this.prisma.moduleFeedback.delete({
+			where: {
+				id
+			}
+		})
+	}
+
 
 }

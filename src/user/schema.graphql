@@ -14,7 +14,7 @@ type User {
 	social: ID
 	plan: ID
 	tokens: [ID!]
-	feedback: [ID!]
+	feedback: [ModuleFeedback!]
 	assignmentGraded: [ID!]
 }
 
