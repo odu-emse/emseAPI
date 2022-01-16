@@ -10,7 +10,7 @@ type ModuleEnrollment {
 
 	role: UserRole!
 	module: Module!
-	plan: ID!
+	# plan: ID!
 }
 
 type AssignmentResult {

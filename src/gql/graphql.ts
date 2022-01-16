@@ -13,13 +13,8 @@ export enum UserRole {
     GRADER = "GRADER"
 }
 
-export class NewPlan {
-    studentID: string;
-}
-
-export class UpdatePlan {
-    id: string;
-    studentID: string;
+export class PlanInput {
+    student?: Nullable<string>;
 }
 
 export class NewModule {
@@ -93,8 +88,11 @@ export class UpdateUser {
 }
 
 export class PlanOfStudy {
-    id?: Nullable<string>;
-    studentID?: Nullable<string>;
+    id: string;
+    student?: Nullable<User>;
+    modules?: Nullable<Nullable<string>[]>;
+    assignmentResults?: Nullable<Nullable<string>[]>;
+    courses?: Nullable<Nullable<string>[]>;
 }
 
 export abstract class IQuery {
@@ -125,12 +123,47 @@ export abstract class IQuery {
     abstract users(): User[] | Promise<User[]>;
 }
 
+export abstract class IMutation {
+    abstract addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
+
+    abstract updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
+
+    abstract deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
+
+    abstract deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
+
+    abstract addModule(input?: Nullable<NewModule>): Module | Promise<Module>;
+
+    abstract updateModule(input?: Nullable<UpdateModule>): Nullable<Module> | Promise<Nullable<Module>>;
+
+    abstract deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
+
+    abstract addCourse(module: string, input?: Nullable<CourseInput>): Course | Promise<Course>;
+
+    abstract updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
+
+    abstract deleteAssignment(module: string, id: string): Nullable<Module> | Promise<Nullable<Module>>;
+
+    abstract updateAssignment(id: string, input?: Nullable<AssignmentInput>): Nullable<Assignment> | Promise<Nullable<Assignment>>;
+
+    abstract addModuleFeedback(moduleId: string, userId: string, input?: Nullable<ModuleFeedbackInput>): Nullable<Module> | Promise<Nullable<Module>>;
+
+    abstract updateModuleFeedback(id: string, input?: Nullable<ModuleFeedbackUpdate>): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
+
+    abstract deleteModuleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
+
+    abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract createUser(input?: Nullable<NewUser>): User | Promise<User>;
+
+    abstract updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
+}
+
 export class ModuleEnrollment {
     id: string;
     enrolledAt: string;
     role: UserRole;
     module: Module;
-    plan: string;
 }
 
 export class AssignmentResult {
@@ -200,36 +233,6 @@ export class Error {
     message?: Nullable<string>;
 }
 
-export abstract class IMutation {
-    abstract deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
-
-    abstract addModule(input?: Nullable<NewModule>): Module | Promise<Module>;
-
-    abstract updateModule(input?: Nullable<UpdateModule>): Nullable<Module> | Promise<Nullable<Module>>;
-
-    abstract deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
-
-    abstract addCourse(module: string, input?: Nullable<CourseInput>): Course | Promise<Course>;
-
-    abstract updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
-
-    abstract deleteAssignment(module: string, id: string): Nullable<Module> | Promise<Nullable<Module>>;
-
-    abstract updateAssignment(id: string, input?: Nullable<AssignmentInput>): Nullable<Assignment> | Promise<Nullable<Assignment>>;
-
-    abstract addModuleFeedback(moduleId: string, userId: string, input?: Nullable<ModuleFeedbackInput>): Nullable<Module> | Promise<Nullable<Module>>;
-
-    abstract updateModuleFeedback(id: string, input?: Nullable<ModuleFeedbackUpdate>): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
-
-    abstract deleteModuleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
-
-    abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
-
-    abstract createUser(input?: Nullable<NewUser>): User | Promise<User>;
-
-    abstract updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
-}
-
 export class User {
     id?: Nullable<string>;
     email?: Nullable<string>;
@@ -243,7 +246,7 @@ export class User {
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
     social?: Nullable<string>;
-    plan?: Nullable<string>;
+    plan?: Nullable<PlanOfStudy>;
     tokens?: Nullable<string[]>;
     feedback?: Nullable<ModuleFeedback[]>;
     assignmentGraded?: Nullable<string[]>;

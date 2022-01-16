@@ -39,7 +39,7 @@ model PlanOfStudy {
   // advisor           User?              @relation(fields: [advisorId], references:[id])
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
-  assignmentResults AssignmentResult[] @relation(name: "results")
+  assignmentResults AssignmentResult[] 
   courses           CourseEnrollment[]
 }
 
@@ -157,7 +157,7 @@ model AssignmentResult {
 
   // Relation Fields
   studentId    String      @db.ObjectId
-  student      PlanOfStudy @relation(name: "results", fields: [studentId], references: [id])
+  student      PlanOfStudy @relation(fields: [studentId], references: [id])
   graderId     String      @db.ObjectId //Same thing as the advisor, issue here, technically this should work but there is now a reference in User that doesnt need to exist maybe a module enrollment relation works better?
   gradedBy     User        @relation(name: "graded", fields: [graderId], references: [id])
   assignmentId String      @db.ObjectId

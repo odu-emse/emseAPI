@@ -1,19 +1,25 @@
 type PlanOfStudy {
-	id: String
-	studentID: String
-}
-
-input NewPlan {
-	studentID: String!
-}
-
-input UpdatePlan {
 	id: ID!
-	studentID: String!
+	student: User
+
+	modules: [ID]
+	assignmentResults: [ID]
+	courses: [ID]
 }
+
+input PlanInput {
+	student: ID
+}
+
 
 type Query {
 	plan(studentID: ID!): PlanOfStudy
 	plans: [PlanOfStudy!]
 	planByID(id: String!): PlanOfStudy
+}
+
+type Mutation {
+	addPlan(input: PlanInput): PlanOfStudy!
+	updatePlan(id: ID!, input: PlanInput): PlanOfStudy
+	deletePlan(id: ID!): PlanOfStudy
 }

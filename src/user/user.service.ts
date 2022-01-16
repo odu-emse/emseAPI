@@ -12,7 +12,8 @@ export class UserService {
 	async users(): Promise<User[]> {
 		return this.prisma.user.findMany({
 			include: {
-				feedback: true
+				feedback: true,
+				plan: true
 			}
 		});
 	}
@@ -24,7 +25,8 @@ export class UserService {
 				id,
 			},
 			include: {
-				feedback: true
+				feedback: true,
+				plan: true
 			}
 		});
 		

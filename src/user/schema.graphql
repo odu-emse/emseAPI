@@ -12,7 +12,7 @@ type User {
 	isActive: Boolean
 
 	social: ID
-	plan: ID
+	plan: PlanOfStudy
 	tokens: [ID!]
 	feedback: [ModuleFeedback!]
 	assignmentGraded: [ID!]
