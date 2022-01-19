@@ -64,6 +64,13 @@ export class ModuleFeedbackUpdate {
     rating?: Nullable<number>;
 }
 
+export class NewAssignmentResult {
+    assignment: string;
+    student: string;
+    grader: string;
+    result: number;
+}
+
 export class NewUser {
     email: string;
     firstName: string;
@@ -91,7 +98,7 @@ export class PlanOfStudy {
     id: string;
     student?: Nullable<User>;
     modules?: Nullable<Nullable<string>[]>;
-    assignmentResults?: Nullable<Nullable<string>[]>;
+    assignmentResults?: Nullable<AssignmentResult[]>;
     courses?: Nullable<Nullable<string>[]>;
 }
 
@@ -117,6 +124,10 @@ export abstract class IQuery {
     abstract moduleFeedbacks(): ModuleFeedback[] | Promise<ModuleFeedback[]>;
 
     abstract moduleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
+
+    abstract assignmentResults(): AssignmentResult[] | Promise<AssignmentResult[]>;
+
+    abstract assignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 
@@ -152,6 +163,12 @@ export abstract class IMutation {
 
     abstract deleteModuleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
 
+    abstract addAssignmentResult(input?: Nullable<NewAssignmentResult>): AssignmentResult | Promise<AssignmentResult>;
+
+    abstract updateAssignmentResult(id: string, result: number): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
+
+    abstract deleteAssignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
+
     abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract createUser(input?: Nullable<NewUser>): User | Promise<User>;
@@ -164,14 +181,15 @@ export class ModuleEnrollment {
     enrolledAt: string;
     role: UserRole;
     module: Module;
+    plan: string;
 }
 
 export class AssignmentResult {
     id: string;
     sumbittedAt: string;
     result: number;
-    student?: Nullable<string>;
-    gradedBy?: Nullable<string>;
+    student?: Nullable<PlanOfStudy>;
+    gradedBy?: Nullable<User>;
     assignment?: Nullable<Assignment>;
 }
 
@@ -249,7 +267,7 @@ export class User {
     plan?: Nullable<PlanOfStudy>;
     tokens?: Nullable<string[]>;
     feedback?: Nullable<ModuleFeedback[]>;
-    assignmentGraded?: Nullable<string[]>;
+    assignmentGraded?: Nullable<AssignmentResult[]>;
 }
 
 type Nullable<T> = T | null;

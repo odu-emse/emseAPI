@@ -1,8 +1,9 @@
-import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, NewModule, UpdateModule } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, NewAssignmentResult, NewModule, UpdateModule } from "./../gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
 import { query } from "express";
+import { double, float } from "aws-sdk/clients/lightsail";
 
 @Resolver()
 export class ProgramResolver {
@@ -97,6 +98,26 @@ export class ProgramResolver {
 		}
 	}
 
+	@Query("assignmentResults")
+	async assignmentResults() {
+		try {
+			const res = await this.programService.assignmentResults();
+			return res;
+		} catch (error) {
+			throw new Error("Could not fetch assignmentResults");
+		}
+	}
+
+	@Query("assignmentResult")
+	async assignmentResult(@Args("id") id: string) {
+		try {
+			const res = await this.programService.assignmentResult(id);
+			return res;
+		} catch (error) {
+			throw new Error("Could not fetch assignment result with id: " + id);
+		}
+	}
+
 	// Mutations
 
 	// Add a module to the db with all required initial fields
@@ -186,6 +207,36 @@ export class ProgramResolver {
 			return res;
 		} catch (error) {
 			throw new Error("Could not delete ModuleFeedback with id: " + id);
+		}
+	}
+
+	@Mutation("addAssignmentResult")
+	async addAssignmentResult(@Args("input") input: NewAssignmentResult) {
+		try {
+			const res = await this.programService.addAssignmentResult(input);
+			return res;
+		} catch (error) {
+			throw new Error("Could not add assignmentResult");
+		}
+	}
+
+	@Mutation("updateAssignmentResult")
+	async updateAssignmentResult(@Args("id") id: string, @Args("result") result: float){
+		try {
+			const res = await this.programService.updateAssignmentResult(id, result);
+			return res;
+		} catch (error) {
+			throw new Error("Could not update AssignmentResult with id: " + id);
+		}
+	}
+
+	@Mutation("deleteAssignmentResult")
+	async deleteAssignmentResult(@Args("id") id: string) {
+		try {
+			const res = await this.programService.deleteAssignmentResult(id);
+			return res;
+		} catch (error) {
+			throw new Error("Could not delete assignment with id: " + id);
 		}
 	}
 }

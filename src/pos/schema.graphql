@@ -3,7 +3,7 @@ type PlanOfStudy {
 	student: User
 
 	modules: [ID]
-	assignmentResults: [ID]
+	assignmentResults: [AssignmentResult!]
 	courses: [ID]
 }
 

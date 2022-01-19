@@ -1,8 +1,9 @@
-import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, UpdateModule } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, UpdateModule, NewAssignmentResult } from "./../gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback } from "@prisma/client";
+import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback, AssignmentResult } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
+import { float } from "aws-sdk/clients/lightsail";
 
 @Injectable()
 export class ProgramService {
@@ -107,6 +108,29 @@ export class ProgramService {
 			include: {
 				student: true,
 				module: true
+			}
+		})
+	}
+
+	async assignmentResults(): Promise<AssignmentResult[]> {
+		return this.prisma.assignmentResult.findMany({
+			include: {
+				student: true,
+				gradedBy: true,
+				assignment: true
+			}
+		})
+	}
+
+	async assignmentResult(id: string): Promise<AssignmentResult | null> {
+		return this.prisma.assignmentResult.findFirst({
+			where:{
+				id
+			},
+			include: {
+				student: true,
+				gradedBy: true,
+				assignment: true
 			}
 		})
 	}
@@ -363,5 +387,37 @@ export class ProgramService {
 		})
 	}
 
+	/// Add an AssignmentResult
+	async addAssignmentResult(input: NewAssignmentResult){
+		return this.prisma.assignmentResult.create({
+			data: {
+				assignmentId: input.assignment,
+				studentId: input.student,
+				graderId: input.grader,
+				result: input.result
+			}
+		})
+	}
+
+	/// Update an assignment result
+	async updateAssignmentResult(id: string, result: float) {
+		return this.prisma.assignmentResult.update({
+			where: {
+				id
+			},
+			data: {
+				result: result
+			}
+		})
+	}
+
+	/// Delete an assignment result
+	async deleteAssignmentResult(id: string) {
+		return this.prisma.assignmentResult.delete({
+			where: {
+				id
+			}
+		})
+	}
 
 }

@@ -10,7 +10,7 @@ type ModuleEnrollment {
 
 	role: UserRole!
 	module: Module!
-	# plan: ID!
+	plan: ID!
 }
 
 type AssignmentResult {
@@ -18,8 +18,8 @@ type AssignmentResult {
 	sumbittedAt: String!
 	result: Float!
 
-	student: ID
-	gradedBy: ID
+	student: PlanOfStudy
+	gradedBy: User
 	assignment: Assignment
 }
 
@@ -90,12 +90,19 @@ type Error {
 type Query {
 	modules: [Module!]!
 	module(id: ID!): Module
+
 	courses: [Course!]!
+
 	assignments: [Assignment!]!
 	assignment(id: ID!): Assignment
+
 	moduleInCourses: [ModuleInCourse!]!
+
 	moduleFeedbacks: [ModuleFeedback!]!
 	moduleFeedback(id: ID!): ModuleFeedback
+
+	assignmentResults: [AssignmentResult!]!
+	assignmentResult(id: ID!): AssignmentResult
 }
 
 input NewModule {
@@ -146,6 +153,14 @@ input ModuleFeedbackUpdate {
 	rating: Int
 }
 
+input NewAssignmentResult {
+	assignment: ID!
+	student: ID!
+	grader: ID!
+
+	result: Float!
+}
+
 type Mutation {
 	deleteModule(id: ID!): Module
 	addModule(input: NewModule): Module!
@@ -161,4 +176,8 @@ type Mutation {
 	addModuleFeedback(moduleId: ID!, userId: ID!, input: ModuleFeedbackInput): Module
 	updateModuleFeedback(id: ID!, input: ModuleFeedbackUpdate): ModuleFeedback
 	deleteModuleFeedback(id: ID!): ModuleFeedback
+
+	addAssignmentResult(input: NewAssignmentResult): AssignmentResult!
+	updateAssignmentResult(id: ID!, result: Float!): AssignmentResult
+	deleteAssignmentResult(id: ID!): AssignmentResult
 }

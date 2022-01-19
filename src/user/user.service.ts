@@ -13,7 +13,8 @@ export class UserService {
 		return this.prisma.user.findMany({
 			include: {
 				feedback: true,
-				plan: true
+				plan: true,
+				assignmentGraded: true
 			}
 		});
 	}
@@ -26,7 +27,8 @@ export class UserService {
 			},
 			include: {
 				feedback: true,
-				plan: true
+				plan: true,
+				assignmentGraded: true
 			}
 		});
 		

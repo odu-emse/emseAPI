@@ -63,7 +63,8 @@ export class PoSService {
 				studentID: input.student
 			},
 			include: {
-				student: true
+				student: true,
+				assignmentResults: true
 			}
 		})
 	}
@@ -79,7 +80,8 @@ export class PoSService {
 				studentID: input.student,
 			},
 			include: {
-				student: true
+				student: true,
+				assignmentResults: true
 			}
 		})
 
