@@ -100,6 +100,14 @@ export class UpdateUser {
     isActive?: Nullable<boolean>;
 }
 
+export class SocialInput {
+    twitter?: Nullable<string>;
+    github?: Nullable<string>;
+    linkedin?: Nullable<string>;
+    facebook?: Nullable<string>;
+    portfolio?: Nullable<string>;
+}
+
 export class PlanOfStudy {
     id: string;
     student?: Nullable<User>;
@@ -146,6 +154,10 @@ export abstract class IQuery {
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract users(): User[] | Promise<User[]>;
+
+    abstract socials(): Social[] | Promise<Social[]>;
+
+    abstract social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
 }
 
 export abstract class IMutation {
@@ -200,6 +212,16 @@ export abstract class IMutation {
     abstract createUser(input?: Nullable<NewUser>): User | Promise<User>;
 
     abstract updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract addSocial(user: string, input?: Nullable<SocialInput>): Social | Promise<Social>;
+
+    abstract updateSocial(id: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
+
+    abstract updateUserSocial(userId: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
+
+    abstract deleteSocial(id: string): Nullable<Social> | Promise<Nullable<Social>>;
+
+    abstract deleteUserSocial(userId: string): Nullable<Social> | Promise<Nullable<Social>>;
 }
 
 export class ModuleEnrollment {
@@ -277,8 +299,18 @@ export class Error {
     message?: Nullable<string>;
 }
 
+export class Social {
+    id: string;
+    twitter?: Nullable<string>;
+    github?: Nullable<string>;
+    linkedin?: Nullable<string>;
+    facebook?: Nullable<string>;
+    portfolio?: Nullable<string>;
+    account: User;
+}
+
 export class User {
-    id?: Nullable<string>;
+    id: string;
     email?: Nullable<string>;
     createdAt?: Nullable<string>;
     firstName?: Nullable<string>;
@@ -289,7 +321,7 @@ export class User {
     passwordConf?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
-    social?: Nullable<string>;
+    social?: Nullable<Social>;
     plan?: Nullable<PlanOfStudy>;
     tokens?: Nullable<string[]>;
     feedback?: Nullable<ModuleFeedback[]>;

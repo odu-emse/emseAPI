@@ -1,5 +1,15 @@
+type Social {
+	id: ID!
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
+	account: User!
+}
+
 type User {
-	id: String
+	id: ID!
 	email: String
 	createdAt: String
 	firstName: String
@@ -11,7 +21,7 @@ type User {
 	isAdmin: Boolean
 	isActive: Boolean
 
-	social: ID
+	social: Social
 	plan: PlanOfStudy
 	tokens: [ID!]
 	feedback: [ModuleFeedback!]
@@ -45,13 +55,30 @@ input UpdateUser {
 	isActive: Boolean
 }
 
+input SocialInput {
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
+}
+
 type Query {
 	user(id: ID!): User
 	users: [User!]!
+
+	socials: [Social!]!
+	social(id: ID!): Social
 }
 
 type Mutation {
 	deleteUser(id: ID!): User
 	createUser(input: NewUser): User!
 	updateUser(input: UpdateUser): User
+
+	addSocial(user: ID!, input: SocialInput): Social!
+	updateSocial(id: ID!, input: SocialInput!): Social
+	updateUserSocial(userId: ID!, input: SocialInput!): Social
+	deleteSocial(id: ID!): Social
+	deleteUserSocial(userId: ID!): Social
 }

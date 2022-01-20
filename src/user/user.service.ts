@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
-import { Prisma, User } from "@prisma/client";
-import { NewUser, UpdateUser } from "src/gql/graphql";
+import { Prisma, User, Social } from "@prisma/client";
+import { NewUser, UpdateUser, SocialInput } from "src/gql/graphql";
 import { hash } from "bcryptjs";
 
 @Injectable()
@@ -33,6 +33,28 @@ export class UserService {
 		});
 		
 		return user;
+	}
+
+
+	/// Get all Social Records
+	async socials(): Promise<Social[]> {
+		return this.prisma.social.findMany({
+			include: {
+				account: true
+			}
+		})
+	}
+
+	/// Get a specific Social Record by ID
+	async social(id: string): Promise<Social | null> {
+		return this.prisma.social.findUnique({
+			where: {
+				id
+			},
+			include: {
+				account: true
+			}
+		})
 	}
 
 	// Create a user
@@ -139,5 +161,72 @@ export class UserService {
 				id,
 			}
 		});
+	}
+
+	/// Create a social record for a User
+	async addSocial(userId: string, input: SocialInput): Promise<Social> {
+		return this.prisma.social.create({
+			data: {
+				twitter: input.twitter,
+				github: input.github,
+				linkedin: input.linkedin,
+				facebook: input.facebook,
+				portfolio: input.portfolio,
+				accountID: userId
+			}
+		})
+	}
+
+	/// Update a social by document ID
+	async updateSocial(id: string, input: SocialInput) {
+		return this.prisma.social.update({
+			where: {
+				id
+			},
+			data: {
+				twitter: input.twitter,
+				github: input.github,
+				linkedin: input.linkedin,
+				facebook: input.facebook,
+				portfolio: input.portfolio
+			},
+			include: {
+				account: true
+			}
+		});
+	}
+
+	/// Update a social record by the owner (user) id
+	async updateUserSocial(userId: string, input: SocialInput) {
+		return this.prisma.social.updateMany({
+			where: {
+				accountID: userId
+			},
+			data: {
+				twitter: input.twitter,
+				github: input.github,
+				linkedin: input.linkedin,
+				facebook: input.facebook,
+				portfolio: input.portfolio
+			}
+		})
+	}
+
+	/// Delete a social record by document ID
+	async deleteSocial(id: string) {
+		return this.prisma.social.delete({
+			where: {
+				id
+			}
+		})
+	}
+
+	/// Delete a social record by owner(user) id
+	async deleteUserSocial(userId: string) {
+		return this.prisma.social.deleteMany({
+			where: {
+				accountID: userId
+			}
+		})
 	}
 }
