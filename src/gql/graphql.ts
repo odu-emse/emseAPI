@@ -103,9 +103,9 @@ export class UpdateUser {
 export class PlanOfStudy {
     id: string;
     student?: Nullable<User>;
-    modules?: Nullable<Nullable<string>[]>;
+    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
-    courses?: Nullable<Nullable<string>[]>;
+    courses?: Nullable<Nullable<CourseEnrollment>[]>;
 }
 
 export abstract class IQuery {
@@ -138,6 +138,10 @@ export abstract class IQuery {
     abstract moduleEnrollments(): ModuleEnrollment[] | Promise<ModuleEnrollment[]>;
 
     abstract moduleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
+
+    abstract courseEnrollments(): CourseEnrollment[] | Promise<CourseEnrollment[]>;
+
+    abstract courseEnrollment(id: string): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 
@@ -185,6 +189,12 @@ export abstract class IMutation {
 
     abstract deleteModuleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
 
+    abstract addCourseEnrollment(planId: string, courseId: string): CourseEnrollment | Promise<CourseEnrollment>;
+
+    abstract updateCourseEnrollment(id: string, planId?: Nullable<string>, courseId?: Nullable<string>): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
+
+    abstract deleteCourseEnrollment(id: string): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
+
     abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract createUser(input?: Nullable<NewUser>): User | Promise<User>;
@@ -229,8 +239,8 @@ export class ModuleFeedback {
 export class CourseEnrollment {
     id: string;
     enrolledAt: string;
-    student?: Nullable<string>;
-    course?: Nullable<Course>;
+    student: PlanOfStudy;
+    course: Course;
 }
 
 export class Course {

@@ -1,6 +1,6 @@
 import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, UpdateModule, NewAssignmentResult, ModuleEnrollmentInput } from "./../gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback, AssignmentResult, ModuleEnrollment } from "@prisma/client";
+import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback, AssignmentResult, ModuleEnrollment, CourseEnrollment } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
 import { float } from "aws-sdk/clients/lightsail";
@@ -79,7 +79,12 @@ export class ProgramService {
 	async courses(): Promise<Course[]> {
 		return this.prisma.course.findMany({
 			include: {
-				modules: true
+				modules: true,
+				enrollment: {
+					include: {
+						student: true
+					}
+				}
 			}
 		});
 	}
@@ -173,6 +178,29 @@ export class ProgramService {
 			where: {
 				id
 			},
+		})
+	}
+
+	/// Fetch all CourseEnrollment records
+	async courseEnrollments(): Promise<CourseEnrollment[]> {
+		return this.prisma.courseEnrollment.findMany({
+			include: {
+				student: true,
+				course: true
+			}
+		})
+	}
+
+	/// Fetch a CourseEnrollment Record by its ID
+	async courseEnrollment(id: string): Promise<CourseEnrollment | null> {
+		return this.prisma.courseEnrollment.findUnique({
+			where: {
+				id
+			},
+			include: {
+				student: true,
+				course: true
+			}
 		})
 	}
 
@@ -528,6 +556,38 @@ export class ProgramService {
 
 	async deleteModuleEnrollment(id: string){
 		return this.prisma.moduleEnrollment.delete({
+			where: {
+				id
+			}
+		})
+	}
+
+	/// Create a new CourseEnrollment Record
+	async addCourseEnrollment(planId: string, courseId: string): Promise<CourseEnrollment> {
+		return this.prisma.courseEnrollment.create({
+			data: {
+				studentId: planId,
+				courseId: courseId
+			}
+		})
+	}
+
+	/// Modify an existing CourseEnrollment Record
+	async updateCourseEnrollment(id: string, planId: string, courseId: string) {
+		return this.prisma.courseEnrollment.update({
+			where: {
+				id
+			},
+			data: {
+				studentId: planId,
+				courseId: courseId
+			}
+		})
+	}
+
+	/// Delete an existing record
+	async deleteCourseEnrollment(id: string) {
+		return this.prisma.courseEnrollment.delete({
 			where: {
 				id
 			}

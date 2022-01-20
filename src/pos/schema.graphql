@@ -4,7 +4,7 @@ type PlanOfStudy {
 
 	modules: [ModuleEnrollment]
 	assignmentResults: [AssignmentResult!]
-	courses: [ID]
+	courses: [CourseEnrollment]
 }
 
 input PlanInput {

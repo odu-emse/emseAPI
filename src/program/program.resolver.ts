@@ -138,6 +138,26 @@ export class ProgramResolver {
 		}
 	}
 
+	@Query("courseEnrollments")
+	async courseEnrollments() {
+		try {
+			const res = await this.programService.courseEnrollments();
+			return res;
+		} catch(error) {
+			throw new Error("Could not fetch CourseEnrollments");
+		}
+	}
+
+	@Query("courseEnrollment")
+	async courseEnrollment(@Args("id") id: string) {
+		try {
+			const res = await this.programService.courseEnrollment(id);
+			return res;
+		} catch(error) {
+			throw new Error("Could not fetch CourseEnrollment with id: " + id);
+		}
+	}
+
 	// Mutations
 
 	// Add a module to the db with all required initial fields
@@ -287,6 +307,36 @@ export class ProgramResolver {
 			return res;
 		} catch (error) {
 			throw new Error("Could not delete ModuleEnrollment with id: " + id);
+		}
+	}
+
+	@Mutation("addCourseEnrollment")
+	async addCourseEnrollment(@Args("planId") plan: string, @Args("courseId") course: string) {
+		try {
+			const res = await this.programService.addCourseEnrollment(plan, course);
+			return res;
+		} catch (error) {
+			throw new Error("Could not create new CourseEnrollment");
+		}
+	}
+
+	@Mutation("updateCourseEnrollment")
+	async updateCourseEnrollment(@Args("id") id: string, @Args("planId") plan: string, @Args("courseId") course: string) {
+		try {
+			const res = await this.programService.updateCourseEnrollment(id, plan, course);
+			return res;
+		} catch (error) {
+			throw new Error("Could not update CourseEnrollment with id: " + id);
+		}
+	}
+
+	@Mutation("deleteCourseEnrollment")
+	async deleteCourseEnrollment(@Args("id") id: string) {
+		try { 
+			const res = await this.programService.deleteCourseEnrollment(id);
+			return res;
+		} catch (error) {
+			throw new Error("Could not delete CourseEnrollment with id: " + id);
 		}
 	}
 }
