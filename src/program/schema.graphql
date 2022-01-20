@@ -10,7 +10,7 @@ type ModuleEnrollment {
 
 	role: UserRole!
 	module: Module!
-	plan: ID!
+	plan: PlanOfStudy!
 }
 
 type AssignmentResult {
@@ -103,6 +103,9 @@ type Query {
 
 	assignmentResults: [AssignmentResult!]!
 	assignmentResult(id: ID!): AssignmentResult
+
+	moduleEnrollments: [ModuleEnrollment!]!
+	moduleEnrollment(id: ID!): ModuleEnrollment
 }
 
 input NewModule {
@@ -161,6 +164,12 @@ input NewAssignmentResult {
 	result: Float!
 }
 
+input ModuleEnrollmentInput {
+	module: ID!
+	plan: ID!
+	role: UserRole!
+}
+
 type Mutation {
 	deleteModule(id: ID!): Module
 	addModule(input: NewModule): Module!
@@ -180,4 +189,8 @@ type Mutation {
 	addAssignmentResult(input: NewAssignmentResult): AssignmentResult!
 	updateAssignmentResult(id: ID!, result: Float!): AssignmentResult
 	deleteAssignmentResult(id: ID!): AssignmentResult
+
+	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
+	updateModuleEnrollment(id: ID!, input: ModuleEnrollmentInput): ModuleEnrollment
+	deleteModuleEnrollment(id: ID!): ModuleEnrollment
 }

@@ -1,6 +1,6 @@
-import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, UpdateModule, NewAssignmentResult } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, UpdateModule, NewAssignmentResult, ModuleEnrollmentInput } from "./../gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback, AssignmentResult } from "@prisma/client";
+import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback, AssignmentResult, ModuleEnrollment } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
 import { float } from "aws-sdk/clients/lightsail";
@@ -14,10 +14,19 @@ export class ProgramService {
 		return this.prisma.module.findMany({
 			include: {
 				assignments: true,
-				parentCourses: true,
+				parentCourses: {
+					include: {
+						course: true
+					}
+				},
 				feedback: {
 					include: {
 						student: true
+					}
+				},
+				members: {
+					include: {
+						plan: true
 					}
 				}
 			}
@@ -33,8 +42,21 @@ export class ProgramService {
 				},
 				include: {
 					assignments: true,
-					feedback: true,
-					// parentCourses: true
+					parentCourses: {
+						include: {
+							course: true
+						}
+					},
+					feedback: {
+						include: {
+							student: true
+						}
+					},
+					members: {
+						include: {
+							plan: true
+						}
+					}
 				}
 			});
 			return res;
@@ -135,6 +157,25 @@ export class ProgramService {
 		})
 	}
 
+	/// Fetch all module enrollments in the database
+	async moduleEnrollments(): Promise<ModuleEnrollment[]> {
+		return this.prisma.moduleEnrollment.findMany({
+			include: {
+				plan: true,
+				module: true
+			}
+		})
+	}
+
+	/// Fetch a moduleEnrollment by document ID
+	async moduleEnrollment(id: string): Promise<ModuleEnrollment | null>{
+		return this.prisma.moduleEnrollment.findFirst({
+			where: {
+				id
+			},
+		})
+	}
+
 	//Mutations
 
 	/// Create a new module
@@ -165,6 +206,24 @@ export class ProgramService {
 			} = data;
 			return this.prisma.module.create({
 				data,
+				include: {
+					assignments: true,
+					parentCourses: {
+						include: {
+							course: true
+						}
+					},
+					feedback: {
+						include: {
+							student: true
+						}
+					},
+					members: {
+						include: {
+							plan: true
+						}
+					}
+				}
 			});
 		}
 	}
@@ -217,7 +276,21 @@ export class ProgramService {
 			},
 			include: {
 				assignments: true,
-				// parentCourses: true 
+				parentCourses: {
+					include: {
+						course: true
+					}
+				},
+				feedback: {
+					include: {
+						student: true
+					}
+				},
+				members: {
+					include: {
+						plan: true
+					}
+				}
 			}
 		});
 	}
@@ -414,6 +487,47 @@ export class ProgramService {
 	/// Delete an assignment result
 	async deleteAssignmentResult(id: string) {
 		return this.prisma.assignmentResult.delete({
+			where: {
+				id
+			}
+		})
+	}
+
+	/// Create a ModuleEnrollment Document
+	async addModuleEnrollment(input: ModuleEnrollmentInput) {
+		return this.prisma.moduleEnrollment.create({
+			data: {
+				moduleId: input.module,
+				planId: input.plan,
+				role: input.role
+			},
+			include: {
+				module: true,
+				plan: true
+			}
+		})
+	}
+
+	/// Update a ModuleEnrollment
+	async updateModuleEnrollment(id: string, input: ModuleEnrollmentInput){
+		return this.prisma.moduleEnrollment.update({
+			where: {
+				id
+			},
+			data: {
+				moduleId: input.module,
+				planId: input.plan,
+				role: input.role
+			},
+			include: {
+				module: true,
+				plan: true
+			}
+		})
+	}
+
+	async deleteModuleEnrollment(id: string){
+		return this.prisma.moduleEnrollment.delete({
 			where: {
 				id
 			}

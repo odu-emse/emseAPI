@@ -1,4 +1,4 @@
-import { AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, NewAssignmentResult, NewModule, UpdateModule } from "./../gql/graphql";
+import { AssignmentInput, CourseInput, ModuleEnrollmentInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, NewAssignmentResult, NewModule, UpdateModule } from "./../gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
@@ -115,6 +115,26 @@ export class ProgramResolver {
 			return res;
 		} catch (error) {
 			throw new Error("Could not fetch assignment result with id: " + id);
+		}
+	}
+
+	@Query("moduleEnrollments")
+	async moduleEnrollments() {
+		try {
+			const res = await this.programService.moduleEnrollments();
+			return res;
+		} catch (error) {
+			throw new Error("Could not fetch moduleEnrollments");
+		}
+	}
+
+	@Query("moduleEnrollment")
+	async moduleEnrollment(@Args("id") id: string) {
+		try {
+			const res = await this.programService.moduleEnrollment(id);
+			return res;
+		} catch (error) {
+			throw new Error("Could not fetch moduleEnrollment with id: " + id);
 		}
 	}
 
@@ -237,6 +257,36 @@ export class ProgramResolver {
 			return res;
 		} catch (error) {
 			throw new Error("Could not delete assignment with id: " + id);
+		}
+	}
+
+	@Mutation("addModuleEnrollment")
+	async addModuleEnrollment(@Args("input") input: ModuleEnrollmentInput) {
+		try {
+			const res = await this.programService.addModuleEnrollment(input);
+			return res;
+		} catch (error) {
+			throw new Error("Could not add ModuleEnrollment");
+		}
+	}
+
+	@Mutation("updateModuleEnrollment")
+	async updateModuleEnrollment(@Args("id") id: string, @Args("input") input: ModuleEnrollmentInput) {
+		try {
+			const res = await this.programService.updateModuleEnrollment(id, input);
+			return res;
+		} catch(error) {
+			throw new Error("Could not update ModuleEnrollment with id: " + id);
+		}
+	}
+
+	@Mutation("deleteModuleEnrollment")
+	async deleteModuleEnrollment(@Args("id") id: string) {
+		try {
+			const res = await this.programService.deleteModuleEnrollment(id);
+			return res;
+		} catch (error) {
+			throw new Error("Could not delete ModuleEnrollment with id: " + id);
 		}
 	}
 }

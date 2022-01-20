@@ -71,6 +71,12 @@ export class NewAssignmentResult {
     result: number;
 }
 
+export class ModuleEnrollmentInput {
+    module: string;
+    plan: string;
+    role: UserRole;
+}
+
 export class NewUser {
     email: string;
     firstName: string;
@@ -129,6 +135,10 @@ export abstract class IQuery {
 
     abstract assignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
 
+    abstract moduleEnrollments(): ModuleEnrollment[] | Promise<ModuleEnrollment[]>;
+
+    abstract moduleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
+
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract users(): User[] | Promise<User[]>;
@@ -169,6 +179,12 @@ export abstract class IMutation {
 
     abstract deleteAssignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
 
+    abstract addModuleEnrollment(input?: Nullable<ModuleEnrollmentInput>): ModuleEnrollment | Promise<ModuleEnrollment>;
+
+    abstract updateModuleEnrollment(id: string, input?: Nullable<ModuleEnrollmentInput>): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
+
+    abstract deleteModuleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
+
     abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract createUser(input?: Nullable<NewUser>): User | Promise<User>;
@@ -181,7 +197,7 @@ export class ModuleEnrollment {
     enrolledAt: string;
     role: UserRole;
     module: Module;
-    plan: string;
+    plan: PlanOfStudy;
 }
 
 export class AssignmentResult {
