@@ -36,12 +36,12 @@ export class UpdateModule {
     duration?: Nullable<number>;
     numSlides?: Nullable<number>;
     keywords?: Nullable<string[]>;
-    assignment?: Nullable<NewAssignment>;
 }
 
 export class NewAssignment {
     name: string;
-    dueAt?: Nullable<string>;
+    dueAt: string;
+    module: string;
 }
 
 export class AssignmentInput {
@@ -178,6 +178,8 @@ export abstract class IMutation {
     abstract addCourse(module: string, input?: Nullable<CourseInput>): Course | Promise<Course>;
 
     abstract updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
+
+    abstract addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
 
     abstract deleteAssignment(module: string, id: string): Nullable<Module> | Promise<Nullable<Module>>;
 

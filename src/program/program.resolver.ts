@@ -202,6 +202,17 @@ export class ProgramResolver {
 		return res;
 	}
 
+	// Add an assignment
+	@Mutation("addAssignment")
+	async addAssignment(@Args("input") input: NewAssignment) {
+		try {
+			const res = await this.programService.addAssignment(input);
+			return res;
+		} catch (error) {
+			throw new Error("Failed to create a new assignment");
+		}
+	}
+
 	// // Delete an assignment from DB
 	@Mutation("deleteAssignment")
 	async deleteAssignment(@Args("module") args: string, @Args("id") id: string) {

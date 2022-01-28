@@ -89,7 +89,7 @@ export class UserResolver {
 		}
 	}
 
-	@Mutation("udpateUserSocial")
+	@Mutation("updateUserSocial")
 	async updateUserSocial(@Args("userId") user: string, @Args("input") input: SocialInput) {
 		try {
 			const res = await this.userService.updateUserSocial(user, input);

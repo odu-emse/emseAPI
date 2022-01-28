@@ -266,28 +266,7 @@ export class ProgramService {
 			duration,
 			numSlides,
 			keywords,
-			assignment,
 		} = data
-
-		let assignmentPayload = {};
-
-		//Add assignments 
-		if (assignment) {
-			// assignmentPayload.
-			assignmentPayload = {
-				createMany: {
-					data: [
-						{
-							name: assignment.name,
-							dueAt: assignment.dueAt,
-							// module: {
-							// 	connect: id
-							// }
-						}
-					],
-				}
-			};	
-		}
 
 		return this.prisma.module.update({
 			where: {
@@ -300,7 +279,6 @@ export class ProgramService {
 				...(duration && {duration}),
 				...(numSlides && {numSlides}),
 				...(keywords && {keywords}),
-				assignments: assignmentPayload,
 			},
 			include: {
 				assignments: true,
@@ -414,6 +392,18 @@ export class ProgramService {
 				assignments: {
 					deleteMany: [{id: id}]
 				}
+			}
+		})
+	}
+
+	/// Create an assignment document
+	async addAssignment(input: NewAssignment) {
+		return this.prisma.assignment.create({
+			data:{
+				name: input.name,
+				moduleId: input.module,
+				dueAt: input.dueAt
+				
 			}
 		})
 	}
