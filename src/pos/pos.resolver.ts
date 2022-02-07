@@ -1,6 +1,6 @@
 import { Resolver, Query, Args, Mutation} from "@nestjs/graphql";
 import { Prisma } from "@prisma/client";
-import { PlanInput } from "src/gql/graphql";
+import { PlanInput } from "gql/graphql";
 import { PoSService } from "./pos.service";
 
 @Resolver()

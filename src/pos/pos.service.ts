@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, PlanOfStudy } from "@prisma/client";
-import { PlanInput } from "src/gql/graphql";
+import { PlanInput } from "gql/graphql";
 import { connect } from "mongoose";
 
 @Injectable()
