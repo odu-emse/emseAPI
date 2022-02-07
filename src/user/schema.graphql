@@ -1,5 +1,15 @@
+type Social {
+	id: ID!
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
+	account: User!
+}
+
 type User {
-	id: String
+	id: ID!
 	email: String
 	createdAt: String
 	firstName: String
@@ -9,6 +19,13 @@ type User {
 	password: String
 	passwordConf: String
 	isAdmin: Boolean
+	isActive: Boolean
+
+	social: Social
+	plan: PlanOfStudy
+	tokens: [ID!]
+	feedback: [ModuleFeedback!]
+	assignmentGraded: [AssignmentResult!]
 }
 
 type Error {
@@ -38,6 +55,16 @@ input UpdateUser {
 	prefix: String
 	password: String
 	passwordConf: String
+	isAdmin: Boolean
+	isActive: Boolean
+}
+
+input SocialInput {
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
 }
 input LoginUser{
 	email: String!
@@ -47,10 +74,19 @@ type Query {
 	user(id: ID!): User
 	users: [User!]!
 	login(input: LoginUser): Token
+	socials: [Social!]!
+	social(id: ID!): Social
+
 }
 
 type Mutation {
 	deleteUser(id: ID!): User
 	createUser(input: NewUser): User!
 	updateUser(input: UpdateUser): User
+
+	addSocial(user: ID!, input: SocialInput): Social!
+	updateSocial(id: ID!, input: SocialInput!): Social
+	updateUserSocial(userId: ID!, input: SocialInput!): Social
+	deleteSocial(id: ID!): Social
+	deleteUserSocial(userId: ID!): Social
 }
