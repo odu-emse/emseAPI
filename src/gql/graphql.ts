@@ -175,7 +175,7 @@ export abstract class IMutation {
 
     abstract deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
 
-    abstract addCourse(module: string, input?: Nullable<CourseInput>): Course | Promise<Course>;
+    abstract addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
 
     abstract updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
 
@@ -208,6 +208,10 @@ export abstract class IMutation {
     abstract updateCourseEnrollment(id: string, planId?: Nullable<string>, courseId?: Nullable<string>): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
 
     abstract deleteCourseEnrollment(id: string): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
+
+    abstract pairCourseModule(courseId: string, moduleId: string): ModuleInCourse | Promise<ModuleInCourse>;
+
+    abstract unpairCourseModule(courseId: string, moduleId: string): Nullable<ModuleInCourse> | Promise<Nullable<ModuleInCourse>>;
 
     abstract deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 

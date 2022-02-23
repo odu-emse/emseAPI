@@ -183,8 +183,8 @@ export class ProgramResolver {
 
 	// // Add a Course to the db with a course name
 	@Mutation("addCourse")
-	async createCourse(@Args("module") id: string, @Args("input") args: CourseInput) {
-		const res = await this.programService.addCourse(id, args);
+	async createCourse(@Args("input") args: CourseInput) {
+		const res = await this.programService.addCourse(args);
 		return res;
 	}
 
@@ -348,6 +348,26 @@ export class ProgramResolver {
 			return res;
 		} catch (error) {
 			throw new Error("Could not delete CourseEnrollment with id: " + id);
+		}
+	}
+
+	@Mutation("pairCourseModule")
+	async pairCourseModule(@Args("courseId") courseId: string, @Args("moduleId") moduleId: string) {
+		try {
+			const res = await this.programService.pairCourseModule(courseId, moduleId);
+			return res;
+		} catch(error) {
+			throw new Error("Could not pair course " + courseId + " and module " + moduleId);
+		}
+	}
+
+	@Mutation("unpairCourseModule")
+	async unpairCourseModule(@Args("courseId") courseId: string, @Args("moduleId") moduleId: string) {
+		try {
+			const res = await this.programService.unpairCourseModule(courseId, moduleId);
+			return res;
+		} catch(error) {
+			throw new Error("Could not unlink course " + courseId + " and module " + moduleId);
 		}
 	}
 }
