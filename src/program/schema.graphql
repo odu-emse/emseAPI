@@ -179,7 +179,7 @@ type Mutation {
 	updateModule(input: UpdateModule): Module
 
 	deleteCourse(id: ID!): Course
-	addCourse(module: ID!, input: CourseInput): Course!
+	addCourse(input: CourseInput): Course!
 	updateCourse(id: ID!, input: CourseInput): Course
 
 	addAssignment(input: NewAssignment): Assignment!
@@ -201,4 +201,8 @@ type Mutation {
 	addCourseEnrollment(planId: ID!, courseId: ID!): CourseEnrollment!
 	updateCourseEnrollment(id: ID!, planId: ID, courseId: ID): CourseEnrollment
 	deleteCourseEnrollment(id: ID!): CourseEnrollment
+
+	pairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse!
+	unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
+
 }

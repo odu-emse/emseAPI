@@ -317,7 +317,7 @@ export class ProgramService {
 	}
 
 	/// Create a course and assign an initial module to that course
-	async addCourse(moduleId: string, data: Prisma.CourseCreateInput): Promise<Course | Error> {
+	async addCourse(data: Prisma.CourseCreateInput): Promise<Course | Error> {
 		//Probably need some error checking here to make sure the module actually exists
 		
 		//Make a new course
@@ -325,21 +325,7 @@ export class ProgramService {
 			data: {
 				// Set the name
 				name: data.name,
-				//Set the list of modules
-				modules: {
-					//Create new object for this field
-					create: [
-						{
-							//Set the module property of this field
-							module: {
-								//To be a connection to the module with the ID provided in parameter
-								connect: {
-									id: moduleId
-								}
-							}
-						}
-					]
-				}
+				
 			}
 		})
 	} 
@@ -580,6 +566,25 @@ export class ProgramService {
 		return this.prisma.courseEnrollment.delete({
 			where: {
 				id
+			}
+		})
+	}
+
+	// Link a course and a module
+	async pairCourseModule(courseId: string, moduleId: string){
+		return this.prisma.moduleInCourse.create({
+			data:{
+				moduleId: moduleId,
+				courseId: courseId
+			}
+		})
+	}
+
+	async unpairCourseModule(courseId: string, moduleId: string) {
+		return this.prisma.moduleInCourse.deleteMany({
+			where: {
+				moduleId: moduleId,
+				courseId: courseId
 			}
 		})
 	}
