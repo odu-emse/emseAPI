@@ -20,7 +20,7 @@ model User {
   password     String
   passwordConf String
   isAdmin      Boolean  @default(false)
-  role         UserRole?
+  // role         UserRole?
   isActive     Boolean @default(false)
 
   // Relation fields
@@ -39,7 +39,7 @@ model PlanOfStudy {
   // advisor           User?              @relation(fields: [advisorId], references:[id])
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
-  assignmentResults AssignmentResult[] @relation(name: "results")
+  assignmentResults AssignmentResult[] 
   courses           CourseEnrollment[]
 }
 
@@ -65,11 +65,22 @@ model Token {
   userId String @db.ObjectId
 }
 
+model ModuleInCourse {
+  id        String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+
+  module    Module  @relation(fields: [moduleId], references: [id])
+  moduleId  String
+
+  course    Course  @relation(fields: [courseId], references: [id])
+  courseId  String
+}
+
 model Course {
   id          String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
   name        String
+  
   enrollment  CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
-  modules     Module[]
+  modules     ModuleInCourse[]
 
 }
 
@@ -89,8 +100,10 @@ model Module {
   members       ModuleEnrollment[]
   assignments   Assignment[]
   feedback      ModuleFeedback[]
-  parentCourses Course[]
+  parentCourses ModuleInCourse[]
 }
+
+
 
 model ModuleFeedback {
   id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
@@ -144,7 +157,7 @@ model AssignmentResult {
 
   // Relation Fields
   studentId    String      @db.ObjectId
-  student      PlanOfStudy @relation(name: "results", fields: [studentId], references: [id])
+  student      PlanOfStudy @relation(fields: [studentId], references: [id])
   graderId     String      @db.ObjectId //Same thing as the advisor, issue here, technically this should work but there is now a reference in User that doesnt need to exist maybe a module enrollment relation works better?
   gradedBy     User        @relation(name: "graded", fields: [graderId], references: [id])
   assignmentId String      @db.ObjectId

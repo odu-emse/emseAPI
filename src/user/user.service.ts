@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
-import { Prisma, User } from "@prisma/client";
-import { NewUser, UpdateUser, LoginUser, Token} from "gql/graphql";
+import { Prisma, User, Social } from "@prisma/client";
+import { NewUser, UpdateUser, LoginUser, Token, SocialInput} from "gql/graphql";
 import { hash,compare } from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
+
 @Injectable()
 export class UserService {
 	constructor(
@@ -12,7 +13,13 @@ export class UserService {
 
 	// Get all users
 	async users(): Promise<User[]> {
-		return this.prisma.user.findMany({});
+		return this.prisma.user.findMany({
+			include: {
+				feedback: true,
+				plan: true,
+				assignmentGraded: true
+			}
+		});
 	}
 
 	// Get a single user based on ID
@@ -21,11 +28,37 @@ export class UserService {
 			where: {
 				id,
 			},
+			include: {
+				feedback: true,
+				plan: true,
+				assignmentGraded: true
+			}
 		});
 		
 		return user;
 	}
-	
+
+
+	/// Get all Social Records
+	async socials(): Promise<Social[]> {
+		return this.prisma.social.findMany({
+			include: {
+				account: true
+			}
+		})
+	}
+
+	/// Get a specific Social Record by ID
+	async social(id: string): Promise<Social | null> {
+		return this.prisma.social.findUnique({
+			where: {
+				id
+			},
+			include: {
+				account: true
+			}
+		})
+	}
 	// Create a user
 	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
 		const {
@@ -91,6 +124,8 @@ export class UserService {
 			prefix,
 			password,
 			passwordConf,
+			isAdmin,
+			isActive
 		} = params;
 		//check if passwords provided match
 		//check if password from db is same as changing it to
@@ -106,6 +141,8 @@ export class UserService {
 				...(prefix && { prefix }),
 				...(password && { password }),
 				...(passwordConf && { passwordConf }),
+				...(isAdmin && {isAdmin}),
+				...(isActive && {isActive})
 			},
 		});
 	}
@@ -127,6 +164,7 @@ export class UserService {
 			}
 		});
 	}
+
 
 	async loginUser(params: LoginUser ): Promise< Token | null| Error>{
 		console.log(params)
@@ -165,5 +203,73 @@ export class UserService {
 		}
 
 		return new Error (`This ${email}, does not exist`) ;
+	}
+
+	/// Create a social record for a User
+	async addSocial(userId: string, input: SocialInput): Promise<Social> {
+		return this.prisma.social.create({
+			data: {
+				twitter: input.twitter,
+				github: input.github,
+				linkedin: input.linkedin,
+				facebook: input.facebook,
+				portfolio: input.portfolio,
+				accountID: userId
+			}
+		})
+	}
+
+	/// Update a social by document ID
+	async updateSocial(id: string, input: SocialInput) {
+		return this.prisma.social.update({
+			where: {
+				id
+			},
+			data: {
+				twitter: input.twitter,
+				github: input.github,
+				linkedin: input.linkedin,
+				facebook: input.facebook,
+				portfolio: input.portfolio
+			},
+			include: {
+				account: true
+			}
+		});
+	}
+
+	/// Update a social record by the owner (user) id
+	async updateUserSocial(userId: string, input: SocialInput) {
+		return this.prisma.social.updateMany({
+			where: {
+				accountID: userId
+			},
+			data: {
+				twitter: input.twitter,
+				github: input.github,
+				linkedin: input.linkedin,
+				facebook: input.facebook,
+				portfolio: input.portfolio
+			}
+		})
+	}
+
+	/// Delete a social record by document ID
+	async deleteSocial(id: string) {
+		return this.prisma.social.delete({
+			where: {
+				id
+			}
+		})
+	}
+
+	/// Delete a social record by owner(user) id
+	async deleteUserSocial(userId: string) {
+		return this.prisma.social.deleteMany({
+			where: {
+				accountID: userId
+			}
+		})
+
 	}
 }
