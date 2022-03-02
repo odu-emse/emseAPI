@@ -10,7 +10,7 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   email        String   @unique
   createdAt    DateTime @default(now())
   firstName    String
@@ -32,7 +32,7 @@ model User {
 }
 
 model PlanOfStudy {
-  id                String             @id @default(dbgenerated()) @map("_id") @db.ObjectId     
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId     
   student           User?              @relation(name: "plan", fields: [studentID], references: [id])
   studentID         String?            @db.ObjectId
   // ill figure advisors out later, my brain needs a rest
@@ -44,7 +44,7 @@ model PlanOfStudy {
 }
 
 model Social {
-  id        String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
   twitter   String?
   github    String?
   linkedin  String?
@@ -55,7 +55,7 @@ model Social {
 }
 
 model Token {
-  id         String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
   createdAt  DateTime  @default(now())
   valid      Boolean   @default(true)
   expiration DateTime
@@ -66,7 +66,7 @@ model Token {
 }
 
 model ModuleInCourse {
-  id        String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
 
   module    Module  @relation(fields: [moduleId], references: [id])
   moduleId  String
@@ -76,7 +76,7 @@ model ModuleInCourse {
 }
 
 model Course {
-  id          String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   
   enrollment  CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
@@ -85,7 +85,7 @@ model Course {
 }
 
 model Module {
-  id            String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   moduleNumber  Int      @unique
   moduleName    String   @unique
   description   String
@@ -106,7 +106,7 @@ model Module {
 
 
 model ModuleFeedback {
-  id       String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   feedback String
   rating   Int
 
@@ -117,7 +117,7 @@ model ModuleFeedback {
 }
 
 model ModuleEnrollment {
-  id         String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   enrolledAt DateTime @default(now())
   role       UserRole //Allow for instructors, graders and students to take part in the module.
 
@@ -129,7 +129,7 @@ model ModuleEnrollment {
 }
 
 model CourseEnrollment {
-  id          String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   student     PlanOfStudy @relation(fields: [studentId], references: [id])
   studentId   String      @db.ObjectId
   enrolledAt  DateTime    @default(now())
@@ -139,7 +139,7 @@ model CourseEnrollment {
 }
 
 model Assignment {
-  id        String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   updatedAt DateTime @default(now()) @updatedAt
   name      String
   dueAt     DateTime
@@ -151,7 +151,7 @@ model Assignment {
 }
 
 model AssignmentResult {
-  id          String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   submittedAt DateTime @default(now())
   result      Float
 

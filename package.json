@@ -4,11 +4,11 @@
 	"private": true,
 	"scripts": {
 		"start": "nest start",
+		"start:prod": "node dist/main",
 		"dev": "nest start --watch",
 		"build": "nest build",
-		"generate": " &&  && ",
-		"tsc": "tsc --excludeDirectories node_modules src/gql/generate-typings.ts",
-		"typings": "node src/gql/generate-typings.js",
+		"tsc": "tsc --excludeDirectories node_modules gql/generate-typings.ts",
+		"typings": "node gql/generate-typings.js",
 		"prisma": "npx prisma generate",
 		"release": "standard-version"
 	},
@@ -18,6 +18,7 @@
 		"@babel/preset-env": "^7.9.6",
 		"@babel/register": "^7.11.5",
 		"@nestjs/apollo": "^10.0.2",
+		"@nestjs/cli": "^8.2.1",
 		"@nestjs/common": "^8.0.6",
 		"@nestjs/core": "^8.0.6",
 		"@nestjs/graphql": "^9.0.5",
