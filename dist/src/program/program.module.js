@@ -6,17 +6,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PoSModule = void 0;
-const prisma_service_1 = require("../prisma.service");
-const pos_resolver_1 = require("./pos.resolver");
+exports.ProgramModule = void 0;
+const prisma_service_1 = require("./../prisma.service");
 const common_1 = require("@nestjs/common");
-const pos_service_1 = require("./pos.service");
-let PoSModule = class PoSModule {
+const program_resolver_1 = require("./program.resolver");
+const program_service_1 = require("./program.service");
+let ProgramModule = class ProgramModule {
 };
-PoSModule = __decorate([
+ProgramModule = __decorate([
     (0, common_1.Module)({
-        providers: [pos_service_1.PoSService, pos_resolver_1.PlanOfStudyResolver, prisma_service_1.PrismaService],
+        providers: [program_resolver_1.ProgramResolver, prisma_service_1.PrismaService, program_service_1.ProgramService],
     })
-], PoSModule);
-exports.PoSModule = PoSModule;
-//# sourceMappingURL=pos.module.js.map
+], ProgramModule);
+exports.ProgramModule = ProgramModule;
+//# sourceMappingURL=program.module.js.map

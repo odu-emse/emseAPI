@@ -14,11 +14,10 @@ require("dotenv").config();
 
 @Module({
 	imports: [
-		GraphQLModule.forRoot<ApolloDriverConfig>({
+		GraphQLModule.forRoot({
 			debug: true,
-			//playground: true,
 			typePaths: ["./**/*.graphql"],
-			driver: ApolloDriver,
+			// driver: ApolloDriver,
 		}),
 		MongooseModule.forRoot(process.env.DATABASE_URL || "", {
 			useNewUrlParser: true,

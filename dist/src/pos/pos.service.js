@@ -8,32 +8,90 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PoSService = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("mongoose");
-const mongoose_2 = require("@nestjs/mongoose");
-const pos_schema_1 = require("./pos.schema");
+const prisma_service_1 = require("../prisma.service");
 let PoSService = class PoSService {
-    constructor(posModel) {
-        this.posModel = posModel;
+    constructor(prisma) {
+        this.prisma = prisma;
     }
-    async findByPlanId(id) {
-        return this.posModel.findById(id).lean();
+    async plans() {
+        const plans = await this.prisma.planOfStudy.findMany({
+            include: {
+                modules: true,
+                assignmentResults: true,
+                courses: true,
+                student: true
+            }
+        });
+        return plans;
     }
-    async findByStudentID(student) {
-        const res = await this.posModel.find({ student });
-        console.log(res);
+    async planById(id) {
+        const res = await this.prisma.planOfStudy.findUnique({
+            where: {
+                id,
+            },
+            include: {
+                modules: true,
+                assignmentResults: true,
+                courses: true,
+                student: true
+            }
+        });
         return res;
+    }
+    async plan(studentID) {
+        const res = await this.prisma.planOfStudy.findFirst({
+            where: {
+                studentID,
+            },
+            include: {
+                modules: true,
+                assignmentResults: true,
+                courses: true,
+                student: true
+            }
+        });
+        return res;
+    }
+    async addPlan(input) {
+        return this.prisma.planOfStudy.create({
+            data: {
+                studentID: input.student
+            },
+            include: {
+                student: true,
+            }
+        });
+    }
+    async updatePlan(id, input) {
+        return this.prisma.planOfStudy.update({
+            where: {
+                id
+            },
+            data: {
+                studentID: input.student,
+            },
+            include: {
+                modules: true,
+                assignmentResults: true,
+                courses: true,
+                student: true
+            }
+        });
+    }
+    async deletePlan(id) {
+        return this.prisma.planOfStudy.delete({
+            where: {
+                id
+            },
+        });
     }
 };
 PoSService = __decorate([
-    common_1.Injectable(),
-    __param(0, mongoose_2.InjectModel(pos_schema_1.PlanOfStudy.name)),
-    __metadata("design:paramtypes", [mongoose_1.Model])
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], PoSService);
 exports.PoSService = PoSService;
 //# sourceMappingURL=pos.service.js.map

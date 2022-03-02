@@ -1,9 +1,19 @@
-import { UserService } from "../user/user.service";
-import { PlanOfStudyInput } from "./pos.schema";
+import { PlanInput } from "gql/graphql";
 import { PoSService } from "./pos.service";
 export declare class PlanOfStudyResolver {
-    private planService;
-    private userService;
-    constructor(planService: PoSService, userService: UserService);
-    plan({ student }: PlanOfStudyInput): Promise<import("./pos.schema").PoSDocument[]>;
+    private readonly planService;
+    constructor(planService: PoSService);
+    plans(): Promise<import(".prisma/client").PlanOfStudy[]>;
+    plan(studentID: string): Promise<import(".prisma/client").PlanOfStudy | null>;
+    planByID(arg: string): Promise<import(".prisma/client").PlanOfStudy | null>;
+    addPlan(args: PlanInput): Promise<import(".prisma/client").PlanOfStudy & {
+        student: import(".prisma/client").User | null;
+    }>;
+    updatePlan(id: string, input: PlanInput): Promise<import(".prisma/client").PlanOfStudy & {
+        modules: import(".prisma/client").ModuleEnrollment[];
+        assignmentResults: import(".prisma/client").AssignmentResult[];
+        courses: import(".prisma/client").CourseEnrollment[];
+        student: import(".prisma/client").User | null;
+    }>;
+    deletePlan(id: string): Promise<import(".prisma/client").PlanOfStudy>;
 }

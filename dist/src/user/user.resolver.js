@@ -14,7 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
-const graphql_2 = require("../gql/graphql");
+const graphql_2 = require("../../gql/graphql");
 const user_service_1 = require("./user.service");
 let UserResolver = class UserResolver {
     constructor(userService) {
@@ -40,6 +40,35 @@ let UserResolver = class UserResolver {
                 throw new Error("An error occurred while trying to execute your query");
         }
     }
+    async login(args) {
+        try {
+            const res = await this.userService.loginUser(args);
+            return res;
+        }
+        catch (error) {
+            if (error)
+                console.log(error);
+            throw new Error("An error occured while trying to executre your query");
+        }
+    }
+    async socials() {
+        try {
+            const res = await this.userService.socials();
+            return res;
+        }
+        catch (error) {
+            throw new Error("Could not fetch Socials");
+        }
+    }
+    async social(id) {
+        try {
+            const res = await this.userService.social(id);
+            return res;
+        }
+        catch (error) {
+            throw new Error("Could not fetch social with id: " + id);
+        }
+    }
     async createUser(args) {
         const res = await this.userService.registerUser(args);
         return res;
@@ -50,43 +79,145 @@ let UserResolver = class UserResolver {
     async delete(args) {
         return this.userService.deleteUser(args);
     }
+    async addSocial(user, input) {
+        try {
+            const res = await this.userService.addSocial(user, input);
+            return res;
+        }
+        catch (error) {
+            throw new Error("Could not add Social");
+        }
+    }
+    async updateSocial(id, input) {
+        try {
+            const res = await this.userService.updateSocial(id, input);
+        }
+        catch (error) {
+            throw new Error("Could not update Social with document id: " + id);
+        }
+    }
+    async updateUserSocial(user, input) {
+        try {
+            const res = await this.userService.updateUserSocial(user, input);
+            return res;
+        }
+        catch (error) {
+            throw new Error("Could not update social with user id: " + user);
+        }
+    }
+    async deleteSocial(id) {
+        try {
+            const res = await this.userService.deleteSocial(id);
+            return res;
+        }
+        catch (error) {
+            throw new Error("Could not delete social with document id: " + id);
+        }
+    }
+    async deleteUserSocial(user) {
+        try {
+            const res = await this.userService.deleteUserSocial(user);
+            return res;
+        }
+        catch (error) {
+            throw new Error("Could not delete Socail with user id: " + user);
+        }
+    }
 };
 __decorate([
-    graphql_1.Query("users"),
+    (0, graphql_1.Query)("users"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "users", null);
 __decorate([
-    graphql_1.Query("user"),
-    __param(0, graphql_1.Args("id")),
+    (0, graphql_1.Query)("user"),
+    __param(0, (0, graphql_1.Args)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "user", null);
 __decorate([
-    graphql_1.Mutation(() => graphql_2.User),
-    __param(0, graphql_1.Args("input")),
+    (0, graphql_1.Query)("login"),
+    __param(0, (0, graphql_1.Args)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [graphql_2.LoginUser]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "login", null);
+__decorate([
+    (0, graphql_1.Query)("socials"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "socials", null);
+__decorate([
+    (0, graphql_1.Query)("social"),
+    __param(0, (0, graphql_1.Args)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "social", null);
+__decorate([
+    (0, graphql_1.Mutation)("createUser"),
+    __param(0, (0, graphql_1.Args)("input")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [graphql_2.NewUser]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "createUser", null);
 __decorate([
-    graphql_1.Mutation("updateUser"),
-    __param(0, graphql_1.Args("input")),
+    (0, graphql_1.Mutation)("updateUser"),
+    __param(0, (0, graphql_1.Args)("input")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [graphql_2.UpdateUser]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "update", null);
 __decorate([
-    graphql_1.Mutation("deleteUser"),
-    __param(0, graphql_1.Args("id")),
+    (0, graphql_1.Mutation)("deleteUser"),
+    __param(0, (0, graphql_1.Args)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "delete", null);
+__decorate([
+    (0, graphql_1.Mutation)("addSocial"),
+    __param(0, (0, graphql_1.Args)("userId")),
+    __param(1, (0, graphql_1.Args)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, graphql_2.SocialInput]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "addSocial", null);
+__decorate([
+    (0, graphql_1.Mutation)("updateSocial"),
+    __param(0, (0, graphql_1.Args)("id")),
+    __param(1, (0, graphql_1.Args)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, graphql_2.SocialInput]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "updateSocial", null);
+__decorate([
+    (0, graphql_1.Mutation)("updateUserSocial"),
+    __param(0, (0, graphql_1.Args)("userId")),
+    __param(1, (0, graphql_1.Args)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, graphql_2.SocialInput]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "updateUserSocial", null);
+__decorate([
+    (0, graphql_1.Mutation)("deleteSocial"),
+    __param(0, (0, graphql_1.Args)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "deleteSocial", null);
+__decorate([
+    (0, graphql_1.Mutation)("deleteUserSocial"),
+    __param(0, (0, graphql_1.Args)("userId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "deleteUserSocial", null);
 UserResolver = __decorate([
-    graphql_1.Resolver("User"),
+    (0, graphql_1.Resolver)("User"),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserResolver);
 exports.UserResolver = UserResolver;

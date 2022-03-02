@@ -10,22 +10,25 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_module_1 = require("./user/user.module");
+const pos_module_1 = require("./pos/pos.module");
 const graphql_1 = require("@nestjs/graphql");
+const program_module_1 = require("./program/program.module");
 require("dotenv").config();
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
-    common_1.Module({
+    (0, common_1.Module)({
         imports: [
             graphql_1.GraphQLModule.forRoot({
                 debug: true,
-                playground: true,
                 typePaths: ["./**/*.graphql"],
             }),
             mongoose_1.MongooseModule.forRoot(process.env.DATABASE_URL || "", {
                 useNewUrlParser: true,
             }),
             user_module_1.UserModule,
+            pos_module_1.PoSModule,
+            program_module_1.ProgramModule,
         ],
         controllers: [],
         providers: [],

@@ -14,30 +14,77 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlanOfStudyResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
-const user_service_1 = require("../user/user.service");
-const pos_schema_1 = require("./pos.schema");
+const graphql_2 = require("../../gql/graphql");
 const pos_service_1 = require("./pos.service");
 let PlanOfStudyResolver = class PlanOfStudyResolver {
-    constructor(planService, userService) {
+    constructor(planService) {
         this.planService = planService;
-        this.userService = userService;
     }
-    async plan({ student }) {
-        const res = await this.planService.findByStudentID(student);
+    async plans() {
+        const res = await this.planService.plans();
         return res;
+    }
+    async plan(studentID) {
+        return this.planService.planById(studentID);
+    }
+    async planByID(arg) {
+        return this.planService.plan(arg);
+    }
+    async addPlan(args) {
+        return this.planService.addPlan(args);
+    }
+    async updatePlan(id, input) {
+        return this.planService.updatePlan(id, input);
+    }
+    async deletePlan(id) {
+        return this.planService.deletePlan(id);
     }
 };
 __decorate([
-    graphql_1.Query(() => pos_schema_1.PlanOfStudy),
-    __param(0, graphql_1.Args("input")),
+    (0, graphql_1.Query)("plans"),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pos_schema_1.PlanOfStudyInput]),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PlanOfStudyResolver.prototype, "plans", null);
+__decorate([
+    (0, graphql_1.Query)("plan"),
+    __param(0, (0, graphql_1.Args)("studentID")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PlanOfStudyResolver.prototype, "plan", null);
+__decorate([
+    (0, graphql_1.Query)("planByID"),
+    __param(0, (0, graphql_1.Args)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PlanOfStudyResolver.prototype, "planByID", null);
+__decorate([
+    (0, graphql_1.Mutation)("addPlan"),
+    __param(0, (0, graphql_1.Args)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [graphql_2.PlanInput]),
+    __metadata("design:returntype", Promise)
+], PlanOfStudyResolver.prototype, "addPlan", null);
+__decorate([
+    (0, graphql_1.Mutation)("updatePlan"),
+    __param(0, (0, graphql_1.Args)("id")),
+    __param(1, (0, graphql_1.Args)("input")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, graphql_2.PlanInput]),
+    __metadata("design:returntype", Promise)
+], PlanOfStudyResolver.prototype, "updatePlan", null);
+__decorate([
+    (0, graphql_1.Mutation)("deletePlan"),
+    __param(0, (0, graphql_1.Args)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PlanOfStudyResolver.prototype, "deletePlan", null);
 PlanOfStudyResolver = __decorate([
-    graphql_1.Resolver(() => pos_schema_1.PlanOfStudy),
-    __metadata("design:paramtypes", [pos_service_1.PoSService,
-        user_service_1.UserService])
+    (0, graphql_1.Resolver)(),
+    __metadata("design:paramtypes", [pos_service_1.PoSService])
 ], PlanOfStudyResolver);
 exports.PlanOfStudyResolver = PlanOfStudyResolver;
 //# sourceMappingURL=pos.resolver.js.map
