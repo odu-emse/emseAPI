@@ -20,6 +20,7 @@ AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             graphql_1.GraphQLModule.forRoot({
+                playground: true,
                 debug: true,
                 typePaths: ["./**/*.graphql"],
             }),

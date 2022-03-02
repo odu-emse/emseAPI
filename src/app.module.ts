@@ -15,6 +15,7 @@ require("dotenv").config();
 @Module({
 	imports: [
 		GraphQLModule.forRoot({
+			playground: true,
 			debug: true,
 			typePaths: ["./**/*.graphql"],
 			// driver: ApolloDriver,
