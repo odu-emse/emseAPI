@@ -12,9 +12,17 @@ export class PoSService {
 	async plans(): Promise<PlanOfStudy[]> {
 		const plans = await this.prisma.planOfStudy.findMany({
 			include: {
-				modules: true,
+				modules: {
+					include: {
+						module: true
+					}
+				},
 				assignmentResults: true,
-				courses: true,
+				courses: {
+					include: {
+						course: true
+					}
+				},
 				student: true
 			}
 		});
@@ -25,14 +33,27 @@ export class PoSService {
 	async planById(id: string): Promise<PlanOfStudy | null> {
 		const res = await this.prisma.planOfStudy.findUnique({
 			where: {
-				id,
+				id
 			},
 			include: {
-				modules: true,
-				assignmentResults: true,
-				courses: true,
+				modules: {
+					include: {
+						module: true,
+						plan: true
+					}
+				},
+				assignmentResults: {
+					include: {
+						assignment: true,
+						gradedBy: true
+					}
+				},
+				courses: {
+					include: {
+						course: true
+					}
+				},
 				student: true
-
 			}
 		});
 		return res;
@@ -43,12 +64,26 @@ export class PoSService {
 	async plan(studentID: string): Promise<PlanOfStudy | null> {
 		const res = await this.prisma.planOfStudy.findFirst({
 			where: {
-				studentID,
+				studentID
 			},
 			include: {
-				modules: true,
-				assignmentResults: true,
-				courses: true,
+				modules: {
+					include: {
+						module: true,
+						plan: true
+					}
+				},
+				assignmentResults: {
+					include: {
+						assignment: true,
+						gradedBy: true
+					}
+				},
+				courses: {
+					include: {
+						course: true
+					}
+				},
 				student: true
 			}
 		});
@@ -63,20 +98,19 @@ export class PoSService {
 				studentID: input.student
 			},
 			include: {
-				student: true,
+				student: true
 			}
-		})
+		});
 	}
 
 	// TODO: Handle connections to modules, courses and assignment results
 	async updatePlan(id: string, input: PlanInput) {
-
 		return this.prisma.planOfStudy.update({
 			where: {
 				id
 			},
 			data: {
-				studentID: input.student,
+				studentID: input.student
 			},
 			include: {
 				modules: true,
@@ -84,15 +118,14 @@ export class PoSService {
 				courses: true,
 				student: true
 			}
-		})
-
+		});
 	}
 
 	async deletePlan(id: string) {
 		return this.prisma.planOfStudy.delete({
 			where: {
 				id
-			},
+			}
 		});
 	}
 }
