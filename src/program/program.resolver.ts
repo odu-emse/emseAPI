@@ -1,9 +1,17 @@
-import { AssignmentInput, CourseInput, ModuleEnrollmentInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, NewAssignmentResult, NewModule, UpdateModule } from "gql/graphql";
+import {
+	AssignmentInput,
+	CourseInput,
+	ModuleEnrollmentInput,
+	ModuleFeedbackInput,
+	ModuleFeedbackUpdate,
+	NewAssignment,
+	NewAssignmentResult,
+	NewModule,
+	UpdateModule
+} from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
-import { query } from "express";
-import { double, float } from "aws-sdk/clients/lightsail";
 
 @Resolver()
 export class ProgramResolver {
@@ -42,7 +50,9 @@ export class ProgramResolver {
 			const res = this.programService.courses();
 			return res;
 		} catch (error) {
-			throw new Error("An error occurred while trying to execute your query");
+			throw new Error(
+				"An error occurred while trying to execute your query"
+			);
 		}
 	}
 
@@ -53,7 +63,9 @@ export class ProgramResolver {
 			const res = await this.programService.assignment(args);
 			return res;
 		} catch (error) {
-			throw new Error("An error occurred while trying to execute your query");
+			throw new Error(
+				"An error occurred while trying to execute your query"
+			);
 		}
 	}
 
@@ -64,7 +76,9 @@ export class ProgramResolver {
 			const res = this.programService.assignments();
 			return res;
 		} catch (error) {
-			throw new Error("An error occurred while trying to execute your query");
+			throw new Error(
+				"An error occurred while trying to execute your query"
+			);
 		}
 	}
 
@@ -84,7 +98,7 @@ export class ProgramResolver {
 			const res = await this.programService.moduleFeedbacks();
 			return res;
 		} catch (error) {
-			throw new Error("Could not fetch ModuleFeedback")
+			throw new Error("Could not fetch ModuleFeedback");
 		}
 	}
 
@@ -143,7 +157,7 @@ export class ProgramResolver {
 		try {
 			const res = await this.programService.courseEnrollments();
 			return res;
-		} catch(error) {
+		} catch (error) {
 			throw new Error("Could not fetch CourseEnrollments");
 		}
 	}
@@ -153,7 +167,7 @@ export class ProgramResolver {
 		try {
 			const res = await this.programService.courseEnrollment(id);
 			return res;
-		} catch(error) {
+		} catch (error) {
 			throw new Error("Could not fetch CourseEnrollment with id: " + id);
 		}
 	}
@@ -162,7 +176,7 @@ export class ProgramResolver {
 
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
-	async create(@Args("input") args: NewModule) { 
+	async create(@Args("input") args: NewModule) {
 		const res = await this.programService.addModule(args);
 		return res;
 	}
@@ -179,7 +193,7 @@ export class ProgramResolver {
 	async delete(@Args("id") args: string) {
 		const res = await this.programService.deleteModule(args);
 		return res;
-	} 
+	}
 
 	// // Add a Course to the db with a course name
 	@Mutation("addCourse")
@@ -190,7 +204,10 @@ export class ProgramResolver {
 
 	// Update a course name
 	@Mutation("updateCourse")
-	async updateCourse(@Args("id") id: string, @Args("input") args: CourseInput) {
+	async updateCourse(
+		@Args("id") id: string,
+		@Args("input") args: CourseInput
+	) {
 		const res = await this.programService.updateCourse(id, args);
 		return res;
 	}
@@ -215,35 +232,54 @@ export class ProgramResolver {
 
 	// // Delete an assignment from DB
 	@Mutation("deleteAssignment")
-	async deleteAssignment(@Args("module") args: string, @Args("id") id: string) {
+	async deleteAssignment(
+		@Args("module") args: string,
+		@Args("id") id: string
+	) {
 		const res = await this.programService.deleteAssignment(args, id);
 		return res;
 	}
 
 	// Update an assignment in the db
 	@Mutation("updateAssignment")
-	async updateAssignment(@Args("id") id: string, @Args("input") args: AssignmentInput) {
+	async updateAssignment(
+		@Args("id") id: string,
+		@Args("input") args: AssignmentInput
+	) {
 		const res = await this.programService.updateAssignment(id, args);
 		return res;
 	}
 
 	/// Add module feedback
 	@Mutation("addModuleFeedback")
-	async addModuleFeedback(@Args("moduleId") moduleId: string, @Args("userId") userId: string, @Args("input") data: Prisma.ModuleFeedbackCreateInput) {
+	async addModuleFeedback(
+		@Args("moduleId") moduleId: string,
+		@Args("userId") userId: string,
+		@Args("input") data: Prisma.ModuleFeedbackCreateInput
+	) {
 		try {
-			const res = await this.programService.addModuleFeedback(moduleId, userId, data);
+			const res = await this.programService.addModuleFeedback(
+				moduleId,
+				userId,
+				data
+			);
 			return res;
-		} catch(error) {
+		} catch (error) {
 			throw new Error("Could not add ModuleFeedback");
 		}
-
 	}
 
 	/// Update a modulefeedback
 	@Mutation("updateModuleFeedback")
-	async updateModuleFeedback(@Args("id") id: string, @Args("input") data: ModuleFeedbackUpdate) {
+	async updateModuleFeedback(
+		@Args("id") id: string,
+		@Args("input") data: ModuleFeedbackUpdate
+	) {
 		try {
-			const res = await this.programService.updateModuleFeedback(id, data);
+			const res = await this.programService.updateModuleFeedback(
+				id,
+				data
+			);
 			return res;
 		} catch (error) {
 			throw new Error("Could not update ModuleFeedback with id: " + id);
@@ -272,9 +308,15 @@ export class ProgramResolver {
 	}
 
 	@Mutation("updateAssignmentResult")
-	async updateAssignmentResult(@Args("id") id: string, @Args("result") result: float){
+	async updateAssignmentResult(
+		@Args("id") id: string,
+		@Args("result") result: number
+	) {
 		try {
-			const res = await this.programService.updateAssignmentResult(id, result);
+			const res = await this.programService.updateAssignmentResult(
+				id,
+				result
+			);
 			return res;
 		} catch (error) {
 			throw new Error("Could not update AssignmentResult with id: " + id);
@@ -302,11 +344,17 @@ export class ProgramResolver {
 	}
 
 	@Mutation("updateModuleEnrollment")
-	async updateModuleEnrollment(@Args("id") id: string, @Args("input") input: ModuleEnrollmentInput) {
+	async updateModuleEnrollment(
+		@Args("id") id: string,
+		@Args("input") input: ModuleEnrollmentInput
+	) {
 		try {
-			const res = await this.programService.updateModuleEnrollment(id, input);
+			const res = await this.programService.updateModuleEnrollment(
+				id,
+				input
+			);
 			return res;
-		} catch(error) {
+		} catch (error) {
 			throw new Error("Could not update ModuleEnrollment with id: " + id);
 		}
 	}
@@ -322,9 +370,15 @@ export class ProgramResolver {
 	}
 
 	@Mutation("addCourseEnrollment")
-	async addCourseEnrollment(@Args("planId") plan: string, @Args("courseId") course: string) {
+	async addCourseEnrollment(
+		@Args("planId") plan: string,
+		@Args("courseId") course: string
+	) {
 		try {
-			const res = await this.programService.addCourseEnrollment(plan, course);
+			const res = await this.programService.addCourseEnrollment(
+				plan,
+				course
+			);
 			return res;
 		} catch (error) {
 			throw new Error("Could not create new CourseEnrollment");
@@ -332,9 +386,17 @@ export class ProgramResolver {
 	}
 
 	@Mutation("updateCourseEnrollment")
-	async updateCourseEnrollment(@Args("id") id: string, @Args("planId") plan: string, @Args("courseId") course: string) {
+	async updateCourseEnrollment(
+		@Args("id") id: string,
+		@Args("planId") plan: string,
+		@Args("courseId") course: string
+	) {
 		try {
-			const res = await this.programService.updateCourseEnrollment(id, plan, course);
+			const res = await this.programService.updateCourseEnrollment(
+				id,
+				plan,
+				course
+			);
 			return res;
 		} catch (error) {
 			throw new Error("Could not update CourseEnrollment with id: " + id);
@@ -343,7 +405,7 @@ export class ProgramResolver {
 
 	@Mutation("deleteCourseEnrollment")
 	async deleteCourseEnrollment(@Args("id") id: string) {
-		try { 
+		try {
 			const res = await this.programService.deleteCourseEnrollment(id);
 			return res;
 		} catch (error) {
@@ -352,22 +414,41 @@ export class ProgramResolver {
 	}
 
 	@Mutation("pairCourseModule")
-	async pairCourseModule(@Args("courseId") courseId: string, @Args("moduleId") moduleId: string) {
+	async pairCourseModule(
+		@Args("courseId") courseId: string,
+		@Args("moduleId") moduleId: string
+	) {
 		try {
-			const res = await this.programService.pairCourseModule(courseId, moduleId);
+			const res = await this.programService.pairCourseModule(
+				courseId,
+				moduleId
+			);
 			return res;
-		} catch(error) {
-			throw new Error("Could not pair course " + courseId + " and module " + moduleId);
+		} catch (error) {
+			throw new Error(
+				"Could not pair course " + courseId + " and module " + moduleId
+			);
 		}
 	}
 
 	@Mutation("unpairCourseModule")
-	async unpairCourseModule(@Args("courseId") courseId: string, @Args("moduleId") moduleId: string) {
+	async unpairCourseModule(
+		@Args("courseId") courseId: string,
+		@Args("moduleId") moduleId: string
+	) {
 		try {
-			const res = await this.programService.unpairCourseModule(courseId, moduleId);
+			const res = await this.programService.unpairCourseModule(
+				courseId,
+				moduleId
+			);
 			return res;
-		} catch(error) {
-			throw new Error("Could not unlink course " + courseId + " and module " + moduleId);
+		} catch (error) {
+			throw new Error(
+				"Could not unlink course " +
+					courseId +
+					" and module " +
+					moduleId
+			);
 		}
 	}
 }

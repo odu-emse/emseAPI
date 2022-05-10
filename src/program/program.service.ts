@@ -1,6 +1,24 @@
-import {  AssignmentInput, CourseInput, ModuleFeedbackInput, ModuleFeedbackUpdate, NewAssignment, UpdateModule, NewAssignmentResult, ModuleEnrollmentInput  } from "gql/graphql";
+import {
+	AssignmentInput,
+	CourseInput,
+	ModuleFeedbackInput,
+	ModuleFeedbackUpdate,
+	NewAssignment,
+	UpdateModule,
+	NewAssignmentResult,
+	ModuleEnrollmentInput
+} from "gql/graphql";
 import { Injectable } from "@nestjs/common";
-import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback, AssignmentResult, ModuleEnrollment, CourseEnrollment } from "@prisma/client";
+import {
+	Module,
+	Course,
+	Assignment,
+	ModuleInCourse,
+	ModuleFeedback,
+	AssignmentResult,
+	ModuleEnrollment,
+	CourseEnrollment
+} from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
 import { float } from "aws-sdk/clients/lightsail";
@@ -38,7 +56,7 @@ export class ProgramService {
 		if (id.length === 24) {
 			const res = await this.prisma.module.findFirst({
 				where: {
-					id,
+					id
 				},
 				include: {
 					assignments: true,
@@ -69,8 +87,8 @@ export class ProgramService {
 		else {
 			const res = await this.prisma.module.findFirst({
 				where: {
-					moduleNumber: parseInt(id),
-				},
+					moduleNumber: parseInt(id)
+				}
 			});
 			return res;
 		}
@@ -97,13 +115,13 @@ export class ProgramService {
 		});
 	}
 
-	async assignment(id: string): Promise <Assignment | null> {
+	async assignment(id: string): Promise<Assignment | null> {
 		const res = await this.prisma.assignment.findFirst({
 			where: {
 				id
 			},
 			include: {
-				module: true,
+				module: true
 			}
 		});
 		return res;
@@ -122,9 +140,9 @@ export class ProgramService {
 		return this.prisma.moduleFeedback.findMany({
 			include: {
 				student: true,
-				module: true	
+				module: true
 			}
-		})
+		});
 	}
 
 	async moduleFeedback(id: string): Promise<ModuleFeedback | null> {
@@ -136,22 +154,29 @@ export class ProgramService {
 				student: true,
 				module: true
 			}
-		})
+		});
 	}
 
 	async assignmentResults(): Promise<AssignmentResult[]> {
 		return this.prisma.assignmentResult.findMany({
 			include: {
-				student: true,
+				student: {
+					include: {
+						student: true,
+						modules: true,
+						assignmentResults: true,
+						courses: true
+					}
+				},
 				gradedBy: true,
 				assignment: true
 			}
-		})
+		});
 	}
 
 	async assignmentResult(id: string): Promise<AssignmentResult | null> {
 		return this.prisma.assignmentResult.findFirst({
-			where:{
+			where: {
 				id
 			},
 			include: {
@@ -159,36 +184,48 @@ export class ProgramService {
 				gradedBy: true,
 				assignment: true
 			}
-		})
+		});
 	}
 
 	/// Fetch all module enrollments in the database
 	async moduleEnrollments(): Promise<ModuleEnrollment[]> {
 		return this.prisma.moduleEnrollment.findMany({
 			include: {
-				plan: true,
+				plan: {
+					include: {
+						student: true
+					}
+				},
 				module: true
 			}
-		})
+		});
 	}
 
 	/// Fetch a moduleEnrollment by document ID
-	async moduleEnrollment(id: string): Promise<ModuleEnrollment | null>{
+	async moduleEnrollment(id: string): Promise<ModuleEnrollment | null> {
 		return this.prisma.moduleEnrollment.findFirst({
 			where: {
 				id
-			},
-		})
+			}
+		});
 	}
 
 	/// Fetch all CourseEnrollment records
 	async courseEnrollments(): Promise<CourseEnrollment[]> {
 		return this.prisma.courseEnrollment.findMany({
 			include: {
-				student: true,
+				// student field below represents a plan of study
+				student: {
+					include: {
+						student: true,
+						modules: true,
+						assignmentResults: true,
+						courses: true
+					}
+				},
 				course: true
 			}
-		})
+		});
 	}
 
 	/// Fetch a CourseEnrollment Record by its ID
@@ -198,10 +235,19 @@ export class ProgramService {
 				id
 			},
 			include: {
-				student: true,
+				// student field below represents a plan of study
+				student: {
+					include: {
+						// this is the actual student's profile etc
+						student: true,
+						modules: true,
+						assignmentResults: true,
+						courses: true
+					}
+				},
 				course: true
 			}
-		})
+		});
 	}
 
 	//Mutations
@@ -211,8 +257,8 @@ export class ProgramService {
 		//find out if there is a duplicate user
 		const get = await this.prisma.module.findMany({
 			where: {
-				moduleNumber: data.moduleNumber,
-			},
+				moduleNumber: data.moduleNumber
+			}
 		});
 		if (get.length !== 0) {
 			throw new Error("Module already exisits.");
@@ -230,7 +276,7 @@ export class ProgramService {
 				createdAt,
 				updatedAt,
 				numSlides,
-				duration,
+				duration
 			} = data;
 			return this.prisma.module.create({
 				data,
@@ -265,20 +311,20 @@ export class ProgramService {
 			description,
 			duration,
 			numSlides,
-			keywords,
-		} = data
+			keywords
+		} = data;
 
 		return this.prisma.module.update({
 			where: {
-				id: data.id,
+				id: data.id
 			},
 			data: {
-				...(moduleNumber && {moduleNumber}),
-				...(moduleName && {moduleName}),
-				...(description && {description}),
-				...(duration && {duration}),
-				...(numSlides && {numSlides}),
-				...(keywords && {keywords}),
+				...(moduleNumber && { moduleNumber }),
+				...(moduleName && { moduleName }),
+				...(description && { description }),
+				...(duration && { duration }),
+				...(numSlides && { numSlides }),
+				...(keywords && { keywords })
 			},
 			include: {
 				assignments: true,
@@ -312,34 +358,31 @@ export class ProgramService {
 		return this.prisma.module.delete({
 			where: {
 				id: id
-			},
+			}
 		});
 	}
 
 	/// Create a course and assign an initial module to that course
 	async addCourse(data: Prisma.CourseCreateInput): Promise<Course | Error> {
 		//Probably need some error checking here to make sure the module actually exists
-		
+
 		//Make a new course
 		return await this.prisma.course.create({
 			data: {
 				// Set the name
-				name: data.name,
-				
+				name: data.name
 			}
-		})
-	} 
+		});
+	}
 
 	async updateCourse(id: string, data: CourseInput): Promise<Course> {
-		const {
-			name
-		} = data
+		const { name } = data;
 		return this.prisma.course.update({
 			where: {
-				id: id,
+				id: id
 			},
 			data: {
-				...(name && {name})
+				...(name && { name })
 			}
 		});
 	}
@@ -364,7 +407,6 @@ export class ProgramService {
 				id
 			}
 		});
-
 	}
 
 	/// Remove an assignment from a module
@@ -376,22 +418,21 @@ export class ProgramService {
 			},
 			data: {
 				assignments: {
-					deleteMany: [{id: id}]
+					deleteMany: [{ id: id }]
 				}
 			}
-		})
+		});
 	}
 
 	/// Create an assignment document
 	async addAssignment(input: NewAssignment) {
 		return this.prisma.assignment.create({
-			data:{
+			data: {
 				name: input.name,
 				moduleId: input.module,
 				dueAt: input.dueAt
-				
 			}
-		})
+		});
 	}
 
 	/// Change an assignments data
@@ -404,17 +445,21 @@ export class ProgramService {
 		} = data;
 		return this.prisma.assignment.update({
 			where: {
-				id: id,
+				id: id
 			},
 			data: {
-				...(name && {name}),
-				...(dueAt && {dueAt})
+				...(name && { name }),
+				...(dueAt && { dueAt })
 			}
-		})
+		});
 	}
 
 	/// Create a module feedback and link it to the user and module
-	async addModuleFeedback(moduleId: string, userId: string, input: Prisma.ModuleFeedbackCreateInput) {
+	async addModuleFeedback(
+		moduleId: string,
+		userId: string,
+		input: Prisma.ModuleFeedbackCreateInput
+	) {
 		return this.prisma.module.update({
 			where: {
 				id: moduleId
@@ -429,30 +474,30 @@ export class ProgramService {
 								studentId: userId
 							}
 						]
-					} 
+					}
 				}
 			},
 			include: {
 				feedback: true
 			}
-		})
+		});
 	}
 
 	/// Update a module feedback
-	async updateModuleFeedback(id: string, input: ModuleFeedbackUpdate): Promise<ModuleFeedback> {
-		const {
-			feedback,
-			rating
-		} = input
+	async updateModuleFeedback(
+		id: string,
+		input: ModuleFeedbackUpdate
+	): Promise<ModuleFeedback> {
+		const { feedback, rating } = input;
 		return this.prisma.moduleFeedback.update({
 			where: {
 				id
 			},
 			data: {
-				...(feedback && {feedback}),
-				...(rating && {rating})
+				...(feedback && { feedback }),
+				...(rating && { rating })
 			}
-		})
+		});
 	}
 
 	/// Delete a ModuleFeedback
@@ -461,11 +506,11 @@ export class ProgramService {
 			where: {
 				id
 			}
-		})
+		});
 	}
 
 	/// Add an AssignmentResult
-	async addAssignmentResult(input: NewAssignmentResult){
+	async addAssignmentResult(input: NewAssignmentResult) {
 		return this.prisma.assignmentResult.create({
 			data: {
 				assignmentId: input.assignment,
@@ -473,7 +518,7 @@ export class ProgramService {
 				graderId: input.grader,
 				result: input.result
 			}
-		})
+		});
 	}
 
 	/// Update an assignment result
@@ -485,7 +530,7 @@ export class ProgramService {
 			data: {
 				result: result
 			}
-		})
+		});
 	}
 
 	/// Delete an assignment result
@@ -494,7 +539,7 @@ export class ProgramService {
 			where: {
 				id
 			}
-		})
+		});
 	}
 
 	/// Create a ModuleEnrollment Document
@@ -509,11 +554,11 @@ export class ProgramService {
 				module: true,
 				plan: true
 			}
-		})
+		});
 	}
 
 	/// Update a ModuleEnrollment
-	async updateModuleEnrollment(id: string, input: ModuleEnrollmentInput){
+	async updateModuleEnrollment(id: string, input: ModuleEnrollmentInput) {
 		return this.prisma.moduleEnrollment.update({
 			where: {
 				id
@@ -527,25 +572,38 @@ export class ProgramService {
 				module: true,
 				plan: true
 			}
-		})
+		});
 	}
 
-	async deleteModuleEnrollment(id: string){
+	async deleteModuleEnrollment(id: string) {
 		return this.prisma.moduleEnrollment.delete({
 			where: {
 				id
 			}
-		})
+		});
 	}
 
 	/// Create a new CourseEnrollment Record
-	async addCourseEnrollment(planId: string, courseId: string): Promise<CourseEnrollment> {
+	async addCourseEnrollment(
+		planId: string,
+		courseId: string
+	): Promise<CourseEnrollment> {
 		return this.prisma.courseEnrollment.create({
 			data: {
 				studentId: planId,
 				courseId: courseId
+			},
+			include: {
+				student: {
+					include: {
+						student: true,
+						modules: true,
+						assignmentResults: true,
+						courses: true
+					}
+				}
 			}
-		})
+		});
 	}
 
 	/// Modify an existing CourseEnrollment Record
@@ -558,7 +616,7 @@ export class ProgramService {
 				studentId: planId,
 				courseId: courseId
 			}
-		})
+		});
 	}
 
 	/// Delete an existing record
@@ -567,17 +625,17 @@ export class ProgramService {
 			where: {
 				id
 			}
-		})
+		});
 	}
 
 	// Link a course and a module
-	async pairCourseModule(courseId: string, moduleId: string){
+	async pairCourseModule(courseId: string, moduleId: string) {
 		return this.prisma.moduleInCourse.create({
-			data:{
+			data: {
 				moduleId: moduleId,
 				courseId: courseId
 			}
-		})
+		});
 	}
 
 	async unpairCourseModule(courseId: string, moduleId: string) {
@@ -586,7 +644,6 @@ export class ProgramService {
 				moduleId: moduleId,
 				courseId: courseId
 			}
-		})
+		});
 	}
-
 }

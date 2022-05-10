@@ -15,7 +15,7 @@ type ModuleEnrollment {
 
 type AssignmentResult {
 	id: ID!
-	sumbittedAt: String!
+	submittedAt: String!
 	result: Float!
 
 	student: PlanOfStudy
@@ -129,7 +129,7 @@ input UpdateModule {
 	description: String
 	duration: Float
 	numSlides: Int
-	
+
 	keywords: [String!]
 }
 
@@ -186,7 +186,11 @@ type Mutation {
 	deleteAssignment(module: ID!, id: ID!): Module
 	updateAssignment(id: ID!, input: AssignmentInput): Assignment
 
-	addModuleFeedback(moduleId: ID!, userId: ID!, input: ModuleFeedbackInput): Module
+	addModuleFeedback(
+		moduleId: ID!
+		userId: ID!
+		input: ModuleFeedbackInput
+	): Module
 	updateModuleFeedback(id: ID!, input: ModuleFeedbackUpdate): ModuleFeedback
 	deleteModuleFeedback(id: ID!): ModuleFeedback
 
@@ -195,7 +199,10 @@ type Mutation {
 	deleteAssignmentResult(id: ID!): AssignmentResult
 
 	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
-	updateModuleEnrollment(id: ID!, input: ModuleEnrollmentInput): ModuleEnrollment
+	updateModuleEnrollment(
+		id: ID!
+		input: ModuleEnrollmentInput
+	): ModuleEnrollment
 	deleteModuleEnrollment(id: ID!): ModuleEnrollment
 
 	addCourseEnrollment(planId: ID!, courseId: ID!): CourseEnrollment!
@@ -204,5 +211,4 @@ type Mutation {
 
 	pairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse!
 	unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
-
 }
