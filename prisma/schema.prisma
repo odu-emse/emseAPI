@@ -17,11 +17,12 @@ model User {
   lastName     String
   middleName   String?
   // prefix       String?  --   We were on the fence about how we were doing prefixes before so its not in for now
+  dob          DateTime? @default(now())
   password     String
   passwordConf String
   isAdmin      Boolean  @default(false)
   // role         UserRole?
-  isActive     Boolean @default(false)
+  isActive     Boolean  @default(false)
 
   // Relation fields
   social           Social?            @relation(name: "social")
@@ -32,14 +33,14 @@ model User {
 }
 
 model PlanOfStudy {
-  id                String             @id @default(auto()) @map("_id") @db.ObjectId     
+  id                String             @id @default(auto()) @map("_id") @db.ObjectId
   student           User?              @relation(name: "plan", fields: [studentID], references: [id])
-  studentID         String?            @db.ObjectId
+  studentID         String?            @db.ObjectId@unique
   // ill figure advisors out later, my brain needs a rest
   // advisor           User?              @relation(fields: [advisorId], references:[id])
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
-  assignmentResults AssignmentResult[] 
+  assignmentResults AssignmentResult[]
   courses           CourseEnrollment[]
 }
 
@@ -51,13 +52,13 @@ model Social {
   facebook  String?
   portfolio String?
   account   User?   @relation(name: "social", fields: [accountID], references: [id])
-  accountID String? @db.ObjectId
+  accountID String? @db.ObjectId@unique
 }
 
 model Token {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt  DateTime  @default(now())
-  valid      Boolean   @default(true)
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime @default(now())
+  valid      Boolean  @default(true)
   expiration DateTime
 
   // Relation fields
@@ -66,35 +67,35 @@ model Token {
 }
 
 model ModuleInCourse {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  module    Module  @relation(fields: [moduleId], references: [id])
-  moduleId  String
+  module   Module @relation(fields: [moduleId], references: [id])
+  moduleId String
 
-  course    Course  @relation(fields: [courseId], references: [id])
-  courseId  String
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId String
 }
 
 model Course {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  
-  enrollment  CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
-  modules     ModuleInCourse[]
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  enrollment CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
+  modules    ModuleInCourse[]
 
 }
 
 model Module {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  moduleNumber  Int      @unique
-  moduleName    String   @unique
-  description   String
-  duration      Float
-  intro         String
-  numSlides     Int
-  keywords      String[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now()) @updatedAt
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  moduleNumber Int      @unique
+  moduleName   String   @unique
+  description  String
+  duration     Float
+  intro        String
+  numSlides    Int
+  keywords     String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
 
   // Relation fields
   members       ModuleEnrollment[]
@@ -102,8 +103,6 @@ model Module {
   feedback      ModuleFeedback[]
   parentCourses ModuleInCourse[]
 }
-
-
 
 model ModuleFeedback {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
@@ -129,13 +128,13 @@ model ModuleEnrollment {
 }
 
 model CourseEnrollment {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  student     PlanOfStudy @relation(fields: [studentId], references: [id])
-  studentId   String      @db.ObjectId
-  enrolledAt  DateTime    @default(now())
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  student    PlanOfStudy @relation(fields: [studentId], references: [id])
+  studentId  String      @db.ObjectId
+  enrolledAt DateTime    @default(now())
 
-  course      Course      @relation(fields: [courseId], references: [id])
-  courseId    String      @db.ObjectId
+  course   Course @relation(fields: [courseId], references: [id])
+  courseId String @db.ObjectId
 }
 
 model Assignment {

@@ -82,7 +82,6 @@ export class NewUser {
     firstName: string;
     lastName: string;
     middleName: string;
-    prefix?: Nullable<string>;
     password: string;
     passwordConf: string;
 }
@@ -93,9 +92,9 @@ export class UpdateUser {
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
-    prefix?: Nullable<string>;
-    password?: Nullable<string>;
-    passwordConf?: Nullable<string>;
+    password: string;
+    passwordConf: string;
+    dob?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
 }
@@ -247,7 +246,7 @@ export class ModuleEnrollment {
 
 export class AssignmentResult {
     id: string;
-    sumbittedAt: string;
+    submittedAt: string;
     result: number;
     student?: Nullable<PlanOfStudy>;
     gradedBy?: Nullable<User>;
@@ -329,11 +328,11 @@ export class User {
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
-    prefix?: Nullable<string>;
     password?: Nullable<string>;
     passwordConf?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
+    dob?: Nullable<string>;
     social?: Nullable<Social>;
     plan?: Nullable<PlanOfStudy>;
     tokens?: Nullable<string[]>;

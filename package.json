@@ -7,7 +7,7 @@
 		"start:prod": "node dist/main",
 		"dev": "nest start --watch",
 		"build": "yarn prisma && nest build",
-		"tsc": "tsc --excludeDirectories node_modules gql/generate-typings.ts",
+		"tsc": "tsc --skipLibCheck --excludeDirectories node_modules gql/generate-typings.ts",
 		"typings": "node gql/generate-typings.js",
 		"prisma": "npx prisma generate",
 		"release": "standard-version"

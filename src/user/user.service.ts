@@ -1,15 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, User, Social } from "@prisma/client";
-import { NewUser, UpdateUser, LoginUser, Token, SocialInput} from "gql/graphql";
-import { hash,compare } from "bcryptjs";
+import {
+	NewUser,
+	UpdateUser,
+	LoginUser,
+	Token,
+	SocialInput
+} from "gql/graphql";
+import { hash, compare } from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class UserService {
 	constructor(
 		private prisma: PrismaService,
-		private readonly jwtService: JwtService) {}
+		private readonly jwtService: JwtService
+	) {}
 
 	// Get all users
 	async users(): Promise<User[]> {
@@ -26,7 +33,7 @@ export class UserService {
 	async user(id: string): Promise<User | null> {
 		const user = this.prisma.user.findUnique({
 			where: {
-				id,
+				id
 			},
 			include: {
 				feedback: true,
@@ -34,10 +41,9 @@ export class UserService {
 				assignmentGraded: true
 			}
 		});
-		
+
 		return user;
 	}
-
 
 	/// Get all Social Records
 	async socials(): Promise<Social[]> {
@@ -45,7 +51,7 @@ export class UserService {
 			include: {
 				account: true
 			}
-		})
+		});
 	}
 
 	/// Get a specific Social Record by ID
@@ -57,7 +63,7 @@ export class UserService {
 			include: {
 				account: true
 			}
-		})
+		});
 	}
 	// Create a user
 	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
@@ -67,26 +73,22 @@ export class UserService {
 			firstName,
 			lastName,
 			middleName,
-			// prefix,
 			password,
-			passwordConf,
+			passwordConf
 		} = data;
 
 		const safeEmail = email.toLowerCase();
 		//find out if there is a duplicate user
 		const get = await this.prisma.user.findUnique({
 			where: {
-				email: safeEmail,
-			},
+				email: safeEmail
+			}
 		});
-
-		
 
 		if (password !== passwordConf) {
 			throw new Error("Passwords provided are not matching...");
 		}
 
-		
 		const hashedPassword = await hash(password, 10);
 		const hashedPasswordConf = hashedPassword;
 
@@ -96,113 +98,121 @@ export class UserService {
 			firstName,
 			lastName,
 			middleName,
-			// prefix,
 			password: hashedPassword,
-			passwordConf: hashedPasswordConf,
+			passwordConf: hashedPasswordConf
 		};
-		
+
 		///Avoids duplicate value(email) if the exist already
-		if (get === null){
+		if (get === null) {
 			const res = await this.prisma.user.create({
-				data: payload,
+				data: payload
 			});
-			
+
 			return res;
 		}
-		
+
 		return new Error("User has an account already.");
 	}
 
 	// Update a user
-	async updateUser(params: UpdateUser): Promise<User> {
+	// TODO: figure out why the UserUpdateInput does not contain the id field
+	async updateUser(params: UpdateUser): Promise<User | Error> {
 		const {
 			id,
 			email,
 			firstName,
 			lastName,
 			middleName,
-			prefix,
 			password,
 			passwordConf,
 			isAdmin,
 			isActive
 		} = params;
+
 		//check if passwords provided match
-		//check if password from db is same as changing it to
+		if (password !== passwordConf) {
+			throw new Error("Passwords provided are not matching...");
+		}
+
+		const res = await this.prisma.user.findUnique({
+			where: {
+				id
+			}
+		});
+
+		if (res === null) {
+			return new Error(`The user with ${id}, does not exist`);
+		}
+
+		if (await compare(password, res.password)) {
+			return new Error(`The user with ${id}, already has this password`);
+		}
+
+		const hashedPassword = await hash(password, 10);
+		const hashedPasswordConf = hashedPassword;
+
 		return this.prisma.user.update({
 			where: {
-				id,
+				id
 			},
 			data: {
 				...(email && { email }),
 				...(firstName && { firstName }),
 				...(lastName && { lastName }),
 				...(middleName && { middleName }),
-				...(prefix && { prefix }),
-				...(password && { password }),
-				...(passwordConf && { passwordConf }),
-				...(isAdmin && {isAdmin}),
-				...(isActive && {isActive})
-			},
+				...(password && { password: hashedPassword }),
+				...(passwordConf && { passwordConf: hashedPasswordConf }),
+				...(isAdmin && { isAdmin }),
+				...(isActive && { isActive })
+			}
 		});
 	}
 
 	// delete a user by id
 	async deleteUser(id: string): Promise<User | Error> {
+		const res = await this.user(id).then(data => {
+			return data;
+		});
 
-		const res = await this.user(id).then((data)=> {
-			return data
-		})
-		
-		if( res === null){
-			return new Error (`The user with ${id}, does not exist`);
+		if (res === null) {
+			return new Error(`The user with ${id}, does not exist`);
 		}
 
 		return this.prisma.user.delete({
-			where:{
-				id,
+			where: {
+				id
 			}
 		});
 	}
 
-
-	async loginUser(params: LoginUser ): Promise< Token | null| Error>{
-		console.log(params)
-		const { email,
-			password,
-		} = params;
+	async loginUser(params: LoginUser): Promise<Token | Error> {
+		const { email, password } = params;
 		const safeEmail = email.toLowerCase();
 
 		const res = await this.prisma.user.findUnique({
-			where:{
-				email:safeEmail,
-			},
-			
-		});
-		
-		//Check if user exits
-		if(res!==null){
-
-			const val = await compare(password, res.password)
-			if(val){
-				// Call token function to genereate login token per id
-				const { 
-					id,
-				}= res 
-				const usrauth_token =  await this.jwtService.sign({id})
-				const token =  {
-					id: res.id,
-					token: usrauth_token,	
-				}
-				return token
-			}else{
-				return new Error (`Password is incorrect please try again.`)
+			where: {
+				email: safeEmail
 			}
-			
+		});
 
+		//Check if user exits
+		if (res !== null) {
+			const val = await compare(password, res.password);
+			if (val) {
+				// Call token function to genereate login token per id
+				const { id } = res;
+				const usrauth_token = await this.jwtService.sign({ id });
+				const token = {
+					id: res.id,
+					token: usrauth_token
+				};
+				return token;
+			} else {
+				return new Error(`Password is incorrect please try again.`);
+			}
 		}
 
-		return new Error (`This ${email}, does not exist`) ;
+		return new Error(`This ${email}, does not exist`);
 	}
 
 	/// Create a social record for a User
@@ -216,7 +226,7 @@ export class UserService {
 				portfolio: input.portfolio,
 				accountID: userId
 			}
-		})
+		});
 	}
 
 	/// Update a social by document ID
@@ -251,7 +261,7 @@ export class UserService {
 				facebook: input.facebook,
 				portfolio: input.portfolio
 			}
-		})
+		});
 	}
 
 	/// Delete a social record by document ID
@@ -260,7 +270,7 @@ export class UserService {
 			where: {
 				id
 			}
-		})
+		});
 	}
 
 	/// Delete a social record by owner(user) id
@@ -269,7 +279,6 @@ export class UserService {
 			where: {
 				accountID: userId
 			}
-		})
-
+		});
 	}
 }
