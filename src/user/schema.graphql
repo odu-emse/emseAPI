@@ -8,6 +8,21 @@ type Social {
 	account: User!
 }
 
+type InstructorProfile {
+	id: ID!
+	account: User
+	title: String
+	officeLocation: String
+	officeHours: String
+	contactPolicy: String
+	phone: String
+	background: String
+	researchInterest: String
+	selectedPapersAndPublications: String
+	personalWebsite: String
+	philosophy: String
+}
+
 type User {
 	id: ID!
 	email: String
@@ -25,6 +40,7 @@ type User {
 	tokens: [ID!]
 	feedback: [ModuleFeedback!]
 	assignmentGraded: [AssignmentResult!]
+	instructorProfile: InstructorProfile
 }
 
 type Error {
@@ -74,6 +90,7 @@ type Query {
 	login(input: LoginUser): Token
 	socials: [Social!]!
 	social(id: ID!): Social
+	instructorProfile(id: ID!): InstructorProfile
 }
 
 type Mutation {

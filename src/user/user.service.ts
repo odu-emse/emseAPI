@@ -6,7 +6,8 @@ import {
 	UpdateUser,
 	LoginUser,
 	Token,
-	SocialInput
+	SocialInput,
+	InstructorProfile
 } from "gql/graphql";
 import { hash, compare } from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
@@ -65,6 +66,21 @@ export class UserService {
 			}
 		});
 	}
+
+	/// Get a specific Instructor's profile by user ID
+	async instructorProfile(id: string): Promise<InstructorProfile | null> {
+		// @ts-ignore
+		return await this.prisma.instructorProfile.findUnique({
+			where: {
+				accountID: id
+			},
+			include: {
+				//TODO: figure out why TS is giving us an error here
+				account: true
+			}
+		});
+	}
+
 	// Create a user
 	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
 		const {
@@ -170,7 +186,7 @@ export class UserService {
 
 	// delete a user by id
 	async deleteUser(id: string): Promise<User | Error> {
-		const res = await this.user(id).then(data => {
+		const res = await this.user(id).then((data) => {
 			return data;
 		});
 
