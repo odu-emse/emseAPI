@@ -212,7 +212,7 @@ export class UserService {
 			}
 		}
 
-		return new Error(`This ${email}, does not exist`);
+		return new Error(`User with the provided credentials does not exist`);
 	}
 
 	/// Create a social record for a User
