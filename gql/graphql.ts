@@ -164,6 +164,8 @@ export abstract class IQuery {
     abstract socials(): Social[] | Promise<Social[]>;
 
     abstract social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
+
+    abstract instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
 }
 
 export abstract class IMutation {
@@ -321,6 +323,21 @@ export class Social {
     account: User;
 }
 
+export class InstructorProfile {
+    id: string;
+    account?: Nullable<User>;
+    title?: Nullable<string>;
+    officeLocation?: Nullable<string>;
+    officeHours?: Nullable<string>;
+    contactPolicy?: Nullable<string>;
+    phone?: Nullable<string>;
+    background?: Nullable<string>;
+    researchInterest?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<string>;
+    personalWebsite?: Nullable<string>;
+    philosophy?: Nullable<string>;
+}
+
 export class User {
     id: string;
     email?: Nullable<string>;
@@ -338,6 +355,7 @@ export class User {
     tokens?: Nullable<string[]>;
     feedback?: Nullable<ModuleFeedback[]>;
     assignmentGraded?: Nullable<AssignmentResult[]>;
+    instructorProfile?: Nullable<InstructorProfile>;
 }
 
 export class Token {
