@@ -11,8 +11,8 @@ export declare class PlanOfStudyResolver {
     }>;
     updatePlan(id: string, input: PlanInput): Promise<import(".prisma/client").PlanOfStudy & {
         modules: import(".prisma/client").ModuleEnrollment[];
-        assignmentResults: import(".prisma/client").AssignmentResult[];
         courses: import(".prisma/client").CourseEnrollment[];
+        assignmentResults: import(".prisma/client").AssignmentResult[];
         student: import(".prisma/client").User | null;
     }>;
     deletePlan(id: string): Promise<import(".prisma/client").PlanOfStudy>;

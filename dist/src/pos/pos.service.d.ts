@@ -12,8 +12,8 @@ export declare class PoSService {
     }>;
     updatePlan(id: string, input: PlanInput): Promise<PlanOfStudy & {
         modules: import(".prisma/client").ModuleEnrollment[];
-        assignmentResults: import(".prisma/client").AssignmentResult[];
         courses: import(".prisma/client").CourseEnrollment[];
+        assignmentResults: import(".prisma/client").AssignmentResult[];
         student: import(".prisma/client").User | null;
     }>;
     deletePlan(id: string): Promise<PlanOfStudy>;

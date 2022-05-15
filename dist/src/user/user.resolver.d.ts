@@ -5,12 +5,13 @@ export declare class UserResolver {
     constructor(userService: UserService);
     users(): Promise<import(".prisma/client").User[] | undefined>;
     user(args: string): Promise<import(".prisma/client").User | null | undefined>;
-    login(args: LoginUser): Promise<Error | import("gql/graphql").Token | null>;
+    login(args: LoginUser): Promise<Error | import("gql/graphql").Token>;
     socials(): Promise<import(".prisma/client").Social[]>;
     social(id: string): Promise<import(".prisma/client").Social | null>;
-    createUser(args: NewUser): Promise<Error | import(".prisma/client").User>;
-    update(args: UpdateUser): Promise<import(".prisma/client").User>;
-    delete(args: string): Promise<Error | import(".prisma/client").User>;
+    instructorProfile(id: string): Promise<import("gql/graphql").InstructorProfile | null>;
+    createUser(args: NewUser): Promise<import(".prisma/client").User | Error>;
+    update(args: UpdateUser): Promise<import(".prisma/client").User | Error>;
+    delete(args: string): Promise<import(".prisma/client").User | Error>;
     addSocial(user: string, input: SocialInput): Promise<import(".prisma/client").Social>;
     updateSocial(id: string, input: SocialInput): Promise<void>;
     updateUserSocial(user: string, input: SocialInput): Promise<import(".prisma/client").Prisma.BatchPayload>;

@@ -2,7 +2,6 @@ import { AssignmentInput, CourseInput, ModuleFeedbackUpdate, NewAssignment, Upda
 import { Module, Course, Assignment, ModuleInCourse, ModuleFeedback, AssignmentResult, ModuleEnrollment, CourseEnrollment } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
-import { float } from "aws-sdk/clients/lightsail";
 export declare class ProgramService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -35,15 +34,15 @@ export declare class ProgramService {
     updateModuleFeedback(id: string, input: ModuleFeedbackUpdate): Promise<ModuleFeedback>;
     deleteModuleFeedback(id: string): Promise<ModuleFeedback>;
     addAssignmentResult(input: NewAssignmentResult): Promise<AssignmentResult>;
-    updateAssignmentResult(id: string, result: float): Promise<AssignmentResult>;
+    updateAssignmentResult(id: string, result: number): Promise<AssignmentResult>;
     deleteAssignmentResult(id: string): Promise<AssignmentResult>;
     addModuleEnrollment(input: ModuleEnrollmentInput): Promise<ModuleEnrollment & {
-        plan: import(".prisma/client").PlanOfStudy;
         module: Module;
+        plan: import(".prisma/client").PlanOfStudy;
     }>;
     updateModuleEnrollment(id: string, input: ModuleEnrollmentInput): Promise<ModuleEnrollment & {
-        plan: import(".prisma/client").PlanOfStudy;
         module: Module;
+        plan: import(".prisma/client").PlanOfStudy;
     }>;
     deleteModuleEnrollment(id: string): Promise<ModuleEnrollment>;
     addCourseEnrollment(planId: string, courseId: string): Promise<CourseEnrollment>;

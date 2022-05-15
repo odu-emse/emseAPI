@@ -20,11 +20,11 @@ UserModule = __decorate([
             jwt_1.JwtModule.register({
                 secret: process.env.jwtSecret,
                 signOptions: {
-                    expiresIn: process.env.jwtExpire,
+                    expiresIn: process.env.jwtExpire
                 }
             })
         ],
-        providers: [user_service_1.UserService, user_resolver_1.UserResolver, prisma_service_1.PrismaService],
+        providers: [user_service_1.UserService, user_resolver_1.UserResolver, prisma_service_1.PrismaService]
     })
 ], UserModule);
 exports.UserModule = UserModule;

@@ -312,7 +312,10 @@ let ProgramResolver = class ProgramResolver {
             return res;
         }
         catch (error) {
-            throw new Error("Could not unlink course " + courseId + " and module " + moduleId);
+            throw new Error("Could not unlink course " +
+                courseId +
+                " and module " +
+                moduleId);
         }
     }
 };

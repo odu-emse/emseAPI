@@ -35,21 +35,6 @@ async function bootstrap() {
         dsn: "https://d7d1b5e63fd145218bf3971031bae0cd@o1009779.ingest.sentry.io/5974128",
         tracesSampleRate: 1.0,
     });
-    const transaction = Sentry.startTransaction({
-        op: "test",
-        name: "My First Test Transaction",
-    });
-    setTimeout(() => {
-        try {
-            console.log("sentry.io works.");
-        }
-        catch (e) {
-            Sentry.captureException(e);
-        }
-        finally {
-            transaction.finish();
-        }
-    }, 99);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

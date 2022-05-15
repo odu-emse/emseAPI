@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Token = exports.User = exports.Social = exports.Error = exports.ModuleInCourse = exports.Module = exports.Course = exports.CourseEnrollment = exports.ModuleFeedback = exports.Assignment = exports.AssignmentResult = exports.ModuleEnrollment = exports.IMutation = exports.IQuery = exports.PlanOfStudy = exports.LoginUser = exports.SocialInput = exports.UpdateUser = exports.NewUser = exports.ModuleEnrollmentInput = exports.NewAssignmentResult = exports.ModuleFeedbackUpdate = exports.ModuleFeedbackInput = exports.CourseInput = exports.AssignmentInput = exports.NewAssignment = exports.UpdateModule = exports.NewModule = exports.PlanInput = exports.UserRole = void 0;
+exports.Token = exports.User = exports.InstructorProfile = exports.Social = exports.Error = exports.ModuleInCourse = exports.Module = exports.Course = exports.CourseEnrollment = exports.ModuleFeedback = exports.Assignment = exports.AssignmentResult = exports.ModuleEnrollment = exports.IMutation = exports.IQuery = exports.PlanOfStudy = exports.LoginUser = exports.SocialInput = exports.UpdateUser = exports.NewUser = exports.ModuleEnrollmentInput = exports.NewAssignmentResult = exports.ModuleFeedbackUpdate = exports.ModuleFeedbackInput = exports.CourseInput = exports.AssignmentInput = exports.NewAssignment = exports.UpdateModule = exports.NewModule = exports.PlanInput = exports.UserRole = void 0;
 var UserRole;
 (function (UserRole) {
     UserRole["STUDENT"] = "STUDENT";
@@ -88,6 +88,9 @@ exports.Error = Error;
 class Social {
 }
 exports.Social = Social;
+class InstructorProfile {
+}
+exports.InstructorProfile = InstructorProfile;
 class User {
 }
 exports.User = User;

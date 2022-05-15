@@ -42,7 +42,7 @@ let ProgramService = class ProgramService {
         if (id.length === 24) {
             const res = await this.prisma.module.findFirst({
                 where: {
-                    id,
+                    id
                 },
                 include: {
                     assignments: true,
@@ -68,8 +68,8 @@ let ProgramService = class ProgramService {
         else {
             const res = await this.prisma.module.findFirst({
                 where: {
-                    moduleNumber: parseInt(id),
-                },
+                    moduleNumber: parseInt(id)
+                }
             });
             return res;
         }
@@ -99,7 +99,7 @@ let ProgramService = class ProgramService {
                 id
             },
             include: {
-                module: true,
+                module: true
             }
         });
         return res;
@@ -129,7 +129,14 @@ let ProgramService = class ProgramService {
     async assignmentResults() {
         return this.prisma.assignmentResult.findMany({
             include: {
-                student: true,
+                student: {
+                    include: {
+                        student: true,
+                        modules: true,
+                        assignmentResults: true,
+                        courses: true
+                    }
+                },
                 gradedBy: true,
                 assignment: true
             }
@@ -150,7 +157,11 @@ let ProgramService = class ProgramService {
     async moduleEnrollments() {
         return this.prisma.moduleEnrollment.findMany({
             include: {
-                plan: true,
+                plan: {
+                    include: {
+                        student: true
+                    }
+                },
                 module: true
             }
         });
@@ -159,13 +170,20 @@ let ProgramService = class ProgramService {
         return this.prisma.moduleEnrollment.findFirst({
             where: {
                 id
-            },
+            }
         });
     }
     async courseEnrollments() {
         return this.prisma.courseEnrollment.findMany({
             include: {
-                student: true,
+                student: {
+                    include: {
+                        student: true,
+                        modules: true,
+                        assignmentResults: true,
+                        courses: true
+                    }
+                },
                 course: true
             }
         });
@@ -176,7 +194,14 @@ let ProgramService = class ProgramService {
                 id
             },
             include: {
-                student: true,
+                student: {
+                    include: {
+                        student: true,
+                        modules: true,
+                        assignmentResults: true,
+                        courses: true
+                    }
+                },
                 course: true
             }
         });
@@ -184,14 +209,14 @@ let ProgramService = class ProgramService {
     async addModule(data) {
         const get = await this.prisma.module.findMany({
             where: {
-                moduleNumber: data.moduleNumber,
-            },
+                moduleNumber: data.moduleNumber
+            }
         });
         if (get.length !== 0) {
             throw new Error("Module already exisits.");
         }
         else {
-            const { id, description, feedback, moduleName, moduleNumber, intro, keywords, assignments, members, createdAt, updatedAt, numSlides, duration, } = data;
+            const { id, description, feedback, moduleName, moduleNumber, intro, keywords, assignments, members, createdAt, updatedAt, numSlides, duration } = data;
             return this.prisma.module.create({
                 data,
                 include: {
@@ -216,10 +241,10 @@ let ProgramService = class ProgramService {
         }
     }
     async updateModule(data) {
-        const { id, moduleNumber, moduleName, description, duration, numSlides, keywords, } = data;
+        const { id, moduleNumber, moduleName, description, duration, numSlides, keywords } = data;
         return this.prisma.module.update({
             where: {
-                id: data.id,
+                id: data.id
             },
             data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (moduleNumber && { moduleNumber })), (moduleName && { moduleName })), (description && { description })), (duration && { duration })), (numSlides && { numSlides })), (keywords && { keywords })),
             include: {
@@ -251,13 +276,13 @@ let ProgramService = class ProgramService {
         return this.prisma.module.delete({
             where: {
                 id: id
-            },
+            }
         });
     }
     async addCourse(data) {
         return await this.prisma.course.create({
             data: {
-                name: data.name,
+                name: data.name
             }
         });
     }
@@ -265,7 +290,7 @@ let ProgramService = class ProgramService {
         const { name } = data;
         return this.prisma.course.update({
             where: {
-                id: id,
+                id: id
             },
             data: Object.assign({}, (name && { name }))
         });
@@ -315,7 +340,7 @@ let ProgramService = class ProgramService {
         const { name, dueAt, module } = data;
         return this.prisma.assignment.update({
             where: {
-                id: id,
+                id: id
             },
             data: Object.assign(Object.assign({}, (name && { name })), (dueAt && { dueAt }))
         });
@@ -375,7 +400,7 @@ let ProgramService = class ProgramService {
                 id
             },
             data: {
-                result: result
+                result
             }
         });
     }
@@ -427,6 +452,16 @@ let ProgramService = class ProgramService {
             data: {
                 studentId: planId,
                 courseId: courseId
+            },
+            include: {
+                student: {
+                    include: {
+                        student: true,
+                        modules: true,
+                        assignmentResults: true,
+                        courses: true
+                    }
+                }
             }
         });
     }

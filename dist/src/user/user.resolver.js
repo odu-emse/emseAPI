@@ -62,11 +62,19 @@ let UserResolver = class UserResolver {
     }
     async social(id) {
         try {
-            const res = await this.userService.social(id);
-            return res;
+            return await this.userService.social(id);
         }
         catch (error) {
             throw new Error("Could not fetch social with id: " + id);
+        }
+    }
+    async instructorProfile(id) {
+        try {
+            const usr = await this.userService.user(id);
+            return await this.userService.instructorProfile(String(usr.id));
+        }
+        catch (error) {
+            throw new Error("Could not fetch instructor's profile with id: " + id);
         }
     }
     async createUser(args) {
@@ -157,6 +165,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "social", null);
+__decorate([
+    (0, graphql_1.Query)("instructorProfile"),
+    __param(0, (0, graphql_1.Args)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "instructorProfile", null);
 __decorate([
     (0, graphql_1.Mutation)("createUser"),
     __param(0, (0, graphql_1.Args)("input")),

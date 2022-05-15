@@ -19,9 +19,17 @@ let PoSService = class PoSService {
     async plans() {
         const plans = await this.prisma.planOfStudy.findMany({
             include: {
-                modules: true,
+                modules: {
+                    include: {
+                        module: true
+                    }
+                },
                 assignmentResults: true,
-                courses: true,
+                courses: {
+                    include: {
+                        course: true
+                    }
+                },
                 student: true
             }
         });
@@ -30,12 +38,26 @@ let PoSService = class PoSService {
     async planById(id) {
         const res = await this.prisma.planOfStudy.findUnique({
             where: {
-                id,
+                id
             },
             include: {
-                modules: true,
-                assignmentResults: true,
-                courses: true,
+                modules: {
+                    include: {
+                        module: true,
+                        plan: true
+                    }
+                },
+                assignmentResults: {
+                    include: {
+                        assignment: true,
+                        gradedBy: true
+                    }
+                },
+                courses: {
+                    include: {
+                        course: true
+                    }
+                },
                 student: true
             }
         });
@@ -44,12 +66,26 @@ let PoSService = class PoSService {
     async plan(studentID) {
         const res = await this.prisma.planOfStudy.findFirst({
             where: {
-                studentID,
+                studentID
             },
             include: {
-                modules: true,
-                assignmentResults: true,
-                courses: true,
+                modules: {
+                    include: {
+                        module: true,
+                        plan: true
+                    }
+                },
+                assignmentResults: {
+                    include: {
+                        assignment: true,
+                        gradedBy: true
+                    }
+                },
+                courses: {
+                    include: {
+                        course: true
+                    }
+                },
                 student: true
             }
         });
@@ -61,7 +97,7 @@ let PoSService = class PoSService {
                 studentID: input.student
             },
             include: {
-                student: true,
+                student: true
             }
         });
     }
@@ -71,7 +107,7 @@ let PoSService = class PoSService {
                 id
             },
             data: {
-                studentID: input.student,
+                studentID: input.student
             },
             include: {
                 modules: true,
@@ -85,7 +121,7 @@ let PoSService = class PoSService {
         return this.prisma.planOfStudy.delete({
             where: {
                 id
-            },
+            }
         });
     }
 };

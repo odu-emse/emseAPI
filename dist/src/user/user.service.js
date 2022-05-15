@@ -31,7 +31,7 @@ let UserService = class UserService {
     async user(id) {
         const user = this.prisma.user.findUnique({
             where: {
-                id,
+                id
             },
             include: {
                 feedback: true,
@@ -58,13 +58,23 @@ let UserService = class UserService {
             }
         });
     }
+    async instructorProfile(id) {
+        return await this.prisma.instructorProfile.findUnique({
+            where: {
+                accountID: id
+            },
+            include: {
+                account: true
+            }
+        });
+    }
     async registerUser(data) {
-        const { id, email, firstName, lastName, middleName, password, passwordConf, } = data;
+        const { id, email, firstName, lastName, middleName, password, passwordConf } = data;
         const safeEmail = email.toLowerCase();
         const get = await this.prisma.user.findUnique({
             where: {
-                email: safeEmail,
-            },
+                email: safeEmail
+            }
         });
         if (password !== passwordConf) {
             throw new Error("Passwords provided are not matching...");
@@ -78,23 +88,39 @@ let UserService = class UserService {
             lastName,
             middleName,
             password: hashedPassword,
-            passwordConf: hashedPasswordConf,
+            passwordConf: hashedPasswordConf
         };
         if (get === null) {
             const res = await this.prisma.user.create({
-                data: payload,
+                data: payload
             });
             return res;
         }
         return new Error("User has an account already.");
     }
     async updateUser(params) {
-        const { id, email, firstName, lastName, middleName, prefix, password, passwordConf, isAdmin, isActive } = params;
+        const { id, email, firstName, lastName, middleName, password, passwordConf, isAdmin, isActive } = params;
+        if (password !== passwordConf) {
+            throw new Error("Passwords provided are not matching...");
+        }
+        const res = await this.prisma.user.findUnique({
+            where: {
+                id
+            }
+        });
+        if (res === null) {
+            return new Error(`The user with ${id}, does not exist`);
+        }
+        if (await (0, bcryptjs_1.compare)(password, res.password)) {
+            return new Error(`The user with ${id}, already has this password`);
+        }
+        const hashedPassword = await (0, bcryptjs_1.hash)(password, 10);
+        const hashedPasswordConf = hashedPassword;
         return this.prisma.user.update({
             where: {
-                id,
+                id
             },
-            data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (email && { email })), (firstName && { firstName })), (lastName && { lastName })), (middleName && { middleName })), (prefix && { prefix })), (password && { password })), (passwordConf && { passwordConf })), (isAdmin && { isAdmin })), (isActive && { isActive })),
+            data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (email && { email })), (firstName && { firstName })), (lastName && { lastName })), (middleName && { middleName })), (password && { password: hashedPassword })), (passwordConf && { passwordConf: hashedPasswordConf })), (isAdmin && { isAdmin })), (isActive && { isActive }))
         });
     }
     async deleteUser(id) {
@@ -106,27 +132,26 @@ let UserService = class UserService {
         }
         return this.prisma.user.delete({
             where: {
-                id,
+                id
             }
         });
     }
     async loginUser(params) {
-        console.log(params);
-        const { email, password, } = params;
+        const { email, password } = params;
         const safeEmail = email.toLowerCase();
         const res = await this.prisma.user.findUnique({
             where: {
-                email: safeEmail,
-            },
+                email: safeEmail
+            }
         });
         if (res !== null) {
             const val = await (0, bcryptjs_1.compare)(password, res.password);
             if (val) {
-                const { id, } = res;
+                const { id } = res;
                 const usrauth_token = await this.jwtService.sign({ id });
                 const token = {
                     id: res.id,
-                    token: usrauth_token,
+                    token: usrauth_token
                 };
                 return token;
             }
@@ -134,7 +159,7 @@ let UserService = class UserService {
                 return new Error(`Password is incorrect please try again.`);
             }
         }
-        return new Error(`This ${email}, does not exist`);
+        return new Error(`User with the provided credentials does not exist`);
     }
     async addSocial(userId, input) {
         return this.prisma.social.create({

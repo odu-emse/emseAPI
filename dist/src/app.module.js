@@ -12,6 +12,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const user_module_1 = require("./user/user.module");
 const pos_module_1 = require("./pos/pos.module");
 const graphql_1 = require("@nestjs/graphql");
+const apollo_1 = require("@nestjs/apollo");
 const program_module_1 = require("./program/program.module");
 require("dotenv").config();
 let AppModule = class AppModule {
@@ -21,8 +22,9 @@ AppModule = __decorate([
         imports: [
             graphql_1.GraphQLModule.forRoot({
                 playground: true,
-                debug: true,
+                debug: process.env.NODE_ENV !== "production",
                 typePaths: ["./**/*.graphql"],
+                driver: apollo_1.ApolloDriver,
             }),
             mongoose_1.MongooseModule.forRoot(process.env.DATABASE_URL || "", {
                 useNewUrlParser: true,

@@ -21,7 +21,6 @@ import {
 } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
-import { float } from "aws-sdk/clients/lightsail";
 
 @Injectable()
 export class ProgramService {
@@ -522,13 +521,13 @@ export class ProgramService {
 	}
 
 	/// Update an assignment result
-	async updateAssignmentResult(id: string, result: float) {
+	async updateAssignmentResult(id: string, result: number) {
 		return this.prisma.assignmentResult.update({
 			where: {
 				id
 			},
 			data: {
-				result: result
+				result
 			}
 		});
 	}

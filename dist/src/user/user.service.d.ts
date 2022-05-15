@@ -1,6 +1,6 @@
 import { PrismaService } from "../prisma.service";
 import { Prisma, User, Social } from "@prisma/client";
-import { UpdateUser, LoginUser, Token, SocialInput } from "gql/graphql";
+import { UpdateUser, LoginUser, Token, SocialInput, InstructorProfile } from "gql/graphql";
 import { JwtService } from "@nestjs/jwt";
 export declare class UserService {
     private prisma;
@@ -10,10 +10,11 @@ export declare class UserService {
     user(id: string): Promise<User | null>;
     socials(): Promise<Social[]>;
     social(id: string): Promise<Social | null>;
+    instructorProfile(id: string): Promise<InstructorProfile | null>;
     registerUser(data: Prisma.UserCreateInput): Promise<User | Error>;
-    updateUser(params: UpdateUser): Promise<User>;
+    updateUser(params: UpdateUser): Promise<User | Error>;
     deleteUser(id: string): Promise<User | Error>;
-    loginUser(params: LoginUser): Promise<Token | null | Error>;
+    loginUser(params: LoginUser): Promise<Token | Error>;
     addSocial(userId: string, input: SocialInput): Promise<Social>;
     updateSocial(id: string, input: SocialInput): Promise<Social & {
         account: User | null;

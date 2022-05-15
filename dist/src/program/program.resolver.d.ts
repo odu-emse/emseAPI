@@ -1,7 +1,6 @@
 import { AssignmentInput, CourseInput, ModuleEnrollmentInput, ModuleFeedbackUpdate, NewAssignment, NewAssignmentResult, NewModule, UpdateModule } from "gql/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
-import { float } from "aws-sdk/clients/lightsail";
 export declare class ProgramResolver {
     private readonly programService;
     constructor(programService: ProgramService);
@@ -19,7 +18,7 @@ export declare class ProgramResolver {
     moduleEnrollment(id: string): Promise<import(".prisma/client").ModuleEnrollment | null>;
     courseEnrollments(): Promise<import(".prisma/client").CourseEnrollment[]>;
     courseEnrollment(id: string): Promise<import(".prisma/client").CourseEnrollment | null>;
-    create(args: NewModule): Promise<Error | import(".prisma/client").Module>;
+    create(args: NewModule): Promise<import(".prisma/client").Module | Error>;
     update(args: UpdateModule): Promise<import(".prisma/client").Module>;
     delete(args: string): Promise<import(".prisma/client").Module>;
     createCourse(args: CourseInput): Promise<Error | import(".prisma/client").Course>;
@@ -34,15 +33,15 @@ export declare class ProgramResolver {
     updateModuleFeedback(id: string, data: ModuleFeedbackUpdate): Promise<import(".prisma/client").ModuleFeedback>;
     deleteModuleFeedback(id: string): Promise<import(".prisma/client").ModuleFeedback>;
     addAssignmentResult(input: NewAssignmentResult): Promise<import(".prisma/client").AssignmentResult>;
-    updateAssignmentResult(id: string, result: float): Promise<import(".prisma/client").AssignmentResult>;
+    updateAssignmentResult(id: string, result: number): Promise<import(".prisma/client").AssignmentResult>;
     deleteAssignmentResult(id: string): Promise<import(".prisma/client").AssignmentResult>;
     addModuleEnrollment(input: ModuleEnrollmentInput): Promise<import(".prisma/client").ModuleEnrollment & {
-        plan: import(".prisma/client").PlanOfStudy;
         module: import(".prisma/client").Module;
+        plan: import(".prisma/client").PlanOfStudy;
     }>;
     updateModuleEnrollment(id: string, input: ModuleEnrollmentInput): Promise<import(".prisma/client").ModuleEnrollment & {
-        plan: import(".prisma/client").PlanOfStudy;
         module: import(".prisma/client").Module;
+        plan: import(".prisma/client").PlanOfStudy;
     }>;
     deleteModuleEnrollment(id: string): Promise<import(".prisma/client").ModuleEnrollment>;
     addCourseEnrollment(plan: string, course: string): Promise<import(".prisma/client").CourseEnrollment>;

@@ -62,7 +62,6 @@ export declare class NewUser {
     firstName: string;
     lastName: string;
     middleName: string;
-    prefix?: Nullable<string>;
     password: string;
     passwordConf: string;
 }
@@ -72,9 +71,9 @@ export declare class UpdateUser {
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
-    prefix?: Nullable<string>;
-    password?: Nullable<string>;
-    passwordConf?: Nullable<string>;
+    password: string;
+    passwordConf: string;
+    dob?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
 }
@@ -119,6 +118,7 @@ export declare abstract class IQuery {
     abstract login(input?: Nullable<LoginUser>): Nullable<Token> | Promise<Nullable<Token>>;
     abstract socials(): Social[] | Promise<Social[]>;
     abstract social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
+    abstract instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
 }
 export declare abstract class IMutation {
     abstract addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
@@ -165,7 +165,7 @@ export declare class ModuleEnrollment {
 }
 export declare class AssignmentResult {
     id: string;
-    sumbittedAt: string;
+    submittedAt: string;
     result: number;
     student?: Nullable<PlanOfStudy>;
     gradedBy?: Nullable<User>;
@@ -231,6 +231,20 @@ export declare class Social {
     portfolio?: Nullable<string>;
     account: User;
 }
+export declare class InstructorProfile {
+    id: string;
+    account?: Nullable<User>;
+    title?: Nullable<string>;
+    officeLocation?: Nullable<string>;
+    officeHours?: Nullable<string>;
+    contactPolicy?: Nullable<string>;
+    phone?: Nullable<string>;
+    background?: Nullable<string>;
+    researchInterest?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<string>;
+    personalWebsite?: Nullable<string>;
+    philosophy?: Nullable<string>;
+}
 export declare class User {
     id: string;
     email?: Nullable<string>;
@@ -238,16 +252,17 @@ export declare class User {
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
-    prefix?: Nullable<string>;
     password?: Nullable<string>;
     passwordConf?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
+    dob?: Nullable<string>;
     social?: Nullable<Social>;
     plan?: Nullable<PlanOfStudy>;
     tokens?: Nullable<string[]>;
     feedback?: Nullable<ModuleFeedback[]>;
     assignmentGraded?: Nullable<AssignmentResult[]>;
+    instructorProfile?: Nullable<InstructorProfile>;
 }
 export declare class Token {
     id?: Nullable<string>;
