@@ -38,7 +38,11 @@ export class UserService {
 			},
 			include: {
 				feedback: true,
-				plan: true,
+				plan: {
+					include: {
+						modules: true
+					}
+				},
 				assignmentGraded: true
 			}
 		});
@@ -142,7 +146,8 @@ export class UserService {
 			password,
 			passwordConf,
 			isAdmin,
-			isActive
+			isActive,
+			instructorProfile
 		} = params;
 
 		//check if passwords provided match
@@ -160,12 +165,22 @@ export class UserService {
 			return new Error(`The user with ${id}, does not exist`);
 		}
 
-		if (await compare(password, res.password)) {
-			return new Error(`The user with ${id}, already has this password`);
+		if (!(await compare(password, res.password))) {
+			return new Error(`Incorrect password provided.`);
 		}
 
 		const hashedPassword = await hash(password, 10);
 		const hashedPasswordConf = hashedPassword;
+
+		this.prisma.instructorProfile.update({
+			where: {
+				accountID: id
+			},
+			//@ts-ignore
+			data: {
+				...(instructorProfile && { instructorProfile })
+			}
+		});
 
 		return this.prisma.user.update({
 			where: {

@@ -97,6 +97,20 @@ export class UpdateUser {
     dob?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
+    instructorProfile?: Nullable<InstructorProfileInput>;
+}
+
+export class InstructorProfileInput {
+    title?: Nullable<string>;
+    officeLocation?: Nullable<string>;
+    officeHours?: Nullable<string>;
+    contactPolicy?: Nullable<string>;
+    phone?: Nullable<string>;
+    background?: Nullable<string>;
+    researchInterest?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<string>;
+    personalWebsite?: Nullable<string>;
+    philosophy?: Nullable<string>;
 }
 
 export class SocialInput {

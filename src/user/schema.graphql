@@ -71,6 +71,20 @@ input UpdateUser {
 	dob: String
 	isAdmin: Boolean
 	isActive: Boolean
+	instructorProfile: InstructorProfileInput
+}
+
+input InstructorProfileInput {
+	title: String
+	officeLocation: String
+	officeHours: String
+	contactPolicy: String
+	phone: String
+	background: String
+	researchInterest: String
+	selectedPapersAndPublications: String
+	personalWebsite: String
+	philosophy: String
 }
 
 input SocialInput {
