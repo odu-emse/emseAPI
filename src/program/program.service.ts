@@ -499,6 +499,20 @@ export class ProgramService {
 
 	/// Create a ModuleEnrollment Document
 	async addModuleEnrollment(input: ModuleEnrollmentInput) {
+
+		let count = await this.prisma.moduleEnrollment.count({
+			where: {
+				planId: input.plan,
+				moduleId: input.module
+			}
+		});
+		
+
+		if (count != 0) {
+			return null;
+		}
+		
+
 		return this.prisma.moduleEnrollment.create({
 			data: {
 				moduleId: input.module,
@@ -510,6 +524,8 @@ export class ProgramService {
 				plan: true
 			}
 		})
+
+		
 	}
 
 	/// Update a ModuleEnrollment
@@ -539,7 +555,20 @@ export class ProgramService {
 	}
 
 	/// Create a new CourseEnrollment Record
-	async addCourseEnrollment(planId: string, courseId: string): Promise<CourseEnrollment> {
+	async addCourseEnrollment(planId: string, courseId: string) {
+		let count = await this.prisma.courseEnrollment.count({
+			where: {
+				studentId: planId,
+				courseId: courseId
+			}
+		});
+		
+
+		if (count != 0) {
+			return null;
+		}
+		
+
 		return this.prisma.courseEnrollment.create({
 			data: {
 				studentId: planId,

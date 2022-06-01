@@ -194,11 +194,11 @@ type Mutation {
 	updateAssignmentResult(id: ID!, result: Float!): AssignmentResult
 	deleteAssignmentResult(id: ID!): AssignmentResult
 
-	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
+	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment
 	updateModuleEnrollment(id: ID!, input: ModuleEnrollmentInput): ModuleEnrollment
 	deleteModuleEnrollment(id: ID!): ModuleEnrollment
 
-	addCourseEnrollment(planId: ID!, courseId: ID!): CourseEnrollment!
+	addCourseEnrollment(planId: ID!, courseId: ID!): CourseEnrollment
 	updateCourseEnrollment(id: ID!, planId: ID, courseId: ID): CourseEnrollment
 	deleteCourseEnrollment(id: ID!): CourseEnrollment
 
