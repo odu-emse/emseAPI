@@ -498,7 +498,7 @@ export class ProgramService {
 	}
 
 	/// Create a ModuleEnrollment Document
-	async addModuleEnrollment(input: ModuleEnrollmentInput) {
+	async addModuleEnrollment(input: ModuleEnrollmentInput): Promise<ModuleEnrollment | Error> {
 
 		let count = await this.prisma.moduleEnrollment.count({
 			where: {
@@ -509,7 +509,7 @@ export class ProgramService {
 		
 
 		if (count != 0) {
-			return null;
+			throw new Error("This Module Enrollment already exists");
 		}
 		
 
@@ -555,7 +555,7 @@ export class ProgramService {
 	}
 
 	/// Create a new CourseEnrollment Record
-	async addCourseEnrollment(planId: string, courseId: string) {
+	async addCourseEnrollment(planId: string, courseId: string): Promise<CourseEnrollment | Error> {
 		let count = await this.prisma.courseEnrollment.count({
 			where: {
 				studentId: planId,
@@ -565,7 +565,7 @@ export class ProgramService {
 		
 
 		if (count != 0) {
-			return null;
+			throw new Error("This course enrollment already exists");
 		}
 		
 

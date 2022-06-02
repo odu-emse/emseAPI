@@ -103,11 +103,10 @@ export class UserService {
 		
 		///Avoids duplicate value(email) if the exist already
 		if (count != 0){
-			const res = await this.prisma.user.create({
+			return await this.prisma.user.create({
 				data: payload,
 			});
 			
-			return res;
 		}
 		
 		return new Error("User has an account already.");
