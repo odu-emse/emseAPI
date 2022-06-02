@@ -716,7 +716,21 @@ export class ProgramService {
 	}
 
 	/// Create a ModuleEnrollment Document
-	async addModuleEnrollment(input: ModuleEnrollmentInput) {
+	async addModuleEnrollment(input: ModuleEnrollmentInput): Promise<ModuleEnrollment | Error> {
+
+		let count = await this.prisma.moduleEnrollment.count({
+			where: {
+				planId: input.plan,
+				moduleId: input.module
+			}
+		});
+		
+
+		if (count != 0) {
+			throw new Error("This Module Enrollment already exists");
+		}
+		
+
 		return this.prisma.moduleEnrollment.create({
 			data: {
 				moduleId: input.module,

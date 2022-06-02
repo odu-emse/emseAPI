@@ -110,7 +110,7 @@ export class UserService {
 
 		const safeEmail = email.toLowerCase();
 		//find out if there is a duplicate user
-		const get = await this.prisma.user.findUnique({
+		const count = await this.prisma.user.count({
 			where: {
 				email: safeEmail
 			}
@@ -138,12 +138,11 @@ export class UserService {
 		};
 
 		///Avoids duplicate value(email) if the exist already
-		if (get === null) {
-			const res = await this.prisma.user.create({
-				data: payload
+		if (count != 0){
+			return await this.prisma.user.create({
+				data: payload,
 			});
-
-			return res;
+			
 		}
 
 		return new Error("User has an account already.");
