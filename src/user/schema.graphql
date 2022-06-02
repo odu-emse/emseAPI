@@ -8,6 +8,21 @@ type Social {
 	account: User!
 }
 
+type InstructorProfile {
+	id: ID!
+	account: User
+	title: String
+	officeLocation: String
+	officeHours: String
+	contactPolicy: String
+	phone: String
+	background: String
+	researchInterest: String
+	selectedPapersAndPublications: String
+	personalWebsite: String
+	philosophy: String
+}
+
 type User {
 	id: ID!
 	email: String
@@ -15,23 +30,23 @@ type User {
 	firstName: String
 	lastName: String
 	middleName: String
-	prefix: String
 	password: String
 	passwordConf: String
 	isAdmin: Boolean
 	isActive: Boolean
-
+	dob: String
 	social: Social
 	plan: PlanOfStudy
 	tokens: [ID!]
 	feedback: [ModuleFeedback!]
 	assignmentGraded: [AssignmentResult!]
+	instructorProfile: InstructorProfile
 }
 
 type Error {
 	message: String
 }
-type Token{
+type Token {
 	id: String
 	token: String
 }
@@ -41,7 +56,6 @@ input NewUser {
 	firstName: String!
 	lastName: String!
 	middleName: String!
-	prefix: String
 	password: String!
 	passwordConf: String!
 }
@@ -52,11 +66,25 @@ input UpdateUser {
 	firstName: String
 	lastName: String
 	middleName: String
-	prefix: String
-	password: String
-	passwordConf: String
+	password: String!
+	passwordConf: String!
+	dob: String
 	isAdmin: Boolean
 	isActive: Boolean
+	instructorProfile: InstructorProfileInput
+}
+
+input InstructorProfileInput {
+	title: String
+	officeLocation: String
+	officeHours: String
+	contactPolicy: String
+	phone: String
+	background: String
+	researchInterest: String
+	selectedPapersAndPublications: String
+	personalWebsite: String
+	philosophy: String
 }
 
 input SocialInput {
@@ -66,7 +94,7 @@ input SocialInput {
 	facebook: String
 	portfolio: String
 }
-input LoginUser{
+input LoginUser {
 	email: String!
 	password: String!
 }
@@ -76,7 +104,7 @@ type Query {
 	login(input: LoginUser): Token
 	socials: [Social!]!
 	social(id: ID!): Social
-
+	instructorProfile(id: ID!): InstructorProfile
 }
 
 type Mutation {

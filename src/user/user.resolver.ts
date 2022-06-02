@@ -1,5 +1,5 @@
-import { Resolver, Query, Args, Mutation, ResolveField } from "@nestjs/graphql";
-import { NewUser, User, UpdateUser, LoginUser, SocialInput} from "gql/graphql";
+import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
+import { NewUser, UpdateUser, LoginUser, SocialInput } from "gql/graphql";
 import { UserService } from "./user.service";
 
 @Resolver("User")
@@ -35,16 +35,15 @@ export class UserResolver {
 	}
 	//login user
 	@Query("login")
-	async login(@Args("input") args: LoginUser){
+	async login(@Args("input") args: LoginUser) {
 		try {
 			const res = await this.userService.loginUser(args);
-			return res
+			return res;
 		} catch (error) {
-			if(error)
-				console.log(error)
-				throw new Error(
-					"An error occured while trying to executre your query"
-				);
+			if (error) console.log(error);
+			throw new Error(
+				"An error occured while trying to executre your query"
+			);
 		}
 	}
 
@@ -61,10 +60,21 @@ export class UserResolver {
 	@Query("social")
 	async social(@Args("id") id: string) {
 		try {
-			const res = await this.userService.social(id);
-			return res;
+			return await this.userService.social(id);
 		} catch (error) {
 			throw new Error("Could not fetch social with id: " + id);
+		}
+	}
+
+	@Query("instructorProfile")
+	async instructorProfile(@Args("id") id: string) {
+		try {
+			const usr = await this.userService.user(id);
+			return await this.userService.instructorProfile(String(usr!.id));
+		} catch (error) {
+			throw new Error(
+				"Could not fetch instructor's profile with id: " + id
+			);
 		}
 	}
 
@@ -85,7 +95,10 @@ export class UserResolver {
 	}
 
 	@Mutation("addSocial")
-	async addSocial(@Args("userId") user: string, @Args("input") input: SocialInput) {
+	async addSocial(
+		@Args("userId") user: string,
+		@Args("input") input: SocialInput
+	) {
 		try {
 			const res = await this.userService.addSocial(user, input);
 			return res;
@@ -95,16 +108,22 @@ export class UserResolver {
 	}
 
 	@Mutation("updateSocial")
-	async updateSocial(@Args("id") id: string, @Args("input") input: SocialInput) {
+	async updateSocial(
+		@Args("id") id: string,
+		@Args("input") input: SocialInput
+	) {
 		try {
 			const res = await this.userService.updateSocial(id, input);
-		} catch(error) {
+		} catch (error) {
 			throw new Error("Could not update Social with document id: " + id);
 		}
 	}
 
 	@Mutation("updateUserSocial")
-	async updateUserSocial(@Args("userId") user: string, @Args("input") input: SocialInput) {
+	async updateUserSocial(
+		@Args("userId") user: string,
+		@Args("input") input: SocialInput
+	) {
 		try {
 			const res = await this.userService.updateUserSocial(user, input);
 			return res;
@@ -113,12 +132,12 @@ export class UserResolver {
 		}
 	}
 
-	@Mutation("deleteSocial") 
+	@Mutation("deleteSocial")
 	async deleteSocial(@Args("id") id: string) {
-		try { 
+		try {
 			const res = await this.userService.deleteSocial(id);
 			return res;
-		} catch(error) {
+		} catch (error) {
 			throw new Error("Could not delete social with document id: " + id);
 		}
 	}
