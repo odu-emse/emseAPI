@@ -30,20 +30,80 @@ export class ProgramService {
 	async modules(): Promise<Module[]> {
 		return this.prisma.module.findMany({
 			include: {
-				assignments: true,
+				assignments: {
+					include: {
+						assignmentResults: {
+							include: {
+								gradedBy: {
+									include: {
+										social: true,
+										feedback: true,
+										assignmentGraded: true,
+										instructorProfile: true
+									}
+								}
+							}
+						}
+					}
+				},
 				parentCourses: {
 					include: {
-						course: true
+						course: {
+							include: {
+								enrollment: {
+									include: {
+										student: true
+									}
+								},
+								modules: {
+									include: {
+										module: true
+									}
+								}
+							}
+						}
 					}
 				},
 				feedback: {
 					include: {
-						student: true
+						student: {
+							include: {
+								social: true,
+								plan: {
+									include: {
+										modules: true,
+										assignmentResults: true,
+										courses: true
+									}
+								},
+								instructorProfile: true
+							}
+						},
+						module: true
 					}
 				},
 				members: {
 					include: {
-						plan: true
+						plan: {
+							include: {
+								student: {
+									include: {
+										social: true,
+										feedback: true
+									}
+								},
+								modules: {
+									include: {
+										module: true
+									}
+								},
+								courses: {
+									include: {
+										course: true
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -53,53 +113,167 @@ export class ProgramService {
 	async module(id: string): Promise<Module | null> {
 		//find module based on id
 		if (id.length === 24) {
-			const res = await this.prisma.module.findFirst({
+			return await this.prisma.module.findFirst({
 				where: {
 					id
 				},
 				include: {
-					assignments: true,
+					assignments: {
+						include: {
+							assignmentResults: {
+								include: {
+									gradedBy: {
+										include: {
+											social: true,
+											feedback: true,
+											assignmentGraded: true,
+											instructorProfile: true
+										}
+									}
+								}
+							}
+						}
+					},
 					parentCourses: {
 						include: {
-							course: true
+							course: {
+								include: {
+									enrollment: {
+										include: {
+											student: true
+										}
+									},
+									modules: {
+										include: {
+											module: true
+										}
+									}
+								}
+							}
 						}
 					},
 					feedback: {
 						include: {
-							student: true
+							student: {
+								include: {
+									social: true,
+									plan: {
+										include: {
+											modules: true,
+											assignmentResults: true,
+											courses: true
+										}
+									},
+									instructorProfile: true
+								}
+							},
+							module: true
 						}
 					},
 					members: {
 						include: {
-							plan: true
+							plan: {
+								include: {
+									student: {
+										include: {
+											social: true,
+											feedback: true
+										}
+									},
+									modules: {
+										include: {
+											module: true
+										}
+									},
+									courses: {
+										include: {
+											course: true
+										}
+									}
+								}
+							}
 						}
 					}
 				}
 			});
-			return res;
-		}
-		//find module based on CRN if we choose to implement such field
-		// else if (id.length <= 12 && id.length >= 5) {
-		// 	//return based on CRN if we will have CRNs
-		// }
-		//find module based on moduleNumber
-		else {
-			const res = await this.prisma.module.findFirst({
+		} else {
+			return await this.prisma.module.findFirst({
 				where: {
 					moduleNumber: parseInt(id)
 				}
 			});
-			return res;
 		}
 	}
 
 	async courses(): Promise<Course[]> {
 		return this.prisma.course.findMany({
 			include: {
-				modules: true,
+				modules: {
+					include: {
+						module: {
+							include: {
+								assignments: true,
+								feedback: {
+									include: {
+										student: true,
+										module: false
+									}
+								},
+								parentCourses: {
+									include: {
+										course: true
+									}
+								},
+								members: {
+									include: {
+										module: false,
+										plan: true
+									}
+								}
+							}
+						},
+						course: false
+					}
+				},
 				enrollment: {
 					include: {
-						student: true
+						student: {
+							include: {
+								student: {
+									include: {
+										social: true,
+										plan: true,
+										feedback: true,
+										assignmentGraded: true,
+										instructorProfile: true
+									}
+								},
+								courses: {
+									include: {
+										course: true
+									}
+								},
+								modules: {
+									include: {
+										module: true,
+										plan: true
+									}
+								},
+								assignmentResults: {
+									include: {
+										student: true,
+										gradedBy: true,
+										assignment: true
+									}
+								}
+							}
+						},
+						course: {
+							include: {
+								enrollment: true,
+								modules: true
+							}
+						}
 					}
 				}
 			}

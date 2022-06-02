@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, User, Social } from "@prisma/client";
 import {
-	NewUser,
 	UpdateUser,
 	LoginUser,
 	Token,
@@ -24,7 +23,15 @@ export class UserService {
 		return this.prisma.user.findMany({
 			include: {
 				feedback: true,
-				plan: true,
+				plan: {
+					include: {
+						modules: {
+							include: {
+								module: true
+							}
+						}
+					}
+				},
 				assignmentGraded: true
 			}
 		});
@@ -40,7 +47,11 @@ export class UserService {
 				feedback: true,
 				plan: {
 					include: {
-						modules: true
+						modules: {
+							include: {
+								module: true
+							}
+						}
 					}
 				},
 				assignmentGraded: true
@@ -107,6 +118,10 @@ export class UserService {
 
 		if (password !== passwordConf) {
 			throw new Error("Passwords provided are not matching...");
+		}
+
+		if (password.length < 6) {
+			throw new Error("Password must be at least 6 characters long");
 		}
 
 		const hashedPassword = await hash(password, 10);
@@ -201,7 +216,7 @@ export class UserService {
 
 	// delete a user by id
 	async deleteUser(id: string): Promise<User | Error> {
-		const res = await this.user(id).then((data) => {
+		const res = await this.user(id).then(data => {
 			return data;
 		});
 
@@ -230,11 +245,11 @@ export class UserService {
 		if (res !== null) {
 			const val = await compare(password, res.password);
 			if (val) {
-				// Call token function to genereate login token per id
+				// Call token function to generate login token per id
 				const { id } = res;
-				const usrauth_token = await this.jwtService.sign({ id });
+				const usrauth_token = this.jwtService.sign({ id });
 				const token = {
-					id: res.id,
+					id,
 					token: usrauth_token
 				};
 				return token;
