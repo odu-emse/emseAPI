@@ -13,9 +13,9 @@ input PlanInput {
 
 
 type Query {
-	plan(studentID: ID!): PlanOfStudy
+	stduentPlan(studentID: ID!): PlanOfStudy
 	plans: [PlanOfStudy!]
-	planByID(id: String!): PlanOfStudy
+	plan(id: String!): PlanOfStudy
 }
 
 type Mutation {

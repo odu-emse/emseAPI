@@ -135,11 +135,11 @@ export class PlanOfStudy {
 }
 
 export abstract class IQuery {
-    abstract plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
+    abstract stduentPlan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
 
     abstract plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
 
-    abstract planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
+    abstract plan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
 
     abstract modules(): Module[] | Promise<Module[]>;
 
