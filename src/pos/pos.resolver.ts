@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Mutation} from "@nestjs/graphql";
+import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
 import { Prisma } from "@prisma/client";
 import { PlanInput } from "gql/graphql";
 import { PoSService } from "./pos.service";
@@ -15,7 +15,7 @@ export class PlanOfStudyResolver {
 
 	@Query("plan")
 	async plan(@Args("studentID") studentID: string) {
-		return this.planService.planById(studentID);
+		return this.planService.studentPlan(studentID);
 	}
 
 	@Query("planByID")

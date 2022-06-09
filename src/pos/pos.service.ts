@@ -31,7 +31,7 @@ export class PoSService {
 
 	// Find a plan based on it's document ID
 	async plan(id: string): Promise<PlanOfStudy | null> {
-		const res = await this.prisma.planOfStudy.findUnique({
+		return await this.prisma.planOfStudy.findUnique({
 			where: {
 				id
 			},
@@ -56,20 +56,29 @@ export class PoSService {
 				student: true
 			}
 		});
-		return res;
 	}
 
-	// TODO: figure out why this is not working
 	// Find a plan based on the student's ID associated with the document
 	async studentPlan(studentID: string): Promise<PlanOfStudy | null> {
-		const res = await this.prisma.planOfStudy.findFirst({
+		return await this.prisma.planOfStudy.findFirst({
 			where: {
 				studentID
 			},
 			include: {
 				modules: {
 					include: {
-						module: true,
+						module: {
+							include: {
+								feedback: true,
+								assignments: true,
+								members: true,
+								parentCourses: {
+									include: {
+										course: true
+									}
+								}
+							}
+						},
 						plan: true
 					}
 				},
@@ -87,8 +96,6 @@ export class PoSService {
 				student: true
 			}
 		});
-
-		return res;
 	}
 
 	// TODO: Allow for starting modules and courses

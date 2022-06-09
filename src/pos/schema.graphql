@@ -11,11 +11,10 @@ input PlanInput {
 	student: ID
 }
 
-
 type Query {
-	stduentPlan(studentID: ID!): PlanOfStudy
+	plan(studentID: ID!): PlanOfStudy
 	plans: [PlanOfStudy!]
-	plan(id: String!): PlanOfStudy
+	planByID(id: String!): PlanOfStudy
 }
 
 type Mutation {
