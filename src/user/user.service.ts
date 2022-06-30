@@ -159,6 +159,7 @@ export class UserService {
 			middleName,
 			password,
 			passwordConf,
+			dob,
 			isAdmin,
 			isActive,
 			instructorProfile
@@ -179,6 +180,7 @@ export class UserService {
 			return new Error(`The user with ${id}, does not exist`);
 		}
 
+		//This still throws and error with matching correct passwords
 		if (!(await compare(password, res.password))) {
 			return new Error(`Incorrect password provided.`);
 		}
@@ -205,6 +207,7 @@ export class UserService {
 				...(firstName && { firstName }),
 				...(lastName && { lastName }),
 				...(middleName && { middleName }),
+				...(dob && { dob }),
 				...(password && { password: hashedPassword }),
 				...(passwordConf && { passwordConf: hashedPasswordConf }),
 				...(isAdmin && { isAdmin }),
