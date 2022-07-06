@@ -42,7 +42,7 @@ export class UserResolver {
 		} catch (error) {
 			if (error) console.log(error);
 			throw new Error(
-				"An error occured while trying to executre your query"
+				"An error occurred while trying to execute your query"
 			);
 		}
 	}
@@ -148,7 +148,7 @@ export class UserResolver {
 			const res = await this.userService.deleteUserSocial(user);
 			return res;
 		} catch (error) {
-			throw new Error("Could not delete Socail with user id: " + user);
+			throw new Error("Could not delete Social with user id: " + user);
 		}
 	}
 }

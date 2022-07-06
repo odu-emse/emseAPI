@@ -84,7 +84,7 @@ export class UserService {
 
 	/// Get a specific Instructor's profile by user ID
 	async instructorProfile(id: string): Promise<InstructorProfile | null> {
-		// @ts-ignore
+		//@ts-ignore
 		return await this.prisma.instructorProfile.findUnique({
 			where: {
 				accountID: id
@@ -138,11 +138,10 @@ export class UserService {
 		};
 
 		///Avoids duplicate value(email) if the exist already
-		if (count != 0){
+		if (count != 0) {
 			return await this.prisma.user.create({
-				data: payload,
+				data: payload
 			});
-			
 		}
 
 		return new Error("User has an account already.");
