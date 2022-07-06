@@ -18,6 +18,7 @@ nocache:
 reup:
 	make remvimg
 	make nocache
+	make regen
 	make up
 regen:
 	docker exec -i back_end_api npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
