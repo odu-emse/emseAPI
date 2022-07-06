@@ -339,7 +339,7 @@ export class Social {
 
 export class InstructorProfile {
     id: string;
-    account?: Nullable<User>;
+    account: User;
     title?: Nullable<string>;
     officeLocation?: Nullable<string>;
     officeHours?: Nullable<string>;
