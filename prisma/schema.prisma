@@ -23,11 +23,11 @@ model User {
   isActive     Boolean   @default(false)
 
   // Relation fields
-  social           Social?            @relation(name: "social")
-  plan             PlanOfStudy?       @relation(name: "plan")
-  tokens           Token[]
-  feedback         ModuleFeedback[]
-  assignmentGraded AssignmentResult[] @relation(name: "graded")
+  social            Social?            @relation(name: "social")
+  plan              PlanOfStudy?       @relation(name: "plan")
+  tokens            Token[]
+  feedback          ModuleFeedback[]
+  assignmentGraded  AssignmentResult[] @relation(name: "graded")
   instructorProfile InstructorProfile?
 }
 

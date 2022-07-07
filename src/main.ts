@@ -2,14 +2,17 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
+import sourceMapSupport from "source-map-support";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
+	sourceMapSupport.install();
+
 	app.enableCors();
 	app.use(cookieParser());
-	await app.listen(process.env.PORT || "", () =>
-		console.log(`🕵️‍♂️ Listening on port ${process.env.PORT}...`)
+	await app.listen(process.env.PORT!, () =>
+		console.log(`🕵️‍♂️ Listening on port ${process.env.PORT || 3000}...`)
 	);
 
 	Sentry.init({
