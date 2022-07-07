@@ -13,7 +13,8 @@ require("dotenv").config();
 			playground: true,
 			debug: process.env.NODE_ENV !== "production",
 			typePaths: ["./**/*.graphql"],
-			driver: ApolloDriver
+			driver: ApolloDriver,
+			introspection: process.env.NODE_ENV === "production" ? true : false
 		}),
 		MongooseModule.forRoot(process.env.DATABASE_URL!, {
 			useNewUrlParser: true
