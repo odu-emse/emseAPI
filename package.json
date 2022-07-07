@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"start": "nest start",
-		"start:prod": "node dist/main",
+		"start:prod": "nest build && node dist/src/main",
 		"dev": "nest start --watch",
 		"dev:clean": "yarn tsc && yarn typings && yarn prisma && make reup",
 		"build": "yarn prisma && nest build",
@@ -22,7 +22,7 @@
 		"@nestjs/jwt": "^8.0.0",
 		"@nestjs/mongoose": "^8.0.1",
 		"@nestjs/platform-express": "^8.0.6",
-		"@prisma/client": "^3.10.0",
+		"@prisma/client": "^4.0.0",
 		"@sendgrid/mail": "^7.1.0",
 		"@sentry/node": "^6.13.2",
 		"@sentry/tracing": "^6.13.2",
@@ -71,7 +71,7 @@
 		"eslint": "^7.24.0",
 		"kill-port": "^1.6.1",
 		"prettier": "^1.19.1",
-		"prisma": "^3.10.0",
+		"prisma": "^4.0.0",
 		"standard-version": "^8.0.1",
 		"ts-node-dev": "^1.1.6",
 		"tsconfig-paths": "^3.11.0"

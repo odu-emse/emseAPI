@@ -1,12 +1,5 @@
 {
 	"extends": "./tsconfig.json",
-	"exclude": [
-		"node_modules",
-		"dist",
-		"test",
-		"**/*spec.ts",
-		"old",
-		"src/gql"
-	],
+	"exclude": ["node_modules", "dist", "test", "**/*spec.ts"],
 	"include": ["src"]
 }

@@ -15,6 +15,12 @@ encn:
 	docker exec -it back_end_api bash
 nocache:
 	docker-compose build --no-cache
+
+quick-reup:
+	make build
+	make up
+	make regen
+
 reup:
 	make remvimg
 	make nocache
