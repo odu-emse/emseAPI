@@ -34,7 +34,7 @@ type User {
 	passwordConf: String
 	isAdmin: Boolean
 	isActive: Boolean
-	dob: String
+	dob: Date
 	social: Social
 	plan: PlanOfStudy
 	tokens: [ID!]
@@ -68,7 +68,7 @@ input UpdateUser {
 	middleName: String
 	password: String!
 	passwordConf: String!
-	dob: String
+	dob: Date
 	isAdmin: Boolean
 	isActive: Boolean
 	instructorProfile: InstructorProfileInput
@@ -118,3 +118,5 @@ type Mutation {
 	deleteSocial(id: ID!): Social
 	deleteUserSocial(userId: ID!): Social
 }
+
+scalar Date

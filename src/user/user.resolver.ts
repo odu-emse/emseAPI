@@ -86,7 +86,12 @@ export class UserResolver {
 
 	@Mutation("updateUser")
 	async update(@Args("input") args: UpdateUser) {
-		return this.userService.updateUser(args);
+		try {
+			return await this.userService.updateUser(args);
+		} catch (error) {
+			//@ts-ignore
+			throw new Error(error.message, { cause: error.cause });
+		}
 	}
 
 	@Mutation("deleteUser")

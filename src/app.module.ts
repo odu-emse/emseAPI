@@ -1,3 +1,4 @@
+import moment from "moment";
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
@@ -6,6 +7,31 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { ProgramModule } from "./program/program.module";
 require("dotenv").config();
+import { CustomScalar, Scalar } from "@nestjs/graphql";
+import { Kind, ValueNode } from "graphql";
+
+@Scalar("Date")
+export class DateScalar implements CustomScalar<string, moment.Moment> {
+	description = "Date custom scalar type";
+
+	parseValue(value: moment.Moment): moment.Moment {
+		//@ts-ignore
+		return moment(value).format("MM/DD/YYYY"); // value from the client
+	}
+
+	//What we are sending to the client
+	serialize(value: moment.Moment): string {
+		return moment(value).format("MM/DD/YYYY"); // value sent to the client
+	}
+
+	//What we are receiving from the client
+	parseLiteral(ast: ValueNode): moment.Moment {
+		if (ast.kind === Kind.STRING) {
+			if (moment(ast.value).isValid()) return moment(ast.value);
+		}
+		return moment(null);
+	}
+}
 
 @Module({
 	imports: [
@@ -14,7 +40,7 @@ require("dotenv").config();
 			debug: process.env.NODE_ENV !== "production",
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
-			introspection: process.env.NODE_ENV === "production" ? true : false
+			introspection: true
 		}),
 		MongooseModule.forRoot(process.env.DATABASE_URL!, {
 			useNewUrlParser: true
@@ -24,6 +50,6 @@ require("dotenv").config();
 		ProgramModule
 	],
 	controllers: [],
-	providers: []
+	providers: [DateScalar]
 })
 export class AppModule {}

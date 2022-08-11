@@ -6,10 +6,12 @@ import {
 	LoginUser,
 	Token,
 	SocialInput,
-	InstructorProfile
+	InstructorProfile,
+	Error
 } from "gql/graphql";
 import { hash, compare } from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
+import moment from "moment";
 
 @Injectable()
 export class UserService {
@@ -138,81 +140,101 @@ export class UserService {
 		};
 
 		///Avoids duplicate value(email) if the exist already
-		if (count != 0) {
+		if (count === 0) {
 			return await this.prisma.user.create({
 				data: payload
 			});
+		} else {
+			return new Error("User has an account already.");
 		}
-
-		return new Error("User has an account already.");
 	}
 
 	// Update a user
 	// TODO: figure out why the UserUpdateInput does not contain the id field
 	async updateUser(params: UpdateUser): Promise<User | Error> {
-		const {
-			id,
-			email,
-			firstName,
-			lastName,
-			middleName,
-			password,
-			passwordConf,
-			dob,
-			isAdmin,
-			isActive,
-			instructorProfile
-		} = params;
+		try {
+			const {
+				id,
+				email,
+				firstName,
+				lastName,
+				middleName,
+				password,
+				passwordConf,
+				dob,
+				isAdmin,
+				isActive
+				// instructorProfile
+			} = params;
 
-		//check if passwords provided match
-		if (password !== passwordConf) {
-			throw new Error("Passwords provided are not matching...");
-		}
-
-		const res = await this.prisma.user.findUnique({
-			where: {
-				id
+			//check if passwords provided match
+			if (password !== passwordConf) {
+				throw new Error("Passwords provided are not matching...");
 			}
-		});
 
-		if (res === null) {
-			return new Error(`The user with ${id}, does not exist`);
-		}
+			const res = await this.prisma.user.findUnique({
+				where: {
+					id
+				}
+			});
 
-		//This still throws and error with matching correct passwords
-		if (!(await compare(password, res.password))) {
-			return new Error(`Incorrect password provided.`);
-		}
+			if (!res) {
+				throw new Error(`The user with ${id}, does not exist`);
+			}
 
-		const hashedPassword = await hash(password, 10);
-		const hashedPasswordConf = hashedPassword;
+			//This still throws and error with matching correct passwords
+			if (!(await compare(password, res.password))) {
+				throw new Error(`Incorrect password provided.`);
+			}
 
-		this.prisma.instructorProfile.update({
-			where: {
-				accountID: id
-			},
+			const hashedPassword = await hash(password, 10);
+			const hashedPasswordConf = hashedPassword;
+
+			// console.log(`Here is the instructor profile ${instructorProfile}`);
+
+			// if (instructorProfile !== undefined) {
+			// 	try {
+			// 		await this.prisma.instructorProfile.update({
+			// 			where: {
+			// 				accountID: id
+			// 			},
+			// 			// @ts-ignore
+			// 			data: {
+			// 				...(instructorProfile && { instructorProfile })
+			// 			}
+			// 		});
+			// 	} catch (error) {
+			// 		//@ts-ignore
+			// 		throw new Error(error.message);
+			// 	}
+			// }
+
+			if (!moment(dob).isValid()) {
+				throw new Error("Invalid date of birth");
+			}
+
+			return await this.prisma.user.update({
+				where: {
+					id
+				},
+				data: {
+					...(email && { email }),
+					...(firstName && { firstName }),
+					...(lastName && { lastName }),
+					...(middleName && { middleName }),
+					...(dob && {
+						dob: dob.toISOString()
+					}),
+					...(password && { password: hashedPassword }),
+					...(passwordConf && { passwordConf: hashedPasswordConf }),
+					...(isAdmin && { isAdmin }),
+					...(isActive && { isActive })
+				}
+			});
+		} catch (error) {
 			//@ts-ignore
-			data: {
-				...(instructorProfile && { instructorProfile })
-			}
-		});
-
-		return this.prisma.user.update({
-			where: {
-				id
-			},
-			data: {
-				...(email && { email }),
-				...(firstName && { firstName }),
-				...(lastName && { lastName }),
-				...(middleName && { middleName }),
-				...(dob && { dob }),
-				...(password && { password: hashedPassword }),
-				...(passwordConf && { passwordConf: hashedPasswordConf }),
-				...(isAdmin && { isAdmin }),
-				...(isActive && { isActive })
-			}
-		});
+			throw new Error(error.message);
+		}
 	}
 
 	// delete a user by id
