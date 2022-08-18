@@ -19,10 +19,12 @@ jobs:
             - node/install:
                   install-yarn: true
                   node-version: "18"
-            - run: node --version
-            - install:
+            - run:
+                  command: node --version
+                  name: Checking Node version
+            - run:
                   command: yarn
-                  name: Install Dependencies
+                  name: Installing Dependencies
             - run:
                   command: yarn test
                   name: Run jest tests
@@ -34,9 +36,12 @@ jobs:
             - node/install:
                   install-yarn: true
                   node-version: "18"
-            - install:
+            - run:
+                  command: node --version
+                  name: Checking Node version
+            - run:
                   command: yarn
-                  name: Install Dependencies
+                  name: Installing Dependencies
             - run:
                   command: yarn test:cov
                   name: Run jest tests with coverage
