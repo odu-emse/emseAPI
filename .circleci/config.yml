@@ -12,20 +12,24 @@ jobs:
                   node-version: "18"
             - run: node --version
     test:
-        executor: node
+        docker:
+            - image: "cimg/base:stable"
         steps:
             - checkout
-            - node/install-packages:
-                  pkg-manager: yarn
+            - node/install:
+                  install-yarn: true
+                  node-version: "18"
             - run:
                   command: yarn test
                   name: Run jest tests
     cov:
-        executor: node
+        docker:
+            - image: "cimg/base:stable"
         steps:
             - checkout
-            - node/install-packages:
-                  pkg-manager: yarn
+            - node/install:
+                  install-yarn: true
+                  node-version: "18"
             - run:
                   command: yarn test:cov
                   name: Run jest tests with coverage
