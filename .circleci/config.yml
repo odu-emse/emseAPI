@@ -1,4 +1,4 @@
-version: "2.1"
+version: 2.1
 orbs:
     node: circleci/node@5.0.2
 jobs:
@@ -12,8 +12,7 @@ jobs:
                   node-version: "18"
             - run: node --version
     test:
-        docker:
-            - image: "cimg/base:stable"
+        executor: node
         steps:
             - checkout
             - node/install-packages:
@@ -22,8 +21,7 @@ jobs:
                   command: yarn test
                   name: Run jest tests
     cov:
-        docker:
-            - image: "cimg/base:stable"
+        executor: node
         steps:
             - checkout
             - node/install-packages:
@@ -39,4 +37,4 @@ workflows:
             - test:
                   requires: [install-node]
             - cov:
-                  requires: [install-node, test]
+                  requires: [test]
