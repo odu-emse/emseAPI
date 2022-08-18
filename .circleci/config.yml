@@ -12,9 +12,8 @@ jobs:
                   node-version: "18"
             - run: node --version
     test:
-        executor:
-            name: node/default
-            tag: "16"
+        docker:
+            - image: "cimg/base:stable"
         steps:
             - checkout
             - node/install-packages:
@@ -23,9 +22,8 @@ jobs:
                   command: yarn test
                   name: Run jest tests
     cov:
-        executor:
-            name: node/default
-            tag: "16"
+        docker:
+            - image: "cimg/base:stable"
         steps:
             - checkout
             - node/install-packages:
@@ -34,8 +32,11 @@ jobs:
                   command: yarn test:cov
                   name: Run jest tests with coverage
 workflows:
-    test_my_app:
+    version: 2
+    api-testing:
         jobs:
             - install-node
-            - test
-            - cov
+            - test:
+                  requires: [install-node]
+            - cov:
+                  requires: [install-node, test]
