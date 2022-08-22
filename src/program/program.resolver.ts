@@ -2,7 +2,6 @@ import {
 	AssignmentInput,
 	CourseInput,
 	ModuleEnrollmentInput,
-	ModuleFeedbackInput,
 	ModuleFeedbackUpdate,
 	NewAssignment,
 	NewAssignmentResult,
@@ -20,8 +19,7 @@ export class ProgramResolver {
 	@Query("modules")
 	async modules() {
 		try {
-			const res = this.programService.modules();
-			return res;
+			return await this.programService.modules();
 		} catch (error) {
 			throw new Error(
 				"An error occurred while trying to execute your query"
@@ -33,8 +31,7 @@ export class ProgramResolver {
 	@Query("module")
 	async module(@Args("id") args: string) {
 		try {
-			const res = await this.programService.module(args);
-			return res;
+			return await this.programService.module(args);
 		} catch (error) {
 			if (error)
 				throw new Error(
@@ -45,10 +42,21 @@ export class ProgramResolver {
 
 	// Get multiple Courses
 	@Query("courses")
+	async course(@Args("id") ID: string) {
+		try {
+			return await this.programService.course(ID);
+		} catch (error) {
+			throw new Error(
+				"An error occurred while trying to execute your query"
+			);
+		}
+	}
+
+	// Get multiple Courses
+	@Query("courses")
 	async courses() {
 		try {
-			const res = this.programService.courses();
-			return res;
+			return await this.programService.courses();
 		} catch (error) {
 			throw new Error(
 				"An error occurred while trying to execute your query"
@@ -60,8 +68,7 @@ export class ProgramResolver {
 	@Query("assignment")
 	async assignment(@Args("id") args: string) {
 		try {
-			const res = await this.programService.assignment(args);
-			return res;
+			return await this.programService.assignment(args);
 		} catch (error) {
 			throw new Error(
 				"An error occurred while trying to execute your query"
@@ -73,8 +80,7 @@ export class ProgramResolver {
 	@Query("assignments")
 	async assignments() {
 		try {
-			const res = this.programService.assignments();
-			return res;
+			return await this.programService.assignments();
 		} catch (error) {
 			throw new Error(
 				"An error occurred while trying to execute your query"
