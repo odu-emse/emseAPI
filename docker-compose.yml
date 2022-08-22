@@ -18,6 +18,6 @@ services:
         networks:
             - empiNetwork
         command: >
-            bash -c "node /usr/src/app/gql/generate-typings.js && yarn dev"
+            bash -c "yarn generate && yarn dev"
 networks:
     empiNetwork:

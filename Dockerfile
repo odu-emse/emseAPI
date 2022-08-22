@@ -8,19 +8,14 @@ COPY package.json ./
 
 
 #For schema back end
-COPY prisma/. /usr/src/app/prisma/.
+COPY prisma/* ./prisma/
 COPY ts*.json ./
 COPY .env ./
 
-
+COPY src/* /usr/src/app/src/
 
 RUN yarn
-COPY gql/. /usr/src/app/gql/.
-RUN npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
-
-RUN yarn global add @nestjs/cli
-
-RUN npx prisma generate
+COPY gql/* ./gql/
 
 FROM base as production
 

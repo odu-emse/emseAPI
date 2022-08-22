@@ -6,7 +6,7 @@
 		"start": "nest start",
 		"start:prod": "node dist/src/main",
 		"dev": "nest start --watch",
-		"dev:clean": "yarn tsc && yarn typings && yarn prisma && make reup",
+		"dev:clean": "yarn generate && make reup",
 		"build": "yarn prisma && nest build",
 		"tsc": "tsc --skipLibCheck --excludeDirectories node_modules gql/generate-typings.ts",
 		"typings": "node gql/generate-typings.js",
