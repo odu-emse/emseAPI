@@ -86,7 +86,7 @@ export class UserService {
 
 	/// Get a specific Instructor's profile by user ID
 	async instructorProfile(id: string): Promise<InstructorProfile | null> {
-		//@ts-ignore
+		// @ts-ignore
 		return await this.prisma.instructorProfile.findUnique({
 			where: {
 				accountID: id
@@ -270,7 +270,19 @@ export class UserService {
 			if (val) {
 				// Call token function to generate login token per id
 				const { id } = res;
-				const usrauth_token = this.jwtService.sign({ id });
+				const now = moment(new Date()).unix();
+				const exp = moment(now)
+					.add(1, "hour")
+					.unix();
+				const usrauth_token = this.jwtService.sign(
+					{
+						id,
+						iat: now
+					},
+					{
+						expiresIn: "1 days"
+					}
+				);
 				const token = {
 					id,
 					token: usrauth_token

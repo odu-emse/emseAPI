@@ -1,5 +1,4 @@
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
-import { Prisma } from "@prisma/client";
 import { PlanInput } from "gql/graphql";
 import { PoSService } from "./pos.service";
 
@@ -9,8 +8,7 @@ export class PlanOfStudyResolver {
 
 	@Query("plans")
 	async plans() {
-		const res = await this.planService.plans();
-		return res;
+		return await this.planService.plans();
 	}
 
 	@Query("plan")
