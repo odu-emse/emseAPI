@@ -140,6 +140,7 @@ export interface IQuery {
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     modules(): Module[] | Promise<Module[]>;
     module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
+    course(id: string): Nullable<Course> | Promise<Nullable<Course>>;
     courses(): Course[] | Promise<Course[]>;
     assignments(): Assignment[] | Promise<Assignment[]>;
     assignment(id: string): Nullable<Assignment> | Promise<Nullable<Assignment>>;
@@ -219,7 +220,7 @@ export interface Assignment {
     updatedAt: string;
     name: string;
     dueAt?: Nullable<string>;
-    module?: Nullable<Module>;
+    module: Module;
     assignmentResults?: Nullable<Nullable<AssignmentResult>[]>;
 }
 

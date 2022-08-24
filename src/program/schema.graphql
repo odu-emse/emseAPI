@@ -29,7 +29,7 @@ type Assignment {
 	name: String!
 	dueAt: String
 
-	module: Module
+	module: Module!
 	assignmentResults: [AssignmentResult]
 }
 
@@ -91,6 +91,7 @@ type Query {
 	modules: [Module!]!
 	module(id: ID!): Module
 
+	course(id: ID!): Course
 	courses: [Course!]!
 
 	assignments: [Assignment!]!

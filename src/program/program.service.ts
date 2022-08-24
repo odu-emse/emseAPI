@@ -205,6 +205,84 @@ export class ProgramService {
 		}
 	}
 
+	async course(id: string): Promise<Course | null> {
+		return this.prisma.course.findFirstOrThrow({
+			where: {
+				id
+			},
+			include: {
+				modules: {
+					include: {
+						module: {
+							include: {
+								assignments: true,
+								feedback: {
+									include: {
+										student: true,
+										module: false
+									}
+								},
+								parentCourses: {
+									include: {
+										course: true
+									}
+								},
+								members: {
+									include: {
+										module: false,
+										plan: true
+									}
+								}
+							}
+						},
+						course: false
+					}
+				},
+				enrollment: {
+					include: {
+						student: {
+							include: {
+								student: {
+									include: {
+										social: true,
+										plan: true,
+										feedback: true,
+										assignmentGraded: true,
+										instructorProfile: true
+									}
+								},
+								courses: {
+									include: {
+										course: true
+									}
+								},
+								modules: {
+									include: {
+										module: true,
+										plan: true
+									}
+								},
+								assignmentResults: {
+									include: {
+										student: true,
+										gradedBy: true,
+										assignment: true
+									}
+								}
+							}
+						},
+						course: {
+							include: {
+								enrollment: true,
+								modules: true
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+
 	async courses(): Promise<Course[]> {
 		return this.prisma.course.findMany({
 			include: {
