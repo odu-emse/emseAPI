@@ -34,7 +34,8 @@ export class UserService {
 						}
 					}
 				},
-				assignmentGraded: true
+				assignmentGraded: true,
+				instructorProfile: true
 			}
 		});
 	}
@@ -56,7 +57,8 @@ export class UserService {
 						}
 					}
 				},
-				assignmentGraded: true
+				assignmentGraded: true,
+				instructorProfile: true
 			}
 		});
 
@@ -150,7 +152,6 @@ export class UserService {
 	}
 
 	// Update a user
-	// TODO: figure out why the UserUpdateInput does not contain the id field
 	async updateUser(params: UpdateUser): Promise<User | Error> {
 		try {
 			const {
@@ -163,8 +164,8 @@ export class UserService {
 				passwordConf,
 				dob,
 				isAdmin,
-				isActive
-				// instructorProfile
+				isActive,
+				instructorProfile
 			} = params;
 
 			//check if passwords provided match
@@ -190,24 +191,21 @@ export class UserService {
 			const hashedPassword = await hash(password, 10);
 			const hashedPasswordConf = hashedPassword;
 
-			// console.log(`Here is the instructor profile ${instructorProfile}`);
-
-			// if (instructorProfile !== undefined) {
-			// 	try {
-			// 		await this.prisma.instructorProfile.update({
-			// 			where: {
-			// 				accountID: id
-			// 			},
-			// 			// @ts-ignore
-			// 			data: {
-			// 				...(instructorProfile && { instructorProfile })
-			// 			}
-			// 		});
-			// 	} catch (error) {
-			// 		//@ts-ignore
-			// 		throw new Error(error.message);
-			// 	}
-			// }
+			if (instructorProfile !== null || instructorProfile !== undefined) {
+				try {
+					await this.prisma.instructorProfile.update({
+						where: {
+							accountID: id
+						},
+						data: {
+							...instructorProfile
+						}
+					});
+				} catch (error) {
+					//@ts-ignore
+					throw new Error(error.message);
+				}
+			}
 
 			if (!moment(dob).isValid()) {
 				throw new Error("Invalid date of birth");
@@ -229,6 +227,9 @@ export class UserService {
 					...(passwordConf && { passwordConf: hashedPasswordConf }),
 					...(isAdmin && { isAdmin }),
 					...(isActive && { isActive })
+				},
+				include: {
+					instructorProfile: true
 				}
 			});
 		} catch (error) {
