@@ -9,89 +9,44 @@ export class UserResolver {
 	// Get all users
 	@Query("users")
 	async users() {
-		try {
-			const res = await this.userService.users();
-			return res;
-		} catch (error) {
-			if (error)
-				throw new Error(
-					"An error occurred while trying to execute your query"
-				);
-		}
+		return await this.userService.users();
 	}
 
 	// Get a single user
 	@Query("user")
 	async user(@Args("id") args: string) {
-		try {
-			const res = await this.userService.user(args);
-			return res;
-		} catch (error) {
-			if (error)
-				throw new Error(
-					"An error occurred while trying to execute your query"
-				);
-		}
+		return await this.userService.user(args);
 	}
 	//login user
 	@Query("login")
 	async login(@Args("input") args: LoginUser) {
-		try {
-			const res = await this.userService.loginUser(args);
-			return res;
-		} catch (error) {
-			if (error) console.log(error);
-			throw new Error(
-				"An error occurred while trying to execute your query"
-			);
-		}
+		return await this.userService.loginUser(args);
 	}
 
 	@Query("socials")
 	async socials() {
-		try {
-			const res = await this.userService.socials();
-			return res;
-		} catch (error) {
-			throw new Error("Could not fetch Socials");
-		}
+		return await this.userService.socials();
 	}
 
 	@Query("social")
 	async social(@Args("id") id: string) {
-		try {
-			return await this.userService.social(id);
-		} catch (error) {
-			throw new Error("Could not fetch social with id: " + id);
-		}
+		return await this.userService.social(id);
 	}
 
 	@Query("instructorProfile")
 	async instructorProfile(@Args("id") id: string) {
-		try {
-			const usr = await this.userService.user(id);
-			return await this.userService.instructorProfile(String(usr!.id));
-		} catch (error) {
-			throw new Error(
-				"Could not fetch instructor's profile with id: " + id
-			);
-		}
+		const usr = await this.userService.user(id);
+		return await this.userService.instructorProfile(String(usr!.id));
 	}
 
 	@Mutation("createUser")
 	async createUser(@Args("input") args: NewUser) {
-		const res = await this.userService.registerUser(args);
-		return res;
+		return await this.userService.registerUser(args);
 	}
 
 	@Mutation("updateUser")
 	async update(@Args("input") args: UpdateUser) {
-		try {
-			return await this.userService.updateUser(args);
-		} catch (error) {
-			//@ts-ignore
-			throw new Error(error.message, { cause: error.cause });
-		}
+		return await this.userService.updateUser(args);
 	}
 
 	@Mutation("deleteUser")
@@ -104,12 +59,7 @@ export class UserResolver {
 		@Args("userId") user: string,
 		@Args("input") input: SocialInput
 	) {
-		try {
-			const res = await this.userService.addSocial(user, input);
-			return res;
-		} catch (error) {
-			throw new Error("Could not add Social");
-		}
+		return await this.userService.addSocial(user, input);
 	}
 
 	@Mutation("updateSocial")
@@ -117,11 +67,7 @@ export class UserResolver {
 		@Args("id") id: string,
 		@Args("input") input: SocialInput
 	) {
-		try {
-			const res = await this.userService.updateSocial(id, input);
-		} catch (error) {
-			throw new Error("Could not update Social with document id: " + id);
-		}
+		return await this.userService.updateSocial(id, input);
 	}
 
 	@Mutation("updateUserSocial")
@@ -129,31 +75,16 @@ export class UserResolver {
 		@Args("userId") user: string,
 		@Args("input") input: SocialInput
 	) {
-		try {
-			const res = await this.userService.updateUserSocial(user, input);
-			return res;
-		} catch (error) {
-			throw new Error("Could not update social with user id: " + user);
-		}
+		return await this.userService.updateUserSocial(user, input);
 	}
 
 	@Mutation("deleteSocial")
 	async deleteSocial(@Args("id") id: string) {
-		try {
-			const res = await this.userService.deleteSocial(id);
-			return res;
-		} catch (error) {
-			throw new Error("Could not delete social with document id: " + id);
-		}
+		return await this.userService.deleteSocial(id);
 	}
 
 	@Mutation("deleteUserSocial")
 	async deleteUserSocial(@Args("userId") user: string) {
-		try {
-			const res = await this.userService.deleteUserSocial(user);
-			return res;
-		} catch (error) {
-			throw new Error("Could not delete Social with user id: " + user);
-		}
+		return await this.userService.deleteUserSocial(user);
 	}
 }
