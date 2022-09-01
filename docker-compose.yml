@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+    api:
+        container_name: back_end_api
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: base
+        tty: true
+        expose:
+            - "4000"
+        ports:
+            - "4000:4000"
+        volumes:
+            - ./src:/usr/src/app/src #major
+            - ./logs:/root/.npm/_logs # use this for logs debugging
+        networks:
+            - empiNetwork
+        command: >
+            bash -c "yarn generate && yarn dev"
+networks:
+    empiNetwork:

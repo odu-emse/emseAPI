@@ -1,0 +1,122 @@
+type Social {
+	id: ID!
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
+	account: User!
+}
+
+type InstructorProfile {
+	id: ID!
+	account: User!
+	title: String
+	officeLocation: String
+	officeHours: String
+	contactPolicy: String
+	phone: String
+	background: String
+	researchInterest: String
+	selectedPapersAndPublications: String
+	personalWebsite: String
+	philosophy: String
+}
+
+type User {
+	id: ID!
+	email: String
+	createdAt: String
+	firstName: String
+	lastName: String
+	middleName: String
+	password: String
+	passwordConf: String
+	isAdmin: Boolean
+	isActive: Boolean
+	dob: Date
+	social: Social
+	plan: PlanOfStudy
+	tokens: [ID!]
+	feedback: [ModuleFeedback!]
+	assignmentGraded: [AssignmentResult!]
+	instructorProfile: InstructorProfile
+}
+
+type Error {
+	message: String
+}
+type Token {
+	id: String
+	token: String
+}
+
+input NewUser {
+	email: String!
+	firstName: String!
+	lastName: String!
+	middleName: String!
+	password: String!
+	passwordConf: String!
+}
+
+input UpdateUser {
+	id: ID!
+	email: String
+	firstName: String
+	lastName: String
+	middleName: String
+	password: String!
+	passwordConf: String!
+	dob: Date
+	isAdmin: Boolean
+	isActive: Boolean
+	instructorProfile: InstructorProfileInput
+}
+
+input InstructorProfileInput {
+	title: String
+	officeLocation: String
+	officeHours: String
+	contactPolicy: String
+	phone: String
+	background: String
+	researchInterest: String
+	selectedPapersAndPublications: String
+	personalWebsite: String
+	philosophy: String
+}
+
+input SocialInput {
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
+}
+input LoginUser {
+	email: String!
+	password: String!
+}
+type Query {
+	user(id: ID!): User
+	users: [User!]!
+	login(input: LoginUser): Token
+	socials: [Social!]!
+	social(id: ID!): Social
+	instructorProfile(id: ID!): InstructorProfile
+}
+
+type Mutation {
+	deleteUser(id: ID!): User
+	createUser(input: NewUser): User!
+	updateUser(input: UpdateUser): User
+
+	addSocial(user: ID!, input: SocialInput): Social!
+	updateSocial(id: ID!, input: SocialInput!): Social
+	updateUserSocial(userId: ID!, input: SocialInput!): Social
+	deleteSocial(id: ID!): Social
+	deleteUserSocial(userId: ID!): Social
+}
+
+scalar Date

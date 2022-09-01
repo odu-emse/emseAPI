@@ -1,0 +1,56 @@
+version: 2.1
+orbs:
+    node: circleci/node@5.0.2
+jobs:
+    install-node:
+        docker:
+            - image: "cimg/base:stable"
+        steps:
+            - checkout
+            - node/install:
+                  install-yarn: true
+                  node-version: "18"
+            - run: node --version
+    test:
+        docker:
+            - image: "cimg/base:stable"
+        steps:
+            - checkout
+            - node/install:
+                  install-yarn: true
+                  node-version: "18"
+            - run:
+                  command: node --version
+                  name: Checking Node version
+            - run:
+                  command: yarn
+                  name: Installing Dependencies
+            - run:
+                  command: yarn test
+                  name: Run jest tests
+    cov:
+        docker:
+            - image: "cimg/base:stable"
+        steps:
+            - checkout
+            - node/install:
+                  install-yarn: true
+                  node-version: "18"
+            - run:
+                  command: node --version
+                  name: Checking Node version
+            - run:
+                  command: yarn
+                  name: Installing Dependencies
+            - run:
+                  command: yarn test:cov
+                  name: Run jest tests with coverage
+workflows:
+    version: 2
+    api-testing:
+        jobs:
+            - install-node
+            - test:
+                  requires: [install-node]
+            - cov:
+                  requires: [test]
