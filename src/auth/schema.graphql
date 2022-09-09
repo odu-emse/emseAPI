@@ -1,0 +1,7 @@
+type AuthTokens {
+    id_token: String
+}
+
+type Query {
+    login(code: String): String
+}
