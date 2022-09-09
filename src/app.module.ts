@@ -9,6 +9,8 @@ import { ProgramModule } from "./program/program.module";
 require("dotenv").config();
 import { CustomScalar, Scalar } from "@nestjs/graphql";
 import { Kind, ValueNode } from "graphql";
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, moment.Moment> {
@@ -40,16 +42,18 @@ export class DateScalar implements CustomScalar<string, moment.Moment> {
 			debug: process.env.NODE_ENV !== "production",
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
-			introspection: true
+			introspection: true,
+			context: ({req, res}) => ({req, res})
 		}),
 		MongooseModule.forRoot(process.env.DATABASE_URL!, {
 			useNewUrlParser: true
 		}),
 		UserModule,
 		PoSModule,
-		ProgramModule
+		ProgramModule,
+		AuthModule,
 	],
 	controllers: [],
-	providers: [DateScalar]
+	providers: [DateScalar, AuthService]
 })
 export class AppModule {}

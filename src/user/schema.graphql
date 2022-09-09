@@ -101,7 +101,7 @@ input LoginUser {
 type Query {
 	user(id: ID!): User
 	users: [User!]!
-	login(input: LoginUser): Token
+	#login(input: LoginUser): Token
 	socials: [Social!]!
 	social(id: ID!): Social
 	instructorProfile(id: ID!): InstructorProfile

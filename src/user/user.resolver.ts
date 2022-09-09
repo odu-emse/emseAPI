@@ -18,10 +18,10 @@ export class UserResolver {
 		return await this.userService.user(args);
 	}
 	//login user
-	@Query("login")
+	/*@Query("login")
 	async login(@Args("input") args: LoginUser) {
 		return await this.userService.loginUser(args);
-	}
+	}*/
 
 	@Query("socials")
 	async socials() {
