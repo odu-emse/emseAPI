@@ -285,7 +285,7 @@ export interface Social {
 
 export interface InstructorProfile {
     id: string;
-    account: User;
+    account?: Nullable<User>;
     title?: Nullable<string>;
     officeLocation?: Nullable<string>;
     officeHours?: Nullable<string>;
