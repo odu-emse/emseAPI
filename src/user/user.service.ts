@@ -88,15 +88,11 @@ export class UserService {
 
 	/// Get a specific Instructor's profile by user ID
 	async instructorProfile(id: string): Promise<InstructorProfile | null> {
-		// @ts-ignore
+		
 		return await this.prisma.instructorProfile.findUnique({
 			where: {
 				accountID: id
 			},
-			include: {
-				//TODO: figure out why TS is giving us an error here
-				account: true
-			}
 		});
 	}
 

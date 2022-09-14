@@ -10,7 +10,7 @@ type Social {
 
 type InstructorProfile {
 	id: ID!
-	account: User!
+	account: User
 	title: String
 	officeLocation: String
 	officeHours: String
