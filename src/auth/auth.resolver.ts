@@ -7,12 +7,15 @@ import { AuthService } from './auth.service';
 export class AuthResolver {
 
     constructor(private readonly authService: AuthService) {}
-
     @Query("login")
     //@UseGuards(AuthGuard('google'))
     async login(@Context() context: GraphQLExecutionContext, @Args("code") code: String) {
         // Init the users login flow
         const response = await this.authService.fetchToken(code)
+        if (!response.ok) {
+            throw new Error("Error " + response.status + ": " + response.statusText);
+            
+        }
         const data = await response.json();
         //@ts-ignore
         context.res.cookie('test', 'value');
