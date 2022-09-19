@@ -14,12 +14,9 @@ export class AuthResolver {
         const response = await this.authService.fetchToken(code)
         if (!response.ok) {
             throw new Error("Error " + response.status + ": " + response.statusText);
-            
         }
+        
         const data = await response.json();
-        //@ts-ignore
-        context.res.cookie('test', 'value');
-        console.log(data)
-        return "Done"
+        return data.id_token
     }
 }
