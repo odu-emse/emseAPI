@@ -38,6 +38,9 @@ export class DateScalar implements CustomScalar<string, moment.Moment> {
 @Module({
 	imports: [
 		GraphQLModule.forRoot<ApolloDriverConfig>({
+			cors: {
+				credentials: 'include',
+			},
 			playground: true,
 			debug: process.env.NODE_ENV !== "production",
 			typePaths: ["./**/*.graphql"],
