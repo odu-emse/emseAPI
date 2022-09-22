@@ -24,7 +24,6 @@ export class AuthGuard implements CanActivate {
 			context.args[2].res.status(401);
 			return false;
 		}
-    // Return true if its good, or false if not
 
     return true;
   }
