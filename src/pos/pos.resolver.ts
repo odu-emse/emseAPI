@@ -1,8 +1,11 @@
+import { UseGuards } from "@nestjs/common";
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
 import { PlanInput } from "gql/graphql";
+import { AuthGuard } from "../auth.guard";
 import { PoSService } from "./pos.service";
 
 @Resolver()
+@UseGuards(AuthGuard)
 export class PlanOfStudyResolver {
 	constructor(private readonly planService: PoSService) {}
 
