@@ -84,6 +84,7 @@
 		"kill-port": "^1.6.1",
 		"prettier": "^1.19.1",
 		"prisma": "^4.0.0",
+		"prisma-dbml-generator": "^0.9.1",
 		"standard-version": "^8.0.1",
 		"ts-jest": "^28.0.8",
 		"ts-node-dev": "^1.1.6",
