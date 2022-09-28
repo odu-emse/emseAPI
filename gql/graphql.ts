@@ -78,26 +78,32 @@ export interface ModuleEnrollmentInput {
 }
 
 export interface NewUser {
+    uuid: string;
     email: string;
+    picURL: string;
     firstName: string;
     lastName: string;
     middleName: string;
-    password: string;
-    passwordConf: string;
 }
 
 export interface UpdateUser {
     id: string;
+    uuid?: Nullable<string>;
     email?: Nullable<string>;
+    picURL?: Nullable<string>;
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
-    password: string;
-    passwordConf: string;
     dob?: Nullable<Date>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
     instructorProfile?: Nullable<InstructorProfileInput>;
+}
+
+export interface RefreshUser {
+    uuid: string;
+    email?: Nullable<string>;
+    picURL?: Nullable<string>;
 }
 
 export interface InstructorProfileInput {
@@ -119,11 +125,6 @@ export interface SocialInput {
     linkedin?: Nullable<string>;
     facebook?: Nullable<string>;
     portfolio?: Nullable<string>;
-}
-
-export interface LoginUser {
-    email: string;
-    password: string;
 }
 
 export interface AuthTokens {
@@ -195,6 +196,7 @@ export interface IMutation {
     deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
+    refreshUser(input?: Nullable<RefreshUser>): Nullable<User> | Promise<Nullable<User>>;
     addSocial(user: string, input?: Nullable<SocialInput>): Social | Promise<Social>;
     updateSocial(id: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
     updateUserSocial(userId: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
@@ -304,13 +306,13 @@ export interface InstructorProfile {
 
 export interface User {
     id: string;
+    uuid: string;
     email?: Nullable<string>;
+    picURL?: Nullable<string>;
     createdAt?: Nullable<string>;
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
-    password?: Nullable<string>;
-    passwordConf?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
     dob?: Nullable<Date>;

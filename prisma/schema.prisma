@@ -23,8 +23,6 @@ model User {
   lastName     String
   middleName   String?
   dob          DateTime? @default(now())
-  password     String
-  passwordConf String
   isAdmin      Boolean   @default(false)
   isActive     Boolean   @default(false)
 
