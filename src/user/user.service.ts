@@ -3,7 +3,6 @@ import { PrismaService } from "../prisma.service";
 import { Prisma, User, Social } from "@prisma/client";
 import {
 	UpdateUser,
-	LoginUser,
 	Token,
 	SocialInput,
 	InstructorProfile,
@@ -104,8 +103,6 @@ export class UserService {
 			firstName,
 			lastName,
 			middleName,
-			password,
-			passwordConf
 		} = data;
 
 		const safeEmail = email.toLowerCase();
@@ -116,30 +113,18 @@ export class UserService {
 			}
 		});
 
-		if (password !== passwordConf) {
-			throw new Error("Passwords provided are not matching...");
-		}
-
-		if (password.length < 6) {
-			throw new Error("Password must be at least 6 characters long");
-		}
-
-		const hashedPassword = await hash(password, 10);
-		const hashedPasswordConf = hashedPassword;
-
 		const payload = {
 			id,
 			email: safeEmail,
 			firstName,
 			lastName,
 			middleName,
-			password: hashedPassword,
-			passwordConf: hashedPasswordConf
 		};
 
 		///Avoids duplicate value(email) if the exist already
 		if (count === 0) {
 			return await this.prisma.user.create({
+				//Maybe ignore this? Could be an issue when testing
 				data: payload
 			});
 		} else {
@@ -152,22 +137,18 @@ export class UserService {
 		try {
 			const {
 				id,
+				uuid,
 				email,
+				picURL,
 				firstName,
 				lastName,
 				middleName,
-				password,
-				passwordConf,
 				dob,
 				isAdmin,
 				isActive,
 				instructorProfile
 			} = params;
 
-			//check if passwords provided match
-			if (password !== passwordConf) {
-				throw new Error("Passwords provided are not matching...");
-			}
 
 			const res = await this.prisma.user.findUnique({
 				where: {
@@ -178,14 +159,6 @@ export class UserService {
 			if (!res) {
 				throw new Error(`The user with ${id}, does not exist`);
 			}
-
-			//This still throws and error with matching correct passwords
-			if (!(await compare(password, res.password))) {
-				throw new Error(`Incorrect password provided.`);
-			}
-
-			const hashedPassword = await hash(password, 10);
-			const hashedPasswordConf = hashedPassword;
 
 			if (instructorProfile !== null || instructorProfile !== undefined) {
 				try {
@@ -212,15 +185,15 @@ export class UserService {
 					id
 				},
 				data: {
+					...(uuid && { uuid }),
 					...(email && { email }),
+					...(picURL && { picURL }),
 					...(firstName && { firstName }),
 					...(lastName && { lastName }),
 					...(middleName && { middleName }),
 					...(dob && {
 						dob: dob.toISOString()
 					}),
-					...(password && { password: hashedPassword }),
-					...(passwordConf && { passwordConf: hashedPasswordConf }),
 					...(isAdmin && { isAdmin }),
 					...(isActive && { isActive })
 				},
@@ -249,48 +222,6 @@ export class UserService {
 				id
 			}
 		});
-	}
-
-	async loginUser(params: LoginUser): Promise<Token | Error> {
-		const { email, password } = params;
-		const safeEmail = email.toLowerCase();
-
-		const res = await this.prisma.user.findUnique({
-			where: {
-				email: safeEmail
-			}
-		});
-
-		//Check if user exits
-		if (res !== null) {
-			const val = await compare(password, res.password);
-			if (val) {
-				// Call token function to generate login token per id
-				const { id } = res;
-				const now = moment(new Date()).unix();
-				const exp = moment(now)
-					.add(1, "hour")
-					.unix();
-				const usrauth_token = this.jwtService.sign(
-					{
-						id,
-						iat: now
-					},
-					{
-						expiresIn: "1 days"
-					}
-				);
-				const token = {
-					id,
-					token: usrauth_token
-				};
-				return token;
-			} else {
-				return new Error(`Password is incorrect please try again.`);
-			}
-		}
-
-		return new Error(`User with the provided credentials does not exist`);
 	}
 
 	/// Create a social record for a User

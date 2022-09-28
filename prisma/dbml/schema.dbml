@@ -12,8 +12,6 @@ Table User {
   lastName String [not null]
   middleName String
   dob DateTime [default: `now()`]
-  password String [not null]
-  passwordConf String [not null]
   isAdmin Boolean [not null, default: false]
   isActive Boolean [not null, default: false]
   social Social

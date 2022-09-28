@@ -1,7 +1,7 @@
 import { UseGuards } from "@nestjs/common";
 import { Resolver, Query, Args, Mutation, GraphQLExecutionContext, Context } from "@nestjs/graphql";
 import { AuthGuard } from "../auth.guard";
-import { NewUser, UpdateUser, LoginUser, SocialInput } from "gql/graphql";
+import { NewUser, UpdateUser, SocialInput } from "gql/graphql";
 import { GraphQLWrappingType } from "graphql";
 import { UserService } from "./user.service";
 
@@ -21,11 +21,6 @@ export class UserResolver {
 	async user(@Args("id") args: string) {
 		return await this.userService.user(args);
 	}
-	//login user
-	/*@Query("login")
-	async login(@Args("input") args: LoginUser) {
-		return await this.userService.loginUser(args);
-	}*/
 
 	@Query("socials")
 	async socials() {
