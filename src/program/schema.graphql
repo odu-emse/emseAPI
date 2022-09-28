@@ -17,6 +17,7 @@ type AssignmentResult {
 	id: ID!
 	submittedAt: String!
 	result: Float!
+	feedback: String
 
 	student: PlanOfStudy
 	gradedBy: User

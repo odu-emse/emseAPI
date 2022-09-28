@@ -168,6 +168,7 @@ model AssignmentResult {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   submittedAt DateTime @default(now())
   result      Float
+  feedback    String?
 
   // Relation Fields
   studentId    String      @db.ObjectId
