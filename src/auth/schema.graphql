@@ -4,4 +4,5 @@ type AuthTokens {
 
 type Query {
     login(code: String): String
+    refresh(token: String): String
 }
