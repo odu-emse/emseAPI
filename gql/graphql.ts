@@ -163,6 +163,7 @@ export interface PlanOfStudy {
     modules?: Nullable<Nullable<ModuleEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
     courses?: Nullable<Nullable<CourseEnrollment>[]>;
+    modulesleft?: Nullable<Nullable<Module>[]>;
 }
 
 export interface IMutation {

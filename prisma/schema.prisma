@@ -57,6 +57,7 @@ model PlanOfStudy {
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
   courses           CourseEnrollment[]
+  modulesleft       Module[]
 }
 
 model Social {
@@ -117,6 +118,8 @@ model Module {
   assignments   Assignment[]
   feedback      ModuleFeedback[]
   parentCourses ModuleInCourse[]
+  modulesleft   PlanOfStudy @relation(fields: [planId], references: [id])
+  planId        String @unique @db.ObjectId
 }
 
 model ModuleFeedback {
