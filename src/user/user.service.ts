@@ -6,7 +6,8 @@ import {
 	Token,
 	SocialInput,
 	InstructorProfile,
-	Error
+	Error,
+	NewUser
 } from "gql/graphql";
 import { hash, compare } from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
@@ -100,6 +101,7 @@ export class UserService {
 		const {
 			id,
 			email,
+			picURL,
 			firstName,
 			lastName,
 			middleName,
@@ -116,6 +118,7 @@ export class UserService {
 		const payload = {
 			id,
 			email: safeEmail,
+			picURL,
 			firstName,
 			lastName,
 			middleName,
@@ -124,7 +127,6 @@ export class UserService {
 		///Avoids duplicate value(email) if the exist already
 		if (count === 0) {
 			return await this.prisma.user.create({
-				//Maybe ignore this? Could be an issue when testing
 				data: payload
 			});
 		} else {
@@ -137,7 +139,6 @@ export class UserService {
 		try {
 			const {
 				id,
-				uuid,
 				email,
 				picURL,
 				firstName,
@@ -185,7 +186,6 @@ export class UserService {
 					id
 				},
 				data: {
-					...(uuid && { uuid }),
 					...(email && { email }),
 					...(picURL && { picURL }),
 					...(firstName && { firstName }),

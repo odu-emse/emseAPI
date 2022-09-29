@@ -15,7 +15,11 @@ export class AuthResolver {
         if (!response.ok) {
             throw new Error("Error " + response.status + ": " + response.statusText);
         }
-        
+
+        /*Check here for an existing user.
+            if one exists let the client know so it can update the user,
+            if not then let the 
+        */
         const data = await response.json();
         return data.id_token
     }
