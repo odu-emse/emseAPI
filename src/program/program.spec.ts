@@ -6,7 +6,6 @@ import {
 	Assignment,
 	Module,
 	AssignmentResult,
-	CourseEnrollment,
 	ModuleEnrollment,
 	Course,
 	PlanOfStudy,
@@ -47,7 +46,6 @@ interface IModule extends Module {
 
 interface IProgramResolver {
 	//multi return queries
-	courseEnrollments: () => Promise<CourseEnrollment[]>;
 	moduleEnrollments: () => Promise<ModuleEnrollment[]>;
 	assignmentResults: () => Promise<AssignmentResult[]>;
 	assignments: () => Promise<IAssignment[]>;
@@ -58,7 +56,6 @@ interface IProgramResolver {
 	module: (ID: string) => Promise<IModule>;
 	course: (ID: string) => Promise<Course>;
 	assignmentResult: (ID: string) => Promise<AssignmentResult>;
-	courseEnrollment: (ID: string) => Promise<CourseEnrollment>;
 	moduleEnrollment: (ID: string) => Promise<ModuleEnrollment>;
 }
 
@@ -173,23 +170,6 @@ describe("Plan services", () => {
 			const start = new Date();
 			const moduleEnrollments = await resolver.moduleEnrollments();
 			expect(moduleEnrollments.length).toBeGreaterThan(1);
-			const end = new Date();
-			expect(end.getTime() - start.getTime()).toBeLessThan(1500);
-		});
-	});
-	describe("Query.courseEnrollments()", () => {
-		it("should return an array of courseEnrollments", async () => {
-			const courseEnrollments = await resolver.courseEnrollments();
-			expect(courseEnrollments).toBeDefined();
-			expect(courseEnrollments.length).toBeGreaterThan(1);
-			courseEnrollments.map(enrollments => {
-				expect(enrollments.id).toBeDefined();
-			});
-		});
-		it("should not take longer than 1.5 seconds to return all courseEnrollments", async () => {
-			const start = new Date();
-			const courseEnrollments = await resolver.courseEnrollments();
-			expect(courseEnrollments.length).toBeGreaterThan(1);
 			const end = new Date();
 			expect(end.getTime() - start.getTime()).toBeLessThan(1500);
 		});

@@ -17,7 +17,6 @@ import {
 	ModuleFeedback,
 	AssignmentResult,
 	ModuleEnrollment,
-	CourseEnrollment
 } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
@@ -461,46 +460,6 @@ export class ProgramService {
 		});
 	}
 
-	/// Fetch all CourseEnrollment records
-	async courseEnrollments(): Promise<CourseEnrollment[]> {
-		return this.prisma.courseEnrollment.findMany({
-			include: {
-				// student field below represents a plan of study
-				student: {
-					include: {
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				},
-				course: true
-			}
-		});
-	}
-
-	/// Fetch a CourseEnrollment Record by its ID
-	async courseEnrollment(id: string): Promise<CourseEnrollment | null> {
-		return this.prisma.courseEnrollment.findUnique({
-			where: {
-				id
-			},
-			include: {
-				// student field below represents a plan of study
-				student: {
-					include: {
-						// this is the actual student's profile etc
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				},
-				course: true
-			}
-		});
-	}
-
 	//Mutations
 
 	/// Create a new module
@@ -841,51 +800,6 @@ export class ProgramService {
 
 	async deleteModuleEnrollment(id: string) {
 		return this.prisma.moduleEnrollment.delete({
-			where: {
-				id
-			}
-		});
-	}
-
-	/// Create a new CourseEnrollment Record
-	async addCourseEnrollment(
-		planId: string,
-		courseId: string
-	): Promise<CourseEnrollment> {
-		return this.prisma.courseEnrollment.create({
-			data: {
-				studentId: planId,
-				courseId: courseId
-			},
-			include: {
-				student: {
-					include: {
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				}
-			}
-		});
-	}
-
-	/// Modify an existing CourseEnrollment Record
-	async updateCourseEnrollment(id: string, planId: string, courseId: string) {
-		return this.prisma.courseEnrollment.update({
-			where: {
-				id
-			},
-			data: {
-				studentId: planId,
-				courseId: courseId
-			}
-		});
-	}
-
-	/// Delete an existing record
-	async deleteCourseEnrollment(id: string) {
-		return this.prisma.courseEnrollment.delete({
 			where: {
 				id
 			}

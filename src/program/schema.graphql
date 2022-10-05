@@ -42,19 +42,10 @@ type ModuleFeedback {
 	module: Module
 }
 
-type CourseEnrollment {
-	id: ID!
-	enrolledAt: String!
-
-	student: PlanOfStudy!
-	course: Course!
-}
-
 type Course {
 	id: ID!
 	name: String!
 
-	enrollment: [CourseEnrollment]
 	modules: [ModuleInCourse]
 }
 
@@ -108,8 +99,6 @@ type Query {
 	moduleEnrollments: [ModuleEnrollment!]!
 	moduleEnrollment(id: ID!): ModuleEnrollment
 
-	courseEnrollments: [CourseEnrollment!]!
-	courseEnrollment(id: ID!): CourseEnrollment
 }
 
 input NewModule {
@@ -205,11 +194,7 @@ type Mutation {
 		input: ModuleEnrollmentInput
 	): ModuleEnrollment
 	deleteModuleEnrollment(id: ID!): ModuleEnrollment
-
-	addCourseEnrollment(planId: ID!, courseId: ID!): CourseEnrollment!
-	updateCourseEnrollment(id: ID!, planId: ID, courseId: ID): CourseEnrollment
-	deleteCourseEnrollment(id: ID!): CourseEnrollment
-
+	
 	pairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse!
 	unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
 }
