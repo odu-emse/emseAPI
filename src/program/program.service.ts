@@ -46,24 +46,7 @@ export class ProgramService {
 						}
 					}
 				},
-				parentCourses: {
-					include: {
-						course: {
-							include: {
-								enrollment: {
-									include: {
-										student: true
-									}
-								},
-								modules: {
-									include: {
-										module: true
-									}
-								}
-							}
-						}
-					}
-				},
+				parentCourses: true,
 				feedback: {
 					include: {
 						student: {
@@ -73,7 +56,6 @@ export class ProgramService {
 									include: {
 										modules: true,
 										assignmentResults: true,
-										courses: true
 									}
 								},
 								instructorProfile: true
@@ -97,11 +79,6 @@ export class ProgramService {
 										module: true
 									}
 								},
-								courses: {
-									include: {
-										course: true
-									}
-								}
 							}
 						}
 					}
@@ -138,11 +115,7 @@ export class ProgramService {
 						include: {
 							course: {
 								include: {
-									enrollment: {
-										include: {
-											student: true
-										}
-									},
+									enrollment: true,
 									modules: {
 										include: {
 											module: true
@@ -161,7 +134,6 @@ export class ProgramService {
 										include: {
 											modules: true,
 											assignmentResults: true,
-											courses: true
 										}
 									},
 									instructorProfile: true
@@ -185,11 +157,6 @@ export class ProgramService {
 											module: true
 										}
 									},
-									courses: {
-										include: {
-											course: true
-										}
-									}
 								}
 							}
 						}
@@ -238,47 +205,6 @@ export class ProgramService {
 						course: false
 					}
 				},
-				enrollment: {
-					include: {
-						student: {
-							include: {
-								student: {
-									include: {
-										social: true,
-										plan: true,
-										feedback: true,
-										assignmentGraded: true,
-										instructorProfile: true
-									}
-								},
-								courses: {
-									include: {
-										course: true
-									}
-								},
-								modules: {
-									include: {
-										module: true,
-										plan: true
-									}
-								},
-								assignmentResults: {
-									include: {
-										student: true,
-										gradedBy: true,
-										assignment: true
-									}
-								}
-							}
-						},
-						course: {
-							include: {
-								enrollment: true,
-								modules: true
-							}
-						}
-					}
-				}
 			}
 		});
 	}
@@ -313,47 +239,6 @@ export class ProgramService {
 						course: false
 					}
 				},
-				enrollment: {
-					include: {
-						student: {
-							include: {
-								student: {
-									include: {
-										social: true,
-										plan: true,
-										feedback: true,
-										assignmentGraded: true,
-										instructorProfile: true
-									}
-								},
-								courses: {
-									include: {
-										course: true
-									}
-								},
-								modules: {
-									include: {
-										module: true,
-										plan: true
-									}
-								},
-								assignmentResults: {
-									include: {
-										student: true,
-										gradedBy: true,
-										assignment: true
-									}
-								}
-							}
-						},
-						course: {
-							include: {
-								enrollment: true,
-								modules: true
-							}
-						}
-					}
-				}
 			}
 		});
 	}
@@ -416,7 +301,6 @@ export class ProgramService {
 						student: true,
 						modules: true,
 						assignmentResults: true,
-						courses: true
 					}
 				},
 				gradedBy: true,
@@ -464,18 +348,7 @@ export class ProgramService {
 	/// Fetch all CourseEnrollment records
 	async courseEnrollments(): Promise<CourseEnrollment[]> {
 		return this.prisma.courseEnrollment.findMany({
-			include: {
-				// student field below represents a plan of study
-				student: {
-					include: {
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				},
-				course: true
-			}
+
 		});
 	}
 
@@ -485,19 +358,6 @@ export class ProgramService {
 			where: {
 				id
 			},
-			include: {
-				// student field below represents a plan of study
-				student: {
-					include: {
-						// this is the actual student's profile etc
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				},
-				course: true
-			}
 		});
 	}
 
@@ -857,16 +717,6 @@ export class ProgramService {
 				studentId: planId,
 				courseId: courseId
 			},
-			include: {
-				student: {
-					include: {
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				}
-			}
 		});
 	}
 

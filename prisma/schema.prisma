@@ -56,7 +56,6 @@ model PlanOfStudy {
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
-  courses           CourseEnrollment[]
 }
 
 model Social {
@@ -144,7 +143,6 @@ model ModuleEnrollment {
 
 model CourseEnrollment {
   id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  student    PlanOfStudy @relation(fields: [studentId], references: [id])
   studentId  String      @db.ObjectId
   enrolledAt DateTime    @default(now())
 
