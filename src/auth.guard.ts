@@ -13,18 +13,18 @@ export class AuthGuard implements CanActivate {
 	const ctx = GqlExecutionContext.create(context);
     //@ts-ignore
     const authToken = ctx.getContext().req.headers.authorization;
-		const client = new OAuth2Client(process.env.GOOGLE_ID);
-		var ticket;
-		try{
-				ticket = await client.verifyIdToken({
-				idToken: authToken,
-				audience: process.env.GOOGLE_ID
-			})
-		} catch(error) {
-      //@ts-ignore
-			context.args[2].res.status(401);
-			return false;
-		}
+	const client = new OAuth2Client(process.env.GOOGLE_ID);
+	var ticket;
+	try{
+			ticket = await client.verifyIdToken({
+			idToken: authToken,
+			audience: process.env.GOOGLE_ID
+		})
+	} catch(error) {
+	//@ts-ignore
+		context.args[2].res.status(401);
+		return false;
+	}
 
     return true;
   }
