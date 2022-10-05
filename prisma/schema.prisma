@@ -142,16 +142,6 @@ model ModuleEnrollment {
   planId   String      @db.ObjectId
 }
 
-model CourseEnrollment {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  student    PlanOfStudy @relation(fields: [studentId], references: [id])
-  studentId  String      @db.ObjectId
-  enrolledAt DateTime    @default(now())
-
-  course   Course @relation(fields: [courseId], references: [id])
-  courseId String @db.ObjectId
-}
-
 model Assignment {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   updatedAt DateTime @default(now()) @updatedAt

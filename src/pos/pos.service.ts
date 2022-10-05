@@ -17,11 +17,6 @@ export class PoSService {
 					}
 				},
 				assignmentResults: true,
-				courses: {
-					include: {
-						course: true
-					}
-				},
 				student: true
 			}
 		});
@@ -45,11 +40,6 @@ export class PoSService {
 					include: {
 						assignment: true,
 						gradedBy: true
-					}
-				},
-				courses: {
-					include: {
-						course: true
 					}
 				},
 				student: true
@@ -85,11 +75,6 @@ export class PoSService {
 					include: {
 						assignment: true,
 						gradedBy: true
-					}
-				},
-				courses: {
-					include: {
-						course: true
 					}
 				},
 				student: true
