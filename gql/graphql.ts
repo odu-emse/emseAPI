@@ -267,6 +267,13 @@ export interface Module {
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
     feedback?: Nullable<Nullable<ModuleFeedback>[]>;
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
+    requirement?: Nullable<Nullable<requirement>[]>;
+}
+
+export interface Requirement {
+    id: string;
+    child: Module;
+    parent: Module;
 }
 
 export interface ModuleInCourse {

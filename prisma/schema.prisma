@@ -120,6 +120,18 @@ model Module {
   parentCourses ModuleInCourse[]
   modulesleft   PlanOfStudy @relation(fields: [planId], references: [id])
   planId        String @unique @db.ObjectId
+  parentmodules requirement[] @relation(name: "child")
+  childmodules requirement[] @relation(name: "parent")
+ 
+}
+
+model requirement{
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+
+  parent            Module @relation(name: "parent", fields: [parentId], references:[id])
+  parentId          String
+  child             Module @relation(name: "child", fields: [childId], references:[id])
+  childId           String
 }
 
 model ModuleFeedback {
