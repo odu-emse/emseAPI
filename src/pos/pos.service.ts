@@ -106,7 +106,6 @@ export class PoSService {
 			include: {
 				modules: true,
 				assignmentResults: true,
-				courses: true,
 				student: true
 			}
 		});
