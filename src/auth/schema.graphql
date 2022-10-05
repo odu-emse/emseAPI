@@ -1,8 +1,9 @@
 type AuthTokens {
-    id_token: String
+    id_token: String,
+    refresh_token: String
 }
 
 type Query {
-    login(code: String): String
+    login(code: String): AuthTokens
     refresh(token: String): String
 }

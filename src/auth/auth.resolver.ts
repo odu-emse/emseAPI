@@ -14,7 +14,10 @@ export class AuthResolver {
         
         const data = await response.json();
         console.log(data)
-        return data.id_token
+        return {
+            id_token: data.id_token,
+            refresh_token: data.refresh_token
+        }
     }
 
     @Query("refresh")
