@@ -12,7 +12,7 @@ export class AuthService {
                 client_id: process.env.GOOGLE_ID,
                 client_secret: process.env.GOOGLE_SECRET,
                 grant_type: 'authorization_code',
-                redirect_uri: 'http://localhost:3000/api/auth/redirect',
+                redirect_uri: 'http://localhost:3000/auth/redirect',
                 access_type: 'offline',
                 code
             })
