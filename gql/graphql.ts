@@ -78,8 +78,9 @@ export interface ModuleEnrollmentInput {
 }
 
 export interface NewUser {
-    uuid: string;
+    id: string;
     email: string;
+    openID: string;
     picURL: string;
     firstName: string;
     lastName: string;
@@ -88,7 +89,7 @@ export interface NewUser {
 
 export interface UpdateUser {
     id: string;
-    uuid?: Nullable<string>;
+    openID: string;
     email?: Nullable<string>;
     picURL?: Nullable<string>;
     firstName?: Nullable<string>;
@@ -98,12 +99,6 @@ export interface UpdateUser {
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
     instructorProfile?: Nullable<InstructorProfileInput>;
-}
-
-export interface RefreshUser {
-    uuid: string;
-    email?: Nullable<string>;
-    picURL?: Nullable<string>;
 }
 
 export interface InstructorProfileInput {
@@ -196,7 +191,6 @@ export interface IMutation {
     deleteUser(id: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
-    refreshUser(input?: Nullable<RefreshUser>): Nullable<User> | Promise<Nullable<User>>;
     addSocial(user: string, input?: Nullable<SocialInput>): Social | Promise<Social>;
     updateSocial(id: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
     updateUserSocial(userId: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
@@ -306,7 +300,7 @@ export interface InstructorProfile {
 
 export interface User {
     id: string;
-    uuid: string;
+    openID: string;
     email?: Nullable<string>;
     picURL?: Nullable<string>;
     createdAt?: Nullable<string>;
