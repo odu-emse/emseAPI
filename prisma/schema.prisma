@@ -9,15 +9,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-}
+//generator dbml {
+//  provider = "prisma-dbml-generator"
+//}
 
 model User {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
-	openID       String    @unique
+	openID       String?    @unique
   email        String    @unique
-  picURL       String   
+  picURL       String?
   createdAt    DateTime  @default(now())
   firstName    String
   lastName     String

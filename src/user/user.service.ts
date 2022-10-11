@@ -1,17 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
-import { Prisma } from "@prisma/client";
+import type { User, Social,  } from "@prisma/client";
 import type {
-	User,
-	Social,
 	UpdateUser,
-	Token,
 	SocialInput,
 	InstructorProfile,
 	Error,
 	NewUser
-} from "gql/graphql";
-import { hash, compare } from "bcryptjs";
+} from 'gql/graphql';
 import { JwtService } from "@nestjs/jwt";
 import moment from "moment";
 
@@ -102,6 +98,7 @@ export class UserService {
 	async registerUser(data: NewUser): Promise<User | Error> {
 		const {
 			id,
+			openID,
 			email,
 			picURL,
 			firstName,
@@ -161,7 +158,7 @@ export class UserService {
 			});
 
 			if (!res) {
-				throw new Error(`The user with ${id}, does not exist`);
+				return new Error(`The user with ${id}, does not exist`);
 			}
 
 			if (instructorProfile !== null || instructorProfile !== undefined) {
@@ -174,14 +171,13 @@ export class UserService {
 							...instructorProfile
 						}
 					});
-				} catch (error) {
-					//@ts-ignore
-					throw new Error(error.message);
+				} catch (error:any) {
+					return new Error(error.message);
 				}
 			}
 
 			if (!moment(dob).isValid()) {
-				throw new Error("Invalid date of birth");
+				return new Error("Invalid date of birth");
 			}
 
 			return await this.prisma.user.update({
@@ -204,9 +200,8 @@ export class UserService {
 					instructorProfile: true
 				}
 			});
-		} catch (error) {
-			//@ts-ignore
-			throw new Error(error.message);
+		} catch (error:any) {
+			return new Error(error);
 		}
 	}
 

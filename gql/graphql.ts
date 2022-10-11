@@ -80,8 +80,8 @@ export interface ModuleEnrollmentInput {
 export interface NewUser {
     id: string;
     email: string;
-    openID: string;
-    picURL: string;
+    openID?: Nullable<string>;
+    picURL?: Nullable<string>;
     firstName: string;
     lastName: string;
     middleName: string;
@@ -89,7 +89,7 @@ export interface NewUser {
 
 export interface UpdateUser {
     id: string;
-    openID: string;
+    openID?: Nullable<string>;
     email?: Nullable<string>;
     picURL?: Nullable<string>;
     firstName?: Nullable<string>;
@@ -124,10 +124,12 @@ export interface SocialInput {
 
 export interface AuthTokens {
     id_token?: Nullable<string>;
+    refresh_token?: Nullable<string>;
 }
 
 export interface IQuery {
-    login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    login(code?: Nullable<string>): Nullable<AuthTokens> | Promise<Nullable<AuthTokens>>;
+    refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -300,7 +302,7 @@ export interface InstructorProfile {
 
 export interface User {
     id: string;
-    openID: string;
+    openID?: Nullable<string>;
     email?: Nullable<string>;
     picURL?: Nullable<string>;
     createdAt?: Nullable<string>;
