@@ -6,7 +6,7 @@ import { GraphQLWrappingType } from "graphql";
 import { UserService } from "./user.service";
 
 @Resolver("User")
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 export class UserResolver {
 	constructor(private readonly userService: UserService) {}
 
@@ -40,7 +40,7 @@ export class UserResolver {
 
 	@Mutation("createUser")
 	async createUser(@Args("input") args: NewUser) {
-		return await this.userService.registerUser(args);
+		// return await this.userService.registerUser(args);
 	}
 
 	@Mutation("updateUser")
