@@ -123,18 +123,11 @@ export interface SocialInput {
 
 export interface AuthTokens {
     id_token?: Nullable<string>;
-}
-
-export interface PlanOfStudy {
-    id: string;
-    student?: Nullable<User>;
-    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
-    assignmentResults?: Nullable<AssignmentResult[]>;
-    courses?: Nullable<Nullable<CourseEnrollment>[]>;
+    refresh_token?: Nullable<string>;
 }
 
 export interface IMutation {
-    login(code?: Nullable<string>): Nullable<User> | Promise<Nullable<User>>;
+    login(code?: Nullable<string>): Nullable<AuthTokens> | Promise<Nullable<AuthTokens>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -171,15 +164,8 @@ export interface IMutation {
     deleteUserSocial(userId: string): Nullable<Social> | Promise<Nullable<Social>>;
 }
 
-export interface PlanOfStudy {
-    id: string;
-    student?: Nullable<User>;
-    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
-    assignmentResults?: Nullable<AssignmentResult[]>;
-    courses?: Nullable<Nullable<CourseEnrollment>[]>;
-}
-
 export interface IQuery {
+    refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -203,6 +189,14 @@ export interface IQuery {
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
     instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
+}
+
+export interface PlanOfStudy {
+    id: string;
+    student?: Nullable<User>;
+    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
+    assignmentResults?: Nullable<AssignmentResult[]>;
+    courses?: Nullable<Nullable<CourseEnrollment>[]>;
 }
 
 export interface ModuleEnrollment {

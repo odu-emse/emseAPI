@@ -18,16 +18,9 @@ export class AuthResolver {
 
         //Update the user data here
         const data = await response.json();
-        return await this.authService.updateUserData(data.id_token);
+        const result = await this.authService.updateUserData(data.id_token);
 
-        // This refresh token needs to come back but im not sure how we would return that, included in the results from update user data.
-
-        // const data = await response.json();
-        // console.log(data)
-        // return {
-        //     id_token: data.id_token,
-        //     refresh_token: data.refresh_token
-        // }
+        return data.id_token
     }
 
     @Query("refresh")

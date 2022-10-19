@@ -4,7 +4,7 @@ type AuthTokens {
 }
 
 type Mutation {
-    login(code: String): User
+    login(code: String): String
 }
 
 type Query {
