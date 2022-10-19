@@ -97,7 +97,7 @@ $ make reup
 
 Once any schema.graphql file is modified, you must run this command to generate new typings _inside of_ the container. This command will enter the container and run the appropriate `node` commands to generate the typings.
 
-Under the hood, it uses `npx` for both TypeScript and Prisma compilations, and uses `node` to run the `generate-typings.js` file, which turns our GraphQL schema into a TypeScript types.
+Under the hood, it uses `npx` for both TypeScript and Prisma compilations, and uses `ts-node-dev` to run the `generate-typings.ts` file, which turns our GraphQL schema into a TypeScript types.
 
 ```shell script
 $ make regen
@@ -115,7 +115,6 @@ emseAPI
 ├── README.md
 ├── docker-compose.yml
 ├── gql
-│   ├── generate-typings.js
 │   ├── generate-typings.ts
 │   └── graphql.ts
 ├── package.json
@@ -182,7 +181,6 @@ Under the hood the `generate-typings.ts` file, picks up all the files called `sc
 
 ```shell
 gql
-├── generate-typings.js
 ├── generate-typings.ts
 └── graphql.ts
 ```

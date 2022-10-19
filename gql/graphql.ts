@@ -125,6 +125,14 @@ export interface AuthTokens {
     id_token?: Nullable<string>;
 }
 
+export interface PlanOfStudy {
+    id: string;
+    student?: Nullable<User>;
+    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
+    assignmentResults?: Nullable<AssignmentResult[]>;
+    courses?: Nullable<Nullable<CourseEnrollment>[]>;
+}
+
 export interface IMutation {
     login(code?: Nullable<string>): Nullable<User> | Promise<Nullable<User>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;

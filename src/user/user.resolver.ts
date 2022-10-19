@@ -1,5 +1,12 @@
 import { UseGuards } from "@nestjs/common";
-import { Resolver, Query, Args, Mutation, GraphQLExecutionContext, Context } from "@nestjs/graphql";
+import {
+	Resolver,
+	Query,
+	Args,
+	Mutation,
+	GraphQLExecutionContext,
+	Context
+} from "@nestjs/graphql";
 import { AuthGuard } from "../auth.guard";
 import { NewUser, UpdateUser, SocialInput } from "gql/graphql";
 import { GraphQLWrappingType } from "graphql";
