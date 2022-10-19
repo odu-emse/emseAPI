@@ -44,7 +44,7 @@ export class UserService {
 	async user(id: string): Promise<User | null> {
 		const user = this.prisma.user.findFirst({
 			where: {
-				openId: id
+				openID: id
 			}, 
 			include: {
 				feedback: true,
@@ -96,50 +96,13 @@ export class UserService {
 		});
 	}
 
-	// Create a user
-	// async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
-	// 	const {
-	// 		id,
-	// 		email,
-	// 		picURL,
-	// 		firstName,
-	// 		lastName,
-	// 		middleName,
-	// 	} = data;
-
-	// 	const safeEmail = email.toLowerCase();
-	// 	//find out if there is a duplicate user
-	// 	const count = await this.prisma.user.count({
-	// 		where: {
-	// 			email: safeEmail
-	// 		}
-	// 	});
-
-	// 	const payload = {
-	// 		id,
-	// 		email: safeEmail,
-	// 		picURL,
-	// 		firstName,
-	// 		lastName,
-	// 		middleName,
-	// 	};
-
-	// 	///Avoids duplicate value(email) if the exist already
-	// 	if (count === 0) {
-	// 		return await this.prisma.user.create({
-	// 			data: payload
-	// 		});
-	// 	} else {
-	// 		return new Error("User has an account already.");
-	// 	}
-	// }
 
 	// Update a user
 	async updateUser(params: UpdateUser): Promise<User | Error> {
 		try {
 			const {
 				id,
-				openId,
+				openID,
 				email,
 				picURL,
 				firstName,
@@ -154,12 +117,12 @@ export class UserService {
 
 			const res = await this.prisma.user.count({
 				where: {
-					openId
+					openID
 				}
 			});
 
 			if (res == 0) {
-				throw new Error(`The user with ${openId}, does not exist`);
+				throw new Error(`The user with ${openID}, does not exist`);
 			}
 
 			if (instructorProfile !== null || instructorProfile !== undefined) {
@@ -184,7 +147,7 @@ export class UserService {
 
 			return await this.prisma.user.update({
 				where: {
-					openId
+					openID
 				},
 				data: {
 					...(email && { email }),

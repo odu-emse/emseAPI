@@ -25,7 +25,7 @@ type InstructorProfile {
 
 type User {
 	id: ID!
-	openId: ID!
+	openID: ID!
 	email: String!
 	picURL: String
 	createdAt: String
@@ -52,7 +52,7 @@ type Token {
 }
 
 input NewUser {
-	openId: String!
+	openID: String!
 	email: String!
 	picURL: String!
 	firstName: String!
@@ -62,7 +62,7 @@ input NewUser {
 
 input UpdateUser {
 	id: String!
-	openId: ID!
+	openID: ID!
 	email: String
 	picURL: String
 	firstName: String

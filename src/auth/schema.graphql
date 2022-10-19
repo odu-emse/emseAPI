@@ -2,6 +2,6 @@ type AuthTokens {
     id_token: String
 }
 
-type Query {
-    login(code: String): String
+type Mutation {
+    login(code: String): User
 }
