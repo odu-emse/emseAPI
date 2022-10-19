@@ -3,10 +3,10 @@ up:
 down:
 	docker-compose down
 build:
-	docker-compose build
+	docker-compose build api
 remvimg:
 	make down
-	docker rmi emseapi_api
+	docker rmi emseapi-api
 rncn:
 	docker ps -a
 img:
@@ -14,17 +14,15 @@ img:
 encn:
 	docker exec -it back_end_api bash
 nocache:
-	docker-compose build --no-cache
+	docker-compose build api --no-cache
 
 quick-reup:
 	make build
 	make up
-	make regen
 
 reup:
 	make remvimg
 	make nocache
-	make regen
 	make up
 regen:
 	docker exec -i back_end_api npx tsc --skipLibCheck /usr/src/app/gql/generate-typings.ts
