@@ -96,7 +96,6 @@ model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  enrollment CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
   modules    ModuleInCourse[]
 
 }
@@ -155,15 +154,6 @@ model ModuleEnrollment {
   moduleId String      @db.ObjectId
   plan     PlanOfStudy @relation(fields: [planId], references: [id])
   planId   String      @db.ObjectId
-}
-
-model CourseEnrollment {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  studentId  String      @db.ObjectId
-  enrolledAt DateTime    @default(now())
-
-  course   Course @relation(fields: [courseId], references: [id])
-  courseId String @db.ObjectId
 }
 
 model Assignment {

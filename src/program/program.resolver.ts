@@ -89,16 +89,6 @@ export class ProgramResolver {
 		return await this.programService.moduleEnrollment(id);
 	}
 
-	@Query("courseEnrollments")
-	async courseEnrollments() {
-		return await this.programService.courseEnrollments();
-	}
-
-	@Query("courseEnrollment")
-	async courseEnrollment(@Args("id") id: string) {
-		return await this.programService.courseEnrollment(id);
-	}
-
 	// Mutations
 
 	// Add a module to the db with all required initial fields
@@ -227,32 +217,6 @@ export class ProgramResolver {
 	@Mutation("deleteModuleEnrollment")
 	async deleteModuleEnrollment(@Args("id") id: string) {
 		return await this.programService.deleteModuleEnrollment(id);
-	}
-
-	@Mutation("addCourseEnrollment")
-	async addCourseEnrollment(
-		@Args("planId") plan: string,
-		@Args("courseId") course: string
-	) {
-		return await this.programService.addCourseEnrollment(plan, course);
-	}
-
-	@Mutation("updateCourseEnrollment")
-	async updateCourseEnrollment(
-		@Args("id") id: string,
-		@Args("planId") plan: string,
-		@Args("courseId") course: string
-	) {
-		return await this.programService.updateCourseEnrollment(
-			id,
-			plan,
-			course
-		);
-	}
-
-	@Mutation("deleteCourseEnrollment")
-	async deleteCourseEnrollment(@Args("id") id: string) {
-		return await this.programService.deleteCourseEnrollment(id);
 	}
 
 	@Mutation("pairCourseModule")
