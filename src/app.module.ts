@@ -59,6 +59,6 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		AuthModule,
 	],
 	controllers: [],
-	providers: [DateScalar, AuthService]
+	providers: [DateScalar]
 })
 export class AppModule {}

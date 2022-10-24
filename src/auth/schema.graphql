@@ -3,7 +3,10 @@ type AuthTokens {
     refresh_token: String
 }
 
+type Mutation {
+    login(code: String): String
+}
+
 type Query {
-    login(code: String): AuthTokens
     refresh(token: String): String
 }

@@ -1,0 +1,189 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  uuid String [unique, not null]
+  email String [unique, not null]
+  picURL String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  firstName String [not null]
+  lastName String [not null]
+  middleName String
+  dob DateTime [default: `now()`]
+  isAdmin Boolean [not null, default: false]
+  isActive Boolean [not null, default: false]
+  social Social
+  plan PlanOfStudy
+  tokens Token [not null]
+  feedback ModuleFeedback [not null]
+  assignmentGraded AssignmentResult [not null]
+  instructorProfile InstructorProfile
+}
+
+Table InstructorProfile {
+  id String [pk]
+  account User
+  accountID String [unique]
+  title String
+  officeLocation String
+  officeHours String
+  contactPolicy String
+  phone String
+  background String
+  researchInterest String
+  selectedPapersAndPublications String
+  personalWebsite String
+  philosophy String
+}
+
+Table PlanOfStudy {
+  id String [pk]
+  student User
+  studentID String [unique]
+  modules ModuleEnrollment [not null]
+  assignmentResults AssignmentResult [not null]
+  courses CourseEnrollment [not null]
+}
+
+Table Social {
+  id String [pk]
+  twitter String
+  github String
+  linkedin String
+  facebook String
+  portfolio String
+  account User
+  accountID String [unique]
+}
+
+Table Token {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  valid Boolean [not null, default: true]
+  expiration DateTime [not null]
+  user User [not null]
+  userId String [not null]
+}
+
+Table ModuleInCourse {
+  id String [pk]
+  module Module [not null]
+  moduleId String [not null]
+  course Course [not null]
+  courseId String [not null]
+}
+
+Table Course {
+  id String [pk]
+  name String [not null]
+  enrollment CourseEnrollment [not null]
+  modules ModuleInCourse [not null]
+}
+
+Table Module {
+  id String [pk]
+  moduleNumber Int [unique, not null]
+  moduleName String [unique, not null]
+  description String [not null]
+  duration Float [not null]
+  intro String [not null]
+  numSlides Int [not null]
+  keywords String[] [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  members ModuleEnrollment [not null]
+  assignments Assignment [not null]
+  feedback ModuleFeedback [not null]
+  parentCourses ModuleInCourse [not null]
+}
+
+Table ModuleFeedback {
+  id String [pk]
+  feedback String [not null]
+  rating Int [not null]
+  studentId String [not null]
+  moduleId String [not null]
+  student User [not null]
+  module Module [not null]
+}
+
+Table ModuleEnrollment {
+  id String [pk]
+  enrolledAt DateTime [default: `now()`, not null]
+  role UserRole [not null]
+  module Module [not null]
+  moduleId String [not null]
+  plan PlanOfStudy [not null]
+  planId String [not null]
+}
+
+Table CourseEnrollment {
+  id String [pk]
+  student PlanOfStudy [not null]
+  studentId String [not null]
+  enrolledAt DateTime [default: `now()`, not null]
+  course Course [not null]
+  courseId String [not null]
+}
+
+Table Assignment {
+  id String [pk]
+  updatedAt DateTime [default: `now()`, not null]
+  name String [not null]
+  dueAt DateTime [not null]
+  moduleId String [not null]
+  module Module [not null]
+  assignmentResults AssignmentResult [not null]
+}
+
+Table AssignmentResult {
+  id String [pk]
+  submittedAt DateTime [default: `now()`, not null]
+  result Float [not null]
+  studentId String [not null]
+  student PlanOfStudy [not null]
+  graderId String [not null]
+  gradedBy User [not null]
+  assignmentId String [not null]
+  assignment Assignment [not null]
+}
+
+Enum UserRole {
+  STUDENT
+  TEACHER
+  GRADER
+}
+
+Ref: InstructorProfile.accountID - User.id
+
+Ref: PlanOfStudy.studentID - User.id
+
+Ref: Social.accountID - User.id
+
+Ref: Token.userId > User.id
+
+Ref: ModuleInCourse.moduleId > Module.id
+
+Ref: ModuleInCourse.courseId > Course.id
+
+Ref: ModuleFeedback.studentId > User.id
+
+Ref: ModuleFeedback.moduleId > Module.id
+
+Ref: ModuleEnrollment.moduleId > Module.id
+
+Ref: ModuleEnrollment.planId > PlanOfStudy.id
+
+Ref: CourseEnrollment.studentId > PlanOfStudy.id
+
+Ref: CourseEnrollment.courseId > Course.id
+
+Ref: Assignment.moduleId > Module.id
+
+Ref: AssignmentResult.studentId > PlanOfStudy.id
+
+Ref: AssignmentResult.graderId > User.id
+
+Ref: AssignmentResult.assignmentId > Assignment.id

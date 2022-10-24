@@ -25,13 +25,13 @@ type InstructorProfile {
 
 type User {
 	id: ID!
-	email: String
+	openID: ID!
+	email: String!
+	picURL: String
 	createdAt: String
 	firstName: String
 	lastName: String
 	middleName: String
-	password: String
-	passwordConf: String
 	isAdmin: Boolean
 	isActive: Boolean
 	dob: Date
@@ -52,22 +52,22 @@ type Token {
 }
 
 input NewUser {
+	openID: String!
 	email: String!
+	picURL: String!
 	firstName: String!
 	lastName: String!
 	middleName: String!
-	password: String!
-	passwordConf: String!
 }
 
 input UpdateUser {
-	id: ID!
+	id: String!
+	openID: ID!
 	email: String
+	picURL: String
 	firstName: String
 	lastName: String
 	middleName: String
-	password: String!
-	passwordConf: String!
 	dob: Date
 	isAdmin: Boolean
 	isActive: Boolean
@@ -94,21 +94,17 @@ input SocialInput {
 	facebook: String
 	portfolio: String
 }
-input LoginUser {
-	email: String!
-	password: String!
-}
+
 type Query {
 	user(id: ID!): User
 	users: [User!]!
-	#login(input: LoginUser): Token
 	socials: [Social!]!
 	social(id: ID!): Social
 	instructorProfile(id: ID!): InstructorProfile
 }
 
 type Mutation {
-	deleteUser(id: ID!): User
+	deleteUser(openId: ID!): User
 	createUser(input: NewUser): User!
 	updateUser(input: UpdateUser): User
 

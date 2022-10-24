@@ -1,15 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
-import { Prisma, User, Social } from "@prisma/client";
-import {
+import type { User, Social,  } from "@prisma/client";
+import type {
 	UpdateUser,
-	LoginUser,
-	Token,
 	SocialInput,
 	InstructorProfile,
-	Error
-} from "gql/graphql";
-import { hash, compare } from "bcryptjs";
+	Error,
+	NewUser
+} from 'gql/graphql';
 import { JwtService } from "@nestjs/jwt";
 import moment from "moment";
 
@@ -42,10 +40,10 @@ export class UserService {
 
 	// Get a single user based on ID
 	async user(id: string): Promise<User | null> {
-		const user = this.prisma.user.findUnique({
+		const user = this.prisma.user.findFirst({
 			where: {
-				id
-			},
+				openID: id
+			}, 
 			include: {
 				feedback: true,
 				plan: {
@@ -96,96 +94,34 @@ export class UserService {
 		});
 	}
 
-	// Create a user
-	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
-		const {
-			id,
-			email,
-			firstName,
-			lastName,
-			middleName,
-			password,
-			passwordConf
-		} = data;
-
-		const safeEmail = email.toLowerCase();
-		//find out if there is a duplicate user
-		const count = await this.prisma.user.count({
-			where: {
-				email: safeEmail
-			}
-		});
-
-		if (password !== passwordConf) {
-			throw new Error("Passwords provided are not matching...");
-		}
-
-		if (password.length < 6) {
-			throw new Error("Password must be at least 6 characters long");
-		}
-
-		const hashedPassword = await hash(password, 10);
-		const hashedPasswordConf = hashedPassword;
-
-		const payload = {
-			id,
-			email: safeEmail,
-			firstName,
-			lastName,
-			middleName,
-			password: hashedPassword,
-			passwordConf: hashedPasswordConf
-		};
-
-		///Avoids duplicate value(email) if the exist already
-		if (count === 0) {
-			return await this.prisma.user.create({
-				data: payload
-			});
-		} else {
-			return new Error("User has an account already.");
-		}
-	}
 
 	// Update a user
 	async updateUser(params: UpdateUser): Promise<User | Error> {
 		try {
 			const {
 				id,
+				openID,
 				email,
+				picURL,
 				firstName,
 				lastName,
 				middleName,
-				password,
-				passwordConf,
 				dob,
 				isAdmin,
 				isActive,
 				instructorProfile
 			} = params;
 
-			//check if passwords provided match
-			if (password !== passwordConf) {
-				throw new Error("Passwords provided are not matching...");
-			}
 
-			const res = await this.prisma.user.findUnique({
+			const res = await this.prisma.user.count({
 				where: {
-					id
+					openID
 				}
 			});
 
-			if (!res) {
-				throw new Error(`The user with ${id}, does not exist`);
+			if (res == 0) {
+				throw new Error(`The user with ${openID}, does not exist`);
 			}
-
-			//This still throws and error with matching correct passwords
-			if (!(await compare(password, res.password))) {
-				throw new Error(`Incorrect password provided.`);
-			}
-
-			const hashedPassword = await hash(password, 10);
-			const hashedPasswordConf = hashedPassword;
 
 			if (instructorProfile !== null || instructorProfile !== undefined) {
 				try {
@@ -197,30 +133,28 @@ export class UserService {
 							...instructorProfile
 						}
 					});
-				} catch (error) {
-					//@ts-ignore
-					throw new Error(error.message);
+				} catch (error:any) {
+					return new Error(error.message);
 				}
 			}
 
 			if (!moment(dob).isValid()) {
-				throw new Error("Invalid date of birth");
+				return new Error("Invalid date of birth");
 			}
 
 			return await this.prisma.user.update({
 				where: {
-					id
+					openID
 				},
 				data: {
 					...(email && { email }),
+					...(picURL && { picURL }),
 					...(firstName && { firstName }),
 					...(lastName && { lastName }),
 					...(middleName && { middleName }),
 					...(dob && {
 						dob: dob.toISOString()
 					}),
-					...(password && { password: hashedPassword }),
-					...(passwordConf && { passwordConf: hashedPasswordConf }),
 					...(isAdmin && { isAdmin }),
 					...(isActive && { isActive })
 				},
@@ -228,9 +162,8 @@ export class UserService {
 					instructorProfile: true
 				}
 			});
-		} catch (error) {
-			//@ts-ignore
-			throw new Error(error.message);
+		} catch (error:any) {
+			return new Error(error);
 		}
 	}
 
@@ -249,48 +182,6 @@ export class UserService {
 				id
 			}
 		});
-	}
-
-	async loginUser(params: LoginUser): Promise<Token | Error> {
-		const { email, password } = params;
-		const safeEmail = email.toLowerCase();
-
-		const res = await this.prisma.user.findUnique({
-			where: {
-				email: safeEmail
-			}
-		});
-
-		//Check if user exits
-		if (res !== null) {
-			const val = await compare(password, res.password);
-			if (val) {
-				// Call token function to generate login token per id
-				const { id } = res;
-				const now = moment(new Date()).unix();
-				const exp = moment(now)
-					.add(1, "hour")
-					.unix();
-				const usrauth_token = this.jwtService.sign(
-					{
-						id,
-						iat: now
-					},
-					{
-						expiresIn: "1 days"
-					}
-				);
-				const token = {
-					id,
-					token: usrauth_token
-				};
-				return token;
-			} else {
-				return new Error(`Password is incorrect please try again.`);
-			}
-		}
-
-		return new Error(`User with the provided credentials does not exist`);
 	}
 
 	/// Create a social record for a User
