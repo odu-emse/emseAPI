@@ -103,7 +103,7 @@ export class ProgramResolver {
 
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
-	async create(@Args("input") args: NewModule) {
+	async create(@Args("input") args: NewModule) { 
 		return await this.programService.addModule(args);
 	}
 

@@ -57,7 +57,8 @@ model PlanOfStudy {
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
   courses           CourseEnrollment[]
-  modulesleft       Module[]
+  modulesleft       Module[] @relation(fields: [moduleLeftIds], references: [id])
+  moduleLeftIds     String[] @db.ObjectId
 }
 
 model Social {
@@ -118,14 +119,14 @@ model Module {
   assignments   Assignment[]
   feedback      ModuleFeedback[]
   parentCourses ModuleInCourse[]
-  modulesleft   PlanOfStudy @relation(fields: [planId], references: [id])
-  planId        String @unique @db.ObjectId
-  parentmodules requirement[] @relation(name: "child")
-  childmodules requirement[] @relation(name: "parent")
+  plan          PlanOfStudy[] @relation(fields: [planIds], references: [id])
+  planIds       String[] @unique @db.ObjectId
+  parentmodules Requirement[] @relation(name: "child")
+  childmodules  Requirement[] @relation(name: "parent")
  
 }
 
-model requirement{
+model Requirement{
   id                String @id @default(auto()) @map("_id") @db.ObjectId
 
   parent            Module @relation(name: "parent", fields: [parentId], references:[id])

@@ -75,9 +75,10 @@ type Module {
 	members: [ModuleEnrollment]
 	feedback: [ModuleFeedback]
 	parentCourses: [ModuleInCourse]
-	requirement: [requirement]
+	parentModules: [Requirement]
+	childModules: [Requirement]
 }
-type requirement{
+type Requirement{
 	id: ID!
 	child: Module!
 	parent: Module!
