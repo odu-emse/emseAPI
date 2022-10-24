@@ -132,6 +132,7 @@ export interface AuthTokens {
 
 export interface IQuery {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -162,8 +163,6 @@ export interface PlanOfStudy {
     student?: Nullable<User>;
     modules?: Nullable<Nullable<ModuleEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
-    courses?: Nullable<Nullable<CourseEnrollment>[]>;
-    modulesleft?: Nullable<Nullable<Module>[]>;
 }
 
 export interface IMutation {
