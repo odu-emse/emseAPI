@@ -6,7 +6,8 @@ import {
 	NewAssignment,
 	UpdateModule,
 	NewAssignmentResult,
-	ModuleEnrollmentInput
+	ModuleEnrollmentInput,
+	
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import {
@@ -17,7 +18,6 @@ import {
 	ModuleFeedback,
 	AssignmentResult,
 	ModuleEnrollment,
-	CourseEnrollment
 } from "@prisma/client";
 import { PrismaService } from "../prisma.service";
 import { Prisma } from "@prisma/client";
@@ -46,24 +46,7 @@ export class ProgramService {
 						}
 					}
 				},
-				parentCourses: {
-					include: {
-						course: {
-							include: {
-								enrollment: {
-									include: {
-										student: true
-									}
-								},
-								modules: {
-									include: {
-										module: true
-									}
-								}
-							}
-						}
-					}
-				},
+				parentCourses: true,
 				feedback: {
 					include: {
 						student: {
@@ -73,7 +56,6 @@ export class ProgramService {
 									include: {
 										modules: true,
 										assignmentResults: true,
-										courses: true
 									}
 								},
 								instructorProfile: true
@@ -97,11 +79,6 @@ export class ProgramService {
 										module: true
 									}
 								},
-								courses: {
-									include: {
-										course: true
-									}
-								}
 							}
 						}
 					}
@@ -134,24 +111,7 @@ export class ProgramService {
 							}
 						}
 					},
-					parentCourses: {
-						include: {
-							course: {
-								include: {
-									enrollment: {
-										include: {
-											student: true
-										}
-									},
-									modules: {
-										include: {
-											module: true
-										}
-									}
-								}
-							}
-						}
-					},
+					parentCourses: true,
 					feedback: {
 						include: {
 							student: {
@@ -161,7 +121,6 @@ export class ProgramService {
 										include: {
 											modules: true,
 											assignmentResults: true,
-											courses: true
 										}
 									},
 									instructorProfile: true
@@ -185,11 +144,6 @@ export class ProgramService {
 											module: true
 										}
 									},
-									courses: {
-										include: {
-											course: true
-										}
-									}
 								}
 							}
 						}
@@ -238,47 +192,6 @@ export class ProgramService {
 						course: false
 					}
 				},
-				enrollment: {
-					include: {
-						student: {
-							include: {
-								student: {
-									include: {
-										social: true,
-										plan: true,
-										feedback: true,
-										assignmentGraded: true,
-										instructorProfile: true
-									}
-								},
-								courses: {
-									include: {
-										course: true
-									}
-								},
-								modules: {
-									include: {
-										module: true,
-										plan: true
-									}
-								},
-								assignmentResults: {
-									include: {
-										student: true,
-										gradedBy: true,
-										assignment: true
-									}
-								}
-							}
-						},
-						course: {
-							include: {
-								enrollment: true,
-								modules: true
-							}
-						}
-					}
-				}
 			}
 		});
 	}
@@ -313,47 +226,6 @@ export class ProgramService {
 						course: false
 					}
 				},
-				enrollment: {
-					include: {
-						student: {
-							include: {
-								student: {
-									include: {
-										social: true,
-										plan: true,
-										feedback: true,
-										assignmentGraded: true,
-										instructorProfile: true
-									}
-								},
-								courses: {
-									include: {
-										course: true
-									}
-								},
-								modules: {
-									include: {
-										module: true,
-										plan: true
-									}
-								},
-								assignmentResults: {
-									include: {
-										student: true,
-										gradedBy: true,
-										assignment: true
-									}
-								}
-							}
-						},
-						course: {
-							include: {
-								enrollment: true,
-								modules: true
-							}
-						}
-					}
-				}
 			}
 		});
 	}
@@ -416,7 +288,6 @@ export class ProgramService {
 						student: true,
 						modules: true,
 						assignmentResults: true,
-						courses: true
 					}
 				},
 				gradedBy: true,
@@ -457,46 +328,6 @@ export class ProgramService {
 		return this.prisma.moduleEnrollment.findFirst({
 			where: {
 				id
-			}
-		});
-	}
-
-	/// Fetch all CourseEnrollment records
-	async courseEnrollments(): Promise<CourseEnrollment[]> {
-		return this.prisma.courseEnrollment.findMany({
-			include: {
-				// student field below represents a plan of study
-				student: {
-					include: {
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				},
-				course: true
-			}
-		});
-	}
-
-	/// Fetch a CourseEnrollment Record by its ID
-	async courseEnrollment(id: string): Promise<CourseEnrollment | null> {
-		return this.prisma.courseEnrollment.findUnique({
-			where: {
-				id
-			},
-			include: {
-				// student field below represents a plan of study
-				student: {
-					include: {
-						// this is the actual student's profile etc
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				},
-				course: true
 			}
 		});
 	}
@@ -847,51 +678,6 @@ export class ProgramService {
 		});
 	}
 
-	/// Create a new CourseEnrollment Record
-	async addCourseEnrollment(
-		planId: string,
-		courseId: string
-	): Promise<CourseEnrollment> {
-		return this.prisma.courseEnrollment.create({
-			data: {
-				studentId: planId,
-				courseId: courseId
-			},
-			include: {
-				student: {
-					include: {
-						student: true,
-						modules: true,
-						assignmentResults: true,
-						courses: true
-					}
-				}
-			}
-		});
-	}
-
-	/// Modify an existing CourseEnrollment Record
-	async updateCourseEnrollment(id: string, planId: string, courseId: string) {
-		return this.prisma.courseEnrollment.update({
-			where: {
-				id
-			},
-			data: {
-				studentId: planId,
-				courseId: courseId
-			}
-		});
-	}
-
-	/// Delete an existing record
-	async deleteCourseEnrollment(id: string) {
-		return this.prisma.courseEnrollment.delete({
-			where: {
-				id
-			}
-		});
-	}
-
 	// Link a course and a module
 	async pairCourseModule(courseId: string, moduleId: string) {
 		return this.prisma.moduleInCourse.create({
@@ -910,4 +696,20 @@ export class ProgramService {
 			}
 		});
 	}
-}
+	async Addrequirement(parentId: string, childId: string){
+		return this.prisma.requirement.create({
+			data:{
+				parentId: parentId,
+				childId:  childId
+			}
+
+		})
+	}
+	async Removerequirement(parentId: string, childId: string){
+		return this.prisma.requirement.deleteMany({
+			where:{
+				parentId: parentId,
+				childId:  childId
+			}
+	})
+}}
