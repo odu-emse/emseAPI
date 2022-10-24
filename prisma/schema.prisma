@@ -56,7 +56,6 @@ model PlanOfStudy {
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
-  courses           CourseEnrollment[]
 }
 
 model Social {
@@ -95,7 +94,6 @@ model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  enrollment CourseEnrollment[] //This and modules are many-many relations, not sure if this is a safe or proper way to do this.
   modules    ModuleInCourse[]
 
 }
