@@ -56,6 +56,8 @@ model PlanOfStudy {
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
+  modulesleft       Module[] @relation(fields: [moduleLeftIds], references: [id])
+  moduleLeftIds     String[] @db.ObjectId
 }
 
 model Social {
@@ -116,6 +118,20 @@ model Module {
   assignments   Assignment[]
   feedback      ModuleFeedback[]
   parentCourses ModuleInCourse[]
+  plan          PlanOfStudy[] @relation(fields: [planIds], references: [id])
+  planIds       String[] @unique @db.ObjectId
+  parentmodules Requirement[] @relation(name: "child")
+  childmodules  Requirement[] @relation(name: "parent")
+ 
+}
+
+model Requirement{
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+
+  parent            Module @relation(name: "parent", fields: [parentId], references:[id])
+  parentId          String
+  child             Module @relation(name: "child", fields: [childId], references:[id])
+  childId           String
 }
 
 model ModuleFeedback {
@@ -166,6 +182,7 @@ model AssignmentResult {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   submittedAt DateTime @default(now())
   result      Float
+  feedback    String?
 
   // Relation Fields
   studentId    String      @db.ObjectId

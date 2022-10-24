@@ -17,6 +17,7 @@ type AssignmentResult {
 	id: ID!
 	submittedAt: String!
 	result: Float!
+	feedback: String
 
 	student: PlanOfStudy
 	gradedBy: User
@@ -74,6 +75,13 @@ type Module {
 	members: [ModuleEnrollment]
 	feedback: [ModuleFeedback]
 	parentCourses: [ModuleInCourse]
+	parentModules: [Requirement]
+	childModules: [Requirement]
+}
+type Requirement{
+	id: ID!
+	child: Module!
+	parent: Module!
 }
 
 type ModuleInCourse {

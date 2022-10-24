@@ -214,6 +214,7 @@ export interface AssignmentResult {
     id: string;
     submittedAt: string;
     result: number;
+    feedback?: Nullable<string>;
     student?: Nullable<PlanOfStudy>;
     gradedBy?: Nullable<User>;
     assignment?: Nullable<Assignment>;
@@ -265,6 +266,14 @@ export interface Module {
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
     feedback?: Nullable<Nullable<ModuleFeedback>[]>;
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
+    parentModules?: Nullable<Nullable<Requirement>[]>;
+    childModules?: Nullable<Nullable<Requirement>[]>;
+}
+
+export interface Requirement {
+    id: string;
+    child: Module;
+    parent: Module;
 }
 
 export interface ModuleInCourse {
