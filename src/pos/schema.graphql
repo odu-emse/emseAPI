@@ -4,6 +4,7 @@ type PlanOfStudy {
 
 	modules: [ModuleEnrollment]
 	assignmentResults: [AssignmentResult!]
+	modulesleft:[Module]
 }
 
 input PlanInput {

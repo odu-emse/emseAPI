@@ -6,7 +6,8 @@ import {
 	NewAssignment,
 	UpdateModule,
 	NewAssignmentResult,
-	ModuleEnrollmentInput
+	ModuleEnrollmentInput,
+	
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import {
@@ -695,4 +696,20 @@ export class ProgramService {
 			}
 		});
 	}
-}
+	async Addrequirement(parentId: string, childId: string){
+		return this.prisma.requirement.create({
+			data:{
+				parentId: parentId,
+				childId:  childId
+			}
+
+		})
+	}
+	async Removerequirement(parentId: string, childId: string){
+		return this.prisma.requirement.deleteMany({
+			where:{
+				parentId: parentId,
+				childId:  childId
+			}
+	})
+}}
