@@ -126,15 +126,12 @@ export interface LoginUser {
     password: string;
 }
 
-export interface PlanOfStudy {
-    id: string;
-    student?: Nullable<User>;
-    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
-    assignmentResults?: Nullable<AssignmentResult[]>;
-    courses?: Nullable<Nullable<CourseEnrollment>[]>;
+export interface AuthTokens {
+    id_token?: Nullable<string>;
 }
 
 export interface IQuery {
+    login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -155,10 +152,18 @@ export interface IQuery {
     courseEnrollment(id: string): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
     user(id: string): Nullable<User> | Promise<Nullable<User>>;
     users(): User[] | Promise<User[]>;
-    login(input?: Nullable<LoginUser>): Nullable<Token> | Promise<Nullable<Token>>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
     instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
+}
+
+export interface PlanOfStudy {
+    id: string;
+    student?: Nullable<User>;
+    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
+    assignmentResults?: Nullable<AssignmentResult[]>;
+    courses?: Nullable<Nullable<CourseEnrollment>[]>;
+    modulesleft?: Nullable<Nullable<Module>[]>;
 }
 
 export interface IMutation {
@@ -210,6 +215,7 @@ export interface AssignmentResult {
     id: string;
     submittedAt: string;
     result: number;
+    feedback?: Nullable<string>;
     student?: Nullable<PlanOfStudy>;
     gradedBy?: Nullable<User>;
     assignment?: Nullable<Assignment>;
@@ -261,6 +267,14 @@ export interface Module {
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
     feedback?: Nullable<Nullable<ModuleFeedback>[]>;
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
+    parentModules?: Nullable<Nullable<Requirement>[]>;
+    childModules?: Nullable<Nullable<Requirement>[]>;
+}
+
+export interface Requirement {
+    id: string;
+    child: Module;
+    parent: Module;
 }
 
 export interface ModuleInCourse {
