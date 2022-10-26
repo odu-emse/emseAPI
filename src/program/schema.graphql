@@ -176,6 +176,9 @@ type Mutation {
 	addModule(input: NewModule): Module!
 	updateModule(input: UpdateModule): Module
 
+	addRequirement(parentId: String, childId: String): Requirement
+	removeRequirement(parentId: String, childId: String): Requirement
+
 	deleteCourse(id: ID!): Course
 	addCourse(input: CourseInput): Course!
 	updateCourse(id: ID!, input: CourseInput): Course
