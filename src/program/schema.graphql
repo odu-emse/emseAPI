@@ -5,328 +5,329 @@ enum UserRole {
 }
 
 type ModuleEnrollment {
-	id: ID! 
 	"""
 	id of the ModuleEnrollment
 	"""
+	id: ID!
 
-	enrolledAt: String!
 	"""
 	TimeStamp at which the module is enrolledAt
 	"""
+	enrolledAt: String!
 
-	role: UserRole!
 	"""
 	Role of the user:Either Student, Teacher or Grader
 	"""
+	role: UserRole!
 
-	module: Module!
 	"""
 	Current Module
 	"""
+	module: Module!
 
-	plan: PlanOfStudy!
 	"""
 	Plan of study Chosen
 	"""
+	plan: PlanOfStudy!
 }
 
 type AssignmentResult {
-	id: ID!
 	"""
 	id of AssignmentResult
 	"""
+	id: ID!
 
-	submittedAt: String!
 	"""
 	Time at which the Assignement Result is given
 	"""
+	submittedAt: String!
 
-	result: Float!
 	"""
 	result of the Assignement
 	"""
+	result: Float!
 
-	feedback: String
 	"""
 	feedback given on the Assignment
 	"""
+	feedback: String
 
-	student: PlanOfStudy
 	"""
 	Assignement Result of the student
 	"""
+	student: PlanOfStudy
 
-	gradedBy: User
 	"""
 	Assignement graded by the User
 	"""
+	gradedBy: User
 
-	assignment: Assignment
 	"""
 	Assignement to which result is given
 	"""
+	assignment: Assignment
 }
 
 type Assignment {
-	id: ID!
 	"""
 	Assignment id
 	"""
+	id: ID!
 
-	updatedAt: String!
 	"""
 	date and time at which assignment is updated
 	"""
+	updatedAt: String!
 
-	name: String!
 	"""
 	Name of the assignment
 	"""
+	name: String!
 
-	dueAt: String
 	"""
 	due of the assignment
 	"""
+	dueAt: String
 
-	module: Module!
 	"""
 	Assignment belonging to the module
 	"""
+	module: Module!
 
-	assignmentResults: [AssignmentResult]
 	"""
 	Assignment Result
 	"""
+	assignmentResults: [AssignmentResult]
 }
 
 type ModuleFeedback {
-	id: ID!
 	"""
 	id of ModuleFeedback
 	"""
+	id: ID!
 
-	feedback: String!
 	"""
 	Feedback fo the Module
 	"""
+	feedback: String!
 
-	rating: Int!
 	"""
 	Rating given in the feedback
 	"""
+	rating: Int!
 
-	student: User
 	"""
 	Module feedback given by the student
 	"""
+	student: User
 
-	module: Module
 	"""
 	Module in which module feedback is given
 	"""
+	module: Module
 
 }
 
 type Course {
-	id: ID!
 	"""
 	course id
 	"""
-	name: String!
+	id: ID!
+
 	"""
 	Name of the course
 	"""
+	name: String!
 
-	modules: [ModuleInCourse]
 	"""
 	modules in the course
 	"""
+	modules: [ModuleInCourse]
 }
 
 type Module {
-	id: ID!
 	"""
 	Module Id
 	"""
+	id: ID!
 
-	moduleNumber: Int!
 	"""
 	Number of the Module
-	""""
+	"""
+	moduleNumber: Int!
 
-	moduleName: String!
 	"""
 	Name of hte Module
 	"""
+	moduleName: String!
 
-	description: String!
 	"""
 	Description of the Module
 	"""
+	description: String!
 
-	duration: Float!
 	"""
 	Duration of the Module
 	"""
+	duration: Float!
 
-	intro: String!
 	"""
 	Introduction of the Module
 	"""
+	intro: String!
 
-	numSlides: Int!
 	"""
 	No of slides in the Module
 	"""
+	numSlides: Int!
 
-	keywords: [String!]!
 	"""
 	Keywords in the Modules
 	"""
+	keywords: [String!]!
 
-	createdAt: String!
 	"""
 	Date and Time of the Module Created at
 	"""
+	createdAt: String!
 
-	updatedAt: String!
 	"""
 	Date and Time of the Module Updated at
 	"""
+	updatedAt: String!
 
-	assignments: [Assignment]
 	"""
 	Assignement in the module
 	"""
+	assignments: [Assignment]
 
-	members: [ModuleEnrollment]
 	"""
 	Memebers enrolled in the Module
 	"""
+	members: [ModuleEnrollment]
 
-	feedback: [ModuleFeedback]
 	"""
 	Feedback of the Module
 	"""
+	feedback: [ModuleFeedback]
 
-	parentCourses: [ModuleInCourse]
 	"""
 	Parent Courses in the Modules
 	"""
+	parentCourses: [ModuleInCourse]
 
-	parentModules: [Requirement]
 	"""
 	Parent Modules of the Module
 	"""
+	parentModules: [Requirement]
 
-	childModules: [Requirement]
 	"""
 	Childmodules in the Module
 	"""
+	childModules: [Requirement]
 }
 type Requirement{
-	id: ID!
 	"""
 	id of Requirement
 	"""
+	id: ID!
 
-	child: Module!
 	"""
 	Child module in requirement
 	"""
+	child: Module!
 
-	parent: Module!
 	"""
 	Parent Module in Requirement
 	"""
+	parent: Module!
 }
 
 type ModuleInCourse {
-	id: ID!
 	"""
 	id of ModuleInCourse
 	"""
+	id: ID!
 
-	module: Module
 	"""
 	Module in ModuleInCourse
 	"""
+	module: Module
 
-	course: Course
 	"""
 	Course in ModuleInCourse
 	"""
+	course: Course
 }
 
 type Error {
-	message: String
 	"""
 	Error message
 	"""
+	message: String
 }
 
 type Query {
-	modules: [Module!]!
 	"""
 	List of All modules in the Query
 	"""
-	module(id: ID!): Module
+	modules: [Module!]!
 	"""
 	Specific Module in the Modules
 	"""
+	module(id: ID!): Module
 
-	course(id: ID!): Course
 	"""
 	Specific Course in the Courses
 	"""
-	courses: [Course!]!
+	course(id: ID!): Course
 	"""
 	List of all courses
 	"""
+	courses: [Course!]!
 
-	assignments: [Assignment!]!
 	"""
 	Specific assignment in assignments
 	"""
-	assignment(id: ID!): Assignment
+	assignments: [Assignment!]!
 	"""
 	List of all assignments
 	"""
+	assignment(id: ID!): Assignment
 
-	moduleInCourses: [ModuleInCourse!]!
 	""""
 	Modules in the courses
 	"""
+	moduleInCourses: [ModuleInCourse!]!
 
-	moduleFeedbacks: [ModuleFeedback!]!
 	"""
 	Module feedbacks
 	"""
-	moduleFeedback(id: ID!): ModuleFeedback
+	moduleFeedbacks: [ModuleFeedback!]!
 	"""
 	Specific module feedback in modulefeedbacks
 	"""
+	moduleFeedback(id: ID!): ModuleFeedback
 
-	assignmentResults: [AssignmentResult!]!
 	"""
 	Specific assisgnement result
 	"""
-	assignmentResult(id: ID!): AssignmentResult
+	assignmentResults: [AssignmentResult!]!
 	"""
 	list of all assignment Results
 	"""
+	assignmentResult(id: ID!): AssignmentResult
 
-	moduleEnrollments: [ModuleEnrollment!]!
 	"""
 	List of module enrollment
 	"""
-	moduleEnrollment(id: ID!): ModuleEnrollment
+	moduleEnrollments: [ModuleEnrollment!]!
 	"""
 	Specific Moduleenrollment in Moduleenrollment
 	"""
-
+	moduleEnrollment(id: ID!): ModuleEnrollment
 }
+
 
 input NewModule {
 	moduleNumber: Int!
