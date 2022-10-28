@@ -4,9 +4,9 @@
 
 Table User {
   id String [pk]
-  uuid String [unique, not null]
+  openID String [unique, not null]
   email String [unique, not null]
-  picURL String [not null]
+  picURL String
   createdAt DateTime [default: `now()`, not null]
   firstName String [not null]
   lastName String [not null]
@@ -44,7 +44,8 @@ Table PlanOfStudy {
   studentID String [unique]
   modules ModuleEnrollment [not null]
   assignmentResults AssignmentResult [not null]
-  courses CourseEnrollment [not null]
+  modulesleft Module [not null]
+  moduleLeftIds String[] [not null]
 }
 
 Table Social {
@@ -78,7 +79,6 @@ Table ModuleInCourse {
 Table Course {
   id String [pk]
   name String [not null]
-  enrollment CourseEnrollment [not null]
   modules ModuleInCourse [not null]
 }
 
@@ -97,6 +97,18 @@ Table Module {
   assignments Assignment [not null]
   feedback ModuleFeedback [not null]
   parentCourses ModuleInCourse [not null]
+  plan PlanOfStudy [not null]
+  planIds String[] [unique, not null]
+  parentModules Requirement [not null]
+  childModules Requirement [not null]
+}
+
+Table Requirement {
+  id String [pk]
+  parent Module [not null]
+  parentId String [not null]
+  child Module [not null]
+  childId String [not null]
 }
 
 Table ModuleFeedback {
@@ -119,15 +131,6 @@ Table ModuleEnrollment {
   planId String [not null]
 }
 
-Table CourseEnrollment {
-  id String [pk]
-  student PlanOfStudy [not null]
-  studentId String [not null]
-  enrolledAt DateTime [default: `now()`, not null]
-  course Course [not null]
-  courseId String [not null]
-}
-
 Table Assignment {
   id String [pk]
   updatedAt DateTime [default: `now()`, not null]
@@ -142,6 +145,7 @@ Table AssignmentResult {
   id String [pk]
   submittedAt DateTime [default: `now()`, not null]
   result Float [not null]
+  feedback String
   studentId String [not null]
   student PlanOfStudy [not null]
   graderId String [not null]
@@ -160,6 +164,8 @@ Ref: InstructorProfile.accountID - User.id
 
 Ref: PlanOfStudy.studentID - User.id
 
+Ref: PlanOfStudy.moduleLeftIds > Module.id
+
 Ref: Social.accountID - User.id
 
 Ref: Token.userId > User.id
@@ -168,6 +174,12 @@ Ref: ModuleInCourse.moduleId > Module.id
 
 Ref: ModuleInCourse.courseId > Course.id
 
+Ref: Module.planIds > PlanOfStudy.id
+
+Ref: Requirement.parentId > Module.id
+
+Ref: Requirement.childId > Module.id
+
 Ref: ModuleFeedback.studentId > User.id
 
 Ref: ModuleFeedback.moduleId > Module.id
@@ -175,10 +187,6 @@ Ref: ModuleFeedback.moduleId > Module.id
 Ref: ModuleEnrollment.moduleId > Module.id
 
 Ref: ModuleEnrollment.planId > PlanOfStudy.id
-
-Ref: CourseEnrollment.studentId > PlanOfStudy.id
-
-Ref: CourseEnrollment.courseId > Course.id
 
 Ref: Assignment.moduleId > Module.id
 

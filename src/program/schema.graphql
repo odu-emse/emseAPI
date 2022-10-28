@@ -89,6 +89,7 @@ type Error {
 type Query {
 	modules: [Module!]!
 	module(id: ID!): Module
+	modulesByParam(input: ModuleFields!): [Module!]
 
 	course(id: ID!): Course
 	courses: [Course!]!
@@ -107,6 +108,26 @@ type Query {
 	moduleEnrollments: [ModuleEnrollment!]!
 	moduleEnrollment(id: ID!): ModuleEnrollment
 
+}
+
+input ModuleFields {
+	id: ID
+	moduleNumber: Int
+	moduleName: String
+	description: String
+	duration: Float
+	intro: String
+	numSlides: Int
+	keywords: [String!]
+	createdAt: String
+	updatedAt: String
+
+	assignments: ID
+	members: ID
+	feedback: ID
+	parentCourses: ID
+	parentModules: ID
+	childModules: ID
 }
 
 input NewModule {

@@ -17,6 +17,25 @@ export interface PlanInput {
     student?: Nullable<string>;
 }
 
+export interface ModuleFields {
+    id?: Nullable<string>;
+    moduleNumber?: Nullable<number>;
+    moduleName?: Nullable<string>;
+    description?: Nullable<string>;
+    duration?: Nullable<number>;
+    intro?: Nullable<string>;
+    numSlides?: Nullable<number>;
+    keywords?: Nullable<string[]>;
+    createdAt?: Nullable<string>;
+    updatedAt?: Nullable<string>;
+    assignments?: Nullable<string>;
+    members?: Nullable<string>;
+    feedback?: Nullable<string>;
+    parentCourses?: Nullable<string>;
+    parentModules?: Nullable<string>;
+    childModules?: Nullable<string>;
+}
+
 export interface NewModule {
     moduleNumber: number;
     moduleName: string;
@@ -121,59 +140,21 @@ export interface SocialInput {
     portfolio?: Nullable<string>;
 }
 
-export interface LoginUser {
-    email: string;
-    password: string;
-}
-
 export interface AuthTokens {
     id_token?: Nullable<string>;
     refresh_token?: Nullable<string>;
 }
 
-export interface IQuery {
-    login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
-    refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
-    plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
-    plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
-    planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
-    modules(): Module[] | Promise<Module[]>;
-    module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
-    course(id: string): Nullable<Course> | Promise<Nullable<Course>>;
-    courses(): Course[] | Promise<Course[]>;
-    assignments(): Assignment[] | Promise<Assignment[]>;
-    assignment(id: string): Nullable<Assignment> | Promise<Nullable<Assignment>>;
-    moduleInCourses(): ModuleInCourse[] | Promise<ModuleInCourse[]>;
-    moduleFeedbacks(): ModuleFeedback[] | Promise<ModuleFeedback[]>;
-    moduleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
-    assignmentResults(): AssignmentResult[] | Promise<AssignmentResult[]>;
-    assignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
-    moduleEnrollments(): ModuleEnrollment[] | Promise<ModuleEnrollment[]>;
-    moduleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
-    courseEnrollments(): CourseEnrollment[] | Promise<CourseEnrollment[]>;
-    courseEnrollment(id: string): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
-    user(id: string): Nullable<User> | Promise<Nullable<User>>;
-    users(): User[] | Promise<User[]>;
-    socials(): Social[] | Promise<Social[]>;
-    social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
-    instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
-}
-
-export interface PlanOfStudy {
-    id: string;
-    student?: Nullable<User>;
-    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
-    assignmentResults?: Nullable<AssignmentResult[]>;
-}
-
 export interface IMutation {
-    login(code?: Nullable<string>): Nullable<AuthTokens> | Promise<Nullable<AuthTokens>>;
+    login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
     addModule(input?: Nullable<NewModule>): Module | Promise<Module>;
     updateModule(input?: Nullable<UpdateModule>): Nullable<Module> | Promise<Nullable<Module>>;
+    addRequirement(parentId?: Nullable<string>, childId?: Nullable<string>): Nullable<Requirement> | Promise<Nullable<Requirement>>;
+    removeRequirement(parentId?: Nullable<string>, childId?: Nullable<string>): Nullable<Requirement> | Promise<Nullable<Requirement>>;
     deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
     addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
@@ -189,9 +170,6 @@ export interface IMutation {
     addModuleEnrollment(input?: Nullable<ModuleEnrollmentInput>): ModuleEnrollment | Promise<ModuleEnrollment>;
     updateModuleEnrollment(id: string, input?: Nullable<ModuleEnrollmentInput>): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
     deleteModuleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
-    addCourseEnrollment(planId: string, courseId: string): CourseEnrollment | Promise<CourseEnrollment>;
-    updateCourseEnrollment(id: string, planId?: Nullable<string>, courseId?: Nullable<string>): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
-    deleteCourseEnrollment(id: string): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
     pairCourseModule(courseId: string, moduleId: string): ModuleInCourse | Promise<ModuleInCourse>;
     unpairCourseModule(courseId: string, moduleId: string): Nullable<ModuleInCourse> | Promise<Nullable<ModuleInCourse>>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
@@ -211,6 +189,7 @@ export interface IQuery {
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     modules(): Module[] | Promise<Module[]>;
     module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
+    modulesByParam(input: ModuleFields): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     course(id: string): Nullable<Course> | Promise<Nullable<Course>>;
     courses(): Course[] | Promise<Course[]>;
     assignments(): Assignment[] | Promise<Assignment[]>;
@@ -222,8 +201,6 @@ export interface IQuery {
     assignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
     moduleEnrollments(): ModuleEnrollment[] | Promise<ModuleEnrollment[]>;
     moduleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
-    courseEnrollments(): CourseEnrollment[] | Promise<CourseEnrollment[]>;
-    courseEnrollment(id: string): Nullable<CourseEnrollment> | Promise<Nullable<CourseEnrollment>>;
     user(id: string): Nullable<User> | Promise<Nullable<User>>;
     users(): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;
@@ -236,7 +213,7 @@ export interface PlanOfStudy {
     student?: Nullable<User>;
     modules?: Nullable<Nullable<ModuleEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
-    courses?: Nullable<Nullable<CourseEnrollment>[]>;
+    modulesleft?: Nullable<Nullable<Module>[]>;
 }
 
 export interface ModuleEnrollment {
@@ -274,17 +251,9 @@ export interface ModuleFeedback {
     module?: Nullable<Module>;
 }
 
-export interface CourseEnrollment {
-    id: string;
-    enrolledAt: string;
-    student: PlanOfStudy;
-    course: Course;
-}
-
 export interface Course {
     id: string;
     name: string;
-    enrollment?: Nullable<Nullable<CourseEnrollment>[]>;
     modules?: Nullable<Nullable<ModuleInCourse>[]>;
 }
 

@@ -7,7 +7,7 @@ import {
 	UpdateModule,
 	NewAssignmentResult,
 	ModuleEnrollmentInput,
-	
+	ModuleFields	
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import {
@@ -30,59 +30,56 @@ export class ProgramService {
 	async modules(): Promise<Module[]> {
 		return this.prisma.module.findMany({
 			include: {
-				assignments: {
-					include: {
-						assignmentResults: {
-							include: {
-								gradedBy: {
-									include: {
-										social: true,
-										feedback: true,
-										assignmentGraded: true,
-										instructorProfile: true
-									}
-								}
-							}
-						}
-					}
-				},
+				assignments: true,
+					// include: {
+					// 	assignmentResults: {
+					// 		include: {
+					// 			gradedBy: {
+					// 				include: {
+					// 					social: true,
+					// 					feedback: true,
+					// 					assignmentGraded: true,
+					// 					instructorProfile: true
+					// 				}
+					// 			}
+					// 		}
+					// 	}
+					// },
 				parentCourses: true,
-				feedback: {
-					include: {
-						student: {
-							include: {
-								social: true,
-								plan: {
-									include: {
-										modules: true,
-										assignmentResults: true,
-									}
-								},
-								instructorProfile: true
-							}
-						},
-						module: true
-					}
-				},
-				members: {
-					include: {
-						plan: {
-							include: {
-								student: {
-									include: {
-										social: true,
-										feedback: true
-									}
-								},
-								modules: {
-									include: {
-										module: true
-									}
-								},
-							}
-						}
-					}
-				}
+				feedback: true,
+					// include: {
+					// 	student: {
+					// 		include: {
+					// 			social: true,
+					// 			plan: {
+					// 				include: {
+					// 					modules: true,
+					// 					assignmentResults: true,
+					// 				}
+					// 			},
+					// 			instructorProfile: true
+					// 		}
+					// 	},
+					// 	module: true
+					// }
+				members: true
+					// include: {
+					// 	plan: {
+					// 		include: {
+					// 			student: {
+					// 				include: {
+					// 					social: true,
+					// 					feedback: true
+					// 				}
+					// 			},
+					// 			modules: {
+					// 				include: {
+					// 					module: true
+					// 				}
+					// 			},
+					// 		}
+					// 	}
+					// }
 			}
 		});
 	}
@@ -157,6 +154,103 @@ export class ProgramService {
 				}
 			});
 		}
+	}
+
+	async modulesByParam(params: ModuleFields): Promise<Module[] | null> {
+		const {
+			id,
+			moduleNumber,
+			moduleName,
+			description,
+			intro,
+			numSlides,
+			keywords,
+			createdAt,
+			updatedAt,
+			assignments,
+			members,
+			feedback,
+			parentCourses,
+			parentModules,
+			childModules,
+		} = params
+
+		var payload = {
+			...(id && {id}),
+			...(moduleNumber && {moduleNumber}),
+			...(moduleName && {moduleName}),
+			...(description && {description}), 
+			...(intro && {intro}),
+			...(numSlides && {numSlides}),
+			...(createdAt && {createdAt}),
+			...(updatedAt && {updatedAt}),
+		}
+
+		if (assignments) {
+			payload['assignments'] = {
+				some: {
+					id: assignments
+				}
+			}
+		}
+
+		if (members) {
+			payload['members'] = {
+				some: {
+					id: members!
+				}
+			}
+		}
+
+		if (keywords) {
+			payload['keywords'] = {
+				hasEvery: keywords
+			}
+		}
+		
+		if (feedback) {
+			payload['feedback'] = {
+				some: {
+					id: feedback!
+				}
+			}
+		}
+
+		if (parentCourses) {
+			payload['parentCourses'] = {
+				some: {
+					id: parentCourses
+				}
+			}
+		}
+
+		if (parentModules) {
+			payload['parentModules'] = {
+				some: {
+					id: parentModules
+				}
+			}
+		}
+
+		if (childModules) {
+			payload['childModules'] = {
+				some: {
+					id: childModules
+				}
+			}
+		}
+
+		return await this.prisma.module.findMany({
+			where: payload,
+			include: {
+				assignments: true,
+				members: true,
+				feedback: true,
+				parentCourses: true,
+				parentModules: true,
+				childModules: true
+			}
+		})
 	}
 
 	async course(id: string): Promise<Course | null> {

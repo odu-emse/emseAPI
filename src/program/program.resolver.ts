@@ -6,7 +6,8 @@ import {
 	NewAssignment,
 	NewAssignmentResult,
 	NewModule,
-	UpdateModule
+	UpdateModule,
+	ModuleFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -15,7 +16,7 @@ import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../auth.guard";
 
 @Resolver()
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 export class ProgramResolver {
 	constructor(private readonly programService: ProgramService) {}
 
@@ -28,6 +29,11 @@ export class ProgramResolver {
 	@Query("module")
 	async module(@Args("id") args: string) {
 		return await this.programService.module(args);
+	}
+
+	@Query("modulesByParam")
+	async modulesByParam(@Args("input") args: ModuleFields) {
+		return await this.programService.modulesByParam(args);
 	}
 
 	// Get multiple Courses
