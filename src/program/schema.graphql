@@ -6,7 +6,7 @@ enum UserRole {
 
 type ModuleEnrollment {
 	"""
-	id of the ModuleEnrollment
+	 id of the ModuleEnrollment
 	"""
 	id: ID!
 
@@ -226,6 +226,7 @@ type Module {
 	"""
 	childModules: [Requirement]
 }
+
 type Requirement{
 	"""
 	id of Requirement
