@@ -93,20 +93,25 @@ type Query {
 
 	course(id: ID!): Course
 	courses: [Course!]!
+	courseByParam(input: CourseFields!): [Course!]
 
 	assignments: [Assignment!]!
 	assignment(id: ID!): Assignment
+	assignmentByParam(input: AssignmentFields!): [Assignment!]
 
 	moduleInCourses: [ModuleInCourse!]!
 
 	moduleFeedbacks: [ModuleFeedback!]!
 	moduleFeedback(id: ID!): ModuleFeedback
+	modFeedbackByParam(input: ModFeedbackFields!): [ModuleFeedback!]
 
 	assignmentResults: [AssignmentResult!]!
 	assignmentResult(id: ID!): AssignmentResult
+	assignmentResultByParam(input: AssignmentResFields!): [AssignmentResult!]
 
 	moduleEnrollments: [ModuleEnrollment!]!
 	moduleEnrollment(id: ID!): ModuleEnrollment
+	modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
 
 }
 
@@ -128,6 +133,52 @@ input ModuleFields {
 	parentCourses: ID
 	parentModules: ID
 	childModules: ID
+}
+
+input CourseFields {
+	id: ID
+	name: String
+
+	module: ID
+}
+
+input AssignmentFields {
+	id: ID
+	updatedAt: String
+	name: String
+	dueAt: String
+
+	module: ID
+	assignmentResult: ID 
+}
+
+input ModFeedbackFields {
+	id: ID
+	feedback: String
+	rating: Int
+
+	student: ID
+	module: ID
+}
+
+input AssignmentResFields {
+	id: ID
+	submittedAt: String
+	result: Float
+	feedback: String
+
+	student: ID
+	gradedBy: ID
+	assignment: ID
+}
+
+input ModEnrollmentFields {
+	id: ID
+	enrolledAt: String
+
+	role: UserRole
+	module: ID
+	plan: ID
 }
 
 input NewModule {

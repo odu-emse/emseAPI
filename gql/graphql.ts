@@ -36,6 +36,47 @@ export interface ModuleFields {
     childModules?: Nullable<string>;
 }
 
+export interface CourseFields {
+    id?: Nullable<string>;
+    name?: Nullable<string>;
+    module?: Nullable<string>;
+}
+
+export interface AssignmentFields {
+    id?: Nullable<string>;
+    updatedAt?: Nullable<string>;
+    name?: Nullable<string>;
+    dueAt?: Nullable<string>;
+    module?: Nullable<string>;
+    assignmentResult?: Nullable<string>;
+}
+
+export interface ModFeedbackFields {
+    id?: Nullable<string>;
+    feedback?: Nullable<string>;
+    rating?: Nullable<number>;
+    student?: Nullable<string>;
+    module?: Nullable<string>;
+}
+
+export interface AssignmentResFields {
+    id?: Nullable<string>;
+    submittedAt?: Nullable<string>;
+    result?: Nullable<number>;
+    feedback?: Nullable<string>;
+    student?: Nullable<string>;
+    gradedBy?: Nullable<string>;
+    assignment?: Nullable<string>;
+}
+
+export interface ModEnrollmentFields {
+    id?: Nullable<string>;
+    enrolledAt?: Nullable<string>;
+    role?: Nullable<string>;
+    module?: Nullable<string>;
+    plan?: Nullable<string>;
+}
+
 export interface NewModule {
     moduleNumber: number;
     moduleName: string;
@@ -192,15 +233,20 @@ export interface IQuery {
     modulesByParam(input: ModuleFields): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     course(id: string): Nullable<Course> | Promise<Nullable<Course>>;
     courses(): Course[] | Promise<Course[]>;
+    courseByParam(input: CourseFields): Nullable<Course[]> | Promise<Nullable<Course[]>>;
     assignments(): Assignment[] | Promise<Assignment[]>;
     assignment(id: string): Nullable<Assignment> | Promise<Nullable<Assignment>>;
+    assignmentByParam(input: AssignmentFields): Nullable<Assignment[]> | Promise<Nullable<Assignment[]>>;
     moduleInCourses(): ModuleInCourse[] | Promise<ModuleInCourse[]>;
     moduleFeedbacks(): ModuleFeedback[] | Promise<ModuleFeedback[]>;
     moduleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
+    modFeedbackByParam(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
     assignmentResults(): AssignmentResult[] | Promise<AssignmentResult[]>;
     assignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
+    assignmentResultByParam(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
     moduleEnrollments(): ModuleEnrollment[] | Promise<ModuleEnrollment[]>;
     moduleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
+    modEnrollmentByParam(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
     user(id: string): Nullable<User> | Promise<Nullable<User>>;
     users(): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;

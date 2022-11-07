@@ -7,7 +7,12 @@ import {
 	UpdateModule,
 	NewAssignmentResult,
 	ModuleEnrollmentInput,
-	ModuleFields	
+	ModuleFields,	
+	CourseFields,
+	AssignmentFields,
+	ModFeedbackFields,
+	AssignmentResFields,
+	ModEnrollmentFields
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import {
@@ -175,7 +180,7 @@ export class ProgramService {
 			childModules,
 		} = params
 
-		var payload = {
+		const payload = {
 			...(id && {id}),
 			...(moduleNumber && {moduleNumber}),
 			...(moduleName && {moduleName}),
@@ -324,6 +329,34 @@ export class ProgramService {
 		});
 	}
 
+	async courseByParam(params: CourseFields): Promise<Course[] | null> {
+		const {
+			id,
+			name,
+			module
+		} = params
+
+		const payload = {
+			...(id && {id}),
+			...(name && {name}),
+		}
+
+		if (module) {
+			payload['module'] = {
+				some: {
+					id: module
+				}
+			}
+		}
+
+		return this.prisma.course.findMany({
+			where: payload,
+			include: {
+				modules: true
+			}
+		})
+	}
+
 	async assignments(): Promise<Assignment[]> {
 		return this.prisma.assignment.findMany({
 			include: {
@@ -344,6 +377,43 @@ export class ProgramService {
 		return res;
 	}
 
+	async assignmentByParam(params: AssignmentFields): Promise<Assignment[] | null> {
+		const {
+			id,
+			updatedAt,
+			name,
+			dueAt,
+			module,
+			assignmentResult
+		} = params
+
+		const payload = {
+			...(id && {id}),
+			...(updatedAt && {updatedAt}),
+			...(name && {name}),
+			...(dueAt && {dueAt}),
+		}
+
+		payload['moduleId'] = module
+
+		if (assignmentResult) {
+			payload['assignmentResults'] = {
+				some: {
+					id: assignmentResult
+				}
+			}
+		}
+
+		return this.prisma.assignment.findMany({
+			where: payload,
+			include: {
+				module: true,
+				assignmentResults: true,
+			}
+		})
+
+	}
+
 	async moduleInCourses(): Promise<ModuleInCourse[]> {
 		return this.prisma.moduleInCourse.findMany({
 			// include: {
@@ -360,6 +430,34 @@ export class ProgramService {
 				module: true
 			}
 		});
+	}
+
+	async modFeedbackByParam(params: ModFeedbackFields): Promise<ModuleFeedback[] | null> {
+		
+		const {
+			id,
+			feedback,
+			rating,
+			student,
+			module
+		} = params
+
+		const payload = {
+			...(id && {id}),
+			...(feedback && {feedback}),
+			...(rating && {rating}),
+		}
+
+		payload['studentId'] = student
+		payload['moduleId'] = module
+
+		return this.prisma.moduleFeedback.findMany({
+			where: payload,
+			include: {
+				student: true,
+				module: true
+			}
+		})
 	}
 
 	async moduleFeedback(id: string): Promise<ModuleFeedback | null> {
@@ -403,6 +501,38 @@ export class ProgramService {
 		});
 	}
 
+	async assignmentResultByParam(params: AssignmentResFields): Promise<AssignmentResult[] | null>{
+		const {
+			id,
+			submittedAt,
+			result,
+			feedback,
+			student,
+			gradedBy,
+			assignment
+		} = params
+
+		const payload = {
+			...(id && {id}),
+			...(submittedAt && {submittedAt}),
+			...(result && {result}),
+			...(feedback && {feedback}),
+		}
+
+		payload['studentId'] = student
+		payload['graderId'] = gradedBy
+		payload['assignmentId'] = assignment
+
+		return this.prisma.assignmentResult.findMany({
+			where: payload,
+			include: {
+				student: true,
+				gradedBy: true,
+				assignment: true
+			}
+		})
+	}
+
 	/// Fetch all module enrollments in the database
 	async moduleEnrollments(): Promise<ModuleEnrollment[]> {
 		return this.prisma.moduleEnrollment.findMany({
@@ -424,6 +554,33 @@ export class ProgramService {
 				id
 			}
 		});
+	}
+
+	async modEnrollmentByParam(params: ModEnrollmentFields): Promise<ModuleEnrollment[] | null> {
+		const {
+			id,
+			enrolledAt,
+			role,
+			module,
+			plan
+		} = params
+
+		const payload = {
+			...(id && {id}),
+			...(enrolledAt && {enrolledAt}),
+			...(role && {role}),
+		}
+
+		payload['moduleId'] = module
+		payload['planId'] = plan
+
+		return this.prisma.moduleEnrollment.findMany({
+			where: payload,
+			include: {
+				module: true,
+				plan: true
+			}
+		})
 	}
 
 	//Mutations
