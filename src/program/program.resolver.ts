@@ -7,13 +7,19 @@ import {
 	NewAssignmentResult,
 	NewModule,
 	UpdateModule,
-	ModuleFields
+	ModuleFields,
+	CourseFields,
+	AssignmentFields,
+	ModFeedbackFields,
+	AssignmentResFields,
+	ModEnrollmentFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../auth.guard";
+import { Arg } from "type-graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
@@ -48,6 +54,11 @@ export class ProgramResolver {
 		return await this.programService.courses();
 	}
 
+	@Query("courseByParam")
+	async courseByParam(@Args("input") args: CourseFields) {
+		return await this.programService.courseByParam(args);
+	}
+
 	// Get an assignment by its id
 	@Query("assignment")
 	async assignment(@Args("id") args: string) {
@@ -58,6 +69,11 @@ export class ProgramResolver {
 	@Query("assignments")
 	async assignments() {
 		return await this.programService.assignments();
+	}
+
+	@Query("assignmentByParam")
+	async assignmentByParam(@Args("input") args: AssignmentFields) {
+		return await this.programService.assignmentByParam(args);
 	}
 
 	@Query("moduleInCourses")
@@ -75,6 +91,11 @@ export class ProgramResolver {
 		return await this.programService.moduleFeedback(id);
 	}
 
+	@Query("modFeebackByParam")
+	async modFeedbackByParam(@Args("input") args: ModFeedbackFields) {
+		return await this.programService.modFeedbackByParam(args);
+	}
+
 	@Query("assignmentResults")
 	async assignmentResults() {
 		return await this.programService.assignmentResults();
@@ -85,6 +106,11 @@ export class ProgramResolver {
 		return await this.programService.assignmentResult(id);
 	}
 
+	@Query("assignmentResultByParam")
+	async assignmentResultByParam(@Args("input") args: AssignmentResFields) {
+		return await this.programService.assignmentResultByParam(args);
+	}
+
 	@Query("moduleEnrollments")
 	async moduleEnrollments() {
 		return await this.programService.moduleEnrollments();
@@ -93,6 +119,11 @@ export class ProgramResolver {
 	@Query("moduleEnrollment")
 	async moduleEnrollment(@Args("id") id: string) {
 		return await this.programService.moduleEnrollment(id);
+	}
+
+	@Query("modEnrollmentByParam")
+	async modEnrollmentByParam(@Args("input") args: ModEnrollmentFields){
+		return await this.programService.modEnrollmentByParam(args);
 	}
 
 	// Mutations
