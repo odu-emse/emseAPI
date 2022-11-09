@@ -91,7 +91,7 @@ export class ProgramResolver {
 		return await this.programService.moduleFeedback(id);
 	}
 
-	@Query("modFeebackByParam")
+	@Query("modFeedbackByParam")
 	async modFeedbackByParam(@Args("input") args: ModFeedbackFields) {
 		return await this.programService.modFeedbackByParam(args);
 	}
