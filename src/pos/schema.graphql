@@ -11,10 +11,20 @@ input PlanInput {
 	student: ID
 }
 
+input PlanFields {
+	id: String
+	
+	student: String
+	module: String
+	assignmentResult: String
+	modulesLeft: String
+}
+
 type Query {
 	plan(studentID: ID!): PlanOfStudy
 	plans: [PlanOfStudy!]
 	planByID(id: String!): PlanOfStudy
+	planByParams(input: PlanFields): [PlanOfStudy!]
 }
 
 type Mutation {

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
 import { Prisma, PlanOfStudy } from "@prisma/client";
-import { PlanInput } from "gql/graphql";
+import { PlanInput, PlanFields } from "gql/graphql";
 
 @Injectable()
 export class PoSService {
@@ -80,6 +80,55 @@ export class PoSService {
 				student: true
 			}
 		});
+	}
+
+	async planByParams(params: PlanFields): Promise<PlanOfStudy[] | null> {
+		const {
+			id,
+			student,
+			module,
+			assignmentResult,
+			modulesLeft
+		} = params
+
+		const payload = {
+			...(id && {id})
+		}
+		if (student) {
+			payload['studentId'] = student
+		}
+
+		if (module) {
+			payload['modules'] = {
+				some: {
+					id: module
+				}
+			}
+		}
+		if (assignmentResult) {
+			payload['assignmentResults'] = {
+				some: {
+					id: assignmentResult
+				}
+			}
+		}
+		if (modulesLeft) {
+			payload['modulesLeft'] = {
+				some: {
+					id: modulesLeft
+				}
+			}
+		}
+
+		return this.prisma.planOfStudy.findMany({
+			where: payload,
+			include: {
+				student: true,
+				modules: true,
+				assignmentResults: true,
+				modulesleft: true
+			}
+		})
 	}
 
 	// TODO: Allow for starting modules and courses

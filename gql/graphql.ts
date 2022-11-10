@@ -17,6 +17,14 @@ export interface PlanInput {
     student?: Nullable<string>;
 }
 
+export interface PlanFields {
+    id?: Nullable<string>;
+    student?: Nullable<string>;
+    module?: Nullable<string>;
+    assignmentResult?: Nullable<string>;
+    modulesLeft?: Nullable<string>;
+}
+
 export interface ModuleFields {
     id?: Nullable<string>;
     moduleNumber?: Nullable<number>;
@@ -72,7 +80,7 @@ export interface AssignmentResFields {
 export interface ModEnrollmentFields {
     id?: Nullable<string>;
     enrolledAt?: Nullable<string>;
-    role?: Nullable<string>;
+    role?: Nullable<UserRole>;
     module?: Nullable<string>;
     plan?: Nullable<string>;
 }
@@ -228,6 +236,7 @@ export interface IQuery {
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
+    planByParams(input?: Nullable<PlanFields>): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     modules(): Module[] | Promise<Module[]>;
     module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
     modulesByParam(input: ModuleFields): Nullable<Module[]> | Promise<Nullable<Module[]>>;
