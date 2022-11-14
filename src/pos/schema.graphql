@@ -1,9 +1,23 @@
 type PlanOfStudy {
 	id: ID!
+	"""
+	Name of the Student Account
+	"""
 	student: User
 
+	"""
+	Modules that are enrolled by the Student
+	"""
 	modules: [ModuleEnrollment]
+
+	"""
+	Results obtained for the Assignement Taken
+	"""
 	assignmentResults: [AssignmentResult!]
+
+	"""
+	Modules to be completed
+	"""
 	modulesleft:[Module]
 }
 
@@ -21,14 +35,38 @@ input PlanFields {
 }
 
 type Query {
+	"""
+	student PlanOfStudy by id
+	"""
 	plan(studentID: ID!): PlanOfStudy
+
+	"""
+	All the plans in the PlanOfStudy
+	"""
 	plans: [PlanOfStudy!]
+	
+	"""
+	PlanOfStudy by the Documentid
+	"""
 	planByID(id: String!): PlanOfStudy
+
 	planByParams(input: PlanFields): [PlanOfStudy!]
 }
 
 type Mutation {
+	"""
+	Plan added to present PlanOfStudy
+	"""
 	addPlan(input: PlanInput): PlanOfStudy!
+	
+	"""
+	Updating the PlanOfStudy
+	"""
 	updatePlan(id: ID!, input: PlanInput): PlanOfStudy
+	
+	"""
+	Deleting the PlanOfStudy
+	"""
 	deletePlan(id: ID!): PlanOfStudy
+	
 }

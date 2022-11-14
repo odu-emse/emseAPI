@@ -1,63 +1,201 @@
 type Social {
+	"""
+	Document id
+	"""
 	id: ID!
+	"""
+	Url POiting to Twitter
+	"""
 	twitter: String
+	"""
+	Url pointing to github
+	"""
 	github: String
+	"""
+	Url pointing to linkedin
+	"""
 	linkedin: String
+	"""
+	Url pointing to Facebook
+	"""
 	facebook: String
+	"""
+	Url poiting to porfolio
+	"""
 	portfolio: String
+	"""
+	relating social to the user account
+	"""
 	account: User!
 }
 
 type InstructorProfile {
+	"""
+	Intrucutor Profile id
+	"""
 	id: ID!
+	"""
+	Account pointing to User
+	"""
 	account: User
+	"""
+	Title of the IntructorProfile
+	"""
 	title: String
+	"""
+	office location of the user
+	"""
 	officeLocation: String
+	"""
+	office hours of the user
+	"""
 	officeHours: String
+	"""
+	contract policy needed
+	"""
 	contactPolicy: String
+	"""
+	Contact phone of th user
+	"""
 	phone: String
+	"""
+	Background of the Profile
+	"""
 	background: String
+	"""
+	Researchinterest of the User
+	"""
 	researchInterest: String
+	"""
+	The papers and publications selected
+	"""
 	selectedPapersAndPublications: String
+	"""
+	Personal webiste of the user
+	"""
 	personalWebsite: String
+	"""
+	Philosopy
+	"""
 	philosophy: String
 }
 
 type User {
+	"""
+	User ID
+	"""
 	id: ID!
+	"""
+	User OpenID
+	"""
 	openID: ID!
+	"""
+	User Email
+	"""
 	email: String!
+	"""
+	User picURL
+	"""
 	picURL: String
+	"""
+	User CreatedAt
+	"""
 	createdAt: String
+	"""
+	Firstname of the user
+	"""
 	firstName: String
+	"""
+	lastname of the user
+	"""
 	lastName: String
+	"""
+	Middlename of the user
+	"""
 	middleName: String
+	"""
+	to check if the user is admin
+	"""
 	isAdmin: Boolean
+	"""
+	to check if the user is active
+	"""
 	isActive: Boolean
+	"""
+	user dob
+	"""
 	dob: Date
+	"""
+	User social
+	"""
 	social: Social
+	"""
+	User planofstudy
+	"""
 	plan: PlanOfStudy
+	"""
+	Token pointing to id
+	"""
 	tokens: [ID!]
+	"""
+	feedback of the user pointing to modulefeedback
+	"""
 	feedback: [ModuleFeedback!]
+	"""
+	assignment graded poiting to assignment result of the user
+	"""
 	assignmentGraded: [AssignmentResult!]
+	"""
+	Instructor profile of the user
+	"""
 	instructorProfile: InstructorProfile
 }
 
 type Error {
+	"""
+	Error message
+	"""
 	message: String
+	
 }
 type Token {
+	"""
+	token id
+	"""
 	id: String
+	"""
+	token
+	"""
 	token: String
+	
 }
 
 input NewUser {
+	"""
+	openID of New user
+	"""
 	openID: String!
+	"""
+	email fo the New user
+	"""
 	email: String!
+	"""
+	picUrl of the Newuser
+	"""
 	picURL: String!
+	"""
+	firstname of the New user
+	"""
 	firstName: String!
+	"""
+	last name of the new user
+	"""
 	lastName: String!
+	"""
+	middle name of new user
+	"""
 	middleName: String!
+	
 }
 
 input UserFields {
@@ -90,59 +228,178 @@ input SocialFields {
 }
 
 input UpdateUser {
+	"""
+	update user id
+	"""
 	id: String!
+	"""
+	Open id of the update user
+	"""
 	openID: ID!
+	"""
+	email of the update user
+	"""
 	email: String
+	"""
+	Picurl of update user
+	"""
 	picURL: String
+	"""
+	firstname fo the update user
+	"""
 	firstName: String
+	"""
+	lastname of the update user
+	"""
 	lastName: String
+	"""
+	middle name of the update user
+	"""
 	middleName: String
+	"""
+	dob of the update user
+	"""
 	dob: Date
+	"""
+	to chcek if the update user is admin
+	"""
 	isAdmin: Boolean
+	"""
+	to check if the update user is active
+	"""
 	isActive: Boolean
+	"""
+	instructor of the Update user
+	"""
 	instructorProfile: InstructorProfileInput
 }
 
 input InstructorProfileInput {
+	"""
+	Intructor profile title
+	"""
 	title: String
+	"""
+	Officelocation of Instructor Profile
+	"""
 	officeLocation: String
+	"""
+	Offcie hours of Instructor Profile
+	"""
 	officeHours: String
+	"""
+	Contact Policy of Instructor Profile
+	"""
 	contactPolicy: String
+	"""
+	Phone of Intructor Profile
+	"""
 	phone: String
+	"""
+	Backgroud of Profile
+	"""
 	background: String
+	"""
+	Research Interest of the Instructor
+	"""
 	researchInterest: String
+	"""
+	Selected Papers and Publications of the Instructor
+	"""
 	selectedPapersAndPublications: String
+	"""
+	Personal Website of the Instructor
+	"""
 	personalWebsite: String
+	"""
+	Philisophy of the Instructor
+	"""
 	philosophy: String
 }
 
 input SocialInput {
+	"""
+	Url poiting to Twitter
+	"""
 	twitter: String
+	"""
+	Url pointing to github
+	"""
 	github: String
+	"""
+	Url pointing to github
+	"""
 	linkedin: String
+	"""
+	Url poiting to facebook
+	"""
 	facebook: String
+	"""
+	Url poiting to portfolio
+	"""
 	portfolio: String
 }
 
 type Query {
+	"""
+	Query that fetches User on id
+	"""
 	user(id: ID!): User
+	"""
+	Query that fetches all the users
+	"""
 	users: [User!]!
+
 	usersByParam(input: UserFields): [User!]
+	"""
+	Query that fetches all the socials
+	"""
 	socials: [Social!]!
+	"""
+	Query that fetches User on Social id
+	"""
 	social(id: ID!): Social
+
 	socialsByParam(input: SocialFields): [Social!]
+	"""
+	Query that fetches instrctor Profile based on id
+	"""
 	instructorProfile(id: ID!): InstructorProfile
 }
 
 type Mutation {
+	"""
+	deletes user
+	"""
 	deleteUser(openId: ID!): User
+	"""
+	Creates User
+	"""
 	createUser(input: NewUser): User!
+	"""
+	Updates user
+	"""
 	updateUser(input: UpdateUser): User
 
+	"""
+	adds Social to the user
+	"""
 	addSocial(user: ID!, input: SocialInput): Social!
+	"""
+	Updates Social to the user
+	"""
 	updateSocial(id: ID!, input: SocialInput!): Social
+	"""
+	updates user social
+	"""
 	updateUserSocial(userId: ID!, input: SocialInput!): Social
+	"""
+	Deletes Social
+	"""
 	deleteSocial(id: ID!): Social
+	"""
+	Delets User social
+	"""
 	deleteUserSocial(userId: ID!): Social
 }
 
