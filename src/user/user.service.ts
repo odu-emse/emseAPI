@@ -6,7 +6,9 @@ import type {
 	SocialInput,
 	InstructorProfile,
 	Error,
-	NewUser
+	NewUser,
+	UserFields,
+	SocialFields
 } from 'gql/graphql';
 import { JwtService } from "@nestjs/jwt";
 import moment from "moment";
@@ -63,6 +65,80 @@ export class UserService {
 		return user;
 	}
 
+	async userByParam(input: UserFields): Promise<User[] | null> {
+		const {
+			id,
+			openID,
+			email,
+			picURL,
+			createdAt,
+			firstName,
+			lastName,
+			middleName,
+			isAdmin,
+			isActive,
+			dob,
+			social,
+			plan,
+			feedback,
+			assignmentGraded,
+			instructorProfile
+		} = input
+
+		const payload = {
+			...(id && {id}),
+			...(openID && {openID}),
+			...(email && {email}),
+			...(picURL && {picURL}),
+			...(createdAt && {createdAt}),
+			...(firstName && {firstName}),
+			...(lastName && {lastName}),
+			...(middleName && {middleName}),
+			...(isAdmin && {isAdmin}),
+			...(isActive && {isActive}),
+			...(dob && {dob}),
+		}
+
+		payload['socialId'] = (social) ? social : undefined
+		payload['planId'] = (plan) ? plan : undefined
+
+		if (feedback) {
+			payload['feedback'] = {
+				some: {
+					id: feedback
+				}
+			}
+		}
+
+		if (assignmentGraded) {
+			payload['assignmentGraded'] = {
+				some: {
+					id: assignmentGraded
+				}
+			}
+		}
+
+		if (instructorProfile) {
+			payload['instructorProfile'] = {
+				some: {
+					id: instructorProfile
+				}
+			}
+		}
+
+		return await this.prisma.user.findMany({
+			where: payload,
+			include: {
+				social: true,
+				plan: true,
+				feedback: true,
+				assignmentGraded: true,
+				instructorProfile: true
+			}
+		})
+
+	}
+
 	/// Get all Social Records
 	async socials(): Promise<Social[]> {
 		return this.prisma.social.findMany({
@@ -82,6 +158,36 @@ export class UserService {
 				account: true
 			}
 		});
+	}
+
+	async socialByParam(input: SocialFields): Promise<Social[] | null> {
+		const {
+			id,
+			twitter,
+			github,
+			linkedin,
+			facebook,
+			portfolio,
+			account
+		} = input
+
+		const payload = {
+			...(id && {id}),
+			...(twitter && {twitter}),
+			...(github && {github}),
+			...(linkedin && {linkedin}),
+			...(facebook && {facebook}),
+			...(portfolio && {portfolio})
+		}
+
+		payload['accountId'] = (account) ? account : undefined
+
+		return await this.prisma.social.findMany({
+			where: payload,
+			include: {
+				account: true
+			}
+		})
 	}
 
 	/// Get a specific Instructor's profile by user ID

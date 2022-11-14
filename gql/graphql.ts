@@ -154,6 +154,35 @@ export interface NewUser {
     middleName: string;
 }
 
+export interface UserFields {
+    id?: Nullable<string>;
+    openID?: Nullable<string>;
+    email?: Nullable<string>;
+    picURL?: Nullable<string>;
+    createdAt?: Nullable<string>;
+    firstName?: Nullable<string>;
+    lastName?: Nullable<string>;
+    middleName?: Nullable<string>;
+    isAdmin?: Nullable<boolean>;
+    isActive?: Nullable<boolean>;
+    dob?: Nullable<Date>;
+    social?: Nullable<string>;
+    plan?: Nullable<string>;
+    feedback?: Nullable<string>;
+    assignmentGraded?: Nullable<string>;
+    instructorProfile?: Nullable<string>;
+}
+
+export interface SocialFields {
+    id?: Nullable<string>;
+    twitter?: Nullable<string>;
+    github?: Nullable<string>;
+    linkedin?: Nullable<string>;
+    facebook?: Nullable<string>;
+    portfolio?: Nullable<string>;
+    account?: Nullable<string>;
+}
+
 export interface UpdateUser {
     id: string;
     openID: string;
@@ -258,8 +287,10 @@ export interface IQuery {
     modEnrollmentByParam(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
     user(id: string): Nullable<User> | Promise<Nullable<User>>;
     users(): User[] | Promise<User[]>;
+    usersByParam(input?: Nullable<UserFields>): Nullable<User[]> | Promise<Nullable<User[]>>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
+    socialByParam(input?: Nullable<SocialFields>): Nullable<Social[]> | Promise<Nullable<Social[]>>;
     instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
 }
 

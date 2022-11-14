@@ -60,6 +60,35 @@ input NewUser {
 	middleName: String!
 }
 
+input UserFields {
+	id: String
+	openID: String
+	email: String
+	picURL: String
+	createdAt: String
+	firstName: String
+	lastName: String
+	middleName: String
+	isAdmin: Boolean
+	isActive: Boolean
+	dob: Date
+	social: String
+	plan: String
+	feedback: String
+	assignmentGraded: String
+	instructorProfile: String
+}
+
+input SocialFields {
+	id: String
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
+	account: String
+}
+
 input UpdateUser {
 	id: String!
 	openID: ID!
@@ -98,8 +127,10 @@ input SocialInput {
 type Query {
 	user(id: ID!): User
 	users: [User!]!
+	usersByParam(input: UserFields): [User!]
 	socials: [Social!]!
 	social(id: ID!): Social
+	socialByParam(input: SocialFields): [Social!]
 	instructorProfile(id: ID!): InstructorProfile
 }
 
