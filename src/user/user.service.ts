@@ -65,7 +65,7 @@ export class UserService {
 		return user;
 	}
 
-	async userByParam(input: UserFields): Promise<User[] | null> {
+	async usersByParam(input: UserFields): Promise<User[] | null> {
 		const {
 			id,
 			openID,
@@ -160,7 +160,7 @@ export class UserService {
 		});
 	}
 
-	async socialByParam(input: SocialFields): Promise<Social[] | null> {
+	async socialsByParam(input: SocialFields): Promise<Social[] | null> {
 		const {
 			id,
 			twitter,

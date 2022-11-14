@@ -290,7 +290,7 @@ export interface IQuery {
     usersByParam(input?: Nullable<UserFields>): Nullable<User[]> | Promise<Nullable<User[]>>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
-    socialByParam(input?: Nullable<SocialFields>): Nullable<Social[]> | Promise<Nullable<Social[]>>;
+    socialsByParam(input?: Nullable<SocialFields>): Nullable<Social[]> | Promise<Nullable<Social[]>>;
     instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
 }
 

@@ -130,7 +130,7 @@ type Query {
 	usersByParam(input: UserFields): [User!]
 	socials: [Social!]!
 	social(id: ID!): Social
-	socialByParam(input: SocialFields): [Social!]
+	socialsByParam(input: SocialFields): [Social!]
 	instructorProfile(id: ID!): InstructorProfile
 }
 
