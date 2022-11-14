@@ -394,7 +394,7 @@ export class ProgramService {
 			...(dueAt && {dueAt}),
 		}
 
-		payload['moduleId'] = module
+		payload['moduleId'] = (module) ? module : undefined
 
 		if (assignmentResult) {
 			payload['assignmentResults'] = {
@@ -448,8 +448,8 @@ export class ProgramService {
 			...(rating && {rating}),
 		}
 
-		payload['studentId'] = student
-		payload['moduleId'] = module
+		payload['studentId'] = (student) ? student : undefined
+		payload['moduleId'] = (module) ? module : undefined
 
 		return this.prisma.moduleFeedback.findMany({
 			where: payload,
@@ -519,9 +519,9 @@ export class ProgramService {
 			...(feedback && {feedback}),
 		}
 
-		payload['studentId'] = student
-		payload['graderId'] = gradedBy
-		payload['assignmentId'] = assignment
+		payload['studentId'] = (student) ? student : undefined
+		payload['graderId'] = (gradedBy) ? gradedBy : undefined
+		payload['assignmentId'] = (assignment) ? assignment : undefined
 
 		return this.prisma.assignmentResult.findMany({
 			where: payload,
@@ -571,8 +571,8 @@ export class ProgramService {
 			...(role && {role}),
 		}
 
-		payload['moduleId'] = module
-		payload['planId'] = plan
+		payload['moduleId'] = (module) ? module : undefined
+		payload['planId'] = (plan) ? plan : undefined
 
 		return this.prisma.moduleEnrollment.findMany({
 			where: payload,
