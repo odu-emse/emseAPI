@@ -4,7 +4,7 @@ type Social {
 	"""
 	id: ID!
 	"""
-	Url POiting to Twitter
+	Url Poiting to Twitter
 	"""
 	twitter: String
 	"""
