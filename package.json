@@ -9,6 +9,7 @@
 		"build": "yarn db:generate && nest build",
 		"typings": "ts-node gql/generate-typings.ts",
 		"generate": "yarn typings && yarn db:generate",
+		"generate:watch": "npx onchange \"**/*.graphql\" -- yarn generate",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:cov": "jest --coverage true",

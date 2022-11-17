@@ -229,15 +229,15 @@ input SocialFields {
 
 input UpdateUser {
 	"""
-	update user id
+	The document's unique ID field
 	"""
 	id: String!
 	"""
-	Open id of the update user
+	Google's Open ID field that is unique to each Google Account
 	"""
 	openID: ID!
 	"""
-	email of the update user
+	The email of the update user
 	"""
 	email: String
 	"""
@@ -261,7 +261,7 @@ input UpdateUser {
 	"""
 	dob: Date
 	"""
-	to chcek if the update user is admin
+	to check if the update user is admin
 	"""
 	isAdmin: Boolean
 	"""
