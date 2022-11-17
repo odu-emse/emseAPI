@@ -8,7 +8,7 @@ import {
 	Context
 } from "@nestjs/graphql";
 import { AuthGuard } from "../auth.guard";
-import { NewUser, UpdateUser, SocialInput } from "gql/graphql";
+import { NewUser, UpdateUser, SocialInput, UserFields, SocialFields } from "gql/graphql";
 import { GraphQLWrappingType } from "graphql";
 import { UserService } from "./user.service";
 
@@ -29,6 +29,11 @@ export class UserResolver {
 		return await this.userService.user(args);
 	}
 
+	@Query("usersByParam")
+	async usersByParam(@Args("input") params: UserFields) {
+		return await this.userService.usersByParam(params);
+	}
+
 	@Query("socials")
 	async socials() {
 		return await this.userService.socials();
@@ -37,6 +42,11 @@ export class UserResolver {
 	@Query("social")
 	async social(@Args("id") id: string) {
 		return await this.userService.social(id);
+	}
+
+	@Query("socialsByParam")
+	async socialsByParam(@Args("input") params: SocialFields) {
+		return await this.userService.socialsByParam(params);
 	}
 
 	@Query("instructorProfile")

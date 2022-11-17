@@ -123,8 +123,8 @@ model Module {
   parentCourses ModuleInCourse[]
   plan          PlanOfStudy[] @relation(fields: [planIds], references: [id])
   planIds       String[] @unique @db.ObjectId
-  parentmodules Requirement[] @relation(name: "child")
-  childmodules  Requirement[] @relation(name: "parent")
+  parentModules Requirement[] @relation(name: "child")
+  childModules  Requirement[] @relation(name: "parent")
  
 }
 

@@ -25,6 +25,15 @@ input PlanInput {
 	student: ID
 }
 
+input PlanFields {
+	id: String
+	
+	student: String
+	module: String
+	assignmentResult: String
+	modulesLeft: String
+}
+
 type Query {
 	"""
 	student PlanOfStudy by id
@@ -40,7 +49,8 @@ type Query {
 	PlanOfStudy by the Documentid
 	"""
 	planByID(id: String!): PlanOfStudy
-	
+
+	planByParams(input: PlanFields): [PlanOfStudy!]
 }
 
 type Mutation {

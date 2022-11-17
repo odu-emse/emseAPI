@@ -277,6 +277,7 @@ type Query {
 	Specific Module in the Modules
 	"""
 	module(id: ID!): Module
+	modulesByParam(input: ModuleFields!): [Module!]
 
 	"""
 	Specific Course in the Courses
@@ -286,6 +287,7 @@ type Query {
 	List of all courses
 	"""
 	courses: [Course!]!
+	courseByParam(input: CourseFields!): [Course!]
 
 	"""
 	Specific assignment in assignments
@@ -295,6 +297,7 @@ type Query {
 	List of all assignments
 	"""
 	assignment(id: ID!): Assignment
+	assignmentByParam(input: AssignmentFields!): [Assignment!]
 
 	""""
 	Modules in the courses
@@ -309,6 +312,7 @@ type Query {
 	Specific module feedback in modulefeedbacks
 	"""
 	moduleFeedback(id: ID!): ModuleFeedback
+	modFeedbackByParam(input: ModFeedbackFields!): [ModuleFeedback!]
 
 	"""
 	Specific assisgnement result
@@ -318,6 +322,7 @@ type Query {
 	list of all assignment Results
 	"""
 	assignmentResult(id: ID!): AssignmentResult
+	assignmentResultByParam(input: AssignmentResFields!): [AssignmentResult!]
 
 	"""
 	List of module enrollment
@@ -327,8 +332,76 @@ type Query {
 	Specific Moduleenrollment in Moduleenrollment
 	"""
 	moduleEnrollment(id: ID!): ModuleEnrollment
+  
+	modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
+
 }
 
+input ModuleFields {
+	id: ID
+	moduleNumber: Int
+	moduleName: String
+	description: String
+	duration: Float
+	intro: String
+	numSlides: Int
+	keywords: [String!]
+	createdAt: String
+	updatedAt: String
+
+	assignments: ID
+	members: ID
+	feedback: ID
+	parentCourses: ID
+	parentModules: ID
+	childModules: ID
+}
+
+input CourseFields {
+	id: ID
+	name: String
+
+	module: ID
+}
+
+input AssignmentFields {
+	id: ID
+	updatedAt: String
+	name: String
+	dueAt: String
+
+	module: ID
+	assignmentResult: ID 
+}
+
+input ModFeedbackFields {
+	id: ID
+	feedback: String
+	rating: Int
+
+	student: ID
+	module: ID
+}
+
+input AssignmentResFields {
+	id: ID
+	submittedAt: String
+	result: Float
+	feedback: String
+
+	student: ID
+	gradedBy: ID
+	assignment: ID
+}
+
+input ModEnrollmentFields {
+	id: ID
+	enrolledAt: String
+
+	role: UserRole
+	module: ID
+	plan: ID
+}
 
 input NewModule {
 	"""
