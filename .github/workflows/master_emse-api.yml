@@ -1,32 +1,38 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - EMSE-API
+name: Build, test, and deploy app to Azure Web App - EMSE-API
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    branches: [master, dev]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Run test suite
+        run: |
+          yarn
+          yarn test
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Node.js version
-        uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-
-      - name: npm install, build, and test
+      - name: Install dependencies and build
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-
+          yarn
+          yarn build --if-present
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
