@@ -21,7 +21,7 @@ jobs:
       - name: Run test suite
         run: |
           yarn
-          yarn typings
+          yarn generate
           yarn test
   build:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           yarn
-          yarn typings
+          yarn generate
           yarn build
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Build types
-        run: yarn typings
+        run: yarn generate
       - name: Run tests and collect coverage
         run: yarn test:cov
       - name: Upload coverage reports to Codecov
