@@ -18,11 +18,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
+      - name: Install dependencies
+        run: yarn
+      - name: Export environment variables
+        run: echo "DATABASE_URL=${{DATABASE_URL}}" > .env
+      - name: Generate types
+        run: yarn generate
       - name: Run test suite
-        run: |
-          yarn
-          yarn generate
-          yarn test
+        run: yarn test
   build:
     runs-on: ubuntu-latest
     steps:
@@ -32,16 +35,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-      - name: Install dependencies and build
-        run: |
-          yarn
-          yarn generate
-          yarn build
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
-        with:
-          name: node-app
-          path: .
+      - name: Install dependencies
+        run: yarn
+      - name: Export environment variables
+        run: echo "DATABASE_URL=${{DATABASE_URL}}" > .env
+      - name: Build application
+        run: yarn build
+
   coverage:
     needs: [test]
     runs-on: ubuntu-latest
@@ -54,6 +54,8 @@ jobs:
           node-version: 16.17.0
       - name: Install dependencies
         run: yarn
+      - name: Export environment variables
+        run: echo "DATABASE_URL=${{DATABASE_URL}}" > .env
       - name: Build types
         run: yarn generate
       - name: Run tests and collect coverage
