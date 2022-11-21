@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Export environment variables
-        run: echo "DATABASE_URL=${{DATABASE_URL}}" > .env
+        run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
       - name: Generate types
         run: yarn generate
       - name: Run test suite
@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Export environment variables
-        run: echo "DATABASE_URL=${{DATABASE_URL}}" > .env
+        run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
       - name: Build application
         run: yarn build
 
@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Export environment variables
-        run: echo "DATABASE_URL=${{DATABASE_URL}}" > .env
+        run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
       - name: Build types
         run: yarn generate
       - name: Run tests and collect coverage
