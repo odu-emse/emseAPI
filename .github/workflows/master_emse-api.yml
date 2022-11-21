@@ -6,6 +6,8 @@ name: Build, test, and deploy app to Azure Web App - EMSE-API
 on:
   push:
     branches: [master, dev]
+  pull_request:
+    branches: [ master, dev ]
 
 jobs:
   test:
