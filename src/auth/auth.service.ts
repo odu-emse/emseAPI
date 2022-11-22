@@ -48,14 +48,12 @@ export class AuthService {
         const {sub, exp, iat, email, picture, given_name, family_name}: TokenType = JSON.parse(decoded);
 
         if (!sub) {
-            return new Error("Invalid token");
+            throw new Error("Invalid token");
         }
 
         //Check to see if a user exists already
         const count = await this.prisma.user.count({
             where: {
-                //TODO: Fix this
-                //@ts-ignore
                 openID: sub
             }
         })
@@ -79,25 +77,21 @@ export class AuthService {
             //Update an existing user
             return this.prisma.user.update({
                 where: {
-                    //TODO: Fix this
-                    //@ts-ignore
                     openID: sub
                 },
                 data: {
-                    //TODO: Fix this
-                    //@ts-ignore
-                    openID: sub,
-                    email: email,
-                    picURL: picture,
-                    firstName: given_name,
-                    lastName: family_name
+                    ...(sub && {openID: sub}),
+                    ...(email && {email}),
+                    ...(picture && {picURL: picture}),
+                    ...(given_name && {firstName: given_name}),
+                    ...(family_name && {lastName: family_name}),
                 }
             })
         }
     }
 
     // Create a user
-    async registerUser(data: NewUser): Promise<User | Error> {
+    async registerUser(data: NewUser) {
         const {
             openID,
             email,
@@ -124,11 +118,7 @@ export class AuthService {
 
         ///Avoids duplicate value(email) if the exist already
         if (count === 0) {
-            //TODO: Fix this
-            //@ts-ignore
             return await this.prisma.user.create({
-                //TODO: Fix this
-                //@ts-ignore
                 data: payload
             });
         } else {
