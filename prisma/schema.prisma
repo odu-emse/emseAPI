@@ -14,17 +14,17 @@ generator dbml {
 }
 
 model User {
-  id           String    @id @map("_id") @db.ObjectId @default(auto())
-  openID       String    @unique
-  email        String    @unique
-  picURL       String?   
-  createdAt    DateTime  @default(now())
-  firstName    String
-  lastName     String
-  middleName   String?
-  dob          DateTime? @default(now())
-  isAdmin      Boolean   @default(false)
-  isActive     Boolean   @default(false)
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  openID     String    @unique
+  email      String    @unique
+  picURL     String?
+  createdAt  DateTime  @default(now())
+  firstName  String
+  lastName   String
+  middleName String?
+  dob        DateTime? @default(now())
+  isAdmin    Boolean   @default(false)
+  isActive   Boolean   @default(false)
 
   // Relation fields
   social            Social?            @relation(name: "social")
@@ -33,6 +33,8 @@ model User {
   feedback          ModuleFeedback[]
   assignmentGraded  AssignmentResult[] @relation(name: "graded")
   instructorProfile InstructorProfile?
+  //  watchedThreads    Thread[] 				 @relation(name: "watched")
+  //  createdThreads		Thread[]  			 @relation(name: "created")
 }
 
 model InstructorProfile {
@@ -60,8 +62,8 @@ model PlanOfStudy {
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
-  modulesleft       Module[] @relation(fields: [moduleLeftIds], references: [id])
-  moduleLeftIds     String[] @db.ObjectId
+  modulesleft       Module[]           @relation(fields: [moduleLeftIds], references: [id])
+  moduleLeftIds     String[]           @db.ObjectId
 }
 
 model Social {
@@ -100,7 +102,7 @@ model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  modules    ModuleInCourse[]
+  modules ModuleInCourse[]
 
 }
 
@@ -121,20 +123,21 @@ model Module {
   assignments   Assignment[]
   feedback      ModuleFeedback[]
   parentCourses ModuleInCourse[]
-  plan          PlanOfStudy[] @relation(fields: [planIds], references: [id])
-  planIds       String[] @unique @db.ObjectId
-  parentModules Requirement[] @relation(name: "child")
-  childModules  Requirement[] @relation(name: "parent")
- 
+  plan          PlanOfStudy[]      @relation(fields: [planIds], references: [id])
+  planIds       String[]           @unique @db.ObjectId
+  parentModules Requirement[]      @relation(name: "child")
+  childModules  Requirement[]      @relation(name: "parent")
+
+  Thread Thread[]
 }
 
-model Requirement{
-  id                String @id @default(auto()) @map("_id") @db.ObjectId
+model Requirement {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  parent            Module @relation(name: "parent", fields: [parentId], references:[id])
-  parentId          String
-  child             Module @relation(name: "child", fields: [childId], references:[id])
-  childId           String
+  parent   Module @relation(name: "parent", fields: [parentId], references: [id])
+  parentId String
+  child    Module @relation(name: "child", fields: [childId], references: [id])
+  childId  String
 }
 
 model ModuleFeedback {
@@ -185,6 +188,23 @@ model AssignmentResult {
   gradedBy     User        @relation(name: "graded", fields: [graderId], references: [id])
   assignmentId String      @db.ObjectId
   assignment   Assignment  @relation(fields: [assignmentId], references: [id])
+}
+
+model Thread {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+  title          String
+  body           String
+  //  usersWatching  User[]   @relation(name: "watched", fields: [watcherID], references: [id])
+  //  watcherID      String[] @db.ObjectId
+  //  author         User     @relation(name: "created", fields: [authorID], references: [id])
+  //  authorID       String   @db.ObjectId
+  //	comments Thread[] @relation(name: "comments", fields: [commentID], references: [id])
+  //	commentID String[] @db.ObjectId
+  upvotes        Int
+  parentLesson   Module   @relation(fields: [parentLessonID], references: [id])
+  parentLessonID String   @db.ObjectId
 }
 
 enum UserRole {

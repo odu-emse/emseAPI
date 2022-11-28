@@ -262,6 +262,8 @@ export interface IMutation {
 
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    thread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    threads(): Nullable<Thread[]> | Promise<Nullable<Thread[]>>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -292,6 +294,17 @@ export interface IQuery {
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
     socialsByParam(input?: Nullable<SocialFields>): Nullable<Social[]> | Promise<Nullable<Social[]>>;
     instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
+}
+
+export interface Thread {
+    id: string;
+    title: string;
+    author: User;
+    body: string;
+    comments?: Nullable<Thread[]>;
+    upvotes: number;
+    usersWatching?: Nullable<User[]>;
+    parentLesson: Module;
 }
 
 export interface PlanOfStudy {

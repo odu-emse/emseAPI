@@ -101,6 +101,7 @@ Table Module {
   planIds String[] [unique, not null]
   parentModules Requirement [not null]
   childModules Requirement [not null]
+  Thread Thread [not null]
 }
 
 Table Requirement {
@@ -154,6 +155,17 @@ Table AssignmentResult {
   assignment Assignment [not null]
 }
 
+Table Thread {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  title String [not null]
+  body String [not null]
+  upvotes Int [not null]
+  parentLesson Module [not null]
+  parentLessonID String [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -195,3 +207,5 @@ Ref: AssignmentResult.studentId > PlanOfStudy.id
 Ref: AssignmentResult.graderId > User.id
 
 Ref: AssignmentResult.assignmentId > Assignment.id
+
+Ref: Thread.parentLessonID > Module.id
