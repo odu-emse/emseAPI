@@ -46,6 +46,14 @@ type Thread {
     parentThreadID: ID
 }
 
+input IThreadCreateInput {
+    title: String
+    body: String!
+    parentLesson: ID
+    parentThread: ID
+    author: ID!
+}
+
 type Query {
     """
     Get a thread by ID
@@ -55,4 +63,22 @@ type Query {
     Get a list of threads
     """
     threads: [Thread]!
+}
+
+type Mutation {
+    """
+    Creates a new thread
+    @args IThreadCreateInput
+    @prop title: String
+    @prop body: String!
+    @prop parentLesson: ID
+    @prop parentThread: ID
+    """
+    createThread(data:IThreadCreateInput!): Thread
+
+    addCommentToThread(id: ID!, data: IThreadCreateInput!): Thread
+
+    upvoteThread(id: ID!): Thread
+
+    updateThread(id: ID!, data: IThreadCreateInput!): Thread
 }

@@ -13,6 +13,14 @@ export enum UserRole {
     GRADER = "GRADER"
 }
 
+export interface IThreadCreateInput {
+    title?: Nullable<string>;
+    body: string;
+    parentLesson?: Nullable<string>;
+    parentThread?: Nullable<string>;
+    author: string;
+}
+
 export interface PlanInput {
     student?: Nullable<string>;
 }
@@ -225,6 +233,10 @@ export interface AuthTokens {
 
 export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    addCommentToThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
