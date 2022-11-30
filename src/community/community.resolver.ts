@@ -1,8 +1,10 @@
-import {Query, Resolver} from '@nestjs/graphql';
-import {PoSService} from "../pos/pos.service";
+import {Args, Query, Resolver} from '@nestjs/graphql';
 import {CommunityService} from "./community.service";
+import {UseGuards} from "@nestjs/common";
+import {AuthGuard} from "../auth.guard";
 
 @Resolver()
+// @UseGuards(AuthGuard)
 export class CommunityResolver {
     constructor(private readonly communityService: CommunityService) {
     }
@@ -13,7 +15,7 @@ export class CommunityResolver {
     }
 
     @Query("thread")
-    async thread(id: string) {
+    async thread(@Args("id") id: string) {
         return await this.communityService.thread(id);
     }
 }
