@@ -227,6 +227,29 @@ type Module {
 	childModules: [Requirement]
 }
 
+type Lesson {
+	"""
+	document ID
+	"""
+	id: 			ID!
+	"""
+	Lesson Name
+	"""
+	name: 			String!
+	"""
+	The type of content being displayed. (PDF, Video, etc.)
+	"""
+	contentType: 	String!
+	"""
+	The link/id of the actual content data itself
+	"""
+	content: 		String!
+	"""
+	An optional transcript of the content data (primarily for videos)
+	"""
+	transcript: 	String
+}
+
 type Requirement{
 	"""
 	id of Requirement
