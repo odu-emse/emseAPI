@@ -19,7 +19,6 @@ import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../auth.guard";
-import { Arg } from "type-graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
