@@ -1,6 +1,5 @@
 import moment from "moment";
 import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
 import { PoSModule } from "./pos/pos.module";
 import { GraphQLModule } from "@nestjs/graphql";
@@ -50,9 +49,6 @@ export class DateScalar implements CustomScalar<string, Moment> {
 			driver: ApolloDriver,
 			introspection: true,
 			context: ({req, res}) => ({req, res})
-		}),
-		MongooseModule.forRoot(process.env.DATABASE_URL!, {
-			useNewUrlParser: true
 		}),
 		UserModule,
 		PoSModule,
