@@ -9,7 +9,7 @@ type Thread {
     """
     The title of the thread
     """
-    title: String!
+    title: String
     """
     The author of the thread
     """
@@ -21,7 +21,7 @@ type Thread {
     """
     The comments added to the thread
     """
-    comments: [Thread!]
+    comments: [Thread]
     """
     The number of upvotes for the thread
     """
@@ -33,7 +33,17 @@ type Thread {
     """
     TODO: Add linkage between lesson and thread once lesson schema is defined
     """
-    parentLesson: Module!
+    parentLesson: Module
+    """
+    """
+    createdAt: Date!
+    """
+    """
+    updatedAt: Date!
+    """
+    """
+    parentThread: Thread
+    parentThreadID: ID
 }
 
 type Query {
@@ -44,5 +54,5 @@ type Query {
     """
     Get a list of threads
     """
-    threads: [Thread!]
+    threads: [Thread]!
 }

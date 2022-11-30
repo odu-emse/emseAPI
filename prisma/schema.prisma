@@ -33,8 +33,10 @@ model User {
   feedback          ModuleFeedback[]
   assignmentGraded  AssignmentResult[] @relation(name: "graded")
   instructorProfile InstructorProfile?
-  //  watchedThreads    Thread[] 				 @relation(name: "watched")
-  //  createdThreads		Thread[]  			 @relation(name: "created")
+  watchedThreads    Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
+  watchedThreadIDs  String[]           @default([]) @db.ObjectId
+  createdThreads    Thread[]           @relation(name: "createdThreads")
+//  createdComments   Comment[]          @relation(name: "createdComments")
 }
 
 model InstructorProfile {
@@ -127,8 +129,7 @@ model Module {
   planIds       String[]           @unique @db.ObjectId
   parentModules Requirement[]      @relation(name: "child")
   childModules  Requirement[]      @relation(name: "parent")
-
-  Thread Thread[]
+  threads       Thread[]
 }
 
 model Requirement {
@@ -191,20 +192,22 @@ model AssignmentResult {
 }
 
 model Thread {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now()) @updatedAt
-  title          String
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+  title          String?
   body           String
-  //  usersWatching  User[]   @relation(name: "watched", fields: [watcherID], references: [id])
-  //  watcherID      String[] @db.ObjectId
-  //  author         User     @relation(name: "created", fields: [authorID], references: [id])
-  //  authorID       String   @db.ObjectId
-  //	comments Thread[] @relation(name: "comments", fields: [commentID], references: [id])
-  //	commentID String[] @db.ObjectId
-  upvotes        Int
-  parentLesson   Module   @relation(fields: [parentLessonID], references: [id])
-  parentLessonID String   @db.ObjectId
+  usersWatching  User[]    @relation(fields: [watcherID], references: [id])
+  watcherID      String[]  @default([]) @db.ObjectId
+  author         User      @relation(name: "createdThreads", fields: [authorID], references: [id])
+  authorID       String    @db.ObjectId
+  upvotes        Int       @default(0)
+  parentLesson   Module?   @relation(fields: [parentLessonID], references: [id])
+  parentLessonID String?   @db.ObjectId
+
+  parentThread Thread?  @relation("subComments", fields: [parentThreadID], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentThreadID String? @db.ObjectId
+  comments Thread[] @relation("subComments")
 }
 
 enum UserRole {

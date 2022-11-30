@@ -263,7 +263,7 @@ export interface IMutation {
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     thread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
-    threads(): Nullable<Thread[]> | Promise<Nullable<Thread[]>>;
+    threads(): Nullable<Thread>[] | Promise<Nullable<Thread>[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -298,13 +298,17 @@ export interface IQuery {
 
 export interface Thread {
     id: string;
-    title: string;
+    title?: Nullable<string>;
     author: User;
     body: string;
-    comments?: Nullable<Thread[]>;
+    comments?: Nullable<Nullable<Thread>[]>;
     upvotes: number;
     usersWatching?: Nullable<User[]>;
-    parentLesson: Module;
+    parentLesson?: Nullable<Module>;
+    createdAt: Date;
+    updatedAt: Date;
+    parentThread?: Nullable<Thread>;
+    parentThreadID?: Nullable<string>;
 }
 
 export interface PlanOfStudy {
@@ -373,6 +377,7 @@ export interface Module {
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
     parentModules?: Nullable<Nullable<Requirement>[]>;
     childModules?: Nullable<Nullable<Requirement>[]>;
+    threads?: Nullable<Nullable<Thread>[]>;
 }
 
 export interface Requirement {
@@ -434,6 +439,9 @@ export interface User {
     feedback?: Nullable<ModuleFeedback[]>;
     assignmentGraded?: Nullable<AssignmentResult[]>;
     instructorProfile?: Nullable<InstructorProfile>;
+    watchedThreads?: Nullable<Thread[]>;
+    watchedThreadIDs?: Nullable<string[]>;
+    createdThreads?: Nullable<Thread[]>;
 }
 
 export interface Token {

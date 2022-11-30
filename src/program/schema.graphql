@@ -225,6 +225,11 @@ type Module {
 	Childmodules in the Module
 	"""
 	childModules: [Requirement]
+
+	"""
+	The list of threads related to the module
+	"""
+	threads: [Thread]
 }
 
 type Requirement{

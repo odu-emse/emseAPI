@@ -20,6 +20,9 @@ Table User {
   feedback ModuleFeedback [not null]
   assignmentGraded AssignmentResult [not null]
   instructorProfile InstructorProfile
+  watchedThreads Thread [not null]
+  watchedThreadIDs String[] [not null]
+  createdThreads Thread [not null]
 }
 
 Table InstructorProfile {
@@ -101,7 +104,7 @@ Table Module {
   planIds String[] [unique, not null]
   parentModules Requirement [not null]
   childModules Requirement [not null]
-  Thread Thread [not null]
+  threads Thread [not null]
 }
 
 Table Requirement {
@@ -159,11 +162,18 @@ Table Thread {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
-  title String [not null]
+  title String
   body String [not null]
-  upvotes Int [not null]
-  parentLesson Module [not null]
-  parentLessonID String [not null]
+  usersWatching User [not null]
+  watcherID String[] [not null]
+  author User [not null]
+  authorID String [not null]
+  upvotes Int [not null, default: 0]
+  parentLesson Module
+  parentLessonID String
+  parentThread Thread
+  parentThreadID String
+  comments Thread [not null]
 }
 
 Enum UserRole {
@@ -171,6 +181,8 @@ Enum UserRole {
   TEACHER
   GRADER
 }
+
+Ref: User.watchedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
 
@@ -208,4 +220,10 @@ Ref: AssignmentResult.graderId > User.id
 
 Ref: AssignmentResult.assignmentId > Assignment.id
 
+Ref: Thread.watcherID > User.id
+
+Ref: Thread.authorID > User.id
+
 Ref: Thread.parentLessonID > Module.id
+
+Ref: Thread.parentThreadID - Thread.id [delete: No Action]
