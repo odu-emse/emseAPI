@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment, {MomentInput} from "moment";
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
@@ -9,7 +9,6 @@ import { ProgramModule } from "./program/program.module";
 require("dotenv").config();
 import { CustomScalar, Scalar } from "@nestjs/graphql";
 import { Kind, ValueNode } from "graphql";
-import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import type { Moment } from "moment";
 
@@ -17,14 +16,15 @@ import type { Moment } from "moment";
 export class DateScalar implements CustomScalar<string, Moment> {
 	description = "Date custom scalar type";
 
-	parseValue(value: Moment | unknown): Moment {
-		//@ts-ignore
-		return moment(value).format("MM/DD/YYYY"); // value from the client
+	parseValue(value: MomentInput | unknown): Moment {
+		if(value instanceof Date) return moment(value); // value from the client
+		return moment(null);
 	}
 
 	//What we are sending to the client
-	serialize(value: Moment | unknown): string {
-		return moment(value!).format("MM/DD/YYYY"); // value sent to the client
+	serialize(value: MomentInput | unknown): string {
+		if(value instanceof Date) return moment(value).format("MM/DD/YYYY");
+		return ""
 	}
 
 	//What we are receiving from the client

@@ -34,8 +34,8 @@ export interface ModuleFields {
     intro?: Nullable<string>;
     numSlides?: Nullable<number>;
     keywords?: Nullable<string[]>;
-    createdAt?: Nullable<string>;
-    updatedAt?: Nullable<string>;
+    createdAt?: Nullable<Date>;
+    updatedAt?: Nullable<Date>;
     assignments?: Nullable<string>;
     members?: Nullable<string>;
     feedback?: Nullable<string>;
@@ -52,9 +52,9 @@ export interface CourseFields {
 
 export interface AssignmentFields {
     id?: Nullable<string>;
-    updatedAt?: Nullable<string>;
+    updatedAt?: Nullable<Date>;
     name?: Nullable<string>;
-    dueAt?: Nullable<string>;
+    dueAt?: Nullable<Date>;
     module?: Nullable<string>;
     assignmentResult?: Nullable<string>;
 }
@@ -69,7 +69,7 @@ export interface ModFeedbackFields {
 
 export interface AssignmentResFields {
     id?: Nullable<string>;
-    submittedAt?: Nullable<string>;
+    submittedAt?: Nullable<Date>;
     result?: Nullable<number>;
     feedback?: Nullable<string>;
     student?: Nullable<string>;
@@ -79,7 +79,7 @@ export interface AssignmentResFields {
 
 export interface ModEnrollmentFields {
     id?: Nullable<string>;
-    enrolledAt?: Nullable<string>;
+    enrolledAt?: Nullable<Date>;
     role?: Nullable<UserRole>;
     module?: Nullable<string>;
     plan?: Nullable<string>;
@@ -108,13 +108,13 @@ export interface UpdateModule {
 
 export interface NewAssignment {
     name: string;
-    dueAt: string;
+    dueAt: Date;
     module: string;
 }
 
 export interface AssignmentInput {
     name?: Nullable<string>;
-    dueAt?: Nullable<string>;
+    dueAt?: Nullable<Date>;
     module?: Nullable<string>;
 }
 
@@ -304,7 +304,7 @@ export interface PlanOfStudy {
 
 export interface ModuleEnrollment {
     id: string;
-    enrolledAt: string;
+    enrolledAt: Date;
     role: UserRole;
     module: Module;
     plan: PlanOfStudy;
@@ -312,7 +312,7 @@ export interface ModuleEnrollment {
 
 export interface AssignmentResult {
     id: string;
-    submittedAt: string;
+    submittedAt: Date;
     result: number;
     feedback?: Nullable<string>;
     student?: Nullable<PlanOfStudy>;
@@ -322,9 +322,9 @@ export interface AssignmentResult {
 
 export interface Assignment {
     id: string;
-    updatedAt: string;
+    updatedAt: Date;
     name: string;
-    dueAt?: Nullable<string>;
+    dueAt?: Nullable<Date>;
     module: Module;
     assignmentResults?: Nullable<Nullable<AssignmentResult>[]>;
 }
@@ -352,8 +352,8 @@ export interface Module {
     intro: string;
     numSlides: number;
     keywords: string[];
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
     assignments?: Nullable<Nullable<Assignment>[]>;
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
     feedback?: Nullable<Nullable<ModuleFeedback>[]>;
