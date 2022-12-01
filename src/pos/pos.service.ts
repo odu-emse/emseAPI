@@ -7,9 +7,9 @@ import { PlanInput, PlanFields } from "gql/graphql";
 export class PoSService {
 	constructor(private prisma: PrismaService) {}
 
-	// ✅ Find all plans recorded in the system
+	//✅ Find all plans recorded in the system
 	async plans(): Promise<PlanOfStudy[]> {
-		const plans = await this.prisma.planOfStudy.findMany({
+		return await this.prisma.planOfStudy.findMany({
 			include: {
 				modules: {
 					include: {
@@ -20,7 +20,6 @@ export class PoSService {
 				student: true
 			}
 		});
-		return plans;
 	}
 
 	// Find a plan based on it's document ID
