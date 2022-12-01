@@ -149,6 +149,18 @@ type User {
 	Instructor profile of the user
 	"""
 	instructorProfile: InstructorProfile
+	"""
+	The list of threads that the user is subscribed to
+	"""
+	watchedThreads: [Thread!]
+	"""
+
+	"""
+	watchedThreadIDs: [ID!]
+	"""
+	The list of threads that the user has created
+	"""
+	createdThreads: [Thread!]
 }
 
 type Error {

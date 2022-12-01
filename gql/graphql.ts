@@ -13,6 +13,14 @@ export enum UserRole {
     GRADER = "GRADER"
 }
 
+export interface IThreadCreateInput {
+    title?: Nullable<string>;
+    body: string;
+    parentLesson?: Nullable<string>;
+    parentThread?: Nullable<string>;
+    author: string;
+}
+
 export interface PlanInput {
     student?: Nullable<string>;
 }
@@ -225,6 +233,10 @@ export interface AuthTokens {
 
 export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    addCommentToThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -262,6 +274,8 @@ export interface IMutation {
 
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    thread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    threads(): Nullable<Thread>[] | Promise<Nullable<Thread>[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -292,6 +306,21 @@ export interface IQuery {
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
     socialsByParam(input?: Nullable<SocialFields>): Nullable<Social[]> | Promise<Nullable<Social[]>>;
     instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
+}
+
+export interface Thread {
+    id: string;
+    title?: Nullable<string>;
+    author: User;
+    body: string;
+    comments?: Nullable<Nullable<Thread>[]>;
+    upvotes: number;
+    usersWatching?: Nullable<User[]>;
+    parentLesson?: Nullable<Module>;
+    createdAt: Date;
+    updatedAt: Date;
+    parentThread?: Nullable<Thread>;
+    parentThreadID?: Nullable<string>;
 }
 
 export interface PlanOfStudy {
@@ -360,6 +389,7 @@ export interface Module {
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
     parentModules?: Nullable<Nullable<Requirement>[]>;
     childModules?: Nullable<Nullable<Requirement>[]>;
+    threads?: Nullable<Nullable<Thread>[]>;
 }
 
 export interface Requirement {
@@ -421,6 +451,9 @@ export interface User {
     feedback?: Nullable<ModuleFeedback[]>;
     assignmentGraded?: Nullable<AssignmentResult[]>;
     instructorProfile?: Nullable<InstructorProfile>;
+    watchedThreads?: Nullable<Thread[]>;
+    watchedThreadIDs?: Nullable<string[]>;
+    createdThreads?: Nullable<Thread[]>;
 }
 
 export interface Token {

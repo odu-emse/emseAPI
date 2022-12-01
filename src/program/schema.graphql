@@ -146,85 +146,90 @@ type Course {
 }
 
 type Module {
-    """
-    Module Id
-    """
-    id: ID!
+	"""
+	Module Id
+	"""
+	id: ID!
 
-    """
-    Number of the Module
-    """
-    moduleNumber: Int!
+	"""
+	Number of the Module
+	"""
+	moduleNumber: Int!
 
-    """
-    Name of hte Module
-    """
-    moduleName: String!
+	"""
+	Name of hte Module
+	"""
+	moduleName: String!
 
-    """
-    Description of the Module
-    """
-    description: String!
+	"""
+	Description of the Module
+	"""
+	description: String!
 
-    """
-    Duration of the Module
-    """
-    duration: Float!
+	"""
+	Duration of the Module
+	"""
+	duration: Float!
 
-    """
-    Introduction of the Module
-    """
-    intro: String!
+	"""
+	Introduction of the Module
+	"""
+	intro: String!
 
-    """
-    No of slides in the Module
-    """
-    numSlides: Int!
+	"""
+	No of slides in the Module
+	"""
+	numSlides: Int!
 
-    """
-    Keywords in the Modules
-    """
-    keywords: [String!]!
+	"""
+	Keywords in the Modules
+	"""
+	keywords: [String!]!
 
-    """
-    Date and Time of the Module Created at
-    """
-    createdAt: Date!
+	"""
+	Date and Time of the Module Created at
+	"""
+	createdAt: Date!
 
-    """
-    Date and Time of the Module Updated at
-    """
-    updatedAt: Date!
+	"""
+	Date and Time of the Module Updated at
+	"""
+	updatedAt: Date!
 
-    """
-    Assignment in the module
-    """
-    assignments: [Assignment]
+	"""
+	Assignement in the module
+	"""
+	assignments: [Assignment]
 
-    """
-    Members enrolled in the Module
-    """
-    members: [ModuleEnrollment]
+	"""
+	Memebers enrolled in the Module
+	"""
+	members: [ModuleEnrollment]
 
-    """
-    Feedback of the Module
-    """
-    feedback: [ModuleFeedback]
+	"""
+	Feedback of the Module
+	"""
+	feedback: [ModuleFeedback]
 
-    """
-    Parent Courses in the Modules
-    """
-    parentCourses: [ModuleInCourse]
+	"""
+	Parent Courses in the Modules
+	"""
+	parentCourses: [ModuleInCourse]
 
-    """
-    Parent Modules of the Module
-    """
-    parentModules: [Requirement]
+	"""
+	Parent Modules of the Module
+	"""
+	parentModules: [Requirement]
 
-    """
-    Child modules in the Module
-    """
-    childModules: [Requirement]
+	"""
+	Childmodules in the Module
+	"""
+	childModules: [Requirement]
+
+	"""
+	The list of threads related to the module
+	"""
+	threads: [Thread]
 }
 
 type Requirement{

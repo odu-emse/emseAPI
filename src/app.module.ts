@@ -1,6 +1,5 @@
 import moment, {MomentInput} from "moment";
 import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
 import { PoSModule } from "./pos/pos.module";
 import { GraphQLModule } from "@nestjs/graphql";
@@ -11,6 +10,7 @@ import { CustomScalar, Scalar } from "@nestjs/graphql";
 import { Kind, ValueNode } from "graphql";
 import { AuthModule } from './auth/auth.module';
 import type { Moment } from "moment";
+import { CommunityModule } from './community/community.module';
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
@@ -50,13 +50,11 @@ export class DateScalar implements CustomScalar<string, Moment> {
 			introspection: true,
 			context: ({req, res}) => ({req, res})
 		}),
-		MongooseModule.forRoot(process.env.DATABASE_URL!, {
-			useNewUrlParser: true
-		}),
 		UserModule,
 		PoSModule,
 		ProgramModule,
 		AuthModule,
+		CommunityModule,
 	],
 	controllers: [],
 	providers: [DateScalar]
