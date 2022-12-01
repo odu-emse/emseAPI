@@ -5,7 +5,6 @@ import {
 	ModuleFeedbackUpdate,
 	NewAssignment,
 	NewAssignmentResult,
-	NewModule,
 	UpdateModule,
 	ModuleFields,
 	CourseFields,
@@ -129,7 +128,7 @@ export class ProgramResolver {
 
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
-	async create(@Args("input") args: NewModule) { 
+	async create(@Args("input") args: Prisma.ModuleCreateInput) {
 		return await this.programService.addModule(args);
 	}
 
