@@ -1,8 +1,5 @@
 version: "3.9"
 
-volumes:
-    api_data:
-
 services:
     api:
         container_name: back_end_api
@@ -16,7 +13,7 @@ services:
         ports:
             - "4000:4000"
         volumes:
-            - api_data:/usr/src/app/
+            - ./:/usr/src/app/
         networks:
             - empiNetwork
         command: >
