@@ -11,7 +11,8 @@ async function bootstrap() {
 			cors: {
 				origin: "http://localhost:3000",
 				credentials: true
-			}
+			},
+			logger: ["error", "warn"]
 		}
 	);
 
@@ -20,7 +21,7 @@ async function bootstrap() {
 	//app.enableCors();
 	app.use(cookieParser());
 	await app.listen(process.env.PORT!, () =>
-		console.log(`🕵️‍♂️ Listening on port ${process.env.PORT || 3000}...`)
+		console.log(`🕵️‍ Listening on port ${process.env.PORT || 3000}...`)
 	);
 
 	Sentry.init({

@@ -5,7 +5,6 @@ import {
 	ModuleFeedbackUpdate,
 	NewAssignment,
 	NewAssignmentResult,
-	NewModule,
 	UpdateModule,
 	ModuleFields,
 	CourseFields,
@@ -19,7 +18,6 @@ import { ProgramService } from "./program.service";
 import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../auth.guard";
-import { Arg } from "type-graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
@@ -130,7 +128,7 @@ export class ProgramResolver {
 
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
-	async create(@Args("input") args: NewModule) { 
+	async create(@Args("input") args: Prisma.ModuleCreateInput) {
 		return await this.programService.addModule(args);
 	}
 

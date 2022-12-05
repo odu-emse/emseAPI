@@ -1,15 +1,10 @@
-import { UseGuards } from "@nestjs/common";
 import {
 	Resolver,
 	Query,
 	Args,
 	Mutation,
-	GraphQLExecutionContext,
-	Context
 } from "@nestjs/graphql";
-import { AuthGuard } from "../auth.guard";
 import { NewUser, UpdateUser, SocialInput, UserFields, SocialFields } from "gql/graphql";
-import { GraphQLWrappingType } from "graphql";
 import { UserService } from "./user.service";
 
 @Resolver("User")
@@ -52,12 +47,14 @@ export class UserResolver {
 	@Query("instructorProfile")
 	async instructorProfile(@Args("id") id: string) {
 		const usr = await this.userService.user(id);
-		return await this.userService.instructorProfile(String(usr!.id));
+		if(usr) return await this.userService.instructorProfile(usr.id);
+		else throw new Error("User not found");
 	}
 
 	@Mutation("createUser")
 	async createUser(@Args("input") args: NewUser) {
 		// return await this.userService.registerUser(args);
+		return
 	}
 
 	@Mutation("updateUser")

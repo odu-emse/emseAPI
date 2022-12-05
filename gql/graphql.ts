@@ -13,6 +13,14 @@ export enum UserRole {
     GRADER = "GRADER"
 }
 
+export interface IThreadCreateInput {
+    title?: Nullable<string>;
+    body: string;
+    parentLesson?: Nullable<string>;
+    parentThread?: Nullable<string>;
+    author: string;
+}
+
 export interface PlanInput {
     student?: Nullable<string>;
 }
@@ -34,8 +42,8 @@ export interface ModuleFields {
     intro?: Nullable<string>;
     numSlides?: Nullable<number>;
     keywords?: Nullable<string[]>;
-    createdAt?: Nullable<string>;
-    updatedAt?: Nullable<string>;
+    createdAt?: Nullable<Date>;
+    updatedAt?: Nullable<Date>;
     assignments?: Nullable<string>;
     members?: Nullable<string>;
     feedback?: Nullable<string>;
@@ -52,9 +60,9 @@ export interface CourseFields {
 
 export interface AssignmentFields {
     id?: Nullable<string>;
-    updatedAt?: Nullable<string>;
+    updatedAt?: Nullable<Date>;
     name?: Nullable<string>;
-    dueAt?: Nullable<string>;
+    dueAt?: Nullable<Date>;
     module?: Nullable<string>;
     assignmentResult?: Nullable<string>;
 }
@@ -69,7 +77,7 @@ export interface ModFeedbackFields {
 
 export interface AssignmentResFields {
     id?: Nullable<string>;
-    submittedAt?: Nullable<string>;
+    submittedAt?: Nullable<Date>;
     result?: Nullable<number>;
     feedback?: Nullable<string>;
     student?: Nullable<string>;
@@ -79,7 +87,7 @@ export interface AssignmentResFields {
 
 export interface ModEnrollmentFields {
     id?: Nullable<string>;
-    enrolledAt?: Nullable<string>;
+    enrolledAt?: Nullable<Date>;
     role?: Nullable<UserRole>;
     module?: Nullable<string>;
     plan?: Nullable<string>;
@@ -108,13 +116,13 @@ export interface UpdateModule {
 
 export interface NewAssignment {
     name: string;
-    dueAt: string;
+    dueAt: Date;
     module: string;
 }
 
 export interface AssignmentInput {
     name?: Nullable<string>;
-    dueAt?: Nullable<string>;
+    dueAt?: Nullable<Date>;
     module?: Nullable<string>;
 }
 
@@ -225,6 +233,10 @@ export interface AuthTokens {
 
 export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    addCommentToThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -262,6 +274,8 @@ export interface IMutation {
 
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
+    thread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    threads(): Nullable<Thread>[] | Promise<Nullable<Thread>[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -294,6 +308,21 @@ export interface IQuery {
     instructorProfile(id: string): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
 }
 
+export interface Thread {
+    id: string;
+    title?: Nullable<string>;
+    author: User;
+    body: string;
+    comments?: Nullable<Nullable<Thread>[]>;
+    upvotes: number;
+    usersWatching?: Nullable<User[]>;
+    parentLesson?: Nullable<Module>;
+    createdAt: Date;
+    updatedAt: Date;
+    parentThread?: Nullable<Thread>;
+    parentThreadID?: Nullable<string>;
+}
+
 export interface PlanOfStudy {
     id: string;
     student?: Nullable<User>;
@@ -304,7 +333,7 @@ export interface PlanOfStudy {
 
 export interface ModuleEnrollment {
     id: string;
-    enrolledAt: string;
+    enrolledAt: Date;
     role: UserRole;
     module: Module;
     plan: PlanOfStudy;
@@ -312,7 +341,7 @@ export interface ModuleEnrollment {
 
 export interface AssignmentResult {
     id: string;
-    submittedAt: string;
+    submittedAt: Date;
     result: number;
     feedback?: Nullable<string>;
     student?: Nullable<PlanOfStudy>;
@@ -322,9 +351,9 @@ export interface AssignmentResult {
 
 export interface Assignment {
     id: string;
-    updatedAt: string;
+    updatedAt: Date;
     name: string;
-    dueAt?: Nullable<string>;
+    dueAt?: Nullable<Date>;
     module: Module;
     assignmentResults?: Nullable<Nullable<AssignmentResult>[]>;
 }
@@ -352,14 +381,15 @@ export interface Module {
     intro: string;
     numSlides: number;
     keywords: string[];
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
     assignments?: Nullable<Nullable<Assignment>[]>;
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
     feedback?: Nullable<Nullable<ModuleFeedback>[]>;
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
     parentModules?: Nullable<Nullable<Requirement>[]>;
     childModules?: Nullable<Nullable<Requirement>[]>;
+    threads?: Nullable<Nullable<Thread>[]>;
 }
 
 export interface Requirement {
@@ -421,6 +451,9 @@ export interface User {
     feedback?: Nullable<ModuleFeedback[]>;
     assignmentGraded?: Nullable<AssignmentResult[]>;
     instructorProfile?: Nullable<InstructorProfile>;
+    watchedThreads?: Nullable<Thread[]>;
+    watchedThreadIDs?: Nullable<string[]>;
+    createdThreads?: Nullable<Thread[]>;
 }
 
 export interface Token {

@@ -1,5 +1,8 @@
 version: "3.9"
 
+volumes:
+    api_data:
+
 services:
     api:
         container_name: back_end_api
@@ -13,11 +16,10 @@ services:
         ports:
             - "4000:4000"
         volumes:
-            - ./src:/usr/src/app/src #major
-            - ./logs:/root/.npm/_logs # use this for logs debugging
+            - api_data:/usr/src/app/
         networks:
             - empiNetwork
         command: >
-            bash -c "yarn generate && yarn dev"
+            bash -c "yarn db:generate && yarn dev"
 networks:
     empiNetwork:

@@ -19,11 +19,25 @@ $ cd emseAPI && touch .env
 
 ## Running the API using Docker
 
-To run the API, first please make sure you have all the necessary Pre-Requisite are installed. Without these, the API will not be able to run or compile.
+To run the API, first please make sure you have all the necessary Pre-Requisite software are installed and your environment file is created. Without these, the API will not be able to run or compile.
+
+### API + Type generation
+
+To make the most out of using Prisma as a Type ORM, we need to generate the TypeScript types from our models, on the fly.
+
+```shell
+$ make dev
+```
+
+If you need to run a clean installation of the API, but you still want to make use of the automatic type generation, you can run the following command:
+
+```shell
+$ make dev-clean
+```
 
 ### Build Image and start container
 
-`Docker-compose` builds the image, if the image is not already present, in which case it would use the already built image to start the container.
+Docker-compose builds the image, if the image is not already present, in which case it would use the already built image to start the container.
 
 ```shell
 $ make up
@@ -31,7 +45,7 @@ $ make up
 
 ### Stop container
 
-`Docker-compose` stops the already operational container.
+Docker-compose stops the already operational container.
 
 ```shell
 $ make down
@@ -39,7 +53,7 @@ $ make down
 
 ### Build image
 
-`Docker-compose` builds the image. If the image previously exists and no changes have been made in the `Dockerfile`, docker-compose rebuilds the image again when there have been modifications made to the Dockerfile.
+Docker-compose builds the image. If the image previously exists and no changes have been made in the Dockerfile, docker-compose rebuilds the image again when there have been modifications made to the Dockerfile.
 
 ```shell
 $ make build
@@ -121,31 +135,25 @@ emseAPI
 ├── prisma
 │   └── schema.prisma
 ├── src
-│   ├── app.module.ts
 │   ├── main.ts
+│   ├── app.module.ts
+│   ├── prisma.service.ts
 │   ├── pos
 │   │   ├── interfaces
 │   │   │   └── pos.interface.ts
-│   │   ├── pos.controller.spec.ts
 │   │   ├── pos.module.ts
 │   │   ├── pos.resolver.ts
-│   │   ├── pos.service.spec.ts
 │   │   ├── pos.service.ts
 │   │   └── schema.graphql
-│   ├── prisma.service.ts
 │   ├── program
 │   │   ├── program.module.ts
-│   │   ├── program.resolver.spec.ts
 │   │   ├── program.resolver.ts
-│   │   ├── program.service.spec.ts
 │   │   ├── program.service.ts
 │   │   └── schema.graphql
 │   └── user
 │       ├── schema.graphql
-│       ├── user.controller.spec.ts
 │       ├── user.module.ts
 │       ├── user.resolver.ts
-│       ├── user.service.spec.ts
 │       └── user.service.ts
 ├── tsconfig.build.json
 ├── tsconfig.json
@@ -199,25 +207,19 @@ src
 ├── pos
 │   ├── interfaces
 │   │   └── pos.interface.ts
-│   ├── pos.controller.spec.ts
 │   ├── pos.module.ts
 │   ├── pos.resolver.ts
-│   ├── pos.service.spec.ts
 │   ├── pos.service.ts
 │   └── schema.graphql
 ├── program
 │   ├── program.module.ts
-│   ├── program.resolver.spec.ts
 │   ├── program.resolver.ts
-│   ├── program.service.spec.ts
 │   ├── program.service.ts
 │   └── schema.graphql
 └── user
     ├── schema.graphql
-    ├── user.controller.spec.ts
     ├── user.module.ts
     ├── user.resolver.ts
-    ├── user.service.spec.ts
     └── user.service.ts
 ```
 
