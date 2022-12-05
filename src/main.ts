@@ -20,15 +20,16 @@ async function bootstrap() {
 
 	//app.enableCors();
 	app.use(cookieParser());
-	await app.listen(process.env.PORT!, () =>
-		console.log(`🕵️‍ Listening on port ${process.env.PORT || 3000}...`)
-	);
 
-	Sentry.init({
+	await Sentry.init({
 		dsn:
 			"https://d7d1b5e63fd145218bf3971031bae0cd@o1009779.ingest.sentry.io/5974128",
 
 		tracesSampleRate: 1.0
 	});
+
+	await app.listen(process.env.PORT!, () =>
+		console.log(`🕵️‍ Listening on port ${process.env.PORT || 3000}...`)
+	);
 }
 bootstrap();

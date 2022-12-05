@@ -17,7 +17,6 @@
 		"db:studio": "npx prisma studio --browser none --port 5555",
 		"db:format": "npx prisma format",
 		"db:validate": "npx prisma validate",
-		"release": "standard-version",
 		"lint": "eslint --ext .ts .",
 		"lint:fix": "eslint --ext .ts . --fix"
 	},
@@ -85,13 +84,12 @@
 		"prettier": "^1.19.1",
 		"prisma": "^4.0.0",
 		"prisma-dbml-generator": "^0.9.1",
-		"standard-version": "^8.0.1",
 		"ts-jest": "^28.0.8",
 		"ts-node": "^10.9.1",
 		"ts-node-dev": "^1.1.6",
 		"tsconfig-paths": "^3.11.0"
 	},
-	"browserslist": "> 0.25%, not dead",
+	"browserslist": ["> 0.25%", "not dead"],
 	"jest": {
 		"moduleFileExtensions": [
 			"ts",
