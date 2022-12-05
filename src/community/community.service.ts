@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {PrismaService} from "@/prisma.service";
 import {Prisma} from "@prisma/client";
-import {IThreadCreateInput} from "@/types/graphql";
+import {ICommentCreateInput, IThreadCreateInput} from "@/types/graphql";
 
 @Injectable()
 export class CommunityService {
@@ -85,16 +85,26 @@ export class CommunityService {
         })
     }
 
-    async addCommentToThread(id: string, data: Prisma.ThreadCreateInput) {
+    async addCommentToThread(parentThreadID: string, data: ICommentCreateInput) {
+        if(!data.id){
+            throw new Error("Comment ID is required to connect to parent thread. There was an error creating your initial comment, if this error is shown.")
+        }
+        const update = Prisma.validator<Prisma.ThreadUncheckedUpdateInput>()({
+            comments: {
+                connect: {
+                    id: data.id
+                }
+            }
+        })
+        console.log(update);
         return await this.prisma.thread.update({
             where: {
-                id
+                id: parentThreadID
             },
-            data: {
-                comments: {
-                    // @ts-ignore
-                    push: data
-                }
+            data: update,
+            include: {
+                comments: true,
+                author: true
             }
         })
     }

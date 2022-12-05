@@ -2,8 +2,8 @@ import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
 import {CommunityService} from "./community.service";
 import {Prisma} from '@prisma/client';
 import {UseGuards} from "@nestjs/common";
-import {AuthGuard} from "../auth.guard";
-import {IThreadCreateInput} from "../../gql/graphql";
+import {AuthGuard} from "@/auth.guard";
+import {IThreadCreateInput} from "@/types/graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
@@ -28,8 +28,13 @@ export class CommunityResolver {
 
 
     @Mutation("addCommentToThread")
-    async addCommentToThread(@Args("id") id: string, @Args("data") data: Prisma.ThreadCreateInput) {
-        return await this.communityService.addCommentToThread(id, data);
+    async addCommentToThread(@Args("parentThreadID") parentThreadID: string, @Args("data") data: IThreadCreateInput) {
+        const comment = await this.communityService.createThread(data);
+        return await this.communityService.addCommentToThread(parentThreadID, {
+            id: comment.id,
+            body: comment.body,
+            author: comment.author.id
+        });
     }
 
     @Mutation("upvoteThread")

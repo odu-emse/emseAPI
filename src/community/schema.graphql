@@ -54,6 +54,12 @@ input IThreadCreateInput {
     author: ID!
 }
 
+input ICommentCreateInput {
+    id: ID
+    body: String!
+    author: ID!
+}
+
 type Query {
     """
     Get a thread by ID
@@ -68,15 +74,10 @@ type Query {
 type Mutation {
     """
     Creates a new thread
-    @args IThreadCreateInput
-    @prop title: String
-    @prop body: String!
-    @prop parentLesson: ID
-    @prop parentThread: ID
     """
     createThread(data:IThreadCreateInput!): Thread
 
-    addCommentToThread(id: ID!, data: IThreadCreateInput!): Thread
+    addCommentToThread(parentThreadID: ID!, data: ICommentCreateInput!): Thread
 
     upvoteThread(id: ID!): Thread
 
