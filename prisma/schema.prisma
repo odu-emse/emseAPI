@@ -129,7 +129,6 @@ model Module {
   planIds       String[]           @unique @db.ObjectId
   parentModules Requirement[]      @relation(name: "child")
   childModules  Requirement[]      @relation(name: "parent")
-  threads       Thread[]
 }
 
 
@@ -139,6 +138,7 @@ model Lesson {
   contentType   String
   content       String
   transcript    String?
+  threads       Thread[]
 }
 
 model Requirement {
@@ -210,7 +210,7 @@ model Thread {
   author         User      @relation(name: "createdThreads", fields: [authorID], references: [id])
   authorID       String    @db.ObjectId
   upvotes        Int       @default(0)
-  parentLesson   Module?   @relation(fields: [parentLessonID], references: [id])
+  parentLesson   Lesson?   @relation(fields: [parentLessonID], references: [id])
   parentLessonID String?   @db.ObjectId
 
   parentThread Thread?  @relation("subComments", fields: [parentThreadID], references: [id], onDelete: NoAction, onUpdate: NoAction)

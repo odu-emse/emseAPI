@@ -316,7 +316,7 @@ export interface Thread {
     comments?: Nullable<Nullable<Thread>[]>;
     upvotes: number;
     usersWatching?: Nullable<User[]>;
-    parentLesson?: Nullable<Module>;
+    parentLesson?: Nullable<Lesson>;
     createdAt: Date;
     updatedAt: Date;
     parentThread?: Nullable<Thread>;
@@ -389,6 +389,14 @@ export interface Module {
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
     parentModules?: Nullable<Nullable<Requirement>[]>;
     childModules?: Nullable<Nullable<Requirement>[]>;
+}
+
+export interface Lesson {
+    id: string;
+    name: string;
+    contentType: string;
+    content: string;
+    transcript?: Nullable<string>;
     threads?: Nullable<Nullable<Thread>[]>;
 }
 
