@@ -132,9 +132,17 @@ model Module {
   threads       Thread[]
 }
 
+
+model Lesson {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  contentType   String
+  content       String
+  transcript    String?
+}
+
 model Requirement {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-
   parent   Module @relation(name: "parent", fields: [parentId], references: [id])
   parentId String
   child    Module @relation(name: "child", fields: [childId], references: [id])
