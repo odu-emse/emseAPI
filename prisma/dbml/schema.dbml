@@ -104,6 +104,14 @@ Table Module {
   planIds String[] [unique, not null]
   parentModules Requirement [not null]
   childModules Requirement [not null]
+}
+
+Table Lesson {
+  id String [pk]
+  name String [not null]
+  contentType String [not null]
+  content String [not null]
+  transcript String
   threads Thread [not null]
 }
 
@@ -169,7 +177,7 @@ Table Thread {
   author User [not null]
   authorID String [not null]
   upvotes Int [not null, default: 0]
-  parentLesson Module
+  parentLesson Lesson
   parentLessonID String
   parentThread Thread
   parentThreadID String
@@ -224,6 +232,6 @@ Ref: Thread.watcherID > User.id
 
 Ref: Thread.authorID > User.id
 
-Ref: Thread.parentLessonID > Module.id
+Ref: Thread.parentLessonID > Lesson.id
 
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]

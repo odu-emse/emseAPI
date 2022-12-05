@@ -33,7 +33,7 @@ type Thread {
     """
     TODO: Add linkage between lesson and thread once lesson schema is defined
     """
-    parentLesson: Module
+    parentLesson: Lesson
     """
     """
     createdAt: Date!

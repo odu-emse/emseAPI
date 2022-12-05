@@ -225,11 +225,6 @@ type Module {
 	Childmodules in the Module
 	"""
 	childModules: [Requirement]
-
-	"""
-	The list of threads related to the module
-	"""
-	threads: [Thread]
 }
 
 type Lesson {
@@ -253,6 +248,10 @@ type Lesson {
 	An optional transcript of the content data (primarily for videos)
 	"""
 	transcript: 	String
+    """
+    The list of threads related to the lesson
+    """
+    threads: [Thread]
 }
 
 type Requirement{
