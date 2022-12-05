@@ -11,6 +11,7 @@ on:
 
 jobs:
   test:
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -37,10 +38,12 @@ jobs:
           node-version: '18'
       - name: Install dependencies
         run: yarn
-      - name: Export environment variables
+      - name: Export DB URL
         run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
+      - name: Generate Prisma types
+        run: yarn db:generate
       - name: Build application
-        run: yarn build
+        run: yarn nest build
 
   coverage:
     needs: [test]
