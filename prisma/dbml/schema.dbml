@@ -106,6 +106,17 @@ Table Module {
   childModules Requirement [not null]
 }
 
+Table Collection {
+  id String [pk]
+  name String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  first String [not null]
+  last String [not null]
+  previous String [not null]
+  next String [not null]
+}
+
 Table Lesson {
   id String [pk]
   name String [not null]

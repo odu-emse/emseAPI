@@ -227,6 +227,53 @@ type Module {
 	childModules: [Requirement]
 }
 
+type Collection {
+    """
+    id of the collection
+    """
+    id: ID!
+
+    """
+    Name of the collection
+    """
+    name: String!
+
+    """
+    Date and Time of the collection created at
+    """
+    createdAt: Date!
+
+    """
+    Date and Time of the collection updated at
+    """
+    updatedAt: Date!
+
+    """
+    List of lessons in the collection
+    """
+    lessons: [Lesson]
+
+    """
+    The ID of the next collection
+    """
+    next: ID
+
+    """
+    The ID of the previous collection
+    """
+    previous: ID
+
+    """
+    The ID of the first lesson in the collection
+    """
+    first: ID
+
+    """
+    The ID of the last lesson in the collection
+    """
+    last: ID
+}
+
 type Lesson {
 	"""
 	document ID

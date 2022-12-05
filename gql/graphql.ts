@@ -391,6 +391,18 @@ export interface Module {
     childModules?: Nullable<Nullable<Requirement>[]>;
 }
 
+export interface Collection {
+    id: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    lessons?: Nullable<Nullable<Lesson>[]>;
+    next?: Nullable<string>;
+    previous?: Nullable<string>;
+    first?: Nullable<string>;
+    last?: Nullable<string>;
+}
+
 export interface Lesson {
     id: string;
     name: string;
