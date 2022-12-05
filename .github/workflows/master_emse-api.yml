@@ -51,7 +51,7 @@ jobs:
       - name: Generate types
         run: yarn generate
       - name: Run test suite
-        run: yarn test
+        run: yarn test --detectOpenHandles
   coverage:
     needs: [test]
     runs-on: ubuntu-latest
@@ -62,6 +62,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      - uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install dependencies
         run: yarn
       - name: Export environment variables
