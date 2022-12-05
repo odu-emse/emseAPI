@@ -534,6 +534,25 @@ export class ProgramService {
         })
     }
 
+    async collections() {
+        return this.prisma.collection.findMany({
+            include: {
+                lessons: true
+            }
+        });
+    }
+
+    async collection(id: string) {
+        return this.prisma.collection.findFirst({
+            where: {
+                id
+            },
+            include: {
+                lessons: true
+            }
+        });
+    }
+
     //Mutations
 
     /// Create a new module

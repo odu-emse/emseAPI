@@ -124,6 +124,16 @@ export class ProgramResolver {
 		return await this.programService.modEnrollmentByParam(args);
 	}
 
+	@Query("collections")
+	async collections() {
+		return await this.programService.collections();
+	}
+
+	@Query("collection")
+	async collection(@Args("id") id: string) {
+		return await this.programService.collection(id);
+	}
+
 	// Mutations
 
 	// Add a module to the db with all required initial fields

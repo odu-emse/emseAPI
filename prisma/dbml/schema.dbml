@@ -111,10 +111,11 @@ Table Collection {
   name String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
-  first String [not null]
-  last String [not null]
-  previous String [not null]
-  next String [not null]
+  first String
+  last String
+  previous String
+  next String
+  lessons Lesson [not null]
 }
 
 Table Lesson {
@@ -124,6 +125,8 @@ Table Lesson {
   content String [not null]
   transcript String
   threads Thread [not null]
+  collection Collection
+  collectionID String
 }
 
 Table Requirement {
@@ -218,6 +221,8 @@ Ref: ModuleInCourse.moduleId > Module.id
 Ref: ModuleInCourse.courseId > Course.id
 
 Ref: Module.planIds > PlanOfStudy.id
+
+Ref: Lesson.collectionID > Collection.id
 
 Ref: Requirement.parentId > Module.id
 

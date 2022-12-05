@@ -299,6 +299,8 @@ export interface IQuery {
     moduleEnrollments(): ModuleEnrollment[] | Promise<ModuleEnrollment[]>;
     moduleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
     modEnrollmentByParam(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
+    collections(): Collection[] | Promise<Collection[]>;
+    collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
     user(id: string): Nullable<User> | Promise<Nullable<User>>;
     users(): User[] | Promise<User[]>;
     usersByParam(input?: Nullable<UserFields>): Nullable<User[]> | Promise<Nullable<User[]>>;
@@ -410,6 +412,8 @@ export interface Lesson {
     content: string;
     transcript?: Nullable<string>;
     threads?: Nullable<Nullable<Thread>[]>;
+    collection?: Nullable<Collection>;
+    collectionID?: Nullable<string>;
 }
 
 export interface Requirement {

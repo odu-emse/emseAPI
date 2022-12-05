@@ -299,6 +299,16 @@ type Lesson {
     The list of threads related to the lesson
     """
     threads: [Thread]
+
+    """
+    The collection that the lesson belongs to
+    """
+    collection: Collection
+
+    """
+    The ID of the parent collection
+    """
+    collectionID: ID
 }
 
 type Requirement{
@@ -409,6 +419,15 @@ type Query {
 
     modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
 
+    """
+    List of all collections
+    """
+    collections: [Collection!]!
+
+    """
+    Retrieve a specific collection based on document ID
+    """
+    collection(id: ID!): Collection
 }
 
 input ModuleFields {
