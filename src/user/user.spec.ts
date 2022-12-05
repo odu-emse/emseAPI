@@ -1,8 +1,8 @@
 import {UserService} from "./user.service";
 import {UserResolver} from "./user.resolver";
-import {PrismaService} from "../prisma.service";
+import {PrismaService} from "@/prisma.service";
 import {JwtService} from "@nestjs/jwt";
-import {Social, UpdateUser, User, InstructorProfileInput, SocialInput} from "../../gql/graphql";
+import {Social, UpdateUser, User, InstructorProfileInput, SocialInput} from "@/types/graphql";
 
 describe("Account services", () => {
     let service: UserService;
