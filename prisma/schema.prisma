@@ -36,7 +36,7 @@ model User {
   watchedThreads    Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
   watchedThreadIDs  String[]           @default([]) @db.ObjectId
   createdThreads    Thread[]           @relation(name: "createdThreads")
-//  createdComments   Comment[]          @relation(name: "createdComments")
+  //  createdComments   Comment[]          @relation(name: "createdComments")
 }
 
 model InstructorProfile {
@@ -129,20 +129,38 @@ model Module {
   planIds       String[]           @unique @db.ObjectId
   parentModules Requirement[]      @relation(name: "child")
   childModules  Requirement[]      @relation(name: "parent")
+  collections Collection[]  @relation(name: "collections")
 }
 
+model Collection {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  first     String?   @db.ObjectId
+  last      String?   @db.ObjectId
+  previous  String?   @db.ObjectId
+  next      String?   @db.ObjectId
+
+  // Relation fields
+  lessons Lesson[]
+  module Module @relation(name: "collections", fields: [moduleID], references: [id])
+  moduleID String @db.ObjectId
+}
 
 model Lesson {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  contentType   String
-  content       String
-  transcript    String?
-  threads       Thread[]
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  contentType String
+  content     String
+  transcript  String?
+  threads     Thread[]
+  collection  Collection? @relation(fields: [collectionID], references: [id])
+  collectionID String? @db.ObjectId
 }
 
 model Requirement {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   parent   Module @relation(name: "parent", fields: [parentId], references: [id])
   parentId String
   child    Module @relation(name: "child", fields: [childId], references: [id])
@@ -200,22 +218,22 @@ model AssignmentResult {
 }
 
 model Thread {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @default(now()) @updatedAt
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
   title          String?
   body           String
-  usersWatching  User[]    @relation(fields: [watcherID], references: [id])
-  watcherID      String[]  @default([]) @db.ObjectId
-  author         User      @relation(name: "createdThreads", fields: [authorID], references: [id])
-  authorID       String    @db.ObjectId
-  upvotes        Int       @default(0)
-  parentLesson   Lesson?   @relation(fields: [parentLessonID], references: [id])
-  parentLessonID String?   @db.ObjectId
+  usersWatching  User[]   @relation(fields: [watcherID], references: [id])
+  watcherID      String[] @default([]) @db.ObjectId
+  author         User     @relation(name: "createdThreads", fields: [authorID], references: [id])
+  authorID       String   @db.ObjectId
+  upvotes        Int      @default(0)
+  parentLesson   Lesson?  @relation(fields: [parentLessonID], references: [id])
+  parentLessonID String?  @db.ObjectId
 
-  parentThread Thread?  @relation("subComments", fields: [parentThreadID], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  parentThreadID String? @db.ObjectId
-  comments Thread[] @relation("subComments")
+  parentThread   Thread?  @relation("subComments", fields: [parentThreadID], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentThreadID String?  @db.ObjectId
+  comments       Thread[] @relation("subComments")
 }
 
 enum UserRole {

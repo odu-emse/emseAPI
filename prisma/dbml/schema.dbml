@@ -104,6 +104,21 @@ Table Module {
   planIds String[] [unique, not null]
   parentModules Requirement [not null]
   childModules Requirement [not null]
+  collections Collection [not null]
+}
+
+Table Collection {
+  id String [pk]
+  name String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  first String
+  last String
+  previous String
+  next String
+  lessons Lesson [not null]
+  module Module [not null]
+  moduleID String [not null]
 }
 
 Table Lesson {
@@ -113,6 +128,8 @@ Table Lesson {
   content String [not null]
   transcript String
   threads Thread [not null]
+  collection Collection
+  collectionID String
 }
 
 Table Requirement {
@@ -207,6 +224,10 @@ Ref: ModuleInCourse.moduleId > Module.id
 Ref: ModuleInCourse.courseId > Course.id
 
 Ref: Module.planIds > PlanOfStudy.id
+
+Ref: Collection.moduleID > Module.id
+
+Ref: Lesson.collectionID > Collection.id
 
 Ref: Requirement.parentId > Module.id
 

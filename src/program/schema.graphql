@@ -225,6 +225,63 @@ type Module {
 	Childmodules in the Module
 	"""
 	childModules: [Requirement]
+    """
+    A list of collections that have this module's materials
+    """
+    collections: [Collection]
+}
+
+type Collection {
+    """
+    id of the collection
+    """
+    id: ID!
+
+    """
+    Name of the collection
+    """
+    name: String!
+
+    """
+    Date and Time of the collection created at
+    """
+    createdAt: Date!
+
+    """
+    Date and Time of the collection updated at
+    """
+    updatedAt: Date!
+
+    """
+    List of lessons in the collection
+    """
+    lessons: [Lesson]
+
+    """
+    The ID of the next collection
+    """
+    next: ID
+
+    """
+    The ID of the previous collection
+    """
+    previous: ID
+
+    """
+    The ID of the first lesson in the collection
+    """
+    first: ID
+
+    """
+    The ID of the last lesson in the collection
+    """
+    last: ID
+    """
+    """
+    module: Module!
+    """
+    """
+    moduleID: ID!
 }
 
 type Lesson {
@@ -252,6 +309,16 @@ type Lesson {
     The list of threads related to the lesson
     """
     threads: [Thread]
+
+    """
+    The collection that the lesson belongs to
+    """
+    collection: Collection
+
+    """
+    The ID of the parent collection
+    """
+    collectionID: ID
 }
 
 type Requirement{
@@ -362,6 +429,26 @@ type Query {
 
     modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
 
+    """
+    List of all collections
+    """
+    collections: [Collection!]!
+
+    """
+    Retrieve a specific collection based on document ID
+    """
+    collection(id: ID!): Collection
+}
+
+input CreateCollectionArgs {
+    name: String!
+    first: ID
+    last: ID
+    previous: ID
+    next: ID
+    moduleID: ID!
+    lessons: [ID!]
+    positionIndex: Int
 }
 
 input ModuleFields {
@@ -682,7 +769,7 @@ type Mutation {
         """
         id: ID!
         """
-        Module enrollement input
+        Module enrollment input
         """
         input: ModuleEnrollmentInput
     ): ModuleEnrollment
@@ -699,4 +786,7 @@ type Mutation {
     Course Module is Unpaired Relating to Course Id and mobile Id
     """
     unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
+    """
+    """
+    createCollection(data: CreateCollectionArgs!): Collection!
 }
