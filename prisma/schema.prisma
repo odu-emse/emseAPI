@@ -129,6 +129,7 @@ model Module {
   planIds       String[]           @unique @db.ObjectId
   parentModules Requirement[]      @relation(name: "child")
   childModules  Requirement[]      @relation(name: "parent")
+  collections Collection[]  @relation(name: "collections")
 }
 
 model Collection {
@@ -143,6 +144,8 @@ model Collection {
 
   // Relation fields
   lessons Lesson[]
+  module Module @relation(name: "collections", fields: [moduleID], references: [id])
+  moduleID String @db.ObjectId
 }
 
 model Lesson {

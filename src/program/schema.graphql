@@ -225,6 +225,10 @@ type Module {
 	Childmodules in the Module
 	"""
 	childModules: [Requirement]
+    """
+    A list of collections that have this module's materials
+    """
+    collections: [Collection]
 }
 
 type Collection {
@@ -272,6 +276,12 @@ type Collection {
     The ID of the last lesson in the collection
     """
     last: ID
+    """
+    """
+    module: Module!
+    """
+    """
+    moduleID: ID!
 }
 
 type Lesson {
@@ -428,6 +438,17 @@ type Query {
     Retrieve a specific collection based on document ID
     """
     collection(id: ID!): Collection
+}
+
+input CreateCollectionArgs {
+    name: String!
+    first: ID
+    last: ID
+    previous: ID
+    next: ID
+    moduleID: ID!
+    lessons: [ID!]
+    positionIndex: Int
 }
 
 input ModuleFields {
@@ -748,7 +769,7 @@ type Mutation {
         """
         id: ID!
         """
-        Module enrollement input
+        Module enrollment input
         """
         input: ModuleEnrollmentInput
     ): ModuleEnrollment
@@ -765,4 +786,7 @@ type Mutation {
     Course Module is Unpaired Relating to Course Id and mobile Id
     """
     unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
+    """
+    """
+    createCollection(data: CreateCollectionArgs!): Collection!
 }

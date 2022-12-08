@@ -33,6 +33,17 @@ export interface PlanFields {
     modulesLeft?: Nullable<string>;
 }
 
+export interface CreateCollectionArgs {
+    name: string;
+    first?: Nullable<string>;
+    last?: Nullable<string>;
+    previous?: Nullable<string>;
+    next?: Nullable<string>;
+    moduleID: string;
+    lessons?: Nullable<string[]>;
+    positionIndex?: Nullable<number>;
+}
+
 export interface ModuleFields {
     id?: Nullable<string>;
     moduleNumber?: Nullable<number>;
@@ -262,6 +273,7 @@ export interface IMutation {
     deleteModuleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
     pairCourseModule(courseId: string, moduleId: string): ModuleInCourse | Promise<ModuleInCourse>;
     unpairCourseModule(courseId: string, moduleId: string): Nullable<ModuleInCourse> | Promise<Nullable<ModuleInCourse>>;
+    createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -391,6 +403,7 @@ export interface Module {
     parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
     parentModules?: Nullable<Nullable<Requirement>[]>;
     childModules?: Nullable<Nullable<Requirement>[]>;
+    collections?: Nullable<Nullable<Collection>[]>;
 }
 
 export interface Collection {
@@ -403,6 +416,8 @@ export interface Collection {
     previous?: Nullable<string>;
     first?: Nullable<string>;
     last?: Nullable<string>;
+    module: Module;
+    moduleID: string;
 }
 
 export interface Lesson {

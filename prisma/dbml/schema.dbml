@@ -104,6 +104,7 @@ Table Module {
   planIds String[] [unique, not null]
   parentModules Requirement [not null]
   childModules Requirement [not null]
+  collections Collection [not null]
 }
 
 Table Collection {
@@ -116,6 +117,8 @@ Table Collection {
   previous String
   next String
   lessons Lesson [not null]
+  module Module [not null]
+  moduleID String [not null]
 }
 
 Table Lesson {
@@ -221,6 +224,8 @@ Ref: ModuleInCourse.moduleId > Module.id
 Ref: ModuleInCourse.courseId > Course.id
 
 Ref: Module.planIds > PlanOfStudy.id
+
+Ref: Collection.moduleID > Module.id
 
 Ref: Lesson.collectionID > Collection.id
 
