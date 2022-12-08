@@ -1,7 +1,7 @@
 import moment from "moment";
 import {ProgramService} from "./program.service";
 import {ProgramResolver} from "./program.resolver";
-import {PrismaService} from "../prisma.service";
+import {PrismaService} from "@/prisma.service";
 import {
     Assignment,
     Module,
@@ -10,8 +10,9 @@ import {
     Course,
     PlanOfStudy,
     User,
-    ModuleFeedback
+    ModuleFeedback, CreateCollectionArgs
 } from "gql/graphql";
+import {Prisma} from "@prisma/client";
 
 interface IAssignment extends Assignment {
     id: string;
@@ -288,3 +289,94 @@ describe("Plan services", () => {
         })
     })
 });
+
+describe("Collection", () => {
+    let service: ProgramService;
+    let resolver: ProgramResolver;
+    let prisma: PrismaService;
+    prisma = new PrismaService();
+
+    const createModule = async (input: Prisma.ModuleCreateInput) => {
+        return await resolver.create(input);
+    }
+
+    const createCollection = async (input: CreateCollectionArgs) => {
+        return await resolver.createCollection(input);
+    }
+
+    const deleteModule = async (id: string) => {
+        return await prisma.module.delete({
+            where: { id },
+        });
+    }
+
+    const deleteCollection = async (id: string) => {
+        return await prisma.collection.delete({
+            where: { id },
+        });
+    }
+
+    const lessons = [
+        "639217c90482bbfb9aba86cc",
+        "639217e70482bbfb9aba86d0",
+        "639217e70482bbfb9aba86d1",
+        "639217e70482bbfb9aba86d2"
+    ]
+
+    let testingCollectionID: string;
+    let testingModuleID: string;
+
+    beforeAll(async () => {
+        service = new ProgramService(prisma);
+        resolver = new ProgramResolver(service);
+
+        const module = await createModule({
+            moduleName: "Test Module",
+            moduleNumber: 1,
+            duration: 1,
+            intro: "Test Intro",
+            numSlides: 1,
+            description: "Test Description",
+        })
+
+        testingModuleID = module.id;
+
+        const collection = await createCollection({
+            name: "Test Collection",
+            moduleID: testingModuleID,
+            lessons
+        })
+
+        testingCollectionID = collection.id;
+    });
+    afterAll(async () => {
+        await deleteCollection(testingCollectionID);
+        await deleteModule(testingModuleID);
+        prisma.$disconnect();
+    })
+    it("should return an array of collections", async () => {
+        expect(await resolver.collections()).toBeDefined();
+        expect(await resolver.collections()).toBeInstanceOf(Array);
+    })
+    it("should return a collection", async () => {
+        const collection = await resolver.collection(testingCollectionID)
+        expect(collection).toBeDefined();
+        if (collection) {
+            expect(collection.id).toBe(testingCollectionID);
+            expect(collection.name).toBeDefined();
+            expect(collection.moduleID).toBeDefined()
+            expect(await resolver.module(collection.moduleID)).toBeDefined();
+        }
+    })
+    it('should populate first and last lessons properties', async () => {
+        const coll = await resolver.collection(testingCollectionID)
+        expect(coll).toBeDefined();
+        if (coll) {
+            expect(coll.first).toEqual(lessons.at(0));
+            expect(coll.last).toEqual(lessons.at(-1));
+        }
+    });
+    it('should populate previous and next based on module ID', function () {
+        expect(true).toBe(true);
+    });
+})

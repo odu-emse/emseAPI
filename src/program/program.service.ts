@@ -574,7 +574,10 @@ export class ProgramService {
             }
         )
         return this.prisma.collection.create({
-            data: create
+            data: create,
+            include: {
+                lessons: true
+            }
         });
     }
 
@@ -618,7 +621,8 @@ export class ProgramService {
                         include: {
                             plan: true
                         }
-                    }
+                    },
+                    collections: true
                 }
             });
         }
