@@ -17,10 +17,10 @@ import {
     Assignment,
     ModuleInCourse,
     ModuleFeedback,
-    ModuleEnrollment,
+    ModuleEnrollment, CreateCollectionArgs,
 } from "gql/graphql";
 import {Injectable} from "@nestjs/common";
-import {PrismaService} from "../prisma.service";
+import {PrismaService} from "@/prisma.service";
 import {Prisma} from "@prisma/client";
 
 @Injectable()
@@ -100,7 +100,8 @@ export class ProgramService {
                                 }
                             }
                         }
-                    }
+                    },
+                    collections: true
                 }
             }) as Prisma.ModuleGetPayload<{}>;
         } else {
@@ -550,6 +551,39 @@ export class ProgramService {
             include: {
                 lessons: true
             }
+        });
+    }
+
+    async createCollection({name, lessons, next, previous, moduleID}:CreateCollectionArgs) {
+        const create = Prisma.validator<Prisma.CollectionCreateInput>()({
+                name,
+                first: lessons?.at(0),
+                last: lessons?.at(-1),
+                previous,
+                next,
+                module: {
+                    connect: {
+                        id: moduleID
+                    }
+                },
+                lessons: {
+                    connect: lessons?.map((lesson) => {
+                        return {id: lesson}
+                    })
+                }
+            }
+        )
+        return this.prisma.collection.create({
+            data: create
+        });
+    }
+
+    async updateCollection(id: string, data: any) {
+        return this.prisma.collection.update({
+            where: {
+                id
+            },
+            data
         });
     }
 
