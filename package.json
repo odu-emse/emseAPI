@@ -89,17 +89,5 @@
 		"ts-node-dev": "^1.1.6",
 		"tsconfig-paths": "^3.11.0"
 	},
-	"browserslist": ["> 0.25%", "not dead"],
-	"jest": {
-		"moduleFileExtensions": [
-			"ts",
-			"js"
-		],
-		"rootDir": "./src",
-		"transform": {
-			"^.+\\.ts$": "ts-jest"
-		},
-		"testRegex": ".*\\.spec\\.ts$",
-		"testEnvironment": "node"
-	}
+	"browserslist": ["> 0.25%", "not dead"]
 }

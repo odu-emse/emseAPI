@@ -1,7 +1,7 @@
 import {PoSService} from "./pos.service";
 import {PlanOfStudyResolver} from "./pos.resolver";
-import {PrismaService} from "../prisma.service";
-import {PlanOfStudy} from "../../gql/graphql";
+import {PrismaService} from "@/prisma.service";
+import {PlanOfStudy} from "@/types/graphql";
 
 describe("Plan services", () => {
     let service: PoSService;

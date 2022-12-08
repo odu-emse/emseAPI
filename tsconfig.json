@@ -19,10 +19,11 @@
 		"rootDir": "./",
 		"incremental": true,
 		"skipLibCheck": true,
+		"resolveJsonModule": true,
 		"paths": {
 			"@/*": ["src/*"],
-			"@/types/*": ["gql/*"],
+			"@/types/*": ["gql/*"]
 		}
 	},
-	"exclude": ["node_modules"],
+	"exclude": ["node_modules"]
 }
