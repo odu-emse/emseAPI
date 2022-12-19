@@ -3,7 +3,7 @@ import {CommunityService} from "./community.service";
 import {Prisma} from '@prisma/client';
 import {UseGuards} from "@nestjs/common";
 import {AuthGuard} from "../auth.guard";
-import {IThreadCreateInput} from "../../gql/graphql";
+import {IThreadCreateInput} from "@/types/graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)

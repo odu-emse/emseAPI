@@ -37,12 +37,20 @@ export class CommunityService {
             author: true
         })
 
+        try {
         return await this.prisma.thread.findUniqueOrThrow({
             where: {
                 id
             },
             include
         })
+        }
+        catch (e) {
+            if(e instanceof Prisma.PrismaClientKnownRequestError) {
+                console.log(e.code)
+            }
+            throw e
+        }
     }
 
     async createThread(data: IThreadCreateInput) {
