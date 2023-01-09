@@ -10,8 +10,8 @@
 		"typings": "ts-node gql/generate-typings.ts",
 		"generate": "yarn typings && yarn db:generate",
 		"generate:watch": "concurrently -n \"types,schema\" -c \"bgBlue.bold,bgMagenta.bold\" \"export WATCH=\"true\" && yarn typings\" \"yarn db:generate --watch\"",
-		"test": "jest",
-		"test:watch": "jest --watch",
+		"test": "vitest",
+		"test:watch": "vitest --watch",
 		"test:cov": "jest --coverage true",
 		"db:generate": "npx prisma generate",
 		"db:studio": "npx prisma studio --browser none --port 5555",
@@ -73,6 +73,8 @@
 		"@types/jest": "^28.1.7",
 		"@types/jsonwebtoken": "^8.5.1",
 		"@types/ms": "^0.7.31",
+		"@vitest/coverage-c8": "^0.27.0",
+		"@vitest/coverage-istanbul": "^0.27.0",
 		"babel-preset-env": "^1.7.0",
 		"babel-preset-es2015": "^6.22.0",
 		"babel-preset-stage-2": "^6.22.0",
@@ -87,7 +89,12 @@
 		"ts-jest": "^28.0.8",
 		"ts-node": "^10.9.1",
 		"ts-node-dev": "^1.1.6",
-		"tsconfig-paths": "^3.11.0"
+		"tsconfig-paths": "^3.11.0",
+		"vite-tsconfig-paths": "^4.0.3",
+		"vitest": "^0.27.0"
 	},
-	"browserslist": ["> 0.25%", "not dead"]
+	"browserslist": [
+		"> 0.25%",
+		"not dead"
+	]
 }
