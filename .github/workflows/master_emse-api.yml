@@ -51,7 +51,7 @@ jobs:
       - name: Generate types
         run: yarn generate
       - name: Run test suite
-        run: yarn test --detectOpenHandles
+        run: yarn test
   coverage:
     needs: [test]
     runs-on: ubuntu-latest
