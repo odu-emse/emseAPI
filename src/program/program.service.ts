@@ -925,10 +925,12 @@ export class ProgramService {
 
     // Link a course and a module
     async pairCourseModule(courseId: string, moduleId: string) {
-        return this.prisma.moduleInCourse.create({
+        return this.prisma.module.update({
+            where: {
+                id: moduleId
+            },
             data: {
-                moduleId: moduleId,
-                courseId: courseId
+                connect: [{ id: courseId }],
             }
         });
     }
