@@ -1,55 +1,121 @@
-import {PrismaService} from "@/prisma.service";
-import {CommunityResolver, CommunityService} from "@/community";
+import { PrismaService } from "@/prisma.service";
+import { CommunityResolver, CommunityService } from "@/community";
+import { IThreadCreateInput } from "@/types/graphql";
+import { AuthService } from "@/auth/auth.service";
+import { UserService } from "@/user/user.service";
 
-describe('Community', () => {
-    let service: CommunityService;
-    let resolver: CommunityResolver;
-    let testingThreadID: string
-    let prisma: PrismaService = new PrismaService()
+describe("Community", () => {
+	let service: CommunityService;
+	let resolver: CommunityResolver;
+	let auth: AuthService;
+	let user: UserService;
+	let testingThreadID: string;
+	let prisma: PrismaService = new PrismaService();
 
-    const pickRandomFromArray = (arr: any[]): number => {
-        return Math.floor(Math.random() * arr.length);
-    }
+	let accountID: string;
+	let threadID: string;
 
-    const shuffle = str => [...str].sort(() => Math.random() - .5).join('');
+	const pickRandomFromArray = (arr: any[]): number => {
+		return Math.floor(Math.random() * arr.length);
+	};
 
-    beforeEach(async () => {
-        service = new CommunityService(prisma);
-        resolver = new CommunityResolver(service);
-    });
+	const shuffle = (str) => [...str].sort(() => Math.random() - 0.5).join("");
 
-    afterEach(async () => {
-        await prisma.$disconnect()
-    })
+	const createThread = async (input: IThreadCreateInput) => {
+		return await resolver.createThread(input);
+	};
 
-    it('should be defined', () => {
-        expect(resolver).toBeDefined();
-    });
-    it('should return an array of threads', async () => {
-        const threads = await resolver.threads();
-        expect(threads).toBeInstanceOf(Array);
+	const deleteThread = async (id: string) => {
+		return await resolver.deleteThread(id);
+	};
 
-        testingThreadID = threads[pickRandomFromArray(threads)].id;
+	const deleteUser = async (id: string) => {
+		return await user.deleteUser(id);
+	};
 
-        expect(threads[pickRandomFromArray(threads)].comments).toBeInstanceOf(Array);
-        expect(threads[pickRandomFromArray(threads)].usersWatching).toBeInstanceOf(Array);
-        expect(threads[pickRandomFromArray(threads)].author).toBeInstanceOf(Object);
-    });
-    //TODO: figure out how to test for error throwing
-    //
-    // it('should throw an error when ID is not found', async () => {
-    //     const thread = await resolver.thread(shuffle(testingThreadID))
-    //     expect(thread).toThrowError();
-    // });
-    it('should return the threads requested by ID', async () => {
-        const thread = await resolver.thread(testingThreadID);
-        expect(thread).toBeInstanceOf(Object);
-        expect(thread.comments).toBeInstanceOf(Array);
-        expect(thread.usersWatching).toBeInstanceOf(Array);
-        expect(thread.author).toBeInstanceOf(Object);
-    });
+	const createUser = async () => {
+		return await auth.registerUser({
+			email:
+				shuffle(
+					"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+				) + "@test.com",
+			openID: shuffle(
+				"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+			),
+			firstName: "Testing",
+			lastName: "Account",
+			middleName: "",
+			picURL: ""
+		});
+	};
+
+	beforeEach(async () => {
+		service = new CommunityService(prisma);
+		resolver = new CommunityResolver(service);
+		auth = new AuthService(prisma);
+		user = new UserService(prisma);
+	});
+
+	afterEach(async () => {
+		await prisma.$disconnect();
+	});
+
+	afterAll(async () => {
+		await deleteThread(threadID);
+		await deleteUser(accountID);
+	});
+
+	it("should be defined", () => {
+		expect(resolver).toBeDefined();
+	});
+	it("should return an array of threads", async () => {
+		const threads = await resolver.threads();
+		expect(threads).toBeInstanceOf(Array);
+
+		testingThreadID = threads[pickRandomFromArray(threads)].id;
+
+		expect(threads[pickRandomFromArray(threads)].comments).toBeInstanceOf(
+			Array
+		);
+		expect(threads[pickRandomFromArray(threads)].usersWatching).toBeInstanceOf(
+			Array
+		);
+		expect(threads[pickRandomFromArray(threads)].author).toBeInstanceOf(Object);
+	});
+	//TODO: figure out how to test for error throwing
+	//
+	// it('should throw an error when ID is not found', async () => {
+	//     const thread = await resolver.thread(shuffle(testingThreadID))
+	//     expect(thread).toThrowError();
+	// });
+	it("should return the threads requested by ID", async () => {
+		const thread = await resolver.thread(testingThreadID);
+		expect(thread).toBeInstanceOf(Object);
+		expect(thread.comments).toBeInstanceOf(Array);
+		expect(thread.usersWatching).toBeInstanceOf(Array);
+		expect(thread.author).toBeInstanceOf(Object);
+	});
+	it("should create a thread with author", async () => {
+		const account = await createUser();
+		if ("id" in account) {
+			const thread = await createThread({
+				title: "This is a test thread",
+				body: "We are inserting this data from a test case, and this data should have been removed after the test case has finished.",
+				author: account.id
+			});
+			threadID = thread.id;
+			accountID = account.id;
+			expect(thread).toHaveProperty("title");
+			expect(thread).toHaveProperty("body");
+			expect(thread).toHaveProperty("author");
+			expect(thread.author.id === account.id).toBe(true);
+			expect(thread.watcherID.includes(account.id)).toBe(true);
+			expect(thread.parentThreadID).toBeNull();
+			expect(thread.parentLessonID).toBeNull();
+			expect(thread.author.watchedThreadIDs.includes(thread.id)).toBe(true);
+		}
+	});
 });
-
 
 // const createModule = async (input: Prisma.ModuleCreateInput) => {
 //   return await resolver.create(input);
