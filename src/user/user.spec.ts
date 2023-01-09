@@ -54,7 +54,6 @@ describe("Account services", () => {
 		prisma = new PrismaService();
 		service = new UserService(prisma);
 		resolver = new UserResolver(service);
-		jest.setTimeout(6000);
 	});
 	afterAll(async () => {
 		await resolver.update(userResetInput);

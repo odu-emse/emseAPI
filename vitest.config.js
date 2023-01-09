@@ -11,7 +11,8 @@ export default defineConfig({
 			provider: "c8",
 			reporter: ["text", "html", "lcov"],
 			reportsDirectory: "coverage"
-		}
+		},
+		reporters: ["verbose"]
 	},
 	plugins: [tsconfigPaths()]
 });

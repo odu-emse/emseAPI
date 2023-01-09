@@ -23,7 +23,8 @@
 		"paths": {
 			"@/*": ["src/*"],
 			"@/types/*": ["gql/*"]
-		}
+		},
+		"types": ["vitest/globals", "node"]
 	},
 	"exclude": ["node_modules"]
 }
