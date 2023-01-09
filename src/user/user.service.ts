@@ -9,7 +9,6 @@ import type {
 	UserFields,
 	SocialFields
 } from "gql/graphql";
-import { JwtService } from "@nestjs/jwt";
 import moment from "moment";
 
 @Injectable()
