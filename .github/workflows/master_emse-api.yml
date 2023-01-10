@@ -73,7 +73,7 @@ jobs:
       - name: Build types
         run: yarn generate
       - name: Run tests and collect coverage
-        run: yarn test:cov
+        run: yarn jest --coverage
       - name: Upload coverage reports to Codecov
         run: |
           curl -Os https://uploader.codecov.io/latest/linux/codecov
