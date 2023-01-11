@@ -71,18 +71,11 @@ Table Token {
   userId String [not null]
 }
 
-Table ModuleInCourse {
-  id String [pk]
-  module Module [not null]
-  moduleId String [not null]
-  course Course [not null]
-  courseId String [not null]
-}
-
 Table Course {
   id String [pk]
   name String [not null]
-  modules ModuleInCourse [not null]
+  moduleIDs String[] [not null]
+  module Module [not null]
 }
 
 Table Module {
@@ -99,12 +92,13 @@ Table Module {
   members ModuleEnrollment [not null]
   assignments Assignment [not null]
   feedback ModuleFeedback [not null]
-  parentCourses ModuleInCourse [not null]
   plan PlanOfStudy [not null]
   planIds String[] [unique, not null]
   parentModules Requirement [not null]
   childModules Requirement [not null]
   collections Collection [not null]
+  courseIDs String[] [not null]
+  course Course [not null]
 }
 
 Table Collection {
@@ -219,11 +213,11 @@ Ref: Social.accountID - User.id
 
 Ref: Token.userId > User.id
 
-Ref: ModuleInCourse.moduleId > Module.id
-
-Ref: ModuleInCourse.courseId > Course.id
+Ref: Course.moduleIDs > Module.id
 
 Ref: Module.planIds > PlanOfStudy.id
+
+Ref: Module.courseIDs > Course.id
 
 Ref: Collection.moduleID > Module.id
 

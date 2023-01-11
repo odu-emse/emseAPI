@@ -116,7 +116,6 @@ describe("Plan services", () => {
                 expect(Array.isArray(module!.keywords)).toBe(true);
                 expect(Array.isArray(module!.feedback)).toBe(true);
                 expect(Array.isArray(module!.members)).toBe(true);
-                expect(Array.isArray(module!.parentCourses)).toBe(true);
             });
         });
     })
@@ -154,9 +153,9 @@ describe("Plan services", () => {
             it('should return modules related to the course', async () => {
                 const courses = await resolver.courses();
                 courses.map(course => {
-                    expect(course.modules).toBeDefined();
-                    expect(course.modules).toBeInstanceOf(Array);
-                    expect(course.modules!.length).toBeGreaterThanOrEqual(1);
+                    expect(course.moduleIDs).toBeDefined();
+                    expect(course.moduleIDs).toBeInstanceOf(Array);
+                    expect(course.moduleIDs!.length).toBeGreaterThanOrEqual(1);
                     testingCourseID = course.id;
                 });
             });
@@ -173,7 +172,7 @@ describe("Plan services", () => {
                 expect(course).toBeDefined();
                 expect(course!.id).toBe(testingCourseID);
                 expect(course!.name).toBeDefined();
-                expect(Array.isArray(course!.modules)).toBe(true);
+                expect(Array.isArray(course!.moduleIDs)).toBe(true);
             });
         });
     })

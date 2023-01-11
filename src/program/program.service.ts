@@ -15,7 +15,6 @@ import {
     Module,
     Course,
     Assignment,
-    ModuleInCourse,
     ModuleFeedback,
     ModuleEnrollment, CreateCollectionArgs,
 } from "gql/graphql";
@@ -33,7 +32,7 @@ export class ProgramService {
         return this.prisma.module.findMany({
             include: {
                 assignments: true,
-                parentCourses: true,
+                // parentCourses: true,
                 feedback: true,
                 members: true
             } as Prisma.ModuleInclude
@@ -64,7 +63,6 @@ export class ProgramService {
                             }
                         }
                     },
-                    parentCourses: true,
                     feedback: {
                         include: {
                             student: {
@@ -203,7 +201,6 @@ export class ProgramService {
                 assignments: true,
                 members: true,
                 feedback: true,
-                parentCourses: true,
                 //@ts-ignore
                 parentModules: true,
                 childModules: true
@@ -217,8 +214,6 @@ export class ProgramService {
                 id
             },
             include: {
-                modules: {
-                    include: {
                         module: {
                             include: {
                                 assignments: true,
@@ -226,11 +221,6 @@ export class ProgramService {
                                     include: {
                                         student: true,
                                         module: false
-                                    }
-                                },
-                                parentCourses: {
-                                    include: {
-                                        course: true
                                     }
                                 },
                                 members: {
@@ -241,18 +231,13 @@ export class ProgramService {
                                 }
                             }
                         },
-                        course: false
                     }
-                },
-            }
         });
     }
 
     async courses(): Promise<Course[]> {
         return this.prisma.course.findMany({
             include: {
-                modules: {
-                    include: {
                         module: {
                             include: {
                                 assignments: true,
@@ -260,11 +245,6 @@ export class ProgramService {
                                     include: {
                                         student: true,
                                         module: false
-                                    }
-                                },
-                                parentCourses: {
-                                    include: {
-                                        course: true
                                     }
                                 },
                                 members: {
@@ -275,9 +255,6 @@ export class ProgramService {
                                 }
                             }
                         },
-                        course: false
-                    }
-                },
             }
         });
     }
@@ -305,7 +282,7 @@ export class ProgramService {
         return this.prisma.course.findMany({
             where: payload,
             include: {
-                modules: true
+                module: true
             }
         })
     }
@@ -364,15 +341,6 @@ export class ProgramService {
             }
         })
 
-    }
-
-    async moduleInCourses(): Promise<ModuleInCourse[]> {
-        return this.prisma.moduleInCourse.findMany({
-            // include: {
-            // 	// module: true,
-            // 	// course: true
-            // }
-        });
     }
 
     async moduleFeedbacks(){
@@ -607,11 +575,6 @@ export class ProgramService {
                 data,
                 include: {
                     assignments: true,
-                    parentCourses: {
-                        include: {
-                            course: true
-                        }
-                    },
                     feedback: {
                         include: {
                             student: true
@@ -653,11 +616,6 @@ export class ProgramService {
             },
             include: {
                 assignments: true,
-                parentCourses: {
-                    include: {
-                        course: true
-                    }
-                },
                 feedback: {
                     include: {
                         student: true
@@ -718,12 +676,12 @@ export class ProgramService {
                 id
             },
             data: {
-                modules: {
+                module: {
                     deleteMany: {}
                 }
             },
             include: {
-                modules: true
+                module: true
             }
         });
 
@@ -925,23 +883,78 @@ export class ProgramService {
 
     // Link a course and a module
     async pairCourseModule(courseId: string, moduleId: string) {
+        let count = await this.prisma.module.count({
+            where: {
+                id: moduleId,
+                course: {
+                    some: {
+                        id: courseId
+                    }
+                }
+            },
+        })
+
+        if (count != 0) {
+            throw new Error("Module and Course are already Linked.")
+        }
+
+        await this.prisma.course.update({
+            where: {
+                id: courseId
+            },
+            data: {
+                moduleIDs: {
+                    push: moduleId
+                }
+            }
+        });
+
         return this.prisma.module.update({
             where: {
                 id: moduleId
             },
             data: {
-                connect: [{ id: courseId }],
+                courseIDs: {
+                    push: courseId
+                }
             }
         });
     }
 
     async unpairCourseModule(courseId: string, moduleId: string) {
-        return this.prisma.moduleInCourse.deleteMany({
+        const courseIdToRemove = await this.prisma.course.findUnique({
             where: {
-                moduleId: moduleId,
-                courseId: courseId
-            }
+                id: courseId,
+            },
         });
+
+        const newModuleSet = (courseIdToRemove !== null) ? courseIdToRemove.moduleIDs.filter((module) => module !== moduleId) : null;
+
+        const moduleIdToRemove = await this.prisma.module.findUnique({
+            where: {
+                id: moduleId,
+            },
+        });
+
+        const newCourseSet = (moduleIdToRemove !== null) ? moduleIdToRemove.courseIDs.filter((course) => course !== courseId) : null;
+
+        await this.prisma.course.update({
+            where: {
+                id: courseId
+            },
+            data: {
+                moduleIDs: newModuleSet !== null ? newModuleSet : undefined
+            }
+        })
+
+        return this.prisma.module.update({
+            where: {
+                id: moduleId
+            },
+            data: {
+                courseIDs: newCourseSet !== null ? newCourseSet : undefined
+            },
+        })
     }
 
     async Addrequirement(parentId: string, childId: string) {

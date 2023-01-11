@@ -141,7 +141,7 @@ type Course {
 	"""
 	modules in the course
 	"""
-	modules: [ID]
+	moduleIDs: [ID]
 }
 
 type Module {
@@ -225,6 +225,11 @@ type Module {
 	A list of collections that have this module's materials
 	"""
 	collections: [Collection]
+
+	"""
+	courseIDs set
+	"""
+	courseIDs: [ID]
 }
 
 type Collection {
@@ -280,8 +285,6 @@ type Collection {
 
 	"""
 	moduleID: ID!
-
-	courses: [ID]
 }
 
 type Lesson {
@@ -767,7 +770,7 @@ type Mutation {
 	# """
 	unpairCourseModule(courseId: ID!, moduleId: ID!): Module
 	"""
-        stuff
+	stuff
 	"""
 	createCollection(data: CreateCollectionArgs!): Collection!
 }
