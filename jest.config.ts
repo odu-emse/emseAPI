@@ -12,5 +12,5 @@ export default {
 	}),
 	testRegex: ".*\\.spec\\.ts$",
 	testEnvironment: "node",
-	coverageDirectory: "./cov"
+	coverageDirectory: "./coverage"
 };

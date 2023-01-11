@@ -3,7 +3,13 @@ import { CommunityService } from "./community.service";
 import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../auth.guard";
-import { IThreadCreateInput } from "@/types/graphql";
+import {
+	ICommentCreateInput,
+	IThreadCreateInput,
+	Lesson,
+	Thread,
+	User
+} from "@/types/graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
@@ -37,9 +43,19 @@ export class CommunityResolver {
 	@Mutation("addCommentToThread")
 	async addCommentToThread(
 		@Args("id") id: string,
-		@Args("data") data: Prisma.ThreadCreateInput
+		@Args("data") data: ICommentCreateInput
 	) {
-		return await this.communityService.addCommentToThread(id, data);
+		const self = await this.communityService.thread(id);
+		if (!self) throw new Error("Thread not found");
+
+		//creating new comment document
+		const newComment = await this.communityService.createThread({
+			body: data.body,
+			author: data.author,
+			parentThread: self.id
+		});
+
+		return newComment;
 	}
 
 	@Mutation("upvoteThread")

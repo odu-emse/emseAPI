@@ -115,6 +115,23 @@ describe("Community", () => {
 			expect(thread.author.watchedThreadIDs.includes(thread.id)).toBe(true);
 		}
 	});
+	it("should add comment with author as watcher", async () => {
+		const res = await resolver.addCommentToThread(threadID, {
+			body: "How does this look?",
+			author: accountID
+		});
+		expect(res.author.id === accountID).toBe(true);
+		expect(res.watcherID.includes(accountID)).toBe(true);
+		expect(res.parentThreadID === threadID).toBe(true);
+	});
+	//TODO: Check if returned value is an error or not
+	it("should fail to add comment if parent ID is not found", async () => {
+		const thread = await resolver.addCommentToThread(shuffle(threadID), {
+			body: "How does this look?",
+			author: accountID
+		});
+		// expect(thread).toBeNull();
+	});
 });
 
 // const createModule = async (input: Prisma.ModuleCreateInput) => {

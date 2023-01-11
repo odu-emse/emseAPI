@@ -1,7 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import { IThreadCreateInput } from "@/types/graphql";
+import {
+	ICommentCreateInput,
+	IThreadCreateInput,
+	Lesson,
+	Thread,
+	User
+} from "@/types/graphql";
 
 @Injectable()
 export class CommunityService {
@@ -84,18 +90,79 @@ export class CommunityService {
 		});
 	}
 
-	async addCommentToThread(id: string, data: Prisma.ThreadCreateInput) {
-		return await this.prisma.thread.update({
-			where: {
-				id
-			},
-			data: {
-				comments: {
-					// @ts-ignore
-					push: data
-				}
-			}
+	async addCommentToThread(
+		id: string,
+		comments: Thread[] & {
+			comments: Array<(Thread & { comments: Thread[] }) | []>;
+		},
+		data: Thread
+	) {
+		console.log({
+			id,
+			comments,
+			data
 		});
+
+		if (comments.length === 0) {
+			const update = Prisma.validator<Prisma.ThreadUpdateInput>()({
+				comments: {
+					connect: {
+						id: data.id
+					}
+				}
+			});
+
+			return await this.prisma.thread.update({
+				where: {
+					id
+				},
+				data: update
+			});
+		} else {
+			const newComments = comments.concat(data);
+
+			console.log(newComments);
+
+			const update = Prisma.validator<Prisma.ThreadUpdateInput>()({});
+
+			return await this.prisma.thread.update({
+				where: {
+					id
+				},
+				data: update
+			});
+		}
+
+		// if (comments.length > 0) {
+		// 	//save old comments
+		// 	//append new comment
+		// 	//set new comments
+		// } else {
+		// 	return await this.prisma.thread.update({
+		// 		where: {
+		// 			id
+		// 		},
+		// 		data: {
+		// 			comments: {
+		// 				set: [newComment]
+		// 			}
+		// 		}
+		// 	});
+		// }
+
+		// return await this.prisma.thread.update({
+		// 	where: {
+		// 		id
+		// 	},
+		// 	data: {
+		// 		comments: {
+		// 			//TODO: fix this with the prisma validator so we can stop using ignore
+		//
+		// 			// @ts-ignore
+		// 			push: data
+		// 		}
+		// 	}
+		// });
 	}
 
 	async upvoteThread(id: string) {
