@@ -100,7 +100,7 @@ type User {
 	"""
 	User CreatedAt
 	"""
-	createdAt: String
+	createdAt: Date
 	"""
 	Firstname of the user
 	"""

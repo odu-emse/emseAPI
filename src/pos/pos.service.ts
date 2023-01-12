@@ -60,11 +60,11 @@ export class PoSService {
 								feedback: true,
 								assignments: true,
 								members: true,
-								parentCourses: {
-									include: {
-										course: true
-									}
-								}
+								// parentCourses: {
+								// 	include: {
+								// 		course: true
+								// 	}
+								// }
 							}
 						},
 						plan: true

@@ -88,22 +88,24 @@ model Token {
   userId String @db.ObjectId
 }
 
-model ModuleInCourse {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+// model ModuleInCourse {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  module   Module @relation(fields: [moduleId], references: [id])
-  moduleId String
+//   module   Module @relation(fields: [moduleId], references: [id])
+//   moduleId String
 
-  course   Course @relation(fields: [courseId], references: [id])
-  courseId String
-}
+//   course   Course @relation(fields: [courseId], references: [id])
+//   courseId String
+// }
 
 model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  modules ModuleInCourse[]
+  moduleIDs String[] @db.ObjectId
+  module    Module[] @relation(fields: [moduleIDs], references: [id])
 
+  //modules ModuleInCourse[]
 }
 
 model Module {
@@ -122,10 +124,13 @@ model Module {
   members       ModuleEnrollment[]
   assignments   Assignment[]
   feedback      ModuleFeedback[]
-  parentCourses ModuleInCourse[]
+
   parentModules Requirement[]      @relation(name: "child")
   childModules  Requirement[]      @relation(name: "parent")
   collections   Collection[]       @relation(name: "collections")
+
+  courseIDs String[] @db.ObjectId
+  course    Course[] @relation(fields: [courseIDs], references: [id])
 }
 
 model Collection {
