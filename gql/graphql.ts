@@ -21,6 +21,11 @@ export interface IThreadCreateInput {
     author: string;
 }
 
+export interface ICommentCreateInput {
+    body: string;
+    author: string;
+}
+
 export interface PlanInput {
     student?: Nullable<string>;
 }
@@ -245,9 +250,10 @@ export interface AuthTokens {
 export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
-    addCommentToThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    addCommentToThread(id: string, data: ICommentCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -470,7 +476,7 @@ export interface User {
     openID: string;
     email: string;
     picURL?: Nullable<string>;
-    createdAt?: Nullable<string>;
+    createdAt?: Nullable<Date>;
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
