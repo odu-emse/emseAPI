@@ -308,17 +308,12 @@ type Lesson {
     """
     The list of threads related to the lesson
     """
-    threads: [Thread]
+    threads: [ID]
 
     """
     The collection that the lesson belongs to
     """
     collection: Collection
-
-    """
-    The ID of the parent collection
-    """
-    collectionID: ID
 }
 
 type Requirement{
@@ -438,6 +433,12 @@ type Query {
     Retrieve a specific collection based on document ID
     """
     collection(id: ID!): Collection
+
+    """
+    Retrieve lessons given a set of parameters
+    """
+    lessons(input: LessonFields): [Lesson!]
+    
 }
 
 input CreateCollectionArgs {
@@ -677,6 +678,60 @@ input ModuleEnrollmentInput {
     role: UserRole!
 }
 
+input LessonInput {
+	"""
+	Lesson Name
+	"""
+	name: 			String!
+	"""
+	The type of content being displayed. (PDF, Video, etc.)
+	"""
+	contentType: 	String!
+	"""
+	The link/id of the actual content data itself
+	"""
+	content: 		String!
+	"""
+	An optional transcript of the content data (primarily for videos)
+	"""
+	transcript: 	String
+    """
+    The ID of the parent collection
+    """
+    collection: ID!
+}
+
+input LessonFields {
+    """
+	document ID
+	"""
+	id: 			ID
+	"""
+	Lesson Name
+	"""
+	name: 			String
+	"""
+	The type of content being displayed. (PDF, Video, etc.)
+	"""
+	contentType: 	String
+	"""
+	The link/id of the actual content data itself
+	"""
+	content: 		String
+	"""
+	An optional transcript of the content data (primarily for videos)
+	"""
+	transcript: 	String
+    """
+    The list of ids to threads related to the lesson (Only a single value is supported)
+    """
+    thread: ID
+    """
+    The ID of the parent collection
+    """
+    collection: ID
+}
+
 type Mutation {
     """
     Deletes the entire Module
@@ -789,4 +844,16 @@ type Mutation {
     """
     """
     createCollection(data: CreateCollectionArgs!): Collection!
+
+    """
+    Create a Lesson for an individual collection
+    """
+    createLesson(input: LessonInput!): Lesson!
+    """
+    Update a lesson given its ID
+    """
+    updateLesson(input: LessonFields): Lesson
+
+    deleteLesson(id: String!): Lesson
+
 }

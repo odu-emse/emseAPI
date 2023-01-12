@@ -12,12 +12,14 @@ import {
     ModFeedbackFields,
     AssignmentResFields,
     ModEnrollmentFields,
+    LessonFields,
     Module,
     Course,
     Assignment,
     ModuleInCourse,
     ModuleFeedback,
-    ModuleEnrollment, CreateCollectionArgs,
+    Lesson,
+    ModuleEnrollment, CreateCollectionArgs, LessonInput,
 } from "gql/graphql";
 import {Injectable} from "@nestjs/common";
 import {PrismaService} from "@/prisma.service";
@@ -554,6 +556,39 @@ export class ProgramService {
         });
     }
 
+    //Fetch Lessons
+    async lessons(input: LessonFields)  {
+        const {
+            id,
+            name,
+            contentType,
+            content,
+            transcript,
+            thread,
+            collection
+        } = input
+
+        const payload = {
+            ...(id && {id}),
+            ...(name && {name}),
+            ...(contentType && {contentType}),
+            ...(content && {content}),
+            ...(transcript && {transcript}),
+        }
+
+        payload['collection'] = (collection) ? collection : undefined;
+        payload['threads'] = (thread) ? {some: {id: thread}} : undefined;
+
+        const where = Prisma.validator<Prisma.LessonWhereInput>()({
+            ...payload
+        })
+
+        return this.prisma.lesson.findMany({
+            where: payload,
+
+        })
+    }
+
     async createCollection({name, lessons, next, previous, moduleID}:CreateCollectionArgs) {
         const create = Prisma.validator<Prisma.CollectionCreateInput>()({
                 name,
@@ -960,4 +995,35 @@ export class ProgramService {
             }
         })
     }
+
+    async createLesson(input: LessonInput): Promise<Lesson> {
+        // const collectionVal = (input.collection) ? input.collection : undefined
+        const create = Prisma.validator<Prisma.LessonCreateInput>()({
+            name: input.name,
+            contentType: input.contentType,
+            content: input.content,
+            transcript: input.transcript,
+            threads: undefined,
+            collection: {
+                connect: {
+                    id: (input.collection) ? input.collection : undefined
+                }
+            }
+        })
+
+        if (create === null) {
+            throw new Error("Validator did not return correct type given lesson input.")
+        }
+
+        const include = Prisma.validator<Prisma.LessonInclude>()({
+            collection: true
+        })
+        
+
+        return this.prisma.lesson.create({
+            data: create,
+        })
+    }
+
+
 }
