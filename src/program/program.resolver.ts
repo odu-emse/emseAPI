@@ -333,4 +333,11 @@ export class ProgramResolver {
 	){
 		return await this.programService.createLesson(input);
 	}
+
+	@Mutation("updateLesson")
+	async updateLesson(
+		@Args("input")input: LessonFields
+	){
+		return await this.programService.updateLesson(input);
+	}
 }

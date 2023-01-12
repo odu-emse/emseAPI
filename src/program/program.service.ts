@@ -1025,5 +1025,47 @@ export class ProgramService {
         })
     }
 
+    async updateLesson(input: LessonFields) {
+        const {
+            id,
+            name,
+            contentType,
+            content,
+            transcript,
+            // Threads are a list so how these are being updated is going to be a little strange.
+            // The only thing i could think of is if these were a list of IDs in which case the threads
+            // Being refererenced would all have to be modified in this update Lesson.
+            // thread,
+            collection
+        } = input
+        const payload = {
+            ...(id && {id}),
+            ...(name && {name}),
+            ...(contentType && {contentType}),
+            ...(content && {content}),
+            ...(transcript && {transcript}),
+            // ...(thread && {thread}),
+            ...(collection && {collection})
+        }
+
+        const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
+            where: {
+                id: payload.id
+            },
+            data: {
+                name: payload.name,
+                contentType: payload.contentType,
+                content: payload.content,
+                transcript: payload.transcript,
+                collectionID: payload.collection
+            }
+        })
+
+        return this.prisma.lesson.update({
+            where: args.where, 
+            data: args.data
+        });
+    }
+
 
 }
