@@ -13,6 +13,11 @@ export enum UserRole {
     GRADER = "GRADER"
 }
 
+export enum EnrollmentStatus {
+    ACTIVE = "ACTIVE",
+    INACTIVE = "INACTIVE"
+}
+
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
@@ -162,6 +167,7 @@ export interface ModuleEnrollmentInput {
     module: string;
     plan: string;
     role: UserRole;
+    status: EnrollmentStatus;
 }
 
 export interface NewUser {
@@ -342,15 +348,17 @@ export interface PlanOfStudy {
     student?: Nullable<User>;
     modules?: Nullable<Nullable<ModuleEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
-    modulesleft?: Nullable<Nullable<Module>[]>;
+    modulesLeft?: Nullable<Nullable<ModuleEnrollment>[]>;
 }
 
 export interface ModuleEnrollment {
     id: string;
     enrolledAt: Date;
     role: UserRole;
+    status: EnrollmentStatus;
     module: Module;
-    plan: PlanOfStudy;
+    plan?: Nullable<PlanOfStudy>;
+    inactivePlan?: Nullable<PlanOfStudy>;
 }
 
 export interface AssignmentResult {

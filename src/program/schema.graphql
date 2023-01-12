@@ -4,6 +4,11 @@ enum UserRole {
     GRADER
 }
 
+enum EnrollmentStatus {
+    ACTIVE
+    INACTIVE
+}
+
 type ModuleEnrollment {
     """
     id of the ModuleEnrollment
@@ -21,6 +26,11 @@ type ModuleEnrollment {
     role: UserRole!
 
     """
+    Status of the enrollment: Either Active or Inactive
+    """
+    status: EnrollmentStatus!
+
+    """
     Current Module
     """
     module: Module!
@@ -28,7 +38,12 @@ type ModuleEnrollment {
     """
     Plan of study Chosen
     """
-    plan: PlanOfStudy!
+    plan: PlanOfStudy
+
+    """
+    Inactive plan of study
+    """
+    inactivePlan: PlanOfStudy
 }
 
 type AssignmentResult {
@@ -668,13 +683,17 @@ input ModuleEnrollmentInput {
     """
     module: ID!
     """
-    Relating Plan to MOdule enrollment
+    Relating Plan to Module enrollment
     """
     plan: ID!
     """
     Relating role to ModuleEnrollment
     """
     role: UserRole!
+    """
+    The status of the current enrollment
+    """
+    status: EnrollmentStatus!
 }
 
 type Mutation {

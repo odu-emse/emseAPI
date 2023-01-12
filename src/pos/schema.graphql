@@ -18,7 +18,7 @@ type PlanOfStudy {
 	"""
 	Modules to be completed
 	"""
-	modulesleft:[Module]
+	modulesLeft:[ModuleEnrollment]
 }
 
 input PlanInput {
