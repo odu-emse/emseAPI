@@ -90,22 +90,24 @@ model Token {
   userId String @db.ObjectId
 }
 
-model ModuleInCourse {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+// model ModuleInCourse {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  module   Module @relation(fields: [moduleId], references: [id])
-  moduleId String
+//   module   Module @relation(fields: [moduleId], references: [id])
+//   moduleId String
 
-  course   Course @relation(fields: [courseId], references: [id])
-  courseId String
-}
+//   course   Course @relation(fields: [courseId], references: [id])
+//   courseId String
+// }
 
 model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  modules ModuleInCourse[]
+  moduleIDs String[] @db.ObjectId
+  module    Module[] @relation(fields: [moduleIDs], references: [id])
 
+  //modules ModuleInCourse[]
 }
 
 model Module {
@@ -124,12 +126,15 @@ model Module {
   members       ModuleEnrollment[]
   assignments   Assignment[]
   feedback      ModuleFeedback[]
-  parentCourses ModuleInCourse[]
+  // parentCourses ModuleInCourse[]
   plan          PlanOfStudy[]      @relation(fields: [planIds], references: [id])
   planIds       String[]           @unique @db.ObjectId
   parentModules Requirement[]      @relation(name: "child")
   childModules  Requirement[]      @relation(name: "parent")
-  collections Collection[]  @relation(name: "collections")
+  collections   Collection[]       @relation(name: "collections")
+
+  courseIDs String[] @db.ObjectId
+  course    Course[] @relation(fields: [courseIDs], references: [id])
 }
 
 model Collection {
@@ -137,26 +142,26 @@ model Collection {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  first     String?   @db.ObjectId
-  last      String?   @db.ObjectId
-  previous  String?   @db.ObjectId
-  next      String?   @db.ObjectId
+  first     String?  @db.ObjectId
+  last      String?  @db.ObjectId
+  previous  String?  @db.ObjectId
+  next      String?  @db.ObjectId
 
   // Relation fields
-  lessons Lesson[]
-  module Module @relation(name: "collections", fields: [moduleID], references: [id])
-  moduleID String @db.ObjectId
+  lessons  Lesson[]
+  module   Module   @relation(name: "collections", fields: [moduleID], references: [id])
+  moduleID String   @db.ObjectId
 }
 
 model Lesson {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  contentType String
-  content     String
-  transcript  String?
-  threads     Thread[]
-  collection  Collection? @relation(fields: [collectionID], references: [id])
-  collectionID String? @db.ObjectId
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  contentType  String
+  content      String
+  transcript   String?
+  threads      Thread[]
+  collection   Collection? @relation(fields: [collectionID], references: [id])
+  collectionID String?     @db.ObjectId
 }
 
 model Requirement {

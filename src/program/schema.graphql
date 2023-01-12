@@ -1,148 +1,147 @@
 enum UserRole {
-    STUDENT
-    TEACHER
-    GRADER
+	STUDENT
+	TEACHER
+	GRADER
 }
 
 type ModuleEnrollment {
-    """
-    id of the ModuleEnrollment
-    """
-    id: ID!
+	"""
+	id of the ModuleEnrollment
+	"""
+	id: ID!
 
-    """
-    TimeStamp at which the module is enrolledAt
-    """
-    enrolledAt: Date!
+	"""
+	TimeStamp at which the module is enrolledAt
+	"""
+	enrolledAt: Date!
 
-    """
-    Role of the user:Either Student, Teacher or Grader
-    """
-    role: UserRole!
+	"""
+	Role of the user:Either Student, Teacher or Grader
+	"""
+	role: UserRole!
 
-    """
-    Current Module
-    """
-    module: Module!
+	"""
+	Current Module
+	"""
+	module: Module!
 
-    """
-    Plan of study Chosen
-    """
-    plan: PlanOfStudy!
+	"""
+	Plan of study Chosen
+	"""
+	plan: PlanOfStudy!
 }
 
 type AssignmentResult {
-    """
-    id of AssignmentResult
-    """
-    id: ID!
+	"""
+	id of AssignmentResult
+	"""
+	id: ID!
 
-    """
-    Time at which the Assignement Result is given
-    """
-    submittedAt: Date!
+	"""
+	Time at which the Assignement Result is given
+	"""
+	submittedAt: Date!
 
-    """
-    result of the Assignement
-    """
-    result: Float!
+	"""
+	result of the Assignement
+	"""
+	result: Float!
 
-    """
-    feedback given on the Assignment
-    """
-    feedback: String
+	"""
+	feedback given on the Assignment
+	"""
+	feedback: String
 
-    """
-    Assignement Result of the student
-    """
-    student: PlanOfStudy
+	"""
+	Assignement Result of the student
+	"""
+	student: PlanOfStudy
 
-    """
-    Assignement graded by the User
-    """
-    gradedBy: User
+	"""
+	Assignement graded by the User
+	"""
+	gradedBy: User
 
-    """
-    Assignement to which result is given
-    """
-    assignment: Assignment
+	"""
+	Assignement to which result is given
+	"""
+	assignment: Assignment
 }
 
 type Assignment {
-    """
-    Assignment id
-    """
-    id: ID!
+	"""
+	Assignment id
+	"""
+	id: ID!
 
-    """
-    date and time at which assignment is updated
-    """
-    updatedAt: Date!
+	"""
+	date and time at which assignment is updated
+	"""
+	updatedAt: Date!
 
-    """
-    Name of the assignment
-    """
-    name: String!
+	"""
+	Name of the assignment
+	"""
+	name: String!
 
-    """
-    due of the assignment
-    """
-    dueAt: Date
+	"""
+	due of the assignment
+	"""
+	dueAt: Date
 
-    """
-    Assignment belonging to the module
-    """
-    module: Module!
+	"""
+	Assignment belonging to the module
+	"""
+	module: Module!
 
-    """
-    Assignment Result
-    """
-    assignmentResults: [AssignmentResult]
+	"""
+	Assignment Result
+	"""
+	assignmentResults: [AssignmentResult]
 }
 
 type ModuleFeedback {
-    """
-    id of ModuleFeedback
-    """
-    id: ID!
+	"""
+	id of ModuleFeedback
+	"""
+	id: ID!
 
-    """
-    Feedback fo the Module
-    """
-    feedback: String!
+	"""
+	Feedback fo the Module
+	"""
+	feedback: String!
 
-    """
-    Rating given in the feedback
-    """
-    rating: Int!
+	"""
+	Rating given in the feedback
+	"""
+	rating: Int!
 
-    """
-    Module feedback given by the student
-    """
-    student: User
+	"""
+	Module feedback given by the student
+	"""
+	student: User
 
-    """
-    Module in which module feedback is given
-    """
-    module: Module
-
+	"""
+	Module in which module feedback is given
+	"""
+	module: Module
 }
 
 type Course {
-    """
-    course id
-    """
-    id: ID!
+	"""
+	course id
+	"""
+	id: ID!
 
-    """
-    Name of the course
-    """
-    name: String!
+	"""
+	Name of the course
+	"""
+	name: String!
 
-    """
-    modules in the course
-    """
-    modules: [ModuleInCourse]
+	"""
+	modules in the course
+	"""
+	moduleIDs: [ID]
 }
 
 type Module {
@@ -211,10 +210,7 @@ type Module {
 	"""
 	feedback: [ModuleFeedback]
 
-	"""
-	Parent Courses in the Modules
-	"""
-	parentCourses: [ModuleInCourse]
+	# parentCourses: [ModuleInCourse]
 
 	"""
 	Parent Modules of the Module
@@ -225,568 +221,556 @@ type Module {
 	Childmodules in the Module
 	"""
 	childModules: [Requirement]
-    """
-    A list of collections that have this module's materials
-    """
-    collections: [Collection]
+	"""
+	A list of collections that have this module's materials
+	"""
+	collections: [Collection]
+
+	"""
+	courseIDs set
+	"""
+	courseIDs: [ID]
 }
 
 type Collection {
-    """
-    id of the collection
-    """
-    id: ID!
+	"""
+	id of the collection
+	"""
+	id: ID!
 
-    """
-    Name of the collection
-    """
-    name: String!
+	"""
+	Name of the collection
+	"""
+	name: String!
 
-    """
-    Date and Time of the collection created at
-    """
-    createdAt: Date!
+	"""
+	Date and Time of the collection created at
+	"""
+	createdAt: Date!
 
-    """
-    Date and Time of the collection updated at
-    """
-    updatedAt: Date!
+	"""
+	Date and Time of the collection updated at
+	"""
+	updatedAt: Date!
 
-    """
-    List of lessons in the collection
-    """
-    lessons: [Lesson]
+	"""
+	List of lessons in the collection
+	"""
+	lessons: [Lesson]
 
-    """
-    The ID of the next collection
-    """
-    next: ID
+	"""
+	The ID of the next collection
+	"""
+	next: ID
 
-    """
-    The ID of the previous collection
-    """
-    previous: ID
+	"""
+	The ID of the previous collection
+	"""
+	previous: ID
 
-    """
-    The ID of the first lesson in the collection
-    """
-    first: ID
+	"""
+	The ID of the first lesson in the collection
+	"""
+	first: ID
 
-    """
-    The ID of the last lesson in the collection
-    """
-    last: ID
-    """
-    """
-    module: Module!
-    """
-    """
-    moduleID: ID!
+	"""
+	The ID of the last lesson in the collection
+	"""
+	last: ID
+	"""
+
+	"""
+	module: Module!
+	"""
+
+	"""
+	moduleID: ID!
 }
 
 type Lesson {
 	"""
 	document ID
 	"""
-	id: 			ID!
+	id: ID!
 	"""
 	Lesson Name
 	"""
-	name: 			String!
+	name: String!
 	"""
 	The type of content being displayed. (PDF, Video, etc.)
 	"""
-	contentType: 	String!
+	contentType: String!
 	"""
 	The link/id of the actual content data itself
 	"""
-	content: 		String!
+	content: String!
 	"""
 	An optional transcript of the content data (primarily for videos)
 	"""
-	transcript: 	String
-    """
-    The list of threads related to the lesson
-    """
-    threads: [Thread]
+	transcript: String
+	"""
+	The list of threads related to the lesson
+	"""
+	threads: [Thread]
 
-    """
-    The collection that the lesson belongs to
-    """
-    collection: Collection
+	"""
+	The collection that the lesson belongs to
+	"""
+	collection: Collection
 
-    """
-    The ID of the parent collection
-    """
-    collectionID: ID
+	"""
+	The ID of the parent collection
+	"""
+	collectionID: ID
 }
 
-type Requirement{
-    """
-    id of Requirement
-    """
-    id: ID!
+type Requirement {
+	"""
+	id of Requirement
+	"""
+	id: ID!
 
-    """
-    Child module in requirement
-    """
-    child: Module!
+	"""
+	Child module in requirement
+	"""
+	child: Module!
 
-    """
-    Parent Module in Requirement
-    """
-    parent: Module!
-}
-
-type ModuleInCourse {
-    """
-    id of ModuleInCourse
-    """
-    id: ID!
-
-    """
-    Module in ModuleInCourse
-    """
-    module: Module
-
-    """
-    Course in ModuleInCourse
-    """
-    course: Course
+	"""
+	Parent Module in Requirement
+	"""
+	parent: Module!
 }
 
 type Error {
-    """
-    Error message
-    """
-    message: String
+	"""
+	Error message
+	"""
+	message: String
 }
 
 type Query {
-    """
-    List of All modules in the Query
-    """
-    modules: [Module!]!
-    """
-    Specific Module in the Modules
-    """
-    module(id: ID!): Module
-    modulesByParam(input: ModuleFields!): [Module!]
+	"""
+	List of All modules in the Query
+	"""
+	modules: [Module!]!
+	"""
+	Specific Module in the Modules
+	"""
+	module(id: ID!): Module
+	modulesByParam(input: ModuleFields!): [Module!]
 
-    """
-    Specific Course in the Courses
-    """
-    course(id: ID!): Course
-    """
-    List of all courses
-    """
-    courses: [Course!]!
-    courseByParam(input: CourseFields!): [Course!]
+	"""
+	Specific Course in the Courses
+	"""
+	course(id: ID!): Course
+	"""
+	List of all courses
+	"""
+	courses: [Course!]!
+	courseByParam(input: CourseFields!): [Course!]
 
-    """
-    Specific assignment in assignments
-    """
-    assignments: [Assignment!]!
-    """
-    List of all assignments
-    """
-    assignment(id: ID!): Assignment
-    assignmentByParam(input: AssignmentFields!): [Assignment!]
+	"""
+	Specific assignment in assignments
+	"""
+	assignments: [Assignment!]!
+	"""
+	List of all assignments
+	"""
+	assignment(id: ID!): Assignment
+	assignmentByParam(input: AssignmentFields!): [Assignment!]
 
-    """"
-    Modules in the courses
-    """
-    moduleInCourses: [ModuleInCourse!]!
+	# moduleInCourses: [ModuleInCourse!]!
 
-    """
-    Module feedbacks
-    """
-    moduleFeedbacks: [ModuleFeedback!]!
-    """
-    Specific module feedback in module feedbacks
-    """
-    moduleFeedback(id: ID!): ModuleFeedback
-    modFeedbackByParam(input: ModFeedbackFields!): [ModuleFeedback!]
+	"""
+	Module feedbacks
+	"""
+	moduleFeedbacks: [ModuleFeedback!]!
+	"""
+	Specific module feedback in module feedbacks
+	"""
+	moduleFeedback(id: ID!): ModuleFeedback
+	modFeedbackByParam(input: ModFeedbackFields!): [ModuleFeedback!]
 
-    """
-    Specific assignment result
-    """
-    assignmentResults: [AssignmentResult!]!
-    """
-    list of all assignment Results
-    """
-    assignmentResult(id: ID!): AssignmentResult
-    assignmentResultByParam(input: AssignmentResFields!): [AssignmentResult!]
+	"""
+	Specific assignment result
+	"""
+	assignmentResults: [AssignmentResult!]!
+	"""
+	list of all assignment Results
+	"""
+	assignmentResult(id: ID!): AssignmentResult
+	assignmentResultByParam(input: AssignmentResFields!): [AssignmentResult!]
 
-    """
-    List of module enrollment
-    """
-    moduleEnrollments: [ModuleEnrollment!]!
-    """
-    Retrieve a specific Module enrollment based on document ID
-    """
-    moduleEnrollment(id: ID!): ModuleEnrollment
+	"""
+	List of module enrollment
+	"""
+	moduleEnrollments: [ModuleEnrollment!]!
+	"""
+	Retrieve a specific Module enrollment based on document ID
+	"""
+	moduleEnrollment(id: ID!): ModuleEnrollment
 
-    modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
+	modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
 
-    """
-    List of all collections
-    """
-    collections: [Collection!]!
+	"""
+	List of all collections
+	"""
+	collections: [Collection!]!
 
-    """
-    Retrieve a specific collection based on document ID
-    """
-    collection(id: ID!): Collection
+	"""
+	Retrieve a specific collection based on document ID
+	"""
+	collection(id: ID!): Collection
 }
 
 input CreateCollectionArgs {
-    name: String!
-    first: ID
-    last: ID
-    previous: ID
-    next: ID
-    moduleID: ID!
-    lessons: [ID!]
-    positionIndex: Int
+	name: String!
+	first: ID
+	last: ID
+	previous: ID
+	next: ID
+	moduleID: ID!
+	lessons: [ID!]
+	positionIndex: Int
 }
 
 input ModuleFields {
-    id: ID
-    moduleNumber: Int
-    moduleName: String
-    description: String
-    duration: Float
-    intro: String
-    numSlides: Int
-    keywords: [String!]
-    createdAt: Date
-    updatedAt: Date
+	id: ID
+	moduleNumber: Int
+	moduleName: String
+	description: String
+	duration: Float
+	intro: String
+	numSlides: Int
+	keywords: [String!]
+	createdAt: Date
+	updatedAt: Date
 
-    assignments: ID
-    members: ID
-    feedback: ID
-    parentCourses: ID
-    parentModules: ID
-    childModules: ID
+	assignments: ID
+	members: ID
+	feedback: ID
+	parentCourses: ID
+	parentModules: ID
+	childModules: ID
 }
 
 input CourseFields {
-    id: ID
-    name: String
+	id: ID
+	name: String
 
-    module: ID
+	module: ID
 }
 
 input AssignmentFields {
-    id: ID
-    updatedAt: Date
-    name: String
-    dueAt: Date
+	id: ID
+	updatedAt: Date
+	name: String
+	dueAt: Date
 
-    module: ID
-    assignmentResult: ID
+	module: ID
+	assignmentResult: ID
 }
 
 input ModFeedbackFields {
-    id: ID
-    feedback: String
-    rating: Int
+	id: ID
+	feedback: String
+	rating: Int
 
-    student: ID
-    module: ID
+	student: ID
+	module: ID
 }
 
 input AssignmentResFields {
-    id: ID
-    submittedAt: Date
-    result: Float
-    feedback: String
+	id: ID
+	submittedAt: Date
+	result: Float
+	feedback: String
 
-    student: ID
-    gradedBy: ID
-    assignment: ID
+	student: ID
+	gradedBy: ID
+	assignment: ID
 }
 
 input ModEnrollmentFields {
-    id: ID
-    enrolledAt: Date
+	id: ID
+	enrolledAt: Date
 
-    role: UserRole
-    module: ID
-    plan: ID
+	role: UserRole
+	module: ID
+	plan: ID
 }
 
 input NewModule {
-    """
-    Number of the Module
-    """
-    moduleNumber: Int!
-    """
-    Name of the Module
-    """
-    moduleName: String!
-    """
-    description of the Module
-    """
-    description: String!
-    """
-    Duration of the NewModule
-    """
-    duration: Float!
-    """
-    Introduction of the NewModule
-    """
-    intro: String!
-    """
-    Number of Slides in NewModule
-    """
-    numSlides: Int!
-    """
-    keywords of the NewModule
-    """
-    keywords: [String!]!
+	"""
+	Number of the Module
+	"""
+	moduleNumber: Int!
+	"""
+	Name of the Module
+	"""
+	moduleName: String!
+	"""
+	description of the Module
+	"""
+	description: String!
+	"""
+	Duration of the NewModule
+	"""
+	duration: Float!
+	"""
+	Introduction of the NewModule
+	"""
+	intro: String!
+	"""
+	Number of Slides in NewModule
+	"""
+	numSlides: Int!
+	"""
+	keywords of the NewModule
+	"""
+	keywords: [String!]!
 }
 
 input UpdateModule {
-    """
-    UpdateModule id
-    """
-    id: ID!
-    """
-    Module Name of the UpdateModule
-    """
-    moduleName: String
-    """
-    Module NUmber of the UpdateModule
-    """
-    moduleNumber: Int
-    """
-    Introduction of the UpdateModule
-    """
-    intro: String
-    """
-    Decription of the UpdateModule
-    """
-    description: String
-    """
-    Duration of the UpdateModule
-    """
-    duration: Float
-    """
-    Number of slides in Updatemodule
-    """
-    numSlides: Int
-    """
-    Keywords in UpdateModule
-    """
-    keywords: [String!]
+	"""
+	UpdateModule id
+	"""
+	id: ID!
+	"""
+	Module Name of the UpdateModule
+	"""
+	moduleName: String
+	"""
+	Module NUmber of the UpdateModule
+	"""
+	moduleNumber: Int
+	"""
+	Introduction of the UpdateModule
+	"""
+	intro: String
+	"""
+	Decription of the UpdateModule
+	"""
+	description: String
+	"""
+	Duration of the UpdateModule
+	"""
+	duration: Float
+	"""
+	Number of slides in Updatemodule
+	"""
+	numSlides: Int
+	"""
+	Keywords in UpdateModule
+	"""
+	keywords: [String!]
 }
 
 input NewAssignment {
-    """
-    Name of the NewAssignement
-    """
-    name: String!
-    """
-    Due date and Time of NewAssignment
-    """
-    dueAt: Date!
-    """
-    Module to which the NewAssignement Belongs to
-    """
-    module: ID!
+	"""
+	Name of the NewAssignement
+	"""
+	name: String!
+	"""
+	Due date and Time of NewAssignment
+	"""
+	dueAt: Date!
+	"""
+	Module to which the NewAssignement Belongs to
+	"""
+	module: ID!
 }
 
 input AssignmentInput {
-    """
-    New Name of the Assignment
-    """
-    name: String
-    """
-    New Due date and time of the Assignement
-    """
-    dueAt: Date
-    """
-    Updated module linkage
-    """
-    module: ID
+	"""
+	New Name of the Assignment
+	"""
+	name: String
+	"""
+	New Due date and time of the Assignement
+	"""
+	dueAt: Date
+	"""
+	Updated module linkage
+	"""
+	module: ID
 }
 
 input CourseInput {
-    """
-    New Name of the Course
-    """
-    name: String!
+	"""
+	New Name of the Course
+	"""
+	name: String!
 }
 
 input ModuleFeedbackInput {
-    """
-    New Feedback of the Module
-    """
-    feedback: String!
-    """
-    New Rating of the Module
-    """
-    rating: Int!
+	"""
+	New Feedback of the Module
+	"""
+	feedback: String!
+	"""
+	New Rating of the Module
+	"""
+	rating: Int!
 }
 
 input ModuleFeedbackUpdate {
-    """
-    Updated feedback of Module
-    """
-    feedback: String
-    """
-    Updated feedback of Module
-    """
-    rating: Int
+	"""
+	Updated feedback of Module
+	"""
+	feedback: String
+	"""
+	Updated feedback of Module
+	"""
+	rating: Int
 }
 
 input NewAssignmentResult {
-    """
-    Relating assignment result to assignment
-    """
-    assignment: ID!
-    """
-    Relating Assignment Result to Student
-    """
-    student: ID!
-    """
-    Relating Assignment Result to Grader
-    """
-    grader: ID!
+	"""
+	Relating assignment result to assignment
+	"""
+	assignment: ID!
+	"""
+	Relating Assignment Result to Student
+	"""
+	student: ID!
+	"""
+	Relating Assignment Result to Grader
+	"""
+	grader: ID!
 
-    """
-    result of the NewAssignement
-    """
-    result: Float!
+	"""
+	result of the NewAssignement
+	"""
+	result: Float!
 }
 
 input ModuleEnrollmentInput {
-    """
-    Relating Module to ModuleEnrollment
-    """
-    module: ID!
-    """
-    Relating Plan to MOdule enrollment
-    """
-    plan: ID!
-    """
-    Relating role to ModuleEnrollment
-    """
-    role: UserRole!
+	"""
+	Relating Module to ModuleEnrollment
+	"""
+	module: ID!
+	"""
+	Relating Plan to MOdule enrollment
+	"""
+	plan: ID!
+	"""
+	Relating role to ModuleEnrollment
+	"""
+	role: UserRole!
 }
 
 type Mutation {
-    """
-    Deletes the entire Module
-    """
-    deleteModule(id: ID!): Module
-    """
-    Adds an entire module
-    """
-    addModule(input: NewModule): Module!
-    """
-    updates a Module
-    """
-    updateModule(input: UpdateModule): Module
+	"""
+	Deletes the entire Module
+	"""
+	deleteModule(id: ID!): Module
+	"""
+	Adds an entire module
+	"""
+	addModule(input: NewModule): Module!
+	"""
+	updates a Module
+	"""
+	updateModule(input: UpdateModule): Module
 
-    """
-    adds Requirements
-    """
-    addRequirement(parentId: String, childId: String): Requirement
-    """
-    Removes requirements
-    """
-    removeRequirement(parentId: String, childId: String): Requirement
+	"""
+	adds Requirements
+	"""
+	addRequirement(parentId: String, childId: String): Requirement
+	"""
+	Removes requirements
+	"""
+	removeRequirement(parentId: String, childId: String): Requirement
 
-    """
-    deletes all Courses referring id
-    """
-    deleteCourse(id: ID!): Course
-    """
-    adds Courses
-    """
-    addCourse(input: CourseInput): Course!
-    """
-    Updates Courses
-    """
-    updateCourse(id: ID!, input: CourseInput): Course
+	"""
+	deletes all Courses referring id
+	"""
+	deleteCourse(id: ID!): Course
+	"""
+	adds Courses
+	"""
+	addCourse(input: CourseInput): Course!
+	"""
+	Updates Courses
+	"""
+	updateCourse(id: ID!, input: CourseInput): Course
 
-    """
-    adds assignement in module
-    """
-    addAssignment(input: NewAssignment): Assignment!
-    """
-    Deletes assignments in Module
-    """
-    deleteAssignment(module: ID!, id: ID!): Module
-    """
-    Updates Assignements
-    """
-    updateAssignment(id: ID!, input: AssignmentInput): Assignment
+	"""
+	adds assignement in module
+	"""
+	addAssignment(input: NewAssignment): Assignment!
+	"""
+	Deletes assignments in Module
+	"""
+	deleteAssignment(module: ID!, id: ID!): Module
+	"""
+	Updates Assignements
+	"""
+	updateAssignment(id: ID!, input: AssignmentInput): Assignment
 
-    addModuleFeedback(
-        """
-        Module Feedback is given relating to Moduleid
-        """
-        moduleId: ID!
-        """
-        Module Feedback is given relating to Userid
-        """
-        userId: ID!
-        """
-        Module Feedback is given relating to Modulefeedbackinput
-        """
-        input: ModuleFeedbackInput
-    ): Module
-    """
-    Module feedback is updated
-    """
-    updateModuleFeedback(id: ID!, input: ModuleFeedbackUpdate): ModuleFeedback
-    """
-    Module feedback is deleted
-    """
-    deleteModuleFeedback(id: ID!): ModuleFeedback
+	addModuleFeedback(
+		"""
+		Module Feedback is given relating to Moduleid
+		"""
+		moduleId: ID!
+		"""
+		Module Feedback is given relating to Userid
+		"""
+		userId: ID!
+		"""
+		Module Feedback is given relating to Modulefeedbackinput
+		"""
+		input: ModuleFeedbackInput
+	): Module
+	"""
+	Module feedback is updated
+	"""
+	updateModuleFeedback(id: ID!, input: ModuleFeedbackUpdate): ModuleFeedback
+	"""
+	Module feedback is deleted
+	"""
+	deleteModuleFeedback(id: ID!): ModuleFeedback
 
-    """
-    Assignment Result is added
-    """
-    addAssignmentResult(input: NewAssignmentResult): AssignmentResult!
-    """
-    Assignment Reuslt is Updated
-    """
-    updateAssignmentResult(id: ID!, result: Float!): AssignmentResult
-    """
-    Assignment result is deleted
-    """
-    deleteAssignmentResult(id: ID!): AssignmentResult
+	"""
+	Assignment Result is added
+	"""
+	addAssignmentResult(input: NewAssignmentResult): AssignmentResult!
+	"""
+	Assignment Reuslt is Updated
+	"""
+	updateAssignmentResult(id: ID!, result: Float!): AssignmentResult
+	"""
+	Assignment result is deleted
+	"""
+	deleteAssignmentResult(id: ID!): AssignmentResult
 
-    addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
-    updateModuleEnrollment(
-        """
-        Module enrollment is updated relating to id
-        """
-        id: ID!
-        """
-        Module enrollment input
-        """
-        input: ModuleEnrollmentInput
-    ): ModuleEnrollment
-    """
-    Delete ModuleEnrollment
-    """
-    deleteModuleEnrollment(id: ID!): ModuleEnrollment
+	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
+	updateModuleEnrollment(
+		"""
+		Module enrollment is updated relating to id
+		"""
+		id: ID!
+		"""
+		Module enrollment input
+		"""
+		input: ModuleEnrollmentInput
+	): ModuleEnrollment
+	"""
+	Delete ModuleEnrollment
+	"""
+	deleteModuleEnrollment(id: ID!): ModuleEnrollment
 
-    """
-    Course Module is paired Relating Course ID and module Id
-    """
-    pairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse!
-    """
-    Course Module is Unpaired Relating to Course Id and mobile Id
-    """
-    unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
-    """
-    """
-    createCollection(data: CreateCollectionArgs!): Collection!
+	"""
+	Course Module is paired Relating Course ID and module Id
+	"""
+	pairCourseModule(courseId: ID!, moduleId: ID!): Module!
+	# """
+	# Course Module is Unpaired Relating to Course Id and mobile Id
+	# """
+	unpairCourseModule(courseId: ID!, moduleId: ID!): Module
+	"""
+	stuff
+	"""
+	createCollection(data: CreateCollectionArgs!): Collection!
 }
