@@ -1,23 +1,22 @@
 import {
-	Assignment,
-	AssignmentFields,
 	AssignmentInput,
-	AssignmentResFields,
-	Course,
-	CourseFields,
 	CourseInput,
-	CreateCollectionArgs,
-	ModEnrollmentFields,
-	ModFeedbackFields,
-	Module,
-	ModuleEnrollment,
-	ModuleEnrollmentInput,
-	ModuleFeedback,
 	ModuleFeedbackUpdate,
-	ModuleFields,
 	NewAssignment,
+	UpdateModule,
 	NewAssignmentResult,
-	UpdateModule
+	ModuleEnrollmentInput,
+	ModuleFields,
+	CourseFields,
+	AssignmentFields,
+	ModFeedbackFields,
+	AssignmentResFields,
+	ModEnrollmentFields,
+	Module,
+	Course,
+	Assignment,
+	ModuleFeedback,
+	CreateCollectionArgs
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
@@ -32,7 +31,6 @@ export class ProgramService {
 		return this.prisma.module.findMany({
 			include: {
 				assignments: true,
-				// parentCourses: true,
 				feedback: true,
 				members: true
 			} as Prisma.ModuleInclude
@@ -201,7 +199,6 @@ export class ProgramService {
 				assignments: true,
 				members: true,
 				feedback: true,
-				//@ts-ignore
 				parentModules: true,
 				childModules: true
 			}
@@ -315,17 +312,15 @@ export class ProgramService {
 		};
 
 		payload["moduleId"] = module ? module : undefined;
+		payload["assignmentResults"] = (assignmentResult) ? {some: {id: assignmentResult}} : undefined;
 
-		if (assignmentResult) {
-			payload["assignmentResults"] = {
-				some: {
-					id: assignmentResult
-				}
-			};
-		}
+		const where = Prisma.validator<Prisma.AssignmentWhereInput>()({
+			...payload
+		});
 
 		return this.prisma.assignment.findMany({
-			where: payload,
+			where: where,
+
 			include: {
 				module: true,
 				assignmentResults: true
@@ -803,35 +798,46 @@ export class ProgramService {
 	}
 
 	/// Create a ModuleEnrollment Document
-	async addModuleEnrollment(
-		input: ModuleEnrollmentInput
-	): Promise<ModuleEnrollment> {
-		const { plan, module, role } = input;
+	async addModuleEnrollment(input: ModuleEnrollmentInput) {
+		const { plan, module, role, status } = input;
+
 
 		console.log(role);
 		let count = await this.prisma.moduleEnrollment.count({
 			where: {
-				planId: plan,
+				planID: plan,
 				moduleId: module
 			}
 		});
 
 		if (count !== 0) {
 			throw new Error("This Module Enrollment already exists");
+		} else {
+			const create =
+				Prisma.validator<Prisma.ModuleEnrollmentCreateInput>()({
+					module: {
+						connect: {
+							id: module
+						}
+					},
+					plan: {
+						connect: {
+							id: plan
+						}
+					},
+					role,
+					status
+				});
+
+			return this.prisma.moduleEnrollment.create({
+				data: create,
+				include: {
+					module: true,
+					plan: true
+				}
+			});
 		}
 
-		//@ts-ignore
-		return this.prisma.moduleEnrollment.create({
-			data: {
-				moduleId: module,
-				planId: plan,
-				role
-			},
-			include: {
-				module: true,
-				plan: true
-			}
-		});
 	}
 
 	/// Update a ModuleEnrollment
@@ -842,7 +848,7 @@ export class ProgramService {
 			},
 			data: {
 				moduleId: input.module,
-				planId: input.plan,
+				planID: input.plan,
 				role: input.role
 			},
 			include: {

@@ -64,8 +64,6 @@ model PlanOfStudy {
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
-  modulesleft       Module[]           @relation(fields: [moduleLeftIds], references: [id])
-  moduleLeftIds     String[]           @db.ObjectId
 }
 
 model Social {
@@ -126,9 +124,7 @@ model Module {
   members       ModuleEnrollment[]
   assignments   Assignment[]
   feedback      ModuleFeedback[]
-  // parentCourses ModuleInCourse[]
-  plan          PlanOfStudy[]      @relation(fields: [planIds], references: [id])
-  planIds       String[]           @unique @db.ObjectId
+
   parentModules Requirement[]      @relation(name: "child")
   childModules  Requirement[]      @relation(name: "parent")
   collections   Collection[]       @relation(name: "collections")
@@ -184,15 +180,16 @@ model ModuleFeedback {
 }
 
 model ModuleEnrollment {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  enrolledAt DateTime @default(now())
+  id         String           @id @default(auto()) @map("_id") @db.ObjectId
+  enrolledAt DateTime         @default(now())
   role       UserRole //Allow for instructors, graders and students to take part in the module.
+  status     EnrollmentStatus @default(INACTIVE)
 
   // Relation Fields
-  module   Module      @relation(fields: [moduleId], references: [id])
-  moduleId String      @db.ObjectId
-  plan     PlanOfStudy @relation(fields: [planId], references: [id])
-  planId   String      @db.ObjectId
+  module         Module       @relation(fields: [moduleId], references: [id])
+  moduleId       String       @db.ObjectId
+  plan           PlanOfStudy? @relation(fields: [planID], references: [id])
+  planID         String?      @db.ObjectId
 }
 
 model Assignment {
@@ -245,6 +242,11 @@ enum UserRole {
   STUDENT
   TEACHER
   GRADER
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  INACTIVE
 }
 
 // Dont need this anymore since we arent doing API Tokens

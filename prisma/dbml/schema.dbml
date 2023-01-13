@@ -47,8 +47,6 @@ Table PlanOfStudy {
   studentID String [unique]
   modules ModuleEnrollment [not null]
   assignmentResults AssignmentResult [not null]
-  modulesleft Module [not null]
-  moduleLeftIds String[] [not null]
 }
 
 Table Social {
@@ -92,8 +90,6 @@ Table Module {
   members ModuleEnrollment [not null]
   assignments Assignment [not null]
   feedback ModuleFeedback [not null]
-  plan PlanOfStudy [not null]
-  planIds String[] [unique, not null]
   parentModules Requirement [not null]
   childModules Requirement [not null]
   collections Collection [not null]
@@ -148,10 +144,11 @@ Table ModuleEnrollment {
   id String [pk]
   enrolledAt DateTime [default: `now()`, not null]
   role UserRole [not null]
+  status EnrollmentStatus [not null, default: 'INACTIVE']
   module Module [not null]
   moduleId String [not null]
-  plan PlanOfStudy [not null]
-  planId String [not null]
+  plan PlanOfStudy
+  planID String
 }
 
 Table Assignment {
@@ -201,21 +198,22 @@ Enum UserRole {
   GRADER
 }
 
+Enum EnrollmentStatus {
+  ACTIVE
+  INACTIVE
+}
+
 Ref: User.watchedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
 
 Ref: PlanOfStudy.studentID - User.id
 
-Ref: PlanOfStudy.moduleLeftIds > Module.id
-
 Ref: Social.accountID - User.id
 
 Ref: Token.userId > User.id
 
 Ref: Course.moduleIDs > Module.id
-
-Ref: Module.planIds > PlanOfStudy.id
 
 Ref: Module.courseIDs > Course.id
 
@@ -233,7 +231,7 @@ Ref: ModuleFeedback.moduleId > Module.id
 
 Ref: ModuleEnrollment.moduleId > Module.id
 
-Ref: ModuleEnrollment.planId > PlanOfStudy.id
+Ref: ModuleEnrollment.planID > PlanOfStudy.id
 
 Ref: Assignment.moduleId > Module.id
 

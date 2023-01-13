@@ -103,24 +103,31 @@ describe("Plan services", () => {
 			it("should return a module", async () => {
 				const module = await resolver.module(testingModuleID);
 				expect(module).toBeDefined();
-				expect(module!.id).toBe(testingModuleID);
-				expect(module!.moduleName).toBeDefined();
-				expect(module!.moduleNumber).toBeDefined();
-				expect(module!.description).toBeDefined();
-				expect(module!.createdAt).toBeDefined();
-				expect(moment(module!.createdAt).isBefore(new Date())).toBe(
+				expect(module.id).toBe(testingModuleID);
+				expect(module.moduleName).toBeDefined();
+				expect(module.moduleNumber).toBeDefined();
+				expect(module.description).toBeDefined();
+				expect(module.createdAt).toBeDefined();
+				expect(moment(module.createdAt).isBefore(new Date())).toBe(
 					true
 				);
-				expect(module!.updatedAt).toBeDefined();
-				expect(moment(module!.updatedAt).isBefore(new Date())).toBe(
+				expect(module.updatedAt).toBeDefined();
+				expect(moment(module.updatedAt).isBefore(new Date())).toBe(
 					true
 				);
-				expect(module!.duration).toBeDefined();
-				expect(module!.numSlides).toBeDefined();
+				expect(module.duration).toBeDefined();
+				expect(module.numSlides).toBeDefined();
 
-				expect(Array.isArray(module!.keywords)).toBe(true);
-				expect(Array.isArray(module!.feedback)).toBe(true);
-				expect(Array.isArray(module!.members)).toBe(true);
+				expect(Array.isArray(module.keywords)).toBe(true);
+				expect(Array.isArray(module.feedback)).toBe(true);
+				expect(Array.isArray(module.members)).toBe(true);
+				if (
+					module.parentCourses !== null &&
+					module.parentCourses !== undefined &&
+					module.parentCourses.length > 0
+				) {
+					expect(Array.isArray(module.parentCourses)).toBe(true);
+				}
 			});
 		});
 	});
@@ -157,15 +164,10 @@ describe("Plan services", () => {
 			it("should return modules related to the course", async () => {
 				const courses = await resolver.courses();
 				courses.map((course) => {
-					expect(course.moduleIDs).toBeDefined();
-					expect(course.moduleIDs).toBeInstanceOf(Array);
+					expect(course.modules).toBeDefined();
+					expect(course.modules).toBeInstanceOf(Array);
+					expect(course.modules!.length).toBeGreaterThanOrEqual(1);
 					testingCourseID = course.id;
-					expect(
-						course.moduleIDs !== null &&
-							course.moduleIDs !== undefined
-							? course.moduleIDs.length
-							: 0
-					).toBeGreaterThanOrEqual(1);
 				});
 			});
 			it("should not take longer than 1.5 seconds to return all courses", () => {
@@ -181,7 +183,7 @@ describe("Plan services", () => {
 				expect(course).toBeDefined();
 				expect(course!.id).toBe(testingCourseID);
 				expect(course!.name).toBeDefined();
-				expect(Array.isArray(course!.moduleIDs)).toBe(true);
+				expect(Array.isArray(course!.modules)).toBe(true);
 			});
 		});
 	});
