@@ -1067,5 +1067,13 @@ export class ProgramService {
         });
     }
 
+	async deleteLesson(id: string) {
+		return this.prisma.lesson.delete({
+			where: {
+				id
+			}
+		})
+	}
+
 
 }

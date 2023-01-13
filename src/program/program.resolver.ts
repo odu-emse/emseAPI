@@ -340,4 +340,11 @@ export class ProgramResolver {
 	){
 		return await this.programService.updateLesson(input);
 	}
+
+	@Mutation("deleteLesson")
+	async deleteLesson(
+		@Args("id")id: string
+	){
+		return await this.programService.deleteLesson(id);
+	}
 }
