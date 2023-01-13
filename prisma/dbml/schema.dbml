@@ -215,9 +215,6 @@ Ref: Token.userId > User.id
 
 Ref: Course.moduleIDs > Module.id
 
-
-Ref: Module.planIds > PlanOfStudy.id
-
 Ref: Module.courseIDs > Course.id
 
 Ref: Collection.moduleID > Module.id

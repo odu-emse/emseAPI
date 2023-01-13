@@ -15,7 +15,6 @@ import {
 	Module,
 	Course,
 	Assignment,
-	ModuleInCourse,
 	ModuleFeedback,
 	CreateCollectionArgs
 } from "gql/graphql";
@@ -312,19 +311,12 @@ export class ProgramService {
 			...(dueAt && { dueAt })
 		};
 
+		payload["moduleId"] = module ? module : undefined;
+		payload["assignmentResults"] = (assignmentResult) ? {some: {id: assignmentResult}} : undefined;
+
 		const where = Prisma.validator<Prisma.AssignmentWhereInput>()({
 			...payload
 		});
-
-		payload["moduleId"] = module ? module : undefined;
-
-		if (assignmentResult) {
-			payload["assignmentResults"] = {
-				some: {
-					id: assignmentResult
-				}
-			};
-		}
 
 		return this.prisma.assignment.findMany({
 			where: where,
