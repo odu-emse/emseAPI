@@ -3,6 +3,7 @@ import { CommunityResolver, CommunityService } from "@/community";
 import { IThreadCreateInput, Thread } from "@/types/graphql";
 import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
+import { Int } from "@nestjs/graphql";
 
 describe("Community", () => {
 	let service: CommunityService;
@@ -131,6 +132,15 @@ describe("Community", () => {
 			author: accountID
 		});
 		// expect(thread).toBeNull();
+	});
+	it("should handle a thread and ensure that the vote count has increased by 1", async () => {
+		const voteNum = await resolver.thread(threadID);
+		const upVoteNum = await resolver.upvoteThread(threadID);
+
+		expect(voteNum.upvotes).toBeInstanceOf(Number);
+		expect(upVoteNum.upvotes).toBeInstanceOf(Number);
+
+		expect(upVoteNum.upvotes === voteNum.upvotes + 1).toBe(true);
 	});
 });
 
