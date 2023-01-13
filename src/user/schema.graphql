@@ -4,7 +4,7 @@ type Social {
 	"""
 	id: ID!
 	"""
-	Url POiting to Twitter
+	Url Poiting to Twitter
 	"""
 	twitter: String
 	"""
@@ -100,7 +100,7 @@ type User {
 	"""
 	User CreatedAt
 	"""
-	createdAt: String
+	createdAt: Date
 	"""
 	Firstname of the user
 	"""
@@ -149,6 +149,18 @@ type User {
 	Instructor profile of the user
 	"""
 	instructorProfile: InstructorProfile
+	"""
+	The list of threads that the user is subscribed to
+	"""
+	watchedThreads: [Thread!]
+	"""
+
+	"""
+	watchedThreadIDs: [ID!]
+	"""
+	The list of threads that the user has created
+	"""
+	createdThreads: [Thread!]
 }
 
 type Error {
@@ -198,17 +210,46 @@ input NewUser {
 	
 }
 
+input UserFields {
+	id: String
+	openID: String
+	email: String
+	picURL: String
+	createdAt: String
+	firstName: String
+	lastName: String
+	middleName: String
+	isAdmin: Boolean
+	isActive: Boolean
+	dob: Date
+	social: String
+	plan: String
+	feedback: String
+	assignmentGraded: String
+	instructorProfile: String
+}
+
+input SocialFields {
+	id: String
+	twitter: String
+	github: String
+	linkedin: String
+	facebook: String
+	portfolio: String
+	account: String
+}
+
 input UpdateUser {
 	"""
-	update user id
+	The document's unique ID field
 	"""
 	id: String!
 	"""
-	Open id of the update user
+	Google's Open ID field that is unique to each Google Account
 	"""
 	openID: ID!
 	"""
-	email of the update user
+	The email of the update user
 	"""
 	email: String
 	"""
@@ -232,7 +273,7 @@ input UpdateUser {
 	"""
 	dob: Date
 	"""
-	to chcek if the update user is admin
+	to check if the update user is admin
 	"""
 	isAdmin: Boolean
 	"""
@@ -320,6 +361,8 @@ type Query {
 	Query that fetches all the users
 	"""
 	users: [User!]!
+
+	usersByParam(input: UserFields): [User!]
 	"""
 	Query that fetches all the socials
 	"""
@@ -328,6 +371,8 @@ type Query {
 	Query that fetches User on Social id
 	"""
 	social(id: ID!): Social
+
+	socialsByParam(input: SocialFields): [Social!]
 	"""
 	Query that fetches instrctor Profile based on id
 	"""

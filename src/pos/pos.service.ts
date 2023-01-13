@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { Prisma, PlanOfStudy } from "@prisma/client";
-import { PlanInput } from "gql/graphql";
+import { PrismaService } from "@/prisma.service";
+import { PlanOfStudy } from "@prisma/client";
+import { PlanInput, PlanFields } from "gql/graphql";
 
 @Injectable()
 export class PoSService {
 	constructor(private prisma: PrismaService) {}
 
-	// ✅ Find all plans recorded in the system
+	//✅ Find all plans recorded in the system
 	async plans(): Promise<PlanOfStudy[]> {
-		const plans = await this.prisma.planOfStudy.findMany({
+		return await this.prisma.planOfStudy.findMany({
 			include: {
 				modules: {
 					include: {
@@ -20,7 +20,6 @@ export class PoSService {
 				student: true
 			}
 		});
-		return plans;
 	}
 
 	// Find a plan based on it's document ID
@@ -61,11 +60,11 @@ export class PoSService {
 								feedback: true,
 								assignments: true,
 								members: true,
-								parentCourses: {
-									include: {
-										course: true
-									}
-								}
+								// parentCourses: {
+								// 	include: {
+								// 		course: true
+								// 	}
+								// }
 							}
 						},
 						plan: true
@@ -78,6 +77,48 @@ export class PoSService {
 					}
 				},
 				student: true
+			}
+		});
+	}
+
+	async planByParams(params: PlanFields) {
+		const { id, student, module, assignmentResult, modulesLeft } = params;
+
+		const payload = {
+			...(id && { id })
+		};
+		if (student) {
+			payload["studentId"] = student;
+		}
+
+		if (module) {
+			payload["modules"] = {
+				some: {
+					id: module
+				}
+			};
+		}
+		if (assignmentResult) {
+			payload["assignmentResults"] = {
+				some: {
+					id: assignmentResult
+				}
+			};
+		}
+		if (modulesLeft) {
+			payload["modulesLeft"] = {
+				some: {
+					id: modulesLeft
+				}
+			};
+		}
+
+		return this.prisma.planOfStudy.findMany({
+			where: payload,
+			include: {
+				student: true,
+				modules: true,
+				assignmentResults: true
 			}
 		});
 	}

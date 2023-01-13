@@ -4,9 +4,9 @@
 
 Table User {
   id String [pk]
-  uuid String [unique, not null]
+  openID String [unique, not null]
   email String [unique, not null]
-  picURL String [not null]
+  picURL String
   createdAt DateTime [default: `now()`, not null]
   firstName String [not null]
   lastName String [not null]
@@ -20,6 +20,9 @@ Table User {
   feedback ModuleFeedback [not null]
   assignmentGraded AssignmentResult [not null]
   instructorProfile InstructorProfile
+  watchedThreads Thread [not null]
+  watchedThreadIDs String[] [not null]
+  createdThreads Thread [not null]
 }
 
 Table InstructorProfile {
@@ -44,7 +47,6 @@ Table PlanOfStudy {
   studentID String [unique]
   modules ModuleEnrollment [not null]
   assignmentResults AssignmentResult [not null]
-  courses CourseEnrollment [not null]
 }
 
 Table Social {
@@ -67,19 +69,11 @@ Table Token {
   userId String [not null]
 }
 
-Table ModuleInCourse {
-  id String [pk]
-  module Module [not null]
-  moduleId String [not null]
-  course Course [not null]
-  courseId String [not null]
-}
-
 Table Course {
   id String [pk]
   name String [not null]
-  enrollment CourseEnrollment [not null]
-  modules ModuleInCourse [not null]
+  moduleIDs String[] [not null]
+  module Module [not null]
 }
 
 Table Module {
@@ -96,7 +90,44 @@ Table Module {
   members ModuleEnrollment [not null]
   assignments Assignment [not null]
   feedback ModuleFeedback [not null]
-  parentCourses ModuleInCourse [not null]
+  parentModules Requirement [not null]
+  childModules Requirement [not null]
+  collections Collection [not null]
+  courseIDs String[] [not null]
+  course Course [not null]
+}
+
+Table Collection {
+  id String [pk]
+  name String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  first String
+  last String
+  previous String
+  next String
+  lessons Lesson [not null]
+  module Module [not null]
+  moduleID String [not null]
+}
+
+Table Lesson {
+  id String [pk]
+  name String [not null]
+  contentType String [not null]
+  content String [not null]
+  transcript String
+  threads Thread [not null]
+  collection Collection
+  collectionID String
+}
+
+Table Requirement {
+  id String [pk]
+  parent Module [not null]
+  parentId String [not null]
+  child Module [not null]
+  childId String [not null]
 }
 
 Table ModuleFeedback {
@@ -113,19 +144,11 @@ Table ModuleEnrollment {
   id String [pk]
   enrolledAt DateTime [default: `now()`, not null]
   role UserRole [not null]
+  status EnrollmentStatus [not null, default: 'INACTIVE']
   module Module [not null]
   moduleId String [not null]
-  plan PlanOfStudy [not null]
-  planId String [not null]
-}
-
-Table CourseEnrollment {
-  id String [pk]
-  student PlanOfStudy [not null]
-  studentId String [not null]
-  enrolledAt DateTime [default: `now()`, not null]
-  course Course [not null]
-  courseId String [not null]
+  plan PlanOfStudy
+  planID String
 }
 
 Table Assignment {
@@ -142,6 +165,7 @@ Table AssignmentResult {
   id String [pk]
   submittedAt DateTime [default: `now()`, not null]
   result Float [not null]
+  feedback String
   studentId String [not null]
   student PlanOfStudy [not null]
   graderId String [not null]
@@ -150,11 +174,36 @@ Table AssignmentResult {
   assignment Assignment [not null]
 }
 
+Table Thread {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  title String
+  body String [not null]
+  usersWatching User [not null]
+  watcherID String[] [not null]
+  author User [not null]
+  authorID String [not null]
+  upvotes Int [not null, default: 0]
+  parentLesson Lesson
+  parentLessonID String
+  parentThread Thread
+  parentThreadID String
+  comments Thread [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
   GRADER
 }
+
+Enum EnrollmentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+Ref: User.watchedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
 
@@ -164,9 +213,17 @@ Ref: Social.accountID - User.id
 
 Ref: Token.userId > User.id
 
-Ref: ModuleInCourse.moduleId > Module.id
+Ref: Course.moduleIDs > Module.id
 
-Ref: ModuleInCourse.courseId > Course.id
+Ref: Module.courseIDs > Course.id
+
+Ref: Collection.moduleID > Module.id
+
+Ref: Lesson.collectionID > Collection.id
+
+Ref: Requirement.parentId > Module.id
+
+Ref: Requirement.childId > Module.id
 
 Ref: ModuleFeedback.studentId > User.id
 
@@ -174,11 +231,7 @@ Ref: ModuleFeedback.moduleId > Module.id
 
 Ref: ModuleEnrollment.moduleId > Module.id
 
-Ref: ModuleEnrollment.planId > PlanOfStudy.id
-
-Ref: CourseEnrollment.studentId > PlanOfStudy.id
-
-Ref: CourseEnrollment.courseId > Course.id
+Ref: ModuleEnrollment.planID > PlanOfStudy.id
 
 Ref: Assignment.moduleId > Module.id
 
@@ -187,3 +240,11 @@ Ref: AssignmentResult.studentId > PlanOfStudy.id
 Ref: AssignmentResult.graderId > User.id
 
 Ref: AssignmentResult.assignmentId > Assignment.id
+
+Ref: Thread.watcherID > User.id
+
+Ref: Thread.authorID > User.id
+
+Ref: Thread.parentLessonID > Lesson.id
+
+Ref: Thread.parentThreadID - Thread.id [delete: No Action]

@@ -1,25 +1,25 @@
 import {
 	AssignmentInput,
 	CourseInput,
-	ModuleFeedbackInput,
 	ModuleFeedbackUpdate,
 	NewAssignment,
 	UpdateModule,
 	NewAssignmentResult,
 	ModuleEnrollmentInput,
-	
-} from "gql/graphql";
-import { Injectable } from "@nestjs/common";
-import {
+	ModuleFields,
+	CourseFields,
+	AssignmentFields,
+	ModFeedbackFields,
+	AssignmentResFields,
+	ModEnrollmentFields,
 	Module,
 	Course,
 	Assignment,
-	ModuleInCourse,
 	ModuleFeedback,
-	AssignmentResult,
-	ModuleEnrollment,
-} from "@prisma/client";
-import { PrismaService } from "../prisma.service";
+	CreateCollectionArgs
+} from "gql/graphql";
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
 
 @Injectable()
@@ -30,67 +30,17 @@ export class ProgramService {
 	async modules(): Promise<Module[]> {
 		return this.prisma.module.findMany({
 			include: {
-				assignments: {
-					include: {
-						assignmentResults: {
-							include: {
-								gradedBy: {
-									include: {
-										social: true,
-										feedback: true,
-										assignmentGraded: true,
-										instructorProfile: true
-									}
-								}
-							}
-						}
-					}
-				},
-				parentCourses: true,
-				feedback: {
-					include: {
-						student: {
-							include: {
-								social: true,
-								plan: {
-									include: {
-										modules: true,
-										assignmentResults: true,
-									}
-								},
-								instructorProfile: true
-							}
-						},
-						module: true
-					}
-				},
-				members: {
-					include: {
-						plan: {
-							include: {
-								student: {
-									include: {
-										social: true,
-										feedback: true
-									}
-								},
-								modules: {
-									include: {
-										module: true
-									}
-								},
-							}
-						}
-					}
-				}
-			}
+				assignments: true,
+				feedback: true,
+				members: true
+			} as Prisma.ModuleInclude
 		});
 	}
 
 	async module(id: string): Promise<Module | null> {
 		//find module based on id
 		if (id.length === 24) {
-			return await this.prisma.module.findFirst({
+			return (await this.prisma.module.findFirst({
 				where: {
 					id
 				},
@@ -111,7 +61,6 @@ export class ProgramService {
 							}
 						}
 					},
-					parentCourses: true,
 					feedback: {
 						include: {
 							student: {
@@ -120,7 +69,7 @@ export class ProgramService {
 									plan: {
 										include: {
 											modules: true,
-											assignmentResults: true,
+											assignmentResults: true
 										}
 									},
 									instructorProfile: true
@@ -143,13 +92,14 @@ export class ProgramService {
 										include: {
 											module: true
 										}
-									},
+									}
 								}
 							}
 						}
-					}
+					},
+					collections: true
 				}
-			});
+			})) as Prisma.ModuleGetPayload<{}>;
 		} else {
 			return await this.prisma.module.findFirst({
 				where: {
@@ -159,39 +109,125 @@ export class ProgramService {
 		}
 	}
 
+	async modulesByParam(params: ModuleFields): Promise<Module[] | null> {
+		const {
+			id,
+			moduleNumber,
+			moduleName,
+			description,
+			intro,
+			numSlides,
+			keywords,
+			createdAt,
+			updatedAt,
+			assignments,
+			members,
+			feedback,
+			parentCourses,
+			parentModules,
+			childModules
+		} = params;
+
+		const payload = {
+			...(id && { id }),
+			...(moduleNumber && { moduleNumber }),
+			...(moduleName && { moduleName }),
+			...(description && { description }),
+			...(intro && { intro }),
+			...(numSlides && { numSlides }),
+			...(createdAt && { createdAt }),
+			...(updatedAt && { updatedAt })
+		};
+
+		if (assignments) {
+			payload["assignments"] = {
+				some: {
+					id: assignments
+				}
+			};
+		}
+
+		if (members) {
+			payload["members"] = {
+				some: {
+					id: members!
+				}
+			};
+		}
+
+		if (keywords) {
+			payload["keywords"] = {
+				hasEvery: keywords
+			};
+		}
+
+		if (feedback) {
+			payload["feedback"] = {
+				some: {
+					id: feedback!
+				}
+			};
+		}
+
+		if (parentCourses) {
+			payload["parentCourses"] = {
+				some: {
+					id: parentCourses
+				}
+			};
+		}
+
+		if (parentModules) {
+			payload["parentModules"] = {
+				some: {
+					id: parentModules
+				}
+			};
+		}
+
+		if (childModules) {
+			payload["childModules"] = {
+				some: {
+					id: childModules
+				}
+			};
+		}
+
+		return (await this.prisma.module.findMany({
+			where: payload,
+			include: {
+				assignments: true,
+				members: true,
+				feedback: true,
+				parentModules: true,
+				childModules: true
+			}
+		})) as Prisma.ModuleGetPayload<{}>[];
+	}
+
 	async course(id: string): Promise<Course | null> {
 		return this.prisma.course.findFirstOrThrow({
 			where: {
 				id
 			},
 			include: {
-				modules: {
+				module: {
 					include: {
-						module: {
+						assignments: true,
+						feedback: {
 							include: {
-								assignments: true,
-								feedback: {
-									include: {
-										student: true,
-										module: false
-									}
-								},
-								parentCourses: {
-									include: {
-										course: true
-									}
-								},
-								members: {
-									include: {
-										module: false,
-										plan: true
-									}
-								}
+								student: true,
+								module: false
 							}
 						},
-						course: false
+						members: {
+							include: {
+								module: false,
+								plan: true
+							}
+						}
 					}
-				},
+				}
 			}
 		});
 	}
@@ -199,33 +235,47 @@ export class ProgramService {
 	async courses(): Promise<Course[]> {
 		return this.prisma.course.findMany({
 			include: {
-				modules: {
+				module: {
 					include: {
-						module: {
+						assignments: true,
+						feedback: {
 							include: {
-								assignments: true,
-								feedback: {
-									include: {
-										student: true,
-										module: false
-									}
-								},
-								parentCourses: {
-									include: {
-										course: true
-									}
-								},
-								members: {
-									include: {
-										module: false,
-										plan: true
-									}
-								}
+								student: true,
+								module: false
 							}
 						},
-						course: false
+						members: {
+							include: {
+								module: false,
+								plan: true
+							}
+						}
 					}
-				},
+				}
+			}
+		});
+	}
+
+	async courseByParam(params: CourseFields): Promise<Course[] | null> {
+		const { id, name, module } = params;
+
+		const payload = {
+			...(id && { id }),
+			...(name && { name })
+		};
+
+		if (module) {
+			payload["module"] = {
+				some: {
+					id: module
+				}
+			};
+		}
+
+		return this.prisma.course.findMany({
+			where: payload,
+			include: {
+				module: true
 			}
 		});
 	}
@@ -239,7 +289,7 @@ export class ProgramService {
 	}
 
 	async assignment(id: string): Promise<Assignment | null> {
-		const res = await this.prisma.assignment.findFirst({
+		return await this.prisma.assignment.findFirst({
 			where: {
 				id
 			},
@@ -247,19 +297,38 @@ export class ProgramService {
 				module: true
 			}
 		});
-		return res;
 	}
 
-	async moduleInCourses(): Promise<ModuleInCourse[]> {
-		return this.prisma.moduleInCourse.findMany({
-			// include: {
-			// 	// module: true,
-			// 	// course: true
-			// }
+	async assignmentByParam(
+		params: AssignmentFields
+	): Promise<Assignment[] | null> {
+		const { id, updatedAt, name, dueAt, module, assignmentResult } = params;
+
+		const payload = {
+			...(id && { id }),
+			...(updatedAt && { updatedAt }),
+			...(name && { name }),
+			...(dueAt && { dueAt })
+		};
+
+		payload["moduleId"] = module ? module : undefined;
+		payload["assignmentResults"] = (assignmentResult) ? {some: {id: assignmentResult}} : undefined;
+
+		const where = Prisma.validator<Prisma.AssignmentWhereInput>()({
+			...payload
+		});
+
+		return this.prisma.assignment.findMany({
+			where: where,
+
+			include: {
+				module: true,
+				assignmentResults: true
+			}
 		});
 	}
 
-	async moduleFeedbacks(): Promise<ModuleFeedback[]> {
+	async moduleFeedbacks() {
 		return this.prisma.moduleFeedback.findMany({
 			include: {
 				student: true,
@@ -268,7 +337,28 @@ export class ProgramService {
 		});
 	}
 
-	async moduleFeedback(id: string): Promise<ModuleFeedback | null> {
+	async modFeedbackByParam(params: ModFeedbackFields) {
+		const { id, feedback, rating, student, module } = params;
+
+		const payload = {
+			...(id && { id }),
+			...(feedback && { feedback }),
+			...(rating && { rating })
+		};
+
+		payload["studentId"] = student ? student : undefined;
+		payload["moduleId"] = module ? module : undefined;
+
+		return this.prisma.moduleFeedback.findMany({
+			where: payload,
+			include: {
+				student: true,
+				module: true
+			}
+		});
+	}
+
+	async moduleFeedback(id: string) {
 		return this.prisma.moduleFeedback.findFirst({
 			where: {
 				id
@@ -280,14 +370,14 @@ export class ProgramService {
 		});
 	}
 
-	async assignmentResults(): Promise<AssignmentResult[]> {
+	async assignmentResults() {
 		return this.prisma.assignmentResult.findMany({
 			include: {
 				student: {
 					include: {
 						student: true,
 						modules: true,
-						assignmentResults: true,
+						assignmentResults: true
 					}
 				},
 				gradedBy: true,
@@ -296,7 +386,7 @@ export class ProgramService {
 		});
 	}
 
-	async assignmentResult(id: string): Promise<AssignmentResult | null> {
+	async assignmentResult(id: string) {
 		return this.prisma.assignmentResult.findFirst({
 			where: {
 				id
@@ -309,8 +399,40 @@ export class ProgramService {
 		});
 	}
 
+	async assignmentResultByParam(params: AssignmentResFields) {
+		const {
+			id,
+			submittedAt,
+			result,
+			feedback,
+			student,
+			gradedBy,
+			assignment
+		} = params;
+
+		const payload = {
+			...(id && { id }),
+			...(submittedAt && { submittedAt }),
+			...(result && { result }),
+			...(feedback && { feedback })
+		};
+
+		payload["studentId"] = student ? student : undefined;
+		payload["graderId"] = gradedBy ? gradedBy : undefined;
+		payload["assignmentId"] = assignment ? assignment : undefined;
+
+		return this.prisma.assignmentResult.findMany({
+			where: payload,
+			include: {
+				student: true,
+				gradedBy: true,
+				assignment: true
+			}
+		});
+	}
+
 	/// Fetch all module enrollments in the database
-	async moduleEnrollments(): Promise<ModuleEnrollment[]> {
+	async moduleEnrollments() {
 		return this.prisma.moduleEnrollment.findMany({
 			include: {
 				plan: {
@@ -324,7 +446,7 @@ export class ProgramService {
 	}
 
 	/// Fetch a moduleEnrollment by document ID
-	async moduleEnrollment(id: string): Promise<ModuleEnrollment | null> {
+	async moduleEnrollment(id: string) {
 		return this.prisma.moduleEnrollment.findFirst({
 			where: {
 				id
@@ -332,10 +454,91 @@ export class ProgramService {
 		});
 	}
 
+	async modEnrollmentByParam(params: ModEnrollmentFields) {
+		const { id, enrolledAt, role, module, plan } = params;
+
+		const payload = {
+			...(id && { id }),
+			...(enrolledAt && { enrolledAt }),
+			...(role && { role })
+		};
+
+		payload["moduleId"] = module ? module : undefined;
+		payload["planId"] = plan ? plan : undefined;
+
+		return this.prisma.moduleEnrollment.findMany({
+			where: payload,
+			include: {
+				module: true,
+				plan: true
+			}
+		});
+	}
+
+	async collections() {
+		return this.prisma.collection.findMany({
+			include: {
+				lessons: true
+			}
+		});
+	}
+
+	async collection(id: string) {
+		return this.prisma.collection.findFirst({
+			where: {
+				id
+			},
+			include: {
+				lessons: true
+			}
+		});
+	}
+
+	async createCollection({
+		name,
+		lessons,
+		next,
+		previous,
+		moduleID
+	}: CreateCollectionArgs) {
+		const create = Prisma.validator<Prisma.CollectionCreateInput>()({
+			name,
+			first: lessons?.at(0),
+			last: lessons?.at(-1),
+			previous,
+			next,
+			module: {
+				connect: {
+					id: moduleID
+				}
+			},
+			lessons: {
+				connect: lessons?.map((lesson) => {
+					return { id: lesson };
+				})
+			}
+		});
+		return this.prisma.collection.create({
+			data: create,
+			include: {
+				lessons: true
+			}
+		});
+	}
+
+	async updateCollection(id: string, data: any) {
+		return this.prisma.collection.update({
+			where: {
+				id
+			},
+			data
+		});
+	}
+
 	//Mutations
 
 	/// Create a new module
-	async addModule(data: Prisma.ModuleCreateInput): Promise<Module | Error> {
+	async addModule(data: Prisma.ModuleCreateInput) {
 		//find out if there is a duplicate user
 		const get = await this.prisma.module.findMany({
 			where: {
@@ -343,32 +546,12 @@ export class ProgramService {
 			}
 		});
 		if (get.length !== 0) {
-			throw new Error("Module already exisits.");
+			throw new Error("Module already exists.");
 		} else {
-			const {
-				id,
-				description,
-				feedback,
-				moduleName,
-				moduleNumber,
-				intro,
-				keywords,
-				assignments,
-				members,
-				createdAt,
-				updatedAt,
-				numSlides,
-				duration
-			} = data;
 			return this.prisma.module.create({
 				data,
 				include: {
 					assignments: true,
-					parentCourses: {
-						include: {
-							course: true
-						}
-					},
 					feedback: {
 						include: {
 							student: true
@@ -378,16 +561,16 @@ export class ProgramService {
 						include: {
 							plan: true
 						}
-					}
+					},
+					collections: true
 				}
 			});
 		}
 	}
 
 	/// Modify a modules data or add an assignment here
-	async updateModule(data: UpdateModule): Promise<Module> {
+	async updateModule(data: UpdateModule) {
 		const {
-			id,
 			moduleNumber,
 			moduleName,
 			description,
@@ -410,11 +593,6 @@ export class ProgramService {
 			},
 			include: {
 				assignments: true,
-				parentCourses: {
-					include: {
-						course: true
-					}
-				},
 				feedback: {
 					include: {
 						student: true
@@ -475,12 +653,12 @@ export class ProgramService {
 				id
 			},
 			data: {
-				modules: {
+				module: {
 					deleteMany: {}
 				}
 			},
 			include: {
-				modules: true
+				module: true
 			}
 		});
 
@@ -519,12 +697,7 @@ export class ProgramService {
 
 	/// Change an assignments data
 	async updateAssignment(id: string, data: AssignmentInput) {
-		const {
-			name,
-			dueAt,
-			// Look into moving assignments between courses through this.
-			module
-		} = data;
+		const { name, dueAt } = data;
 		return this.prisma.assignment.update({
 			where: {
 				id: id
@@ -625,31 +798,46 @@ export class ProgramService {
 	}
 
 	/// Create a ModuleEnrollment Document
-	async addModuleEnrollment(
-		input: ModuleEnrollmentInput
-	): Promise<ModuleEnrollment | Error> {
+	async addModuleEnrollment(input: ModuleEnrollmentInput) {
+		const { plan, module, role, status } = input;
+
+
+		console.log(role);
 		let count = await this.prisma.moduleEnrollment.count({
 			where: {
-				planId: input.plan,
-				moduleId: input.module
+				planID: plan,
+				moduleId: module
 			}
 		});
 
-		if (count != 0) {
+		if (count !== 0) {
 			throw new Error("This Module Enrollment already exists");
+		} else {
+			const create =
+				Prisma.validator<Prisma.ModuleEnrollmentCreateInput>()({
+					module: {
+						connect: {
+							id: module
+						}
+					},
+					plan: {
+						connect: {
+							id: plan
+						}
+					},
+					role,
+					status
+				});
+
+			return this.prisma.moduleEnrollment.create({
+				data: create,
+				include: {
+					module: true,
+					plan: true
+				}
+			});
 		}
 
-		return this.prisma.moduleEnrollment.create({
-			data: {
-				moduleId: input.module,
-				planId: input.plan,
-				role: input.role
-			},
-			include: {
-				module: true,
-				plan: true
-			}
-		});
 	}
 
 	/// Update a ModuleEnrollment
@@ -660,7 +848,7 @@ export class ProgramService {
 			},
 			data: {
 				moduleId: input.module,
-				planId: input.plan,
+				planID: input.plan,
 				role: input.role
 			},
 			include: {
@@ -680,36 +868,105 @@ export class ProgramService {
 
 	// Link a course and a module
 	async pairCourseModule(courseId: string, moduleId: string) {
-		return this.prisma.moduleInCourse.create({
+		let count = await this.prisma.module.count({
+			where: {
+				id: moduleId,
+				course: {
+					some: {
+						id: courseId
+					}
+				}
+			}
+		});
+
+		if (count != 0) {
+			throw new Error("Module and Course are already Linked.");
+		}
+
+		await this.prisma.course.update({
+			where: {
+				id: courseId
+			},
 			data: {
-				moduleId: moduleId,
-				courseId: courseId
+				moduleIDs: {
+					push: moduleId
+				}
+			}
+		});
+
+		return this.prisma.module.update({
+			where: {
+				id: moduleId
+			},
+			data: {
+				courseIDs: {
+					push: courseId
+				}
 			}
 		});
 	}
 
 	async unpairCourseModule(courseId: string, moduleId: string) {
-		return this.prisma.moduleInCourse.deleteMany({
+		const courseIdToRemove = await this.prisma.course.findUnique({
 			where: {
-				moduleId: moduleId,
-				courseId: courseId
+				id: courseId
+			}
+		});
+
+		const newModuleSet =
+			courseIdToRemove !== null
+				? courseIdToRemove.moduleIDs.filter(
+						(module) => module !== moduleId
+				  )
+				: null;
+
+		const moduleIdToRemove = await this.prisma.module.findUnique({
+			where: {
+				id: moduleId
+			}
+		});
+
+		const newCourseSet =
+			moduleIdToRemove !== null
+				? moduleIdToRemove.courseIDs.filter(
+						(course) => course !== courseId
+				  )
+				: null;
+
+		await this.prisma.course.update({
+			where: {
+				id: courseId
+			},
+			data: {
+				moduleIDs: newModuleSet !== null ? newModuleSet : undefined
+			}
+		});
+
+		return this.prisma.module.update({
+			where: {
+				id: moduleId
+			},
+			data: {
+				courseIDs: newCourseSet !== null ? newCourseSet : undefined
 			}
 		});
 	}
-	async Addrequirement(parentId: string, childId: string){
-		return this.prisma.requirement.create({
-			data:{
-				parentId: parentId,
-				childId:  childId
-			}
 
-		})
-	}
-	async Removerequirement(parentId: string, childId: string){
-		return this.prisma.requirement.deleteMany({
-			where:{
+	async Addrequirement(parentId: string, childId: string) {
+		return this.prisma.requirement.create({
+			data: {
 				parentId: parentId,
-				childId:  childId
+				childId: childId
 			}
-	})
-}}
+		});
+	}
+
+	async Removerequirement(parentId: string, childId: string) {
+		return this.prisma.requirement.deleteMany({
+			where: {
+				parentId: parentId,
+				childId: childId
+			}
+		});
+	}
+}

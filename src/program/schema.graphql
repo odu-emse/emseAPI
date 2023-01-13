@@ -4,31 +4,47 @@ enum UserRole {
 	GRADER
 }
 
+enum EnrollmentStatus {
+    ACTIVE
+    INACTIVE
+}
+
 type ModuleEnrollment {
-	"""
-	 id of the ModuleEnrollment
-	"""
-	id: ID!
+    """
+    id of the ModuleEnrollment
+    """
+    id: ID!
 
-	"""
-	TimeStamp at which the module is enrolledAt
-	"""
-	enrolledAt: String!
+    """
+    TimeStamp at which the module is enrolledAt
+    """
+    enrolledAt: Date!
 
-	"""
-	Role of the user:Either Student, Teacher or Grader
-	"""
-	role: UserRole!
+    """
+    Role of the user:Either Student, Teacher or Grader
+    """
+    role: UserRole!
 
-	"""
-	Current Module
-	"""
-	module: Module!
+    """
+    Status of the enrollment: Either Active or Inactive
+    """
+    status: EnrollmentStatus!
 
-	"""
-	Plan of study Chosen
-	"""
-	plan: PlanOfStudy!
+    """
+    Current Module
+    """
+    module: Module!
+
+    """
+    Plan of study Chosen
+    """
+    plan: PlanOfStudy
+
+    """
+    Inactive plan of study
+    """
+    inactivePlan: PlanOfStudy
+
 }
 
 type AssignmentResult {
@@ -40,7 +56,7 @@ type AssignmentResult {
 	"""
 	Time at which the Assignement Result is given
 	"""
-	submittedAt: String!
+	submittedAt: Date!
 
 	"""
 	result of the Assignement
@@ -77,7 +93,7 @@ type Assignment {
 	"""
 	date and time at which assignment is updated
 	"""
-	updatedAt: String!
+	updatedAt: Date!
 
 	"""
 	Name of the assignment
@@ -87,7 +103,7 @@ type Assignment {
 	"""
 	due of the assignment
 	"""
-	dueAt: String
+	dueAt: Date
 
 	"""
 	Assignment belonging to the module
@@ -125,7 +141,6 @@ type ModuleFeedback {
 	Module in which module feedback is given
 	"""
 	module: Module
-
 }
 
 type Course {
@@ -142,7 +157,7 @@ type Course {
 	"""
 	modules in the course
 	"""
-	modules: [ModuleInCourse]
+	moduleIDs: [ID]
 }
 
 type Module {
@@ -189,12 +204,12 @@ type Module {
 	"""
 	Date and Time of the Module Created at
 	"""
-	createdAt: String!
+	createdAt: Date!
 
 	"""
 	Date and Time of the Module Updated at
 	"""
-	updatedAt: String!
+	updatedAt: Date!
 
 	"""
 	Assignement in the module
@@ -211,10 +226,7 @@ type Module {
 	"""
 	feedback: [ModuleFeedback]
 
-	"""
-	Parent Courses in the Modules
-	"""
-	parentCourses: [ModuleInCourse]
+	# parentCourses: [ModuleInCourse]
 
 	"""
 	Parent Modules of the Module
@@ -225,9 +237,110 @@ type Module {
 	Childmodules in the Module
 	"""
 	childModules: [Requirement]
+	"""
+	A list of collections that have this module's materials
+	"""
+	collections: [Collection]
+
+	"""
+	courseIDs set
+	"""
+	courseIDs: [ID]
 }
 
-type Requirement{
+type Collection {
+	"""
+	id of the collection
+	"""
+	id: ID!
+
+	"""
+	Name of the collection
+	"""
+	name: String!
+
+	"""
+	Date and Time of the collection created at
+	"""
+	createdAt: Date!
+
+	"""
+	Date and Time of the collection updated at
+	"""
+	updatedAt: Date!
+
+	"""
+	List of lessons in the collection
+	"""
+	lessons: [Lesson]
+
+	"""
+	The ID of the next collection
+	"""
+	next: ID
+
+	"""
+	The ID of the previous collection
+	"""
+	previous: ID
+
+	"""
+	The ID of the first lesson in the collection
+	"""
+	first: ID
+
+	"""
+	The ID of the last lesson in the collection
+	"""
+	last: ID
+	"""
+
+	"""
+	module: Module!
+	"""
+
+	"""
+	moduleID: ID!
+}
+
+type Lesson {
+	"""
+	document ID
+	"""
+	id: ID!
+	"""
+	Lesson Name
+	"""
+	name: String!
+	"""
+	The type of content being displayed. (PDF, Video, etc.)
+	"""
+	contentType: String!
+	"""
+	The link/id of the actual content data itself
+	"""
+	content: String!
+	"""
+	An optional transcript of the content data (primarily for videos)
+	"""
+	transcript: String
+	"""
+	The list of threads related to the lesson
+	"""
+	threads: [Thread]
+
+	"""
+	The collection that the lesson belongs to
+	"""
+	collection: Collection
+
+	"""
+	The ID of the parent collection
+	"""
+	collectionID: ID
+}
+
+type Requirement {
 	"""
 	id of Requirement
 	"""
@@ -242,23 +355,6 @@ type Requirement{
 	Parent Module in Requirement
 	"""
 	parent: Module!
-}
-
-type ModuleInCourse {
-	"""
-	id of ModuleInCourse
-	"""
-	id: ID!
-
-	"""
-	Module in ModuleInCourse
-	"""
-	module: Module
-
-	"""
-	Course in ModuleInCourse
-	"""
-	course: Course
 }
 
 type Error {
@@ -277,6 +373,7 @@ type Query {
 	Specific Module in the Modules
 	"""
 	module(id: ID!): Module
+	modulesByParam(input: ModuleFields!): [Module!]
 
 	"""
 	Specific Course in the Courses
@@ -286,6 +383,7 @@ type Query {
 	List of all courses
 	"""
 	courses: [Course!]!
+	courseByParam(input: CourseFields!): [Course!]
 
 	"""
 	Specific assignment in assignments
@@ -295,40 +393,128 @@ type Query {
 	List of all assignments
 	"""
 	assignment(id: ID!): Assignment
+	assignmentByParam(input: AssignmentFields!): [Assignment!]
 
-	""""
-	Modules in the courses
-	"""
-	moduleInCourses: [ModuleInCourse!]!
+	# moduleInCourses: [ModuleInCourse!]!
 
 	"""
 	Module feedbacks
 	"""
 	moduleFeedbacks: [ModuleFeedback!]!
 	"""
-	Specific module feedback in modulefeedbacks
+	Specific module feedback in module feedbacks
 	"""
 	moduleFeedback(id: ID!): ModuleFeedback
+	modFeedbackByParam(input: ModFeedbackFields!): [ModuleFeedback!]
 
 	"""
-	Specific assisgnement result
+	Specific assignment result
 	"""
 	assignmentResults: [AssignmentResult!]!
 	"""
 	list of all assignment Results
 	"""
 	assignmentResult(id: ID!): AssignmentResult
+	assignmentResultByParam(input: AssignmentResFields!): [AssignmentResult!]
 
 	"""
 	List of module enrollment
 	"""
 	moduleEnrollments: [ModuleEnrollment!]!
 	"""
-	Specific Moduleenrollment in Moduleenrollment
+	Retrieve a specific Module enrollment based on document ID
 	"""
 	moduleEnrollment(id: ID!): ModuleEnrollment
+
+	modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
+
+	"""
+	List of all collections
+	"""
+	collections: [Collection!]!
+
+	"""
+	Retrieve a specific collection based on document ID
+	"""
+	collection(id: ID!): Collection
 }
 
+input CreateCollectionArgs {
+	name: String!
+	first: ID
+	last: ID
+	previous: ID
+	next: ID
+	moduleID: ID!
+	lessons: [ID!]
+	positionIndex: Int
+}
+
+input ModuleFields {
+	id: ID
+	moduleNumber: Int
+	moduleName: String
+	description: String
+	duration: Float
+	intro: String
+	numSlides: Int
+	keywords: [String!]
+	createdAt: Date
+	updatedAt: Date
+
+	assignments: ID
+	members: ID
+	feedback: ID
+	parentCourses: ID
+	parentModules: ID
+	childModules: ID
+}
+
+input CourseFields {
+	id: ID
+	name: String
+
+	module: ID
+}
+
+input AssignmentFields {
+	id: ID
+	updatedAt: Date
+	name: String
+	dueAt: Date
+
+	module: ID
+	assignmentResult: ID
+}
+
+input ModFeedbackFields {
+	id: ID
+	feedback: String
+	rating: Int
+
+	student: ID
+	module: ID
+}
+
+input AssignmentResFields {
+	id: ID
+	submittedAt: Date
+	result: Float
+	feedback: String
+
+	student: ID
+	gradedBy: ID
+	assignment: ID
+}
+
+input ModEnrollmentFields {
+	id: ID
+	enrolledAt: Date
+
+	role: UserRole
+	module: ID
+	plan: ID
+}
 
 input NewModule {
 	"""
@@ -404,7 +590,7 @@ input NewAssignment {
 	"""
 	Due date and Time of NewAssignment
 	"""
-	dueAt: String!
+	dueAt: Date!
 	"""
 	Module to which the NewAssignement Belongs to
 	"""
@@ -419,7 +605,7 @@ input AssignmentInput {
 	"""
 	New Due date and time of the Assignement
 	"""
-	dueAt: String
+	dueAt: Date
 	"""
 	Updated module linkage
 	"""
@@ -476,18 +662,22 @@ input NewAssignmentResult {
 }
 
 input ModuleEnrollmentInput {
-	"""
-	Relating Module to ModuleEnrollment
-	"""
-	module: ID!
-	"""
-	Relating Plan to MOdule enrollment
-	"""
-	plan: ID!
-	"""
-	Relating role to ModuleEnrollment
-	"""
-	role: UserRole!
+    """
+    Relating Module to ModuleEnrollment
+    """
+    module: ID!
+    """
+    Relating Plan to Module enrollment
+    """
+    plan: ID!
+    """
+    Relating role to ModuleEnrollment
+    """
+    role: UserRole!
+    """
+    The status of the current enrollment
+    """
+    status: EnrollmentStatus!
 }
 
 type Mutation {
@@ -582,7 +772,7 @@ type Mutation {
 		"""
 		id: ID!
 		"""
-		Module enrollement input
+		Module enrollment input
 		"""
 		input: ModuleEnrollmentInput
 	): ModuleEnrollment
@@ -594,9 +784,13 @@ type Mutation {
 	"""
 	Course Module is paired Relating Course ID and module Id
 	"""
-	pairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse!
+	pairCourseModule(courseId: ID!, moduleId: ID!): Module!
+	# """
+	# Course Module is Unpaired Relating to Course Id and mobile Id
+	# """
+	unpairCourseModule(courseId: ID!, moduleId: ID!): Module
 	"""
-	Course Module is Unpaired Relating to Course Id and mobile Id
+	stuff
 	"""
-	unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
+	createCollection(data: CreateCollectionArgs!): Collection!
 }

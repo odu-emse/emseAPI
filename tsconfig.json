@@ -15,9 +15,16 @@
 		"target": "es2017",
 		"sourceMap": true,
 		"outDir": "./dist",
-		"baseUrl": "./",
+		"baseUrl": ".",
+		"rootDir": "./",
 		"incremental": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"paths": {
+			"@/*": ["src/*"],
+			"@/types/*": ["gql/*"]
+		},
+		"types": ["vitest/globals", "node"]
 	},
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules", "./dist"]
 }

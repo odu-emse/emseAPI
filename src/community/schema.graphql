@@ -1,0 +1,91 @@
+    """
+    A thread is a collection of messages posted to a particular topic.
+    """
+type Thread {
+    """
+    The ID of the document object
+    """
+    id: ID!
+    """
+    The title of the thread
+    """
+    title: String
+    """
+    The author of the thread
+    """
+    author: User!
+    """
+    The content body of the thread
+    """
+    body: String!
+    """
+    The comments added to the thread
+    """
+    comments: [Thread]
+    """
+    The number of upvotes for the thread
+    """
+    upvotes: Int!
+    """
+    The list of users who are subscribed to changes/notifications on the thread
+    """
+    usersWatching: [User!]
+    """
+    TODO: Add linkage between lesson and thread once lesson schema is defined
+    """
+    parentLesson: Lesson
+    """
+    """
+    createdAt: Date!
+    """
+    """
+    updatedAt: Date!
+    """
+    """
+    parentThread: Thread
+    parentThreadID: ID
+}
+
+input IThreadCreateInput {
+    title: String
+    body: String!
+    parentLesson: ID
+    parentThread: ID
+    author: ID!
+}
+
+input ICommentCreateInput {
+    body: String!
+    author: ID!
+}
+
+type Query {
+    """
+    Get a thread by ID
+    """
+    thread(id: ID!): Thread
+    """
+    Get a list of threads
+    """
+    threads: [Thread]!
+}
+
+type Mutation {
+    """
+    Creates a new thread
+    @args IThreadCreateInput
+    @prop title: String
+    @prop body: String!
+    @prop parentLesson: ID
+    @prop parentThread: ID
+    """
+    createThread(data:IThreadCreateInput!): Thread
+
+    addCommentToThread(id: ID!, data: ICommentCreateInput!): Thread
+
+    upvoteThread(id: ID!): Thread
+
+    updateThread(id: ID!, data: IThreadCreateInput!): Thread
+
+    deleteThread(id: ID!): Thread
+}

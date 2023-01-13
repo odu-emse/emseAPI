@@ -1,6 +1,6 @@
 import { UseGuards } from "@nestjs/common";
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
-import { PlanInput } from "gql/graphql";
+import { PlanFields, PlanInput } from "gql/graphql";
 import { AuthGuard } from "../auth.guard";
 import { PoSService } from "./pos.service";
 
@@ -22,6 +22,11 @@ export class PlanOfStudyResolver {
 	@Query("planByID")
 	async planByID(@Args("id") arg: string) {
 		return this.planService.plan(arg);
+	}
+
+	@Query("planByParams")
+	async planByParams(@Args("input") args: PlanFields) {
+		return await this.planService.planByParams(args);
 	}
 
 	@Mutation("addPlan")

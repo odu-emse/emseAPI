@@ -1,85 +1,102 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import { UserService } from 'src/user/user.service';
-import { Prisma, User } from "@prisma/client";
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma.service";
+import { NewUser, User } from "../../gql/graphql";
+
+type TokenType = {
+	sub: string;
+	email: string;
+	iat: number;
+	exp: number;
+	picture: string;
+	given_name: string;
+	family_name: string;
+};
+
+interface UserOpenID {
+	openID: string;
+}
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private prisma: PrismaService
-    ){}
+	constructor(private prisma: PrismaService) {}
 
-    async fetchToken(code: String) {
-        const response = await fetch("https://oauth2.googleapis.com/token", {
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify({
-                client_id: process.env.GOOGLE_ID,
-                client_secret: process.env.GOOGLE_SECRET,
-                grant_type: 'authorization_code',
-                redirect_uri: 'http://localhost:3000/auth/redirect',
-                access_type: 'offline',
-                code
-            })
-        });
+	async fetchToken(code: String) {
+		return await fetch("https://oauth2.googleapis.com/token", {
+			method: "POST",
+			credentials: "include",
+			body: JSON.stringify({
+				client_id: process.env.GOOGLE_ID,
+				client_secret: process.env.GOOGLE_SECRET,
+				grant_type: "authorization_code",
+				redirect_uri: "http://localhost:3000/auth/redirect",
+				access_type: "offline",
+				code
+			})
+		});
+	}
 
-        return response;
-    }
+	async updateUserData(id_token: string) {
+		const d1 = id_token.indexOf(".");
+		const d2 = id_token.indexOf(".", d1 + 1);
+		const JWTpayload = id_token.substring(d1 + 1, d2);
 
-    async updateUserData(id_token: string) {
-        const d1 = id_token.indexOf('.');
-        const d2 = id_token.indexOf('.', d1+1);
-        const JWTpayload = id_token.substring(d1+1, d2);
+		const decoded: string = Buffer.from(JWTpayload, "base64").toString("ascii");
 
-        const data = JSON.parse(atob(JWTpayload));
-
-        //Check to see if a user exists already
-        const count = await this.prisma.user.count({
-            where: {
-                openID: data.sub
-            }
-        })
-        
-        if (count == 0) {
-            //Register User here
-            console.log("First time user")
-
-            const payload = {
-                openID: data.sub,
-                email: data.email,
-                picURL: data.picture,
-                firstName: data.given_name,
-                lastName: data.family_name
-            }
-
-            return this.registerUser(payload);
-
-        }else {
-            //Update an exisiting user
-            return this.prisma.user.update({
-                where: {
-                    openID: data.sub
-                },
-                data: {
-                    openID: data.sub,
-                    email: data.email,
-                    picURL: data.picture,
-                    firstName: data.given_name,
-                    lastName: data.family_name
-                }
-            })
-        }
-    }
-
-    // Create a user
-	async registerUser(data: Prisma.UserCreateInput): Promise<User | Error> {
 		const {
-			openID,
+			sub,
+			exp,
+			iat,
 			email,
-			picURL,
-			firstName,
-			lastName,
-		} = data;
+			picture,
+			given_name,
+			family_name
+		}: TokenType = JSON.parse(decoded);
+
+		if (!sub) {
+			throw new Error("Invalid token");
+		}
+
+		//Check to see if a user exists already
+		const count = await this.prisma.user.count({
+			where: {
+				openID: sub
+			}
+		});
+
+		if (count == 0) {
+			//Register User here
+			console.log("First time user");
+
+			const payload = {
+				openID: sub,
+				email: email,
+				picURL: picture,
+				firstName: given_name,
+				lastName: family_name,
+				middleName: ""
+			};
+
+			return this.registerUser(payload);
+		} else {
+			//Update an existing user
+			return this.prisma.user.update({
+				where: {
+					openID: sub
+				},
+				data: {
+					...(sub && { openID: sub }),
+					...(email && { email }),
+					...(picture && { picURL: picture }),
+					...(given_name && { firstName: given_name }),
+					...(family_name && { lastName: family_name })
+				}
+			});
+		}
+	}
+
+	// Create a user
+	async registerUser(data: NewUser) {
+		const { openID, email, picURL, firstName, lastName } = data;
 
 		const safeEmail = email.toLowerCase();
 		//find out if there is a duplicate user
@@ -94,7 +111,7 @@ export class AuthService {
 			email: safeEmail,
 			picURL,
 			firstName,
-			lastName,
+			lastName
 		};
 
 		///Avoids duplicate value(email) if the exist already
@@ -106,19 +123,17 @@ export class AuthService {
 			return new Error("User has an account already.");
 		}
 	}
-    
-    async refreshToken(token: String) {
-        const response = await fetch("https://oauth2.googleapis.com/token", {
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify({
-                client_id: process.env.GOOGLE_ID,
-                client_secret: process.env.GOOGLE_SECRET,
-                grant_type: 'refresh_token',
-                refresh_token: token
-            })
-        });
 
-        return response;
-    }
+	async refreshToken(token: String) {
+		return await fetch("https://oauth2.googleapis.com/token", {
+			method: "POST",
+			credentials: "include",
+			body: JSON.stringify({
+				client_id: process.env.GOOGLE_ID,
+				client_secret: process.env.GOOGLE_SECRET,
+				grant_type: "refresh_token",
+				refresh_token: token
+			})
+		});
+	}
 }
