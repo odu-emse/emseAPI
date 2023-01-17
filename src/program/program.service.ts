@@ -109,7 +109,7 @@ export class ProgramService {
 		}
 	}
 
-	async modulesByParam(params: ModuleFields): Promise<Module[] | null> {
+	async modulesByParam(params: ModuleFields) {
 		const {
 			id,
 			moduleNumber,
@@ -139,6 +139,8 @@ export class ProgramService {
 			...(updatedAt && { updatedAt })
 		};
 
+		let where: Prisma.ModuleWhereInput = {};
+
 		if (assignments) {
 			payload["assignments"] = {
 				some: {
@@ -148,17 +150,24 @@ export class ProgramService {
 		}
 
 		if (members) {
-			payload["members"] = {
-				some: {
-					id: members!
-				}
+			// get a module that has all elements of params.[members]
+			where = {
+				AND: members.map((member) => {
+					return {
+						members: {
+							some: {
+								planID: member
+							}
+						}
+					};
+				})
 			};
 		}
 
 		if (keywords) {
 			payload["keywords"] = {
 				hasEvery: keywords
-			};
+			} as Prisma.ModuleWhereInput;
 		}
 
 		if (feedback) {
@@ -166,7 +175,7 @@ export class ProgramService {
 				some: {
 					id: feedback!
 				}
-			};
+			} as Prisma.ModuleFeedbackListRelationFilter;
 		}
 
 		if (parentCourses) {
@@ -182,7 +191,7 @@ export class ProgramService {
 				some: {
 					id: parentModules
 				}
-			};
+			} as Prisma.RequirementListRelationFilter;
 		}
 
 		if (childModules) {
@@ -190,19 +199,30 @@ export class ProgramService {
 				some: {
 					id: childModules
 				}
-			};
+			} as Prisma.RequirementListRelationFilter;
 		}
 
-		return (await this.prisma.module.findMany({
-			where: payload,
+		console.log(where);
+
+		return await this.prisma.module.findMany({
+			where: where,
 			include: {
 				assignments: true,
-				members: true,
+				members: {
+					include: {
+						module: true,
+						plan: {
+							include: {
+								student: true
+							}
+						}
+					}
+				},
 				feedback: true,
 				parentModules: true,
 				childModules: true
 			}
-		})) as Prisma.ModuleGetPayload<{}>[];
+		});
 	}
 
 	async course(id: string): Promise<Course | null> {
@@ -312,7 +332,9 @@ export class ProgramService {
 		};
 
 		payload["moduleId"] = module ? module : undefined;
-		payload["assignmentResults"] = (assignmentResult) ? {some: {id: assignmentResult}} : undefined;
+		payload["assignmentResults"] = assignmentResult
+			? { some: { id: assignmentResult } }
+			: undefined;
 
 		const where = Prisma.validator<Prisma.AssignmentWhereInput>()({
 			...payload
@@ -400,15 +422,8 @@ export class ProgramService {
 	}
 
 	async assignmentResultByParam(params: AssignmentResFields) {
-		const {
-			id,
-			submittedAt,
-			result,
-			feedback,
-			student,
-			gradedBy,
-			assignment
-		} = params;
+		const { id, submittedAt, result, feedback, student, gradedBy, assignment } =
+			params;
 
 		const payload = {
 			...(id && { id }),
@@ -801,8 +816,6 @@ export class ProgramService {
 	async addModuleEnrollment(input: ModuleEnrollmentInput) {
 		const { plan, module, role, status } = input;
 
-
-		console.log(role);
 		let count = await this.prisma.moduleEnrollment.count({
 			where: {
 				planID: plan,
@@ -813,21 +826,20 @@ export class ProgramService {
 		if (count !== 0) {
 			throw new Error("This Module Enrollment already exists");
 		} else {
-			const create =
-				Prisma.validator<Prisma.ModuleEnrollmentCreateInput>()({
-					module: {
-						connect: {
-							id: module
-						}
-					},
-					plan: {
-						connect: {
-							id: plan
-						}
-					},
-					role,
-					status
-				});
+			const create = Prisma.validator<Prisma.ModuleEnrollmentCreateInput>()({
+				module: {
+					connect: {
+						id: module
+					}
+				},
+				plan: {
+					connect: {
+						id: plan
+					}
+				},
+				role,
+				status
+			});
 
 			return this.prisma.moduleEnrollment.create({
 				data: create,
@@ -837,7 +849,6 @@ export class ProgramService {
 				}
 			});
 		}
-
 	}
 
 	/// Update a ModuleEnrollment
@@ -915,9 +926,7 @@ export class ProgramService {
 
 		const newModuleSet =
 			courseIdToRemove !== null
-				? courseIdToRemove.moduleIDs.filter(
-						(module) => module !== moduleId
-				  )
+				? courseIdToRemove.moduleIDs.filter((module) => module !== moduleId)
 				: null;
 
 		const moduleIdToRemove = await this.prisma.module.findUnique({
@@ -928,9 +937,7 @@ export class ProgramService {
 
 		const newCourseSet =
 			moduleIdToRemove !== null
-				? moduleIdToRemove.courseIDs.filter(
-						(course) => course !== courseId
-				  )
+				? moduleIdToRemove.courseIDs.filter((course) => course !== courseId)
 				: null;
 
 		await this.prisma.course.update({

@@ -66,7 +66,7 @@ export interface ModuleFields {
     createdAt?: Nullable<Date>;
     updatedAt?: Nullable<Date>;
     assignments?: Nullable<string>;
-    members?: Nullable<string>;
+    members?: Nullable<string[]>;
     feedback?: Nullable<string>;
     parentCourses?: Nullable<string>;
     parentModules?: Nullable<string>;

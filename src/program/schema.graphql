@@ -463,7 +463,7 @@ input ModuleFields {
 	updatedAt: Date
 
 	assignments: ID
-	members: ID
+	members: [ID!]
 	feedback: ID
 	parentCourses: ID
 	parentModules: ID
