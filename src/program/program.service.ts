@@ -21,9 +21,9 @@ import {
     Lesson,
     ModuleEnrollment, CreateCollectionArgs, LessonInput,
 } from "gql/graphql";
-import {Injectable} from "@nestjs/common";
-import {PrismaService} from "@/prisma.service";
-import {Prisma} from "@prisma/client";
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "@/prisma.service";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class ProgramService {
@@ -1074,6 +1074,4 @@ export class ProgramService {
 			}
 		})
 	}
-
-
 }

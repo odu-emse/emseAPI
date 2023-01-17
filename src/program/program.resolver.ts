@@ -74,11 +74,6 @@ export class ProgramResolver {
 		return await this.programService.assignmentByParam(args);
 	}
 
-	@Query("moduleInCourses")
-	async moduleInCourses() {
-		return await this.programService.moduleInCourses();
-	}
-
 	@Query("moduleFeedbacks")
 	async moduleFeedbacks() {
 		return await this.programService.moduleFeedbacks();

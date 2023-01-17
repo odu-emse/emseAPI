@@ -9,5 +9,5 @@ node_modules
 .vercel/
 
 logs/
-src/coverage/
+coverage/
 dist/

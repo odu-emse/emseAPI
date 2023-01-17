@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { Prisma, PlanOfStudy } from "@prisma/client";
+import { PrismaService } from "@/prisma.service";
+import { PlanOfStudy } from "@prisma/client";
 import { PlanInput, PlanFields } from "gql/graphql";
 
 @Injectable()
@@ -60,11 +60,11 @@ export class PoSService {
 								feedback: true,
 								assignments: true,
 								members: true,
-								parentCourses: {
-									include: {
-										course: true
-									}
-								}
+								// parentCourses: {
+								// 	include: {
+								// 		course: true
+								// 	}
+								// }
 							}
 						},
 						plan: true
@@ -81,42 +81,36 @@ export class PoSService {
 		});
 	}
 
-	async planByParams(params: PlanFields): Promise<PlanOfStudy[] | null> {
-		const {
-			id,
-			student,
-			module,
-			assignmentResult,
-			modulesLeft
-		} = params
+	async planByParams(params: PlanFields) {
+		const { id, student, module, assignmentResult, modulesLeft } = params;
 
 		const payload = {
-			...(id && {id})
-		}
+			...(id && { id })
+		};
 		if (student) {
-			payload['studentId'] = student
+			payload["studentId"] = student;
 		}
 
 		if (module) {
-			payload['modules'] = {
+			payload["modules"] = {
 				some: {
 					id: module
 				}
-			}
+			};
 		}
 		if (assignmentResult) {
-			payload['assignmentResults'] = {
+			payload["assignmentResults"] = {
 				some: {
 					id: assignmentResult
 				}
-			}
+			};
 		}
 		if (modulesLeft) {
-			payload['modulesLeft'] = {
+			payload["modulesLeft"] = {
 				some: {
 					id: modulesLeft
 				}
-			}
+			};
 		}
 
 		return this.prisma.planOfStudy.findMany({
@@ -124,10 +118,9 @@ export class PoSService {
 			include: {
 				student: true,
 				modules: true,
-				assignmentResults: true,
-				modulesleft: true
+				assignmentResults: true
 			}
-		})
+		});
 	}
 
 	// TODO: Allow for starting modules and courses

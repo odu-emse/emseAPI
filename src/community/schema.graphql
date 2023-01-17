@@ -54,6 +54,11 @@ input IThreadCreateInput {
     author: ID!
 }
 
+input ICommentCreateInput {
+    body: String!
+    author: ID!
+}
+
 type Query {
     """
     Get a thread by ID
@@ -76,9 +81,11 @@ type Mutation {
     """
     createThread(data:IThreadCreateInput!): Thread
 
-    addCommentToThread(id: ID!, data: IThreadCreateInput!): Thread
+    addCommentToThread(id: ID!, data: ICommentCreateInput!): Thread
 
     upvoteThread(id: ID!): Thread
 
     updateThread(id: ID!, data: IThreadCreateInput!): Thread
+
+    deleteThread(id: ID!): Thread
 }

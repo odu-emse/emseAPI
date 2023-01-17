@@ -13,11 +13,21 @@ export enum UserRole {
     GRADER = "GRADER"
 }
 
+export enum EnrollmentStatus {
+    ACTIVE = "ACTIVE",
+    INACTIVE = "INACTIVE"
+}
+
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
     parentLesson?: Nullable<string>;
     parentThread?: Nullable<string>;
+    author: string;
+}
+
+export interface ICommentCreateInput {
+    body: string;
     author: string;
 }
 
@@ -162,6 +172,7 @@ export interface ModuleEnrollmentInput {
     module: string;
     plan: string;
     role: UserRole;
+    status: EnrollmentStatus;
 }
 
 export interface LessonInput {
@@ -263,9 +274,10 @@ export interface AuthTokens {
 export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
-    addCommentToThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    addCommentToThread(id: string, data: ICommentCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
+    deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -289,8 +301,8 @@ export interface IMutation {
     addModuleEnrollment(input?: Nullable<ModuleEnrollmentInput>): ModuleEnrollment | Promise<ModuleEnrollment>;
     updateModuleEnrollment(id: string, input?: Nullable<ModuleEnrollmentInput>): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
     deleteModuleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
-    pairCourseModule(courseId: string, moduleId: string): ModuleInCourse | Promise<ModuleInCourse>;
-    unpairCourseModule(courseId: string, moduleId: string): Nullable<ModuleInCourse> | Promise<Nullable<ModuleInCourse>>;
+    pairCourseModule(courseId: string, moduleId: string): Module | Promise<Module>;
+    unpairCourseModule(courseId: string, moduleId: string): Nullable<Module> | Promise<Nullable<Module>>;
     createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
     createLesson(input: LessonInput): Lesson | Promise<Lesson>;
     updateLesson(input?: Nullable<LessonFields>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
@@ -322,7 +334,6 @@ export interface IQuery {
     assignments(): Assignment[] | Promise<Assignment[]>;
     assignment(id: string): Nullable<Assignment> | Promise<Nullable<Assignment>>;
     assignmentByParam(input: AssignmentFields): Nullable<Assignment[]> | Promise<Nullable<Assignment[]>>;
-    moduleInCourses(): ModuleInCourse[] | Promise<ModuleInCourse[]>;
     moduleFeedbacks(): ModuleFeedback[] | Promise<ModuleFeedback[]>;
     moduleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
     modFeedbackByParam(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
@@ -364,15 +375,17 @@ export interface PlanOfStudy {
     student?: Nullable<User>;
     modules?: Nullable<Nullable<ModuleEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
-    modulesleft?: Nullable<Nullable<Module>[]>;
+    modulesLeft?: Nullable<Nullable<ModuleEnrollment>[]>;
 }
 
 export interface ModuleEnrollment {
     id: string;
     enrolledAt: Date;
     role: UserRole;
+    status: EnrollmentStatus;
     module: Module;
-    plan: PlanOfStudy;
+    plan?: Nullable<PlanOfStudy>;
+    inactivePlan?: Nullable<PlanOfStudy>;
 }
 
 export interface AssignmentResult {
@@ -405,7 +418,7 @@ export interface ModuleFeedback {
 export interface Course {
     id: string;
     name: string;
-    modules?: Nullable<Nullable<ModuleInCourse>[]>;
+    moduleIDs?: Nullable<Nullable<string>[]>;
 }
 
 export interface Module {
@@ -422,10 +435,10 @@ export interface Module {
     assignments?: Nullable<Nullable<Assignment>[]>;
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
     feedback?: Nullable<Nullable<ModuleFeedback>[]>;
-    parentCourses?: Nullable<Nullable<ModuleInCourse>[]>;
     parentModules?: Nullable<Nullable<Requirement>[]>;
     childModules?: Nullable<Nullable<Requirement>[]>;
     collections?: Nullable<Nullable<Collection>[]>;
+    courseIDs?: Nullable<Nullable<string>[]>;
 }
 
 export interface Collection {
@@ -456,12 +469,6 @@ export interface Requirement {
     id: string;
     child: Module;
     parent: Module;
-}
-
-export interface ModuleInCourse {
-    id: string;
-    module?: Nullable<Module>;
-    course?: Nullable<Course>;
 }
 
 export interface Error {
@@ -498,7 +505,7 @@ export interface User {
     openID: string;
     email: string;
     picURL?: Nullable<string>;
-    createdAt?: Nullable<string>;
+    createdAt?: Nullable<Date>;
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
