@@ -11,7 +11,7 @@ import {
 	AssignmentFields,
 	ModFeedbackFields,
 	AssignmentResFields,
-	ModEnrollmentFields, CreateCollectionArgs
+	ModEnrollmentFields, CreateCollectionArgs, LessonInput, LessonFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -153,6 +153,11 @@ export class ProgramResolver {
 			next
 		}
 		return await this.programService.createCollection(input);
+	}
+
+	@Query("lessons")
+	async lessons(@Args("input") input: LessonFields) {
+		return await this.programService.lessons(input);
 	}
 
 	// Mutations
@@ -315,5 +320,26 @@ export class ProgramResolver {
 		@Args("childId")childId: string
 	){
 		return await this.programService.Removerequirement(parentId,childId)
+	}
+
+	@Mutation("createLesson")
+	async createLesson(
+		@Args("input")input: LessonInput
+	){
+		return await this.programService.createLesson(input);
+	}
+
+	@Mutation("updateLesson")
+	async updateLesson(
+		@Args("input")input: LessonFields
+	){
+		return await this.programService.updateLesson(input);
+	}
+
+	@Mutation("deleteLesson")
+	async deleteLesson(
+		@Args("id")id: string
+	){
+		return await this.programService.deleteLesson(id);
 	}
 }

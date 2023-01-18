@@ -175,6 +175,24 @@ export interface ModuleEnrollmentInput {
     status: EnrollmentStatus;
 }
 
+export interface LessonInput {
+    name: string;
+    contentType: string;
+    content: string;
+    transcript?: Nullable<string>;
+    collection: string;
+}
+
+export interface LessonFields {
+    id?: Nullable<string>;
+    name?: Nullable<string>;
+    contentType?: Nullable<string>;
+    content?: Nullable<string>;
+    transcript?: Nullable<string>;
+    thread?: Nullable<string>;
+    collection?: Nullable<string>;
+}
+
 export interface NewUser {
     openID: string;
     email: string;
@@ -286,6 +304,9 @@ export interface IMutation {
     pairCourseModule(courseId: string, moduleId: string): Module | Promise<Module>;
     unpairCourseModule(courseId: string, moduleId: string): Nullable<Module> | Promise<Nullable<Module>>;
     createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
+    createLesson(input: LessonInput): Lesson | Promise<Lesson>;
+    updateLesson(input?: Nullable<LessonFields>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
+    deleteLesson(id: string): Nullable<Lesson> | Promise<Nullable<Lesson>>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -324,6 +345,7 @@ export interface IQuery {
     modEnrollmentByParam(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
     collections(): Collection[] | Promise<Collection[]>;
     collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
+    lessons(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     user(id: string): Nullable<User> | Promise<Nullable<User>>;
     users(): User[] | Promise<User[]>;
     usersByParam(input?: Nullable<UserFields>): Nullable<User[]> | Promise<Nullable<User[]>>;
@@ -439,13 +461,13 @@ export interface Lesson {
     contentType: string;
     content: string;
     transcript?: Nullable<string>;
-    threads?: Nullable<Nullable<Thread>[]>;
+    threads?: Nullable<Nullable<string>[]>;
     collection?: Nullable<Collection>;
-    collectionID?: Nullable<string>;
 }
 
 export interface Requirement {
     id: string;
+    collection?: Nullable<Collection>;
     child: Module;
     parent: Module;
 }
