@@ -231,12 +231,12 @@ type Module {
 	"""
 	Parent Modules of the Module
 	"""
-	parentModules: [Requirement]
+	parentModules: [Module]
 
 	"""
-	Childmodules in the Module
+	Child modules in the Module
 	"""
-	childModules: [Requirement]
+	subModules: [Module]
 	"""
 	A list of collections that have this module's materials
 	"""
@@ -338,23 +338,6 @@ type Lesson {
 	The ID of the parent collection
 	"""
 	collectionID: ID
-}
-
-type Requirement {
-	"""
-	id of Requirement
-	"""
-	id: ID!
-
-	"""
-	Child module in requirement
-	"""
-	child: Module!
-
-	"""
-	Parent Module in Requirement
-	"""
-	parent: Module!
 }
 
 type Error {
@@ -465,9 +448,8 @@ input ModuleFields {
 	assignments: ID
 	members: [ID!]
 	feedback: ID
-	parentCourses: ID
-	parentModules: ID
-	childModules: ID
+	parentModules: [ID!]
+	subModules: [ID!]
 }
 
 input CourseFields {
@@ -693,15 +675,6 @@ type Mutation {
 	updates a Module
 	"""
 	updateModule(input: UpdateModule): Module
-
-	"""
-	adds Requirements
-	"""
-	addRequirement(parentId: String, childId: String): Requirement
-	"""
-	Removes requirements
-	"""
-	removeRequirement(parentId: String, childId: String): Requirement
 
 	"""
 	deletes all Courses referring id

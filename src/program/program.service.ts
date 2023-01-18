@@ -27,16 +27,6 @@ export class ProgramService {
 	constructor(private prisma: PrismaService) {}
 
 	/// Queries
-	async modules(): Promise<Module[]> {
-		return this.prisma.module.findMany({
-			include: {
-				assignments: true,
-				feedback: true,
-				members: true
-			} as Prisma.ModuleInclude
-		});
-	}
-
 	async module(id: string): Promise<Module | null> {
 		//find module based on id
 		if (id.length === 24) {
@@ -123,9 +113,8 @@ export class ProgramService {
 			assignments,
 			members,
 			feedback,
-			parentCourses,
 			parentModules,
-			childModules
+			subModules
 		} = params;
 
 		const payload = {
@@ -141,26 +130,45 @@ export class ProgramService {
 
 		let where: Prisma.ModuleWhereInput = {};
 
-		if (assignments) {
-			payload["assignments"] = {
-				some: {
-					id: assignments
+		where["AND"] = [];
+
+		if (parentModules) {
+			where.AND.push({
+				parentModuleIDs: {
+					hasEvery: parentModules
 				}
-			};
+			});
+		}
+
+		if (subModules) {
+			where.AND.push({
+				subModuleIDs: {
+					hasEvery: subModules
+				}
+			});
 		}
 
 		if (members) {
-			// get a module that has all elements of params.[members]
-			where = {
-				AND: members.map((member) => {
-					return {
+			members.forEach((member) => {
+				if (where.AND) {
+					//TODO: Fix this type error thinking that AND is not an array
+					// @ts-ignore
+					where.AND.push({
 						members: {
 							some: {
 								planID: member
 							}
 						}
-					};
-				})
+					});
+				}
+			});
+		}
+
+		if (assignments) {
+			payload["assignments"] = {
+				some: {
+					id: assignments
+				}
 			};
 		}
 
@@ -178,34 +186,11 @@ export class ProgramService {
 			} as Prisma.ModuleFeedbackListRelationFilter;
 		}
 
-		if (parentCourses) {
-			payload["parentCourses"] = {
-				some: {
-					id: parentCourses
-				}
-			};
-		}
-
-		if (parentModules) {
-			payload["parentModules"] = {
-				some: {
-					id: parentModules
-				}
-			} as Prisma.RequirementListRelationFilter;
-		}
-
-		if (childModules) {
-			payload["childModules"] = {
-				some: {
-					id: childModules
-				}
-			} as Prisma.RequirementListRelationFilter;
-		}
-
-		console.log(where);
-
 		return await this.prisma.module.findMany({
-			where: where,
+			where: {
+				...where,
+				...payload
+			},
 			include: {
 				assignments: true,
 				members: {
@@ -220,7 +205,7 @@ export class ProgramService {
 				},
 				feedback: true,
 				parentModules: true,
-				childModules: true
+				subModules: true
 			}
 		});
 	}
@@ -955,24 +940,6 @@ export class ProgramService {
 			},
 			data: {
 				courseIDs: newCourseSet !== null ? newCourseSet : undefined
-			}
-		});
-	}
-
-	async Addrequirement(parentId: string, childId: string) {
-		return this.prisma.requirement.create({
-			data: {
-				parentId: parentId,
-				childId: childId
-			}
-		});
-	}
-
-	async Removerequirement(parentId: string, childId: string) {
-		return this.prisma.requirement.deleteMany({
-			where: {
-				parentId: parentId,
-				childId: childId
 			}
 		});
 	}
