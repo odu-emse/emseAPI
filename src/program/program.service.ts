@@ -210,7 +210,7 @@ export class ProgramService {
 		});
 	}
 
-	async course(id: string): Promise<Course | null> {
+	async course(id: string) {
 		return this.prisma.course.findFirstOrThrow({
 			where: {
 				id
@@ -237,7 +237,7 @@ export class ProgramService {
 		});
 	}
 
-	async courses(): Promise<Course[]> {
+	async courses() {
 		return this.prisma.course.findMany({
 			include: {
 				module: {
@@ -285,28 +285,36 @@ export class ProgramService {
 		});
 	}
 
-	async assignments(): Promise<Assignment[]> {
+	async assignments() {
+		const include = Prisma.validator<Prisma.AssignmentInclude>()({
+			module: true,
+			assignmentResults: true
+		});
 		return this.prisma.assignment.findMany({
-			include: {
-				module: true
-			}
+			include
 		});
 	}
 
-	async assignment(id: string): Promise<Assignment | null> {
+	async assignment(id: string) {
+		const include = Prisma.validator<Prisma.AssignmentInclude>()({
+			module: true,
+			assignmentResults: {
+				include: {
+					student: true,
+					gradedBy: true,
+					assignment: true
+				}
+			}
+		});
 		return await this.prisma.assignment.findFirst({
 			where: {
 				id
 			},
-			include: {
-				module: true
-			}
+			include
 		});
 	}
 
-	async assignmentByParam(
-		params: AssignmentFields
-	): Promise<Assignment[] | null> {
+	async assignmentByParam(params: AssignmentFields) {
 		const { id, updatedAt, name, dueAt, module, assignmentResult } = params;
 
 		const payload = {
