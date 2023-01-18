@@ -88,16 +88,6 @@ model Token {
   userId String @db.ObjectId
 }
 
-// model ModuleInCourse {
-//   id String @id @default(auto()) @map("_id") @db.ObjectId
-
-//   module   Module @relation(fields: [moduleId], references: [id])
-//   moduleId String
-
-//   course   Course @relation(fields: [courseId], references: [id])
-//   courseId String
-// }
-
 model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
@@ -105,7 +95,6 @@ model Course {
   moduleIDs String[] @db.ObjectId
   module    Module[] @relation(fields: [moduleIDs], references: [id])
 
-  //modules ModuleInCourse[]
 }
 
 model Module {

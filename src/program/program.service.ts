@@ -16,7 +16,6 @@ import {
     Module,
     Course,
     Assignment,
-    ModuleInCourse,
     ModuleFeedback,
     Lesson,
     ModuleEnrollment, CreateCollectionArgs, LessonInput,
@@ -66,7 +65,6 @@ export class ProgramService {
                             }
                         }
                     },
-                    parentCourses: true,
                     feedback: {
                         include: {
                             student: {
@@ -205,7 +203,6 @@ export class ProgramService {
                 assignments: true,
                 members: true,
                 feedback: true,
-                parentCourses: true,
                 //@ts-ignore
                 parentModules: true,
                 childModules: true
@@ -219,33 +216,23 @@ export class ProgramService {
                 id
             },
             include: {
-                modules: {
-                    include: {
-                        module: {
-                            include: {
-                                assignments: true,
-                                feedback: {
-                                    include: {
-                                        student: true,
-                                        module: false
-                                    }
-                                },
-                                parentCourses: {
-                                    include: {
-                                        course: true
-                                    }
-                                },
-                                members: {
-                                    include: {
-                                        module: false,
-                                        plan: true
-                                    }
-                                }
-                            }
-                        },
-                        course: false
-                    }
-                },
+				module: {
+					include: {
+						assignments: true,
+						feedback: {
+							include: {
+								student: true,
+								module: false
+							}
+						},
+						members: {
+							include: {
+								module: false,
+								plan: true
+							}
+						}
+					}
+				},
             }
         });
     }
@@ -253,33 +240,24 @@ export class ProgramService {
     async courses(): Promise<Course[]> {
         return this.prisma.course.findMany({
             include: {
-                modules: {
-                    include: {
-                        module: {
-                            include: {
-                                assignments: true,
-                                feedback: {
-                                    include: {
-                                        student: true,
-                                        module: false
-                                    }
-                                },
-                                parentCourses: {
-                                    include: {
-                                        course: true
-                                    }
-                                },
-                                members: {
-                                    include: {
-                                        module: false,
-                                        plan: true
-                                    }
-                                }
-                            }
-                        },
-                        course: false
-                    }
-                },
+				module: {
+					include: {
+						assignments: true,
+						feedback: {
+							include: {
+								student: true,
+								module: false
+							}
+						},
+						course: true,
+						members: {
+							include: {
+								module: false,
+								plan: true
+							}
+						}
+					}
+				},
             }
         });
     }
@@ -307,7 +285,7 @@ export class ProgramService {
         return this.prisma.course.findMany({
             where: payload,
             include: {
-                modules: true
+                module: true
             }
         })
     }
@@ -366,15 +344,6 @@ export class ProgramService {
             }
         })
 
-    }
-
-    async moduleInCourses(): Promise<ModuleInCourse[]> {
-        return this.prisma.moduleInCourse.findMany({
-            // include: {
-            // 	// module: true,
-            // 	// course: true
-            // }
-        });
     }
 
     async moduleFeedbacks(){
@@ -642,11 +611,7 @@ export class ProgramService {
                 data,
                 include: {
                     assignments: true,
-                    parentCourses: {
-                        include: {
-                            course: true
-                        }
-                    },
+                    course: true,
                     feedback: {
                         include: {
                             student: true
@@ -688,11 +653,7 @@ export class ProgramService {
             },
             include: {
                 assignments: true,
-                parentCourses: {
-                    include: {
-                        course: true
-                    }
-                },
+                course: true,
                 feedback: {
                     include: {
                         student: true
@@ -753,12 +714,12 @@ export class ProgramService {
                 id
             },
             data: {
-                modules: {
+                module: {
                     deleteMany: {}
                 }
             },
             include: {
-                modules: true
+                module: true
             }
         });
 
@@ -909,7 +870,7 @@ export class ProgramService {
         console.log(role);
         let count = await this.prisma.moduleEnrollment.count({
             where: {
-                planId: plan,
+                planID: plan,
                 moduleId: module
             }
         });
@@ -922,7 +883,7 @@ export class ProgramService {
         return this.prisma.moduleEnrollment.create({
             data: {
                 moduleId: module,
-                planId: plan,
+                planID: plan,
                 role,
             },
             include: {
@@ -940,7 +901,7 @@ export class ProgramService {
             },
             data: {
                 moduleId: input.module,
-                planId: input.plan,
+                planID: input.plan,
                 role: input.role
             },
             include: {
@@ -960,21 +921,88 @@ export class ProgramService {
 
     // Link a course and a module
     async pairCourseModule(courseId: string, moduleId: string) {
-        return this.prisma.moduleInCourse.create({
-            data: {
-                moduleId: moduleId,
-                courseId: courseId
-            }
-        });
+        let count = await this.prisma.module.count({
+			where: {
+				id: moduleId,
+				course: {
+					some: {
+						id: courseId
+					}
+				}
+			}
+		});
+
+		if (count != 0) {
+			throw new Error("Module and Course are already Linked.");
+		}
+
+		await this.prisma.course.update({
+			where: {
+				id: courseId
+			},
+			data: {
+				moduleIDs: {
+					push: moduleId
+				}
+			}
+		});
+
+		return this.prisma.module.update({
+			where: {
+				id: moduleId
+			},
+			data: {
+				courseIDs: {
+					push: courseId
+				}
+			}
+		});
     }
 
     async unpairCourseModule(courseId: string, moduleId: string) {
-        return this.prisma.moduleInCourse.deleteMany({
-            where: {
-                moduleId: moduleId,
-                courseId: courseId
-            }
-        });
+        const courseIdToRemove = await this.prisma.course.findUnique({
+			where: {
+				id: courseId
+			}
+		});
+
+		const newModuleSet =
+			courseIdToRemove !== null
+				? courseIdToRemove.moduleIDs.filter(
+						(module) => module !== moduleId
+				  )
+				: null;
+
+		const moduleIdToRemove = await this.prisma.module.findUnique({
+			where: {
+				id: moduleId
+			}
+		});
+
+		const newCourseSet =
+			moduleIdToRemove !== null
+				? moduleIdToRemove.courseIDs.filter(
+						(course) => course !== courseId
+				  )
+				: null;
+
+		await this.prisma.course.update({
+			where: {
+				id: courseId
+			},
+			data: {
+				moduleIDs: newModuleSet !== null ? newModuleSet : undefined
+			}
+		});
+
+		return this.prisma.module.update({
+			where: {
+				id: moduleId
+			},
+			data: {
+				courseIDs: newCourseSet !== null ? newCourseSet : undefined
+			}
+		});
     }
 
     async Addrequirement(parentId: string, childId: string) {

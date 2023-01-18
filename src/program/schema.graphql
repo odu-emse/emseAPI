@@ -226,7 +226,6 @@ type Module {
 	"""
 	feedback: [ModuleFeedback]
 
-	# parentCourses: [ModuleInCourse]
 
 	"""
 	Parent Modules of the Module
@@ -401,8 +400,6 @@ type Query {
 	"""
 	assignment(id: ID!): Assignment
 	assignmentByParam(input: AssignmentFields!): [Assignment!]
-
-	# moduleInCourses: [ModuleInCourse!]!
 
 	"""
 	Module feedbacks
@@ -817,14 +814,44 @@ type Mutation {
 	Module feedback is deleted
 	"""
 	deleteModuleFeedback(id: ID!): ModuleFeedback
+	"""
+	Assignment Result is added
+	"""
+	addAssignmentResult(input: NewAssignmentResult): AssignmentResult!
+	"""
+	Assignment Reuslt is Updated
+	"""
+	updateAssignmentResult(id: ID!, result: Float!): AssignmentResult
+	"""
+	Assignment result is deleted
+	"""
+	deleteAssignmentResult(id: ID!): AssignmentResult
     """
     Course Module is paired Relating Course ID and module Id
     """
-    pairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse!
+
+	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
+	updateModuleEnrollment(
+		"""
+		Module enrollment is updated relating to id
+		"""
+		id: ID!
+		"""
+		Module enrollment input
+		"""
+		input: ModuleEnrollmentInput
+	): ModuleEnrollment
+	
+	"""
+	Delete ModuleEnrollment
+	"""
+	deleteModuleEnrollment(id: ID!): ModuleEnrollment
+
+    pairCourseModule(courseId: ID!, moduleId: ID!): Module!
     """
     Course Module is Unpaired Relating to Course Id and mobile Id
     """
-    unpairCourseModule(courseId: ID!, moduleId: ID!): ModuleInCourse
+    unpairCourseModule(courseId: ID!, moduleId: ID!): Module
     """
     """
     createCollection(data: CreateCollectionArgs!): Collection!

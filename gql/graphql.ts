@@ -467,6 +467,7 @@ export interface Lesson {
 
 export interface Requirement {
     id: string;
+    collection?: Nullable<Collection>;
     child: Module;
     parent: Module;
 }
