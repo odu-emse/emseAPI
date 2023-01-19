@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build, test, and deploy app to Azure Web App - EMSE-API
+name: EMSE-API - CI pipeline
 
 on:
   push:
@@ -79,24 +79,28 @@ jobs:
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
           ./codecov -t ba891e32-a8ac-42aa-be84-f7ad7837b34f
-#  deploy:
-#    runs-on: ubuntu-latest
-#    needs: [build, test]
-#    environment:
-#      name: 'Production'
-#      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-#
-#    steps:
-#      - name: Download artifact from build job
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: node-app
-#
-#      - name: 'Deploy to Azure Web App'
-#        id: deploy-to-webapp
-#        uses: azure/webapps-deploy@v2
-#        with:
-#          app-name: 'EMSE-API'
-#          slot-name: 'Production'
-#          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_547B49C59E124645AC45C5FBF3189426 }}
-#          package: .
+  docs:
+    runs-on: ubuntu-latest
+    name: Create Docs
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Install dependencies
+        run: yarn
+      - name: Export environment variables
+        run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
+      - name: Build types
+        run: yarn generate
+      - name: Generate docs
+        run: yarn docs:gen
+      - name: Deploy docs
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs

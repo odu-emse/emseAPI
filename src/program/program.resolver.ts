@@ -11,7 +11,10 @@ import {
 	AssignmentFields,
 	ModFeedbackFields,
 	AssignmentResFields,
-	ModEnrollmentFields, CreateCollectionArgs, LessonInput, LessonFields
+	ModEnrollmentFields, 
+  CreateCollectionArgs, 
+  LessonInput, 
+  LessonFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -26,7 +29,7 @@ export class ProgramResolver {
 
 	@Query("modules")
 	async modules() {
-		return await this.programService.modules();
+		return await this.programService.modulesByParam({});
 	}
 
 	// Get a single module based on module's ID
@@ -115,7 +118,7 @@ export class ProgramResolver {
 	}
 
 	@Query("modEnrollmentByParam")
-	async modEnrollmentByParam(@Args("input") args: ModEnrollmentFields){
+	async modEnrollmentByParam(@Args("input") args: ModEnrollmentFields) {
 		return await this.programService.modEnrollmentByParam(args);
 	}
 
@@ -132,7 +135,7 @@ export class ProgramResolver {
 	@Mutation("createCollection")
 	async createCollection(@Args("data") data: CreateCollectionArgs) {
 		// const lessons = data?.lessons?.map(async (lesson) => {
-			// here is where we would want to query to see if the passed in lessons already exist or if they need to be created
+		// here is where we would want to query to see if the passed in lessons already exist or if they need to be created
 		// })
 
 		// this allows us to add the collection to the last index in the array
@@ -145,13 +148,13 @@ export class ProgramResolver {
 		// if positionIndex is null, then set the previous collection to the last collection in the array
 		// if positionIndex is given, next collection is the collection after it (positionIndex + 1)
 
-		const previous = module?.collections?.at(-1)
-		const next = null
+		const previous = module?.collections?.at(-1);
+		const next = null;
 		const input = {
 			...data,
 			previous: previous?.id || undefined,
 			next
-		}
+		};
 		return await this.programService.createCollection(input);
 	}
 
@@ -188,10 +191,7 @@ export class ProgramResolver {
 
 	// Update a course name
 	@Mutation("updateCourse")
-	async updateCourse(
-		@Args("id") id: string,
-		@Args("input") args: CourseInput
-	) {
+	async updateCourse(@Args("id") id: string, @Args("input") args: CourseInput) {
 		return await this.programService.updateCourse(id, args);
 	}
 
@@ -209,10 +209,7 @@ export class ProgramResolver {
 
 	// // Delete an assignment from DB
 	@Mutation("deleteAssignment")
-	async deleteAssignment(
-		@Args("module") args: string,
-		@Args("id") id: string
-	) {
+	async deleteAssignment(@Args("module") args: string, @Args("id") id: string) {
 		return await this.programService.deleteAssignment(args, id);
 	}
 
@@ -232,11 +229,7 @@ export class ProgramResolver {
 		@Args("userId") userId: string,
 		@Args("input") data: Prisma.ModuleFeedbackCreateInput
 	) {
-		return await this.programService.addModuleFeedback(
-			moduleId,
-			userId,
-			data
-		);
+		return await this.programService.addModuleFeedback(moduleId, userId, data);
 	}
 
 	/// Update a modulefeedback
@@ -304,22 +297,6 @@ export class ProgramResolver {
 		@Args("moduleId") moduleId: string
 	) {
 		return await this.programService.unpairCourseModule(courseId, moduleId);
-	}
-
-	@Mutation("addRequirement")
-	async addRequirment(
-		@Args("parentId") parentId: string,
-		@Args("childId") childId: string
-	){
-		return await this.programService.Addrequirement(parentId,childId)
-	};
-
-	@Mutation("removeRequirement")
-	async removeRequirement(
-		@Args("parentId")parentId: string,
-		@Args("childId")childId: string
-	){
-		return await this.programService.Removerequirement(parentId,childId)
 	}
 
 	@Mutation("createLesson")

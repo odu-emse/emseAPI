@@ -66,11 +66,10 @@ export interface ModuleFields {
     createdAt?: Nullable<Date>;
     updatedAt?: Nullable<Date>;
     assignments?: Nullable<string>;
-    members?: Nullable<string>;
+    members?: Nullable<string[]>;
     feedback?: Nullable<string>;
-    parentCourses?: Nullable<string>;
-    parentModules?: Nullable<string>;
-    childModules?: Nullable<string>;
+    parentModules?: Nullable<string[]>;
+    subModules?: Nullable<string[]>;
 }
 
 export interface CourseFields {
@@ -284,8 +283,6 @@ export interface IMutation {
     deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
     addModule(input?: Nullable<NewModule>): Module | Promise<Module>;
     updateModule(input?: Nullable<UpdateModule>): Nullable<Module> | Promise<Nullable<Module>>;
-    addRequirement(parentId?: Nullable<string>, childId?: Nullable<string>): Nullable<Requirement> | Promise<Nullable<Requirement>>;
-    removeRequirement(parentId?: Nullable<string>, childId?: Nullable<string>): Nullable<Requirement> | Promise<Nullable<Requirement>>;
     deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
     addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
@@ -435,8 +432,8 @@ export interface Module {
     assignments?: Nullable<Nullable<Assignment>[]>;
     members?: Nullable<Nullable<ModuleEnrollment>[]>;
     feedback?: Nullable<Nullable<ModuleFeedback>[]>;
-    parentModules?: Nullable<Nullable<Requirement>[]>;
-    childModules?: Nullable<Nullable<Requirement>[]>;
+    parentModules?: Nullable<Nullable<Module>[]>;
+    subModules?: Nullable<Nullable<Module>[]>;
     collections?: Nullable<Nullable<Collection>[]>;
     courseIDs?: Nullable<Nullable<string>[]>;
 }
@@ -463,13 +460,6 @@ export interface Lesson {
     transcript?: Nullable<string>;
     threads?: Nullable<Nullable<string>[]>;
     collection?: Nullable<Collection>;
-}
-
-export interface Requirement {
-    id: string;
-    collection?: Nullable<Collection>;
-    child: Module;
-    parent: Module;
 }
 
 export interface Error {

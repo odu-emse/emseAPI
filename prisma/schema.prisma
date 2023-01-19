@@ -36,8 +36,7 @@ model User {
   watchedThreads    Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
   watchedThreadIDs  String[]           @default([]) @db.ObjectId
   createdThreads    Thread[]           @relation(name: "createdThreads")
-  //  createdComments   Comment[]          @relation(name: "createdComments")
-}
+  }
 
 model InstructorProfile {
   id                            String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -110,13 +109,15 @@ model Module {
   updatedAt    DateTime @default(now()) @updatedAt
 
   // Relation fields
-  members       ModuleEnrollment[]
-  assignments   Assignment[]
-  feedback      ModuleFeedback[]
+  members     ModuleEnrollment[]
+  assignments Assignment[]
+  feedback    ModuleFeedback[]
 
-  parentModules Requirement[]      @relation(name: "child")
-  childModules  Requirement[]      @relation(name: "parent")
-  collections   Collection[]       @relation(name: "collections")
+  parentModules   Module[]  @relation("parentModules",fields: [parentModuleIDs], references: [id])
+  parentModuleIDs String[]  @db.ObjectId @default([])
+  subModules       Module[] @relation("parentModules",fields: [subModuleIDs], references: [id])
+  subModuleIDs     String[] @db.ObjectId @default([])
+  collections Collection[] @relation(name: "collections")
 
   courseIDs String[] @db.ObjectId
   course    Course[] @relation(fields: [courseIDs], references: [id])
@@ -150,14 +151,6 @@ model Lesson {
   collectionID String?     @db.ObjectId
 }
 
-model Requirement {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  parent   Module @relation(name: "parent", fields: [parentId], references: [id])
-  parentId String
-  child    Module @relation(name: "child", fields: [childId], references: [id])
-  childId  String
-}
-
 model ModuleFeedback {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   feedback String
@@ -176,10 +169,10 @@ model ModuleEnrollment {
   status     EnrollmentStatus @default(INACTIVE)
 
   // Relation Fields
-  module         Module       @relation(fields: [moduleId], references: [id])
-  moduleId       String       @db.ObjectId
-  plan           PlanOfStudy? @relation(fields: [planID], references: [id])
-  planID         String?      @db.ObjectId
+  module   Module       @relation(fields: [moduleId], references: [id])
+  moduleId String       @db.ObjectId
+  plan     PlanOfStudy? @relation(fields: [planID], references: [id])
+  planID   String?      @db.ObjectId
 }
 
 model Assignment {

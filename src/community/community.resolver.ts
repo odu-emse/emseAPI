@@ -23,11 +23,7 @@ export class CommunityResolver {
 
 	@Query("thread")
 	async thread(@Args("id") id: string) {
-		try {
-			return await this.communityService.thread(id);
-		} catch (e: any) {
-			return e;
-		}
+		return await this.communityService.thread(id);
 	}
 
 	@Mutation("createThread")

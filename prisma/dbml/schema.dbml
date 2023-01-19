@@ -90,8 +90,10 @@ Table Module {
   members ModuleEnrollment [not null]
   assignments Assignment [not null]
   feedback ModuleFeedback [not null]
-  parentModules Requirement [not null]
-  childModules Requirement [not null]
+  parentModules Module [not null]
+  parentModuleIDs String[] [not null]
+  subModules Module [not null]
+  subModuleIDs String[] [not null]
   collections Collection [not null]
   courseIDs String[] [not null]
   course Course [not null]
@@ -120,14 +122,6 @@ Table Lesson {
   threads Thread [not null]
   collection Collection
   collectionID String
-}
-
-Table Requirement {
-  id String [pk]
-  parent Module [not null]
-  parentId String [not null]
-  child Module [not null]
-  childId String [not null]
 }
 
 Table ModuleFeedback {
@@ -215,15 +209,15 @@ Ref: Token.userId > User.id
 
 Ref: Course.moduleIDs > Module.id
 
+Ref: Module.parentModuleIDs > Module.id
+
+Ref: Module.subModuleIDs > Module.id
+
 Ref: Module.courseIDs > Course.id
 
 Ref: Collection.moduleID > Module.id
 
 Ref: Lesson.collectionID > Collection.id
-
-Ref: Requirement.parentId > Module.id
-
-Ref: Requirement.childId > Module.id
 
 Ref: ModuleFeedback.studentId > User.id
 
