@@ -956,33 +956,29 @@ export class ProgramService {
 			}
 		});
 	}
-	async createLesson(input: LessonInput): Promise<Lesson> {
-		// const collectionVal = (input.collection) ? input.collection : undefined
+	async createLesson(input: LessonInput) {
 		const create = Prisma.validator<Prisma.LessonCreateInput>()({
 			name: input.name,
 			contentType: input.contentType,
 			content: input.content,
 			transcript: input.transcript,
-			threads: undefined,
 			collection: {
 				connect: {
 					id: input.collection ? input.collection : undefined
 				}
-			}
+			},
+			next: input.next ? input.next : undefined,
+			previous: input.previous ? input.previous : undefined
 		});
 
-		if (create === null) {
-			throw new Error(
-				"Validator did not return correct type given lesson input."
-			);
-		}
-
 		const include = Prisma.validator<Prisma.LessonInclude>()({
-			collection: true
+			collection: true,
+			threads: true
 		});
 
 		return this.prisma.lesson.create({
-			data: create
+			data: create,
+			include
 		});
 	}
 

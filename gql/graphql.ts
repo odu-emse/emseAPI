@@ -180,6 +180,8 @@ export interface LessonInput {
     content: string;
     transcript?: Nullable<string>;
     collection: string;
+    next?: Nullable<string>;
+    previous?: Nullable<string>;
 }
 
 export interface LessonFields {
@@ -460,6 +462,8 @@ export interface Lesson {
     transcript?: Nullable<string>;
     threads?: Nullable<Nullable<string>[]>;
     collection?: Nullable<Collection>;
+    next?: Nullable<string>;
+    previous?: Nullable<string>;
 }
 
 export interface Error {

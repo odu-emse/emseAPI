@@ -149,6 +149,8 @@ model Lesson {
   // TODO: Should not be empty EVER
   collection   Collection? @relation(fields: [collectionID], references: [id])
   collectionID String?     @db.ObjectId
+  previous  String?  @db.ObjectId
+  next      String?  @db.ObjectId
 }
 
 model ModuleFeedback {

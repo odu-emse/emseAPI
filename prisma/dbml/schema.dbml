@@ -122,6 +122,8 @@ Table Lesson {
   threads Thread [not null]
   collection Collection
   collectionID String
+  previous String
+  next String
 }
 
 Table ModuleFeedback {

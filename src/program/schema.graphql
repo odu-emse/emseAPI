@@ -293,11 +293,11 @@ type Collection {
 	"""
 	last: ID
 	"""
-
+	The module that this collection belongs to
 	"""
 	module: Module!
 	"""
-
+	The module's unique ID that this collection belongs to
 	"""
 	moduleID: ID!
 }
@@ -327,11 +327,19 @@ type Lesson {
     The list of threads related to the lesson
     """
     threads: [ID]
-
     """
     The collection that the lesson belongs to
     """
     collection: Collection
+	"""
+	The ID of the next lesson
+	"""
+	next: ID
+
+	"""
+	The ID of the previous lesson
+	"""
+	previous: ID
 }
 
 type Error {
@@ -680,6 +688,14 @@ input LessonInput {
     The ID of the parent collection
     """
     collection: ID!
+	"""
+	The ID of the next lesson in the collection
+	"""
+	next: 			ID
+	"""
+	The ID of the previous lesson in the collection
+	"""
+	previous: 		ID
 }
 
 input LessonFields {
