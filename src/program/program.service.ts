@@ -1,26 +1,26 @@
 import {
-    AssignmentInput,
-    CourseInput,
-    ModuleFeedbackUpdate,
-    NewAssignment,
-    UpdateModule,
-    NewAssignmentResult,
-    ModuleEnrollmentInput,
-    ModuleFields,
-    CourseFields,
-    AssignmentFields,
-    ModFeedbackFields,
-    AssignmentResFields,
-    ModEnrollmentFields,
-    LessonFields,
-    Module,
-    Course,
-    Assignment,
-    ModuleFeedback,
-    Lesson,
-    ModuleEnrollment, 
-    CreateCollectionArgs, 
-    LessonInput,
+	AssignmentInput,
+	CourseInput,
+	ModuleFeedbackUpdate,
+	NewAssignment,
+	UpdateModule,
+	NewAssignmentResult,
+	ModuleEnrollmentInput,
+	ModuleFields,
+	CourseFields,
+	AssignmentFields,
+	ModFeedbackFields,
+	AssignmentResFields,
+	ModEnrollmentFields,
+	LessonFields,
+	Module,
+	Course,
+	Assignment,
+	ModuleFeedback,
+	Lesson,
+	ModuleEnrollment,
+	CreateCollectionArgs,
+	LessonInput
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
@@ -482,6 +482,31 @@ export class ProgramService {
 		});
 	}
 
+	//Fetch Lessons
+	async lessons(input: LessonFields) {
+		const { id, name, contentType, content, transcript, thread, collection } =
+			input;
+
+		const payload = {
+			...(id && { id }),
+			...(name && { name }),
+			...(contentType && { contentType }),
+			...(content && { content }),
+			...(transcript && { transcript })
+		};
+
+		payload["collection"] = collection ? collection : undefined;
+		payload["threads"] = thread ? { some: { id: thread } } : undefined;
+
+		const where = Prisma.validator<Prisma.LessonWhereInput>()({
+			...payload
+		});
+
+		return this.prisma.lesson.findMany({
+			where: payload
+		});
+	}
+
 	async createCollection({
 		name,
 		lessons,
@@ -888,10 +913,10 @@ export class ProgramService {
 				}
 			}
 		});
-    }
+	}
 
-    async unpairCourseModule(courseId: string, moduleId: string) {
-        const courseIdToRemove = await this.prisma.course.findUnique({
+	async unpairCourseModule(courseId: string, moduleId: string) {
+		const courseIdToRemove = await this.prisma.course.findUnique({
 			where: {
 				id: courseId
 			}
@@ -930,83 +955,84 @@ export class ProgramService {
 				courseIDs: newCourseSet !== null ? newCourseSet : undefined
 			}
 		});
-    }
-    async createLesson(input: LessonInput): Promise<Lesson> {
-        // const collectionVal = (input.collection) ? input.collection : undefined
-        const create = Prisma.validator<Prisma.LessonCreateInput>()({
-            name: input.name,
-            contentType: input.contentType,
-            content: input.content,
-            transcript: input.transcript,
-            threads: undefined,
-            collection: {
-                connect: {
-                    id: (input.collection) ? input.collection : undefined
-                }
-            }
-        })
+	}
+	async createLesson(input: LessonInput): Promise<Lesson> {
+		// const collectionVal = (input.collection) ? input.collection : undefined
+		const create = Prisma.validator<Prisma.LessonCreateInput>()({
+			name: input.name,
+			contentType: input.contentType,
+			content: input.content,
+			transcript: input.transcript,
+			threads: undefined,
+			collection: {
+				connect: {
+					id: input.collection ? input.collection : undefined
+				}
+			}
+		});
 
-        if (create === null) {
-            throw new Error("Validator did not return correct type given lesson input.")
-        }
+		if (create === null) {
+			throw new Error(
+				"Validator did not return correct type given lesson input."
+			);
+		}
 
-        const include = Prisma.validator<Prisma.LessonInclude>()({
-            collection: true
-        })
-        
+		const include = Prisma.validator<Prisma.LessonInclude>()({
+			collection: true
+		});
 
-        return this.prisma.lesson.create({
-            data: create,
-        })
-    }
+		return this.prisma.lesson.create({
+			data: create
+		});
+	}
 
-    async updateLesson(input: LessonFields) {
-        const {
-            id,
-            name,
-            contentType,
-            content,
-            transcript,
-            // Threads are a list so how these are being updated is going to be a little strange.
-            // The only thing i could think of is if these were a list of IDs in which case the threads
-            // Being refererenced would all have to be modified in this update Lesson.
-            // thread,
-            collection
-        } = input
-        const payload = {
-            ...(id && {id}),
-            ...(name && {name}),
-            ...(contentType && {contentType}),
-            ...(content && {content}),
-            ...(transcript && {transcript}),
-            // ...(thread && {thread}),
-            ...(collection && {collection})
-        }
+	async updateLesson(input: LessonFields) {
+		const {
+			id,
+			name,
+			contentType,
+			content,
+			transcript,
+			// Threads are a list so how these are being updated is going to be a little strange.
+			// The only thing i could think of is if these were a list of IDs in which case the threads
+			// Being refererenced would all have to be modified in this update Lesson.
+			// thread,
+			collection
+		} = input;
+		const payload = {
+			...(id && { id }),
+			...(name && { name }),
+			...(contentType && { contentType }),
+			...(content && { content }),
+			...(transcript && { transcript }),
+			// ...(thread && {thread}),
+			...(collection && { collection })
+		};
 
-        const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
-            where: {
-                id: payload.id
-            },
-            data: {
-                name: payload.name,
-                contentType: payload.contentType,
-                content: payload.content,
-                transcript: payload.transcript,
-                collectionID: payload.collection
-            }
-        })
+		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
+			where: {
+				id: payload.id
+			},
+			data: {
+				name: payload.name,
+				contentType: payload.contentType,
+				content: payload.content,
+				transcript: payload.transcript,
+				collectionID: payload.collection
+			}
+		});
 
-        return this.prisma.lesson.update({
-            where: args.where, 
-            data: args.data
-        });
-    }
+		return this.prisma.lesson.update({
+			where: args.where,
+			data: args.data
+		});
+	}
 
 	async deleteLesson(id: string) {
 		return this.prisma.lesson.delete({
 			where: {
 				id
 			}
-		})
+		});
 	}
 }
