@@ -6,11 +6,9 @@ import {
 	Assignment,
 	Module,
 	AssignmentResult,
-	ModuleEnrollment,
 	Course,
 	PlanOfStudy,
 	User,
-	ModuleFeedback,
 	CreateCollectionArgs
 } from "gql/graphql";
 import { Prisma } from "@prisma/client";
@@ -89,11 +87,14 @@ describe("Plan services", () => {
 					expect(module.duration).toBeDefined();
 					expect(module.numSlides).toBeDefined();
 
-					expect(Array.isArray(module.keywords)).toBe(true);
-					expect(Array.isArray(module.feedback)).toBe(true);
-					expect(Array.isArray(module.members)).toBe(true);
-					expect(Array.isArray(module.parentModules)).toBe(true);
-					expect(Array.isArray(module.subModules)).toBe(true);
+					expect(module.keywords).toBeInstanceOf(Array);
+					expect(module.feedback).toBeInstanceOf(Array);
+					expect(module.members).toBeInstanceOf(Array);
+
+					if (module.parentModules !== null || true)
+						expect(module.parentModules).toBeInstanceOf(Array);
+					if (module.subModules !== null || true)
+						expect(module.subModules).toBeInstanceOf(Array);
 				}
 			});
 		});
@@ -164,7 +165,7 @@ describe("Plan services", () => {
 					expect(assignment.id).toBeDefined();
 					testingAssignmentID = assignment.id;
 					if (assignment.assignmentResults !== undefined) {
-						assignment.assignmentResults.map((result: AssignmentResult) => {
+						assignment.assignmentResults.map((result) => {
 							expect(result.id).toBeDefined();
 							expect(result.result).toBeDefined();
 							expect(result.submittedAt).toBeDefined();

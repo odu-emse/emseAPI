@@ -14,7 +14,6 @@ import {
 	ModEnrollmentFields,
 	Module,
 	Course,
-	Assignment,
 	ModuleFeedback,
 	CreateCollectionArgs
 } from "gql/graphql";
@@ -25,6 +24,37 @@ import { Prisma } from "@prisma/client";
 @Injectable()
 export class ProgramService {
 	constructor(private prisma: PrismaService) {}
+
+	private assignmentInclude = Prisma.validator<Prisma.AssignmentInclude>()({
+		module: true,
+		assignmentResults: {
+			include: {
+				student: true,
+				gradedBy: true,
+				assignment: true
+			}
+		}
+	});
+
+	private courseInclude = Prisma.validator<Prisma.CourseInclude>()({
+		module: {
+			include: {
+				assignments: true,
+				feedback: {
+					include: {
+						student: true,
+						module: false
+					}
+				},
+				members: {
+					include: {
+						module: false,
+						plan: true
+					}
+				}
+			}
+		}
+	});
 
 	/// Queries
 	async module(id: string): Promise<Module | null> {
@@ -215,53 +245,17 @@ export class ProgramService {
 			where: {
 				id
 			},
-			include: {
-				module: {
-					include: {
-						assignments: true,
-						feedback: {
-							include: {
-								student: true,
-								module: false
-							}
-						},
-						members: {
-							include: {
-								module: false,
-								plan: true
-							}
-						}
-					}
-				}
-			}
+			include: this.courseInclude
 		});
 	}
 
 	async courses() {
 		return this.prisma.course.findMany({
-			include: {
-				module: {
-					include: {
-						assignments: true,
-						feedback: {
-							include: {
-								student: true,
-								module: false
-							}
-						},
-						members: {
-							include: {
-								module: false,
-								plan: true
-							}
-						}
-					}
-				}
-			}
+			include: this.courseInclude
 		});
 	}
 
-	async courseByParam(params: CourseFields): Promise<Course[] | null> {
+	async courseByParam(params: CourseFields) {
 		const { id, name, module } = params;
 
 		const payload = {
@@ -279,38 +273,22 @@ export class ProgramService {
 
 		return this.prisma.course.findMany({
 			where: payload,
-			include: {
-				module: true
-			}
+			include: this.courseInclude
 		});
 	}
 
 	async assignments() {
-		const include = Prisma.validator<Prisma.AssignmentInclude>()({
-			module: true,
-			assignmentResults: true
-		});
 		return this.prisma.assignment.findMany({
-			include
+			include: this.assignmentInclude
 		});
 	}
 
 	async assignment(id: string) {
-		const include = Prisma.validator<Prisma.AssignmentInclude>()({
-			module: true,
-			assignmentResults: {
-				include: {
-					student: true,
-					gradedBy: true,
-					assignment: true
-				}
-			}
-		});
 		return await this.prisma.assignment.findFirst({
 			where: {
 				id
 			},
-			include
+			include: this.assignmentInclude
 		});
 	}
 
@@ -336,10 +314,7 @@ export class ProgramService {
 		return this.prisma.assignment.findMany({
 			where: where,
 
-			include: {
-				module: true,
-				assignmentResults: true
-			}
+			include: this.assignmentInclude
 		});
 	}
 
