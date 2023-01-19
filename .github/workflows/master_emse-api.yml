@@ -80,7 +80,6 @@ jobs:
           chmod +x codecov
           ./codecov -t ba891e32-a8ac-42aa-be84-f7ad7837b34f
   docs:
-    needs: [test]
     runs-on: ubuntu-latest
     name: Create Docs
     steps:
@@ -100,7 +99,7 @@ jobs:
       - name: Build types
         run: yarn generate
       - name: Generate docs
-        run: yarn start-server-and-test start http://localhost:4000 docs:gen
+        run: yarn docs:gen
       - name: Deploy docs
         uses: JamesIves/github-pages-deploy-action@v4
         with:

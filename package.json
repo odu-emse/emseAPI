@@ -90,7 +90,6 @@
 		"prisma": "^4.0.0",
 		"prisma-dbml-generator": "^0.9.1",
 		"spectaql": "^2.0.3",
-		"start-server-and-test": "^1.15.2",
 		"ts-jest": "^28.0.8",
 		"ts-node": "^10.9.1",
 		"ts-node-dev": "^1.1.6",
