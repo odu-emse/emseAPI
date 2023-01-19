@@ -1,9 +1,8 @@
 import { PrismaService } from "@/prisma.service";
 import { CommunityResolver, CommunityService } from "@/community";
-import { IThreadCreateInput, Thread } from "@/types/graphql";
+import { IThreadCreateInput } from "@/types/graphql";
 import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
-import { Int } from "@nestjs/graphql";
 
 describe("Community", () => {
 	let service: CommunityService;
@@ -131,74 +130,15 @@ describe("Community", () => {
 			body: "How does this look?",
 			author: accountID
 		});
-		// expect(thread).toBeNull();
+		expect(thread).toBeNull();
 	});
 	it("should handle a thread and ensure that the vote count has increased by 1", async () => {
 		const voteNum = await resolver.thread(threadID);
 		const upVoteNum = await resolver.upvoteThread(threadID);
 
-		expect(voteNum.upvotes).toBeInstanceOf(Number);
-		expect(upVoteNum.upvotes).toBeInstanceOf(Number);
+		expect(voteNum.upvotes).toBeInstanceOf("number");
+		expect(upVoteNum.upvotes).toBeInstanceOf("number");
 
 		expect(upVoteNum.upvotes === voteNum.upvotes + 1).toBe(true);
 	});
 });
-
-// const createModule = async (input: Prisma.ModuleCreateInput) => {
-//   return await resolver.create(input);
-// }
-//
-// const createCollection = async (input: CreateCollectionArgs) => {
-//   return await resolver.createCollection(input);
-// }
-//
-// const deleteModule = async (id: string) => {
-//   return await prisma.module.delete({
-//     where: { id },
-//   });
-// }
-//
-// const deleteCollection = async (id: string) => {
-//   return await prisma.collection.delete({
-//     where: { id },
-//   });
-// }
-//
-// const lessons = [
-//   "639217c90482bbfb9aba86cc",
-//   "639217e70482bbfb9aba86d0",
-//   "639217e70482bbfb9aba86d1",
-//   "639217e70482bbfb9aba86d2"
-// ]
-//
-// let testingCollectionID: string;
-// let testingModuleID: string;
-//
-// beforeAll(async () => {
-//   service = new ProgramService(prisma);
-//   resolver = new ProgramResolver(service);
-//
-//   const module = await createModule({
-//     moduleName: "Test Module",
-//     moduleNumber: 1,
-//     duration: 1,
-//     intro: "Test Intro",
-//     numSlides: 1,
-//     description: "Test Description",
-//   })
-//
-//   testingModuleID = module.id;
-//
-//   const collection = await createCollection({
-//     name: "Test Collection",
-//     moduleID: testingModuleID,
-//     lessons
-//   })
-//
-//   testingCollectionID = collection.id;
-// });
-// afterAll(async () => {
-//   await deleteCollection(testingCollectionID);
-//   await deleteModule(testingModuleID);
-//   prisma.$disconnect();
-// })
