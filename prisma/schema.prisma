@@ -94,7 +94,6 @@ model Course {
   moduleIDs String[] @db.ObjectId
   module    Module[] @relation(fields: [moduleIDs], references: [id])
 
-  //modules ModuleInCourse[]
 }
 
 model Module {
@@ -147,6 +146,7 @@ model Lesson {
   content      String
   transcript   String?
   threads      Thread[]
+  // TODO: Should not be empty EVER
   collection   Collection? @relation(fields: [collectionID], references: [id])
   collectionID String?     @db.ObjectId
 }
