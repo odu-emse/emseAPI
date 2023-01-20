@@ -192,6 +192,8 @@ export interface LessonFields {
     transcript?: Nullable<string>;
     thread?: Nullable<string>;
     collection?: Nullable<string>;
+    next?: Nullable<string>;
+    previous?: Nullable<string>;
 }
 
 export interface NewUser {

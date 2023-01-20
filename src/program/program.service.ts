@@ -15,10 +15,7 @@ import {
 	LessonFields,
 	Module,
 	Course,
-	Assignment,
 	ModuleFeedback,
-	Lesson,
-	ModuleEnrollment,
 	CreateCollectionArgs,
 	LessonInput
 } from "gql/graphql";
@@ -957,28 +954,29 @@ export class ProgramService {
 		});
 	}
 	async createLesson(input: LessonInput) {
-		const create = Prisma.validator<Prisma.LessonCreateInput>()({
-			name: input.name,
-			contentType: input.contentType,
-			content: input.content,
-			transcript: input.transcript,
-			collection: {
-				connect: {
-					id: input.collection ? input.collection : undefined
-				}
+		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
+			data: {
+				name: input.name,
+				contentType: input.contentType,
+				content: input.content,
+				transcript: input.transcript,
+				collection: {
+					connect: {
+						id: input.collection ? input.collection : undefined
+					}
+				},
+				next: input.next ? input.next : undefined,
+				previous: input.previous ? input.previous : undefined
 			},
-			next: input.next ? input.next : undefined,
-			previous: input.previous ? input.previous : undefined
-		});
-
-		const include = Prisma.validator<Prisma.LessonInclude>()({
-			collection: true,
-			threads: true
+			include: {
+				collection: true,
+				threads: true
+			}
 		});
 
 		return this.prisma.lesson.create({
-			data: create,
-			include
+			data: args.data,
+			include: args.include
 		});
 	}
 
@@ -993,7 +991,10 @@ export class ProgramService {
 			// The only thing i could think of is if these were a list of IDs in which case the threads
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
-			collection
+			collection,
+			thread,
+			next,
+			previous
 		} = input;
 		const payload = {
 			...(id && { id }),
@@ -1001,8 +1002,10 @@ export class ProgramService {
 			...(contentType && { contentType }),
 			...(content && { content }),
 			...(transcript && { transcript }),
-			// ...(thread && {thread}),
-			...(collection && { collection })
+			...(thread && { thread }),
+			...(collection && { collection }),
+			...(next && { next }),
+			...(previous && { previous })
 		};
 
 		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
@@ -1014,13 +1017,25 @@ export class ProgramService {
 				contentType: payload.contentType,
 				content: payload.content,
 				transcript: payload.transcript,
-				collectionID: payload.collection
+				collectionID: payload.collection,
+				next: payload.next,
+				previous: payload.previous,
+				threads: {
+					connect: {
+						id: payload.thread
+					}
+				}
+			},
+			include: {
+				collection: true,
+				threads: true
 			}
 		});
 
 		return this.prisma.lesson.update({
 			where: args.where,
-			data: args.data
+			data: args.data,
+			include: args.include
 		});
 	}
 
