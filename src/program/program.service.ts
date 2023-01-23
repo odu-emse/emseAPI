@@ -18,11 +18,13 @@ import {
 	ModuleFeedback,
 	CreateCollectionArgs,
 	LessonInput,
+    CreateContentArgs,
+    ContentFields
 	CollectionFields
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { Prisma } from "@prisma/client";
+import { Content, Prisma } from "@prisma/client";
 
 @Injectable()
 export class ProgramService {
@@ -482,27 +484,43 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lessons(input: LessonFields) {
-		const { id, name, contentType, content, transcript, thread, collection } =
+		const { id, name, content, transcript, thread, collection } =
 			input;
-
-		const payload = {
-			...(id && { id }),
-			...(name && { name }),
-			...(contentType && { contentType }),
-			...(content && { content }),
-			...(transcript && { transcript })
-		};
-
-		payload["collection"] = collection ? collection : undefined;
-		payload["threads"] = thread ? { some: { id: thread } } : undefined;
+        
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
-			...payload
+			...(id && {id}),
+			...(name && {name}),
+			...(transcript && {transcript}),
+			collection: {id: collection ? collection : undefined},
+			threads: thread ? {some: {id: thread}} : undefined,
+			content: content ? {some: {id: content}} : undefined
 		});
 
 		return this.prisma.lesson.findMany({
-			where: payload
+			where,
+			include: {
+				content: true
+			}
 		});
+	}
+
+	async content(input: ContentFields): Promise<Content[]> {
+		const {id, type, link, parent} = input;
+
+
+		const where = Prisma.validator<Prisma.ContentWhereInput>()({
+			...(id && {id}),
+			...(type && {type}),
+			...(link && {link}),
+			parent: { id: parent ? parent : undefined}
+		})
+
+		return this.prisma.content.findMany({
+			where
+		})
+
+
 	}
 
 	async createCollection({
@@ -979,8 +997,8 @@ export class ProgramService {
 		const {
 			id,
 			name,
-			contentType,
-			content,
+			// TODO: Allow for list fields to be updated 
+			// content,
 			transcript,
 			// Threads are a list so how these are being updated is going to be a little strange.
 			// The only thing i could think of is if these were a list of IDs in which case the threads
@@ -992,8 +1010,6 @@ export class ProgramService {
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
-			...(contentType && { contentType }),
-			...(content && { content }),
 			...(transcript && { transcript }),
 			...(thread && { thread }),
 			...(collection && { collection })
@@ -1005,8 +1021,6 @@ export class ProgramService {
 			},
 			data: {
 				name: payload.name,
-				contentType: payload.contentType,
-				content: payload.content,
 				transcript: payload.transcript,
 				collectionID: payload.collection,
 				threads: {
@@ -1035,4 +1049,62 @@ export class ProgramService {
 			}
 		});
 	}
+
+    async createContent(input: CreateContentArgs): Promise<Content> {
+        const {
+            type,
+            link,
+            parent
+        } = input
+
+        const data = Prisma.validator<Prisma.ContentCreateInput>()({
+            type,
+            link,
+            parent: {
+                connect: {
+                    id: parent
+                }
+            }
+        })
+
+        return this.prisma.content.create({
+            data
+        })
+    }
+
+    async updateContent(input: ContentFields): Promise<Content | null> {
+        const {
+            id,
+            type,
+            link,
+            parent,
+        } = input
+
+		if (!id) {
+			throw new Error("Id not provided to updateContent");
+		}
+
+        const data = Prisma.validator<Prisma.ContentUpdateArgs>()({
+            where: {
+                id: id
+            },
+            data: {
+                ...(type && {type}),
+                ...(link && {link}),
+                parent: parent ? { connect: { id: parent}} : undefined
+            }
+        })
+
+        return this.prisma.content.update(
+            data
+        )
+    }
+
+    async deleteContent(contentID: string): Promise<Content | null> {
+        return this.prisma.content.delete({
+            where: {
+                id: contentID
+            }
+        })
+    }
 }

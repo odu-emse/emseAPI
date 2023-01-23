@@ -293,13 +293,9 @@ type Lesson {
 	"""
 	name: String!
 	"""
-	The type of content being displayed. (PDF, Video, etc.)
-	"""
-	contentType: String!
-	"""
 	The link/id of the actual content data itself
 	"""
-	content: String!
+	content: [Content]
 	"""
 	An optional transcript of the content data (primarily for videos)
 	"""
@@ -312,6 +308,28 @@ type Lesson {
     The collection that the lesson belongs to
     """
     collection: Collection
+}
+
+type Content {
+	""" 
+	Document ID for this content
+	"""
+	id: ID!
+
+	"""
+	The type of content that this link/id references
+	"""
+	type: String!
+
+	""" 
+	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
+	"""
+	link: String!
+
+	"""
+	The lesson that this content belongs to.
+	"""
+	parent: Lesson!
 }
 
 type Error {
@@ -396,7 +414,51 @@ type Query {
     Retrieve lessons given a set of parameters
     """
     lessons(input: LessonFields): [Lesson!]
+
+	"""
+	Retrieve Content Given a set of parameters
+	"""
+	content(input: ContentFields): [Content!]
    
+}
+
+input CreateContentArgs {
+	"""
+	The type of content that this link/id references
+	"""
+	type: String!
+
+	""" 
+	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
+	"""
+	link: String!
+
+	"""
+	The lesson that this content belongs to.
+	"""
+	parent: ID!
+}
+
+input ContentFields {
+	""" 
+	Document ID for this content
+	"""
+	id: ID
+
+	"""
+	The type of content that this link/id references
+	"""
+	type: String
+
+	""" 
+	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
+	"""
+	link: String
+
+	"""
+	The lesson that this content belongs to.
+	"""
+	parent: ID
 }
 
 input CreateCollectionArgs {
@@ -647,13 +709,9 @@ input LessonInput {
 	"""
 	name: 			String!
 	"""
-	The type of content being displayed. (PDF, Video, etc.)
-	"""
-	contentType: 	String!
-	"""
 	The link/id of the actual content data itself
 	"""
-	content: 		String!
+	content: 		ID
 	"""
 	An optional transcript of the content data (primarily for videos)
 	"""
@@ -674,13 +732,9 @@ input LessonFields {
 	"""
 	name: 			String
 	"""
-	The type of content being displayed. (PDF, Video, etc.)
-	"""
-	contentType: 	String
-	"""
 	The link/id of the actual content data itself
 	"""
-	content: 		String
+	content: 		ID
 	"""
 	An optional transcript of the content data (primarily for videos)
 	"""
@@ -817,4 +871,20 @@ type Mutation {
     updateLesson(input: LessonFields): Lesson
 
     deleteLesson(id: String!): Lesson
+
+	"""
+	Create a Content Record
+	"""
+	createContent(input: CreateContentArgs!): Content!
+
+	"""
+	Update a content Record
+	"""
+	updateContent(input: ContentFields!): Content
+
+	"""
+	Delete an existing content record
+	"""
+	deleteContent(contentID: ID!): Content
+
 }

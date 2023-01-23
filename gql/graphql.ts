@@ -43,6 +43,19 @@ export interface PlanFields {
     modulesLeft?: Nullable<string>;
 }
 
+export interface CreateContentArgs {
+    type: string;
+    link: string;
+    parent: string;
+}
+
+export interface ContentFields {
+    id?: Nullable<string>;
+    type?: Nullable<string>;
+    link?: Nullable<string>;
+    parent?: Nullable<string>;
+}
+
 export interface CreateCollectionArgs {
     name: string;
     moduleID: string;
@@ -179,8 +192,7 @@ export interface ModuleEnrollmentInput {
 
 export interface LessonInput {
     name: string;
-    contentType: string;
-    content: string;
+    content?: Nullable<string>;
     transcript?: Nullable<string>;
     collection: string;
 }
@@ -188,7 +200,6 @@ export interface LessonInput {
 export interface LessonFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
-    contentType?: Nullable<string>;
     content?: Nullable<string>;
     transcript?: Nullable<string>;
     thread?: Nullable<string>;
@@ -308,6 +319,9 @@ export interface IMutation {
     createLesson(input: LessonInput): Lesson | Promise<Lesson>;
     updateLesson(input?: Nullable<LessonFields>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
     deleteLesson(id: string): Nullable<Lesson> | Promise<Nullable<Lesson>>;
+    createContent(input: CreateContentArgs): Content | Promise<Content>;
+    updateContent(input: ContentFields): Nullable<Content> | Promise<Nullable<Content>>;
+    deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -347,6 +361,7 @@ export interface IQuery {
     collections(): Collection[] | Promise<Collection[]>;
     collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
     lessons(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
+    content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     user(id: string): Nullable<User> | Promise<Nullable<User>>;
     users(): User[] | Promise<User[]>;
     usersByParam(input?: Nullable<UserFields>): Nullable<User[]> | Promise<Nullable<User[]>>;
@@ -455,11 +470,17 @@ export interface Collection {
 export interface Lesson {
     id: string;
     name: string;
-    contentType: string;
-    content: string;
+    content?: Nullable<Nullable<Content>[]>;
     transcript?: Nullable<string>;
     threads?: Nullable<Nullable<string>[]>;
     collection?: Nullable<Collection>;
+}
+
+export interface Content {
+    id: string;
+    type: string;
+    link: string;
+    parent: Lesson;
 }
 
 export interface Error {

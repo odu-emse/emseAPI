@@ -139,14 +139,15 @@ model Collection {
 model Lesson {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  contentType  String
-  content      String
   transcript   String?
   threads      Thread[]
   // TODO: Should not be empty EVER
   collection   Collection? @relation(fields: [collectionID], references: [id])
   collectionID String?     @db.ObjectId
   position     Int         @default(0)
+
+  content      Content[]
+
 }
 
 model ModuleFeedback {
@@ -217,6 +218,14 @@ model Thread {
   parentThread   Thread?  @relation("subComments", fields: [parentThreadID], references: [id], onDelete: NoAction, onUpdate: NoAction)
   parentThreadID String?  @db.ObjectId
   comments       Thread[] @relation("subComments")
+}
+
+model Content {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  type  String
+  link  String
+  parent Lesson @relation(fields: [parentID], references: [id])
+  parentID String @db.ObjectId
 }
 
 enum UserRole {
