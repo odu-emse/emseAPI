@@ -2,14 +2,8 @@ import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CommunityService } from "./community.service";
 import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
-import { AuthGuard } from "../auth.guard";
-import {
-	ICommentCreateInput,
-	IThreadCreateInput,
-	Lesson,
-	Thread,
-	User
-} from "@/types/graphql";
+import { AuthGuard } from "@/auth.guard";
+import { ICommentCreateInput, IThreadCreateInput } from "@/types/graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
@@ -23,7 +17,10 @@ export class CommunityResolver {
 
 	@Query("thread")
 	async thread(@Args("id") id: string) {
-		return await this.communityService.thread(id);
+		const thread = await this.communityService.thread(id);
+		if (!thread) {
+			return new Error("Thread not found");
+		} else return thread;
 	}
 
 	@Mutation("createThread")
@@ -41,17 +38,17 @@ export class CommunityResolver {
 		@Args("id") id: string,
 		@Args("data") data: ICommentCreateInput
 	) {
-		const self = await this.communityService.thread(id);
-		if (!self) throw new Error("Thread not found");
-
-		//creating new comment document
-		const newComment = await this.communityService.createThread({
-			body: data.body,
-			author: data.author,
-			parentThread: self.id
-		});
-
-		return newComment;
+		const self = await this.thread(id);
+		if (!self || self instanceof Error)
+			return new Error("Parent thread to add comment to was not found");
+		else {
+			//creating new comment document
+			return await this.communityService.createThread({
+				body: data.body,
+				author: data.author,
+				parentThread: self.id
+			});
+		}
 	}
 
 	@Mutation("upvoteThread")
