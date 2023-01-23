@@ -11,17 +11,17 @@ import {
 	AssignmentFields,
 	ModFeedbackFields,
 	AssignmentResFields,
-  ContentFields
-  LessonFields,
-  LessonInput, 
-  CreateCollectionArgs, 
-  CreateContentArgs,
-	ModEnrollmentFields, 
+	ContentFields,
+	LessonFields,
+	LessonInput,
+	CreateCollectionArgs,
+	CreateContentArgs,
+	ModEnrollmentFields,
 	CollectionFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
-import { Content, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
 
@@ -136,7 +136,7 @@ export class ProgramResolver {
 	}
 
 	@Query("content")
-	async content(@Args("input")input: ContentFields){
+	async content(@Args("input") input: ContentFields) {
 		return await this.programService.content(input);
 	}
 
@@ -310,17 +310,17 @@ export class ProgramResolver {
 	}
 
 	@Mutation("createContent")
-	async createContent(@Args("input")input: CreateContentArgs){
+	async createContent(@Args("input") input: CreateContentArgs) {
 		return await this.programService.createContent(input);
 	}
 
 	@Mutation("updateContent")
-	async updateContent(@Args("input")input: ContentFields){
+	async updateContent(@Args("input") input: ContentFields) {
 		return await this.programService.updateContent(input);
 	}
 
 	@Mutation("deleteContent")
-	async deleteContent(@Args("contentID")contentID: string){
+	async deleteContent(@Args("contentID") contentID: string) {
 		return await this.programService.deleteContent(contentID);
 	}
 }

@@ -18,13 +18,12 @@ import {
 	ModuleFeedback,
 	CreateCollectionArgs,
 	LessonInput,
-    CreateContentArgs,
-    ContentFields
-	CollectionFields
+	CreateContentArgs,
+	ContentFields
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { Content, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class ProgramService {
@@ -484,17 +483,15 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lessons(input: LessonFields) {
-		const { id, name, content, transcript, thread, collection } =
-			input;
-        
+		const { id, name, content, transcript, thread, collection } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
-			...(id && {id}),
-			...(name && {name}),
-			...(transcript && {transcript}),
-			collection: {id: collection ? collection : undefined},
-			threads: thread ? {some: {id: thread}} : undefined,
-			content: content ? {some: {id: content}} : undefined
+			...(id && { id }),
+			...(name && { name }),
+			...(transcript && { transcript }),
+			collection: { id: collection ? collection : undefined },
+			threads: thread ? { some: { id: thread } } : undefined,
+			content: content ? { some: { id: content } } : undefined
 		});
 
 		return this.prisma.lesson.findMany({
@@ -505,22 +502,19 @@ export class ProgramService {
 		});
 	}
 
-	async content(input: ContentFields): Promise<Content[]> {
-		const {id, type, link, parent} = input;
-
+	async content(input: ContentFields) {
+		const { id, type, link, parent } = input;
 
 		const where = Prisma.validator<Prisma.ContentWhereInput>()({
-			...(id && {id}),
-			...(type && {type}),
-			...(link && {link}),
-			parent: { id: parent ? parent : undefined}
-		})
+			...(id && { id }),
+			...(type && { type }),
+			...(link && { link }),
+			parent: { id: parent ? parent : undefined }
+		});
 
 		return this.prisma.content.findMany({
 			where
-		})
-
-
+		});
 	}
 
 	async createCollection({
@@ -972,8 +966,11 @@ export class ProgramService {
 		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
 			data: {
 				name: input.name,
-				contentType: input.contentType,
-				content: input.content,
+				content: {
+					connect: {
+						id: input.content ? input.content : undefined
+					}
+				},
 				transcript: input.transcript,
 				collection: {
 					connect: {
@@ -997,7 +994,7 @@ export class ProgramService {
 		const {
 			id,
 			name,
-			// TODO: Allow for list fields to be updated 
+			// TODO: Allow for list fields to be updated
 			// content,
 			transcript,
 			// Threads are a list so how these are being updated is going to be a little strange.
@@ -1050,61 +1047,50 @@ export class ProgramService {
 		});
 	}
 
-    async createContent(input: CreateContentArgs): Promise<Content> {
-        const {
-            type,
-            link,
-            parent
-        } = input
+	async createContent(input: CreateContentArgs) {
+		const { type, link, parent } = input;
 
-        const data = Prisma.validator<Prisma.ContentCreateInput>()({
-            type,
-            link,
-            parent: {
-                connect: {
-                    id: parent
-                }
-            }
-        })
+		const data = Prisma.validator<Prisma.ContentCreateInput>()({
+			type,
+			link,
+			parent: {
+				connect: {
+					id: parent
+				}
+			}
+		});
 
-        return this.prisma.content.create({
-            data
-        })
-    }
+		return this.prisma.content.create({
+			data
+		});
+	}
 
-    async updateContent(input: ContentFields): Promise<Content | null> {
-        const {
-            id,
-            type,
-            link,
-            parent,
-        } = input
+	async updateContent(input: ContentFields) {
+		const { id, type, link, parent } = input;
 
 		if (!id) {
 			throw new Error("Id not provided to updateContent");
 		}
 
-        const data = Prisma.validator<Prisma.ContentUpdateArgs>()({
-            where: {
-                id: id
-            },
-            data: {
-                ...(type && {type}),
-                ...(link && {link}),
-                parent: parent ? { connect: { id: parent}} : undefined
-            }
-        })
+		const data = Prisma.validator<Prisma.ContentUpdateArgs>()({
+			where: {
+				id: id
+			},
+			data: {
+				...(type && { type }),
+				...(link && { link }),
+				parent: parent ? { connect: { id: parent } } : undefined
+			}
+		});
 
-        return this.prisma.content.update(
-            data
-        )
-    }
+		return this.prisma.content.update(data);
+	}
 
-    async deleteContent(contentID: string): Promise<Content | null> {
-        return this.prisma.content.delete({
-            where: {
-                id: contentID
-            }
-        })
-    }
+	async deleteContent(contentID: string) {
+		return this.prisma.content.delete({
+			where: {
+				id: contentID
+			}
+		});
+	}
 }

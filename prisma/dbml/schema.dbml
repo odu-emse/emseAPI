@@ -117,8 +117,8 @@ Table Lesson {
   threads Thread [not null]
   collection Collection
   collectionID String
-  content Content [not null]
   position Int [not null, default: 0]
+  content Content [not null]
 }
 
 Table ModuleFeedback {
