@@ -3,10 +3,13 @@ import { CommunityResolver, CommunityService } from "@/community";
 import { IThreadCreateInput } from "@/types/graphql";
 import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
+import { PlanOfStudyResolver, PoSService } from "@/pos";
 
 describe("Community", () => {
 	let service: CommunityService;
 	let resolver: CommunityResolver;
+	let posService: PoSService
+	let posResolver: PlanOfStudyResolver
 	let auth: AuthService;
 	let user: UserService;
 	let testingThreadID: string = "6387808aeca98a745ea97691";
@@ -51,8 +54,10 @@ describe("Community", () => {
 
 	beforeEach(async () => {
 		service = new CommunityService(prisma);
+		posService = new PoSService(prisma)
+		posResolver = new PlanOfStudyResolver(posService)
 		resolver = new CommunityResolver(service);
-		auth = new AuthService(prisma);
+		auth = new AuthService(prisma, posResolver);
 		user = new UserService(prisma);
 	});
 
