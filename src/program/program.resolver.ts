@@ -14,11 +14,13 @@ import {
 	ModEnrollmentFields, 
   CreateCollectionArgs, 
   LessonInput, 
-  LessonFields
+  LessonFields,
+  CreateContentArgs,
+  ContentFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
-import { Prisma } from "@prisma/client";
+import { Content, Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
 
@@ -130,6 +132,11 @@ export class ProgramResolver {
 	@Query("collection")
 	async collection(@Args("id") id: string) {
 		return await this.programService.collection(id);
+	}
+
+	@Query("content")
+	async content(@Args("input")input: ContentFields){
+		return await this.programService.content(input);
 	}
 
 	@Mutation("createCollection")
@@ -318,5 +325,20 @@ export class ProgramResolver {
 		@Args("id")id: string
 	){
 		return await this.programService.deleteLesson(id);
+	}
+
+	@Mutation("createContent")
+	async createContent(@Args("input")input: CreateContentArgs){
+		return await this.programService.createContent(input);
+	}
+
+	@Mutation("updateContent")
+	async updateContent(@Args("input")input: ContentFields){
+		return await this.programService.updateContent(input);
+	}
+
+	@Mutation("deleteContent")
+	async deleteContent(@Args("contentID")contentID: string){
+		return await this.programService.deleteContent(contentID);
 	}
 }

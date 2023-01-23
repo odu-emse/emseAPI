@@ -116,12 +116,11 @@ Table Collection {
 Table Lesson {
   id String [pk]
   name String [not null]
-  contentType String [not null]
-  content String [not null]
   transcript String
   threads Thread [not null]
   collection Collection
   collectionID String
+  content Content [not null]
 }
 
 Table ModuleFeedback {
@@ -186,6 +185,14 @@ Table Thread {
   comments Thread [not null]
 }
 
+Table Content {
+  id String [pk]
+  type String [not null]
+  link String [not null]
+  parent Lesson [not null]
+  parentID String [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -242,3 +249,5 @@ Ref: Thread.authorID > User.id
 Ref: Thread.parentLessonID > Lesson.id
 
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]
+
+Ref: Content.parentID > Lesson.id
