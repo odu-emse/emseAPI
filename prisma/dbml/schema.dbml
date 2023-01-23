@@ -85,6 +85,7 @@ Table Module {
   intro String [not null]
   numSlides Int [not null]
   keywords String[] [not null]
+  objectives String[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
   members ModuleEnrollment [not null]

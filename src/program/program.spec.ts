@@ -88,6 +88,7 @@ describe("Plan services", () => {
 					expect(module.numSlides).toBeDefined();
 
 					expect(module.keywords).toBeInstanceOf(Array);
+					expect(module.objectives).toBeInstanceOf(Array);
 					expect(module.feedback).toBeInstanceOf(Array);
 					expect(module.members).toBeInstanceOf(Array);
 
