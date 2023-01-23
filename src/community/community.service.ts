@@ -13,40 +13,33 @@ import {
 export class CommunityService {
 	constructor(private prisma: PrismaService) {}
 
-	async threads() {
-		const include = Prisma.validator<Prisma.ThreadInclude>()({
-			comments: true,
-			parentLesson: true,
-			usersWatching: true,
-			author: true
-		});
+	private threadInclude = Prisma.validator<Prisma.ThreadInclude>()({
+		comments: {
+			include: {
+				comments: {
+					include: {
+						comments: true
+					}
+				}
+			}
+		},
+		parentLesson: true,
+		usersWatching: true,
+		author: true
+	});
 
+	async threads() {
 		return await this.prisma.thread.findMany({
-			include
+			include: this.threadInclude
 		});
 	}
 
 	async thread(id: string) {
-		const include = Prisma.validator<Prisma.ThreadInclude>()({
-			comments: {
-				include: {
-					comments: {
-						include: {
-							comments: true
-						}
-					}
-				}
-			},
-			parentLesson: true,
-			usersWatching: true,
-			author: true
-		});
-
 		return await this.prisma.thread.findUniqueOrThrow({
 			where: {
 				id
 			},
-			include
+			include: this.threadInclude
 		});
 	}
 
