@@ -17,7 +17,8 @@ import {
 	Course,
 	ModuleFeedback,
 	CreateCollectionArgs,
-	LessonInput
+	LessonInput,
+	CollectionFields
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
@@ -507,16 +508,12 @@ export class ProgramService {
 	async createCollection({
 		name,
 		lessons,
-		next,
-		previous,
+		positionIndex,
 		moduleID
 	}: CreateCollectionArgs) {
 		const create = Prisma.validator<Prisma.CollectionCreateInput>()({
 			name,
-			first: lessons?.at(0),
-			last: lessons?.at(-1),
-			previous,
-			next,
+			position: positionIndex,
 			module: {
 				connect: {
 					id: moduleID
@@ -536,7 +533,7 @@ export class ProgramService {
 		});
 	}
 
-	async updateCollection(id: string, data: any) {
+	async updateCollection(id: string, data: Prisma.CollectionUpdateInput) {
 		return this.prisma.collection.update({
 			where: {
 				id
@@ -964,9 +961,7 @@ export class ProgramService {
 					connect: {
 						id: input.collection ? input.collection : undefined
 					}
-				},
-				next: input.next ? input.next : undefined,
-				previous: input.previous ? input.previous : undefined
+				}
 			},
 			include: {
 				collection: true,
@@ -992,9 +987,7 @@ export class ProgramService {
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
 			collection,
-			thread,
-			next,
-			previous
+			thread
 		} = input;
 		const payload = {
 			...(id && { id }),
@@ -1003,9 +996,7 @@ export class ProgramService {
 			...(content && { content }),
 			...(transcript && { transcript }),
 			...(thread && { thread }),
-			...(collection && { collection }),
-			...(next && { next }),
-			...(previous && { previous })
+			...(collection && { collection })
 		};
 
 		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
@@ -1018,8 +1009,6 @@ export class ProgramService {
 				content: payload.content,
 				transcript: payload.transcript,
 				collectionID: payload.collection,
-				next: payload.next,
-				previous: payload.previous,
 				threads: {
 					connect: {
 						id: payload.thread

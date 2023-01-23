@@ -14,7 +14,8 @@ import {
 	ModEnrollmentFields,
 	CreateCollectionArgs,
 	LessonInput,
-	LessonFields
+	LessonFields,
+	CollectionFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -134,28 +135,15 @@ export class ProgramResolver {
 
 	@Mutation("createCollection")
 	async createCollection(@Args("data") data: CreateCollectionArgs) {
-		// const lessons = data?.lessons?.map(async (lesson) => {
-		// here is where we would want to query to see if the passed in lessons already exist or if they need to be created
-		// })
+		return await this.programService.createCollection(data);
+	}
 
-		// this allows us to add the collection to the last index in the array
-		// by getting the last element in the existing collections array on the module model
-		// and setting the next collection ID to null
-		const module = await this.programService.module(data.moduleID);
-
-		// get position index from args and set the previous collection to point to the collection before it (positionIndex - 1)
-		// if positionIndex is 0, then set the previous collection to null
-		// if positionIndex is null, then set the previous collection to the last collection in the array
-		// if positionIndex is given, next collection is the collection after it (positionIndex + 1)
-
-		const previous = module?.collections?.at(-1);
-		const next = null;
-		const input = {
-			...data,
-			previous: previous?.id || undefined,
-			next
-		};
-		return await this.programService.createCollection(input);
+	@Mutation("updateCollection")
+	async updateCollection(
+		@Args("data") data: Prisma.CollectionUpdateInput,
+		@Args("id") id: string
+	) {
+		return await this.programService.updateCollection(id, data);
 	}
 
 	@Query("lessons")

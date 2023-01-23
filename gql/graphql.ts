@@ -45,11 +45,14 @@ export interface PlanFields {
 
 export interface CreateCollectionArgs {
     name: string;
-    first?: Nullable<string>;
-    last?: Nullable<string>;
-    previous?: Nullable<string>;
-    next?: Nullable<string>;
     moduleID: string;
+    lessons?: Nullable<string[]>;
+    positionIndex: number;
+}
+
+export interface CollectionFields {
+    name?: Nullable<string>;
+    moduleID?: Nullable<string>;
     lessons?: Nullable<string[]>;
     positionIndex?: Nullable<number>;
 }
@@ -180,8 +183,6 @@ export interface LessonInput {
     content: string;
     transcript?: Nullable<string>;
     collection: string;
-    next?: Nullable<string>;
-    previous?: Nullable<string>;
 }
 
 export interface LessonFields {
@@ -192,8 +193,6 @@ export interface LessonFields {
     transcript?: Nullable<string>;
     thread?: Nullable<string>;
     collection?: Nullable<string>;
-    next?: Nullable<string>;
-    previous?: Nullable<string>;
 }
 
 export interface NewUser {
@@ -305,6 +304,7 @@ export interface IMutation {
     pairCourseModule(courseId: string, moduleId: string): Module | Promise<Module>;
     unpairCourseModule(courseId: string, moduleId: string): Nullable<Module> | Promise<Nullable<Module>>;
     createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
+    updateCollection(id: string, data: CollectionFields): Collection | Promise<Collection>;
     createLesson(input: LessonInput): Lesson | Promise<Lesson>;
     updateLesson(input?: Nullable<LessonFields>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
     deleteLesson(id: string): Nullable<Lesson> | Promise<Nullable<Lesson>>;
@@ -448,10 +448,6 @@ export interface Collection {
     createdAt: Date;
     updatedAt: Date;
     lessons?: Nullable<Nullable<Lesson>[]>;
-    next?: Nullable<string>;
-    previous?: Nullable<string>;
-    first?: Nullable<string>;
-    last?: Nullable<string>;
     module: Module;
     moduleID: string;
 }
@@ -464,8 +460,6 @@ export interface Lesson {
     transcript?: Nullable<string>;
     threads?: Nullable<Nullable<string>[]>;
     collection?: Nullable<Collection>;
-    next?: Nullable<string>;
-    previous?: Nullable<string>;
 }
 
 export interface Error {
