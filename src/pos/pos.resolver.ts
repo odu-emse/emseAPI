@@ -1,7 +1,7 @@
 import { UseGuards } from "@nestjs/common";
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
 import { PlanFields, PlanInput } from "gql/graphql";
-import { AuthGuard } from "../auth.guard";
+import { AuthGuard } from "@/auth.guard";
 import { PoSService } from "./pos.service";
 
 @Resolver()

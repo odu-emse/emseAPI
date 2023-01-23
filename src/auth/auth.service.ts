@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { NewUser, User } from "../../gql/graphql";
-import { PlanOfStudy } from "@prisma/client";
+import { PrismaService } from "@/prisma.service";
+import { NewUser } from "@/types/graphql";
 import { PlanOfStudyResolver } from "@/pos/pos.resolver";
 
 type TokenType = {
@@ -14,16 +13,12 @@ type TokenType = {
 	family_name: string;
 };
 
-interface UserOpenID {
-	openID: string;
-}
-
 @Injectable()
 export class AuthService {
-	constructor(
-		private prisma: PrismaService,
-		private pos: PlanOfStudyResolver
-	) {}
+	constructor(private prisma: PrismaService, private pos: PlanOfStudyResolver) {
+		this.prisma = prisma;
+		this.pos = pos;
+	}
 
 	async fetchToken(code: String) {
 		return await fetch("https://oauth2.googleapis.com/token", {
@@ -85,7 +80,7 @@ export class AuthService {
 			if (account instanceof Error) {
 				throw "Error adding plan to user.";
 			} else {
-				this.pos.addPlan({
+				await this.pos.addPlan({
 					student: account.id
 				});
 			}
