@@ -727,7 +727,7 @@ export class ProgramService {
 					}
 				}
 			},
-			include: this.moduleFeedbackInclude
+			include: this.moduleInclude
 		});
 	}
 
