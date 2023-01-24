@@ -50,7 +50,7 @@ describe("Account services", () => {
 		philosophy: "I  teach people"
 	};
 
-	beforeEach(async () => {
+	beforeAll(async () => {
 		prisma = new PrismaService();
 		service = new UserService(prisma);
 		resolver = new UserResolver(service);

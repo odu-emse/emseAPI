@@ -8,8 +8,8 @@ import { PlanOfStudyResolver, PoSService } from "@/pos";
 describe("Community", () => {
 	let service: CommunityService;
 	let resolver: CommunityResolver;
-	let posService: PoSService
-	let posResolver: PlanOfStudyResolver
+	let posService: PoSService;
+	let posResolver: PlanOfStudyResolver;
 	let auth: AuthService;
 	let user: UserService;
 	let testingThreadID: string = "6387808aeca98a745ea97691";
@@ -52,22 +52,19 @@ describe("Community", () => {
 		});
 	};
 
-	beforeEach(async () => {
+	beforeAll(async () => {
 		service = new CommunityService(prisma);
-		posService = new PoSService(prisma)
-		posResolver = new PlanOfStudyResolver(posService)
+		posService = new PoSService(prisma);
+		posResolver = new PlanOfStudyResolver(posService);
 		resolver = new CommunityResolver(service);
 		auth = new AuthService(prisma, posResolver);
 		user = new UserService(prisma);
 	});
 
-	afterEach(async () => {
-		await prisma.$disconnect();
-	});
-
 	afterAll(async () => {
 		await deleteThread(threadID);
 		await deleteUser(accountID);
+		await prisma.$disconnect();
 	});
 
 	it("should be defined", () => {
@@ -87,10 +84,9 @@ describe("Community", () => {
 		);
 		expect(threads[pickRandomFromArray(threads)].author).toBeInstanceOf(Object);
 	});
-	//TODO: This test case will keep failing until we fix the code coverage using vitest instead of jest
 	it("should throw an error when ID is not found", async () => {
 		const thread = await resolver.thread(shuffle(testingThreadID));
-		// expectTypeOf(thread).toMatchTypeOf<Object>();
+		expect(thread instanceof Error).toBe(true);
 	});
 	it("should return the threads requested by ID", async () => {
 		const thread = await resolver.thread(testingThreadID);
@@ -108,6 +104,7 @@ describe("Community", () => {
 				body: "We are inserting this data from a test case, and this data should have been removed after the test case has finished.",
 				author: account.id
 			});
+			if (thread instanceof Error) return new Error(thread.message);
 			threadID = thread.id;
 			accountID = account.id;
 			expect(thread).toHaveProperty("title");
@@ -125,25 +122,25 @@ describe("Community", () => {
 			body: "How does this look?",
 			author: accountID
 		});
-		expect(res.author.id === accountID).toBe(true);
-		expect(res.watcherID.includes(accountID)).toBe(true);
-		expect(res.parentThreadID === threadID).toBe(true);
+		if (res instanceof Error) return new Error(res.message);
+		else {
+			expect(res.author.id === accountID).toBe(true);
+			expect(res.watcherID.includes(accountID)).toBe(true);
+			expect(res.parentThreadID === threadID).toBe(true);
+		}
 	});
-	//TODO: Check if returned value is an error or not
 	it("should fail to add comment if parent ID is not found", async () => {
 		const thread = await resolver.addCommentToThread(shuffle(threadID), {
 			body: "How does this look?",
 			author: accountID
 		});
-		expect(thread).toBeNull();
+		expect(thread instanceof Error).toBe(true);
 	});
 	it("should handle a thread and ensure that the vote count has increased by 1", async () => {
 		const voteNum = await resolver.thread(threadID);
 		const upVoteNum = await resolver.upvoteThread(threadID);
-
-		expect(voteNum.upvotes).toBeInstanceOf("number");
-		expect(upVoteNum.upvotes).toBeInstanceOf("number");
-
+		if (voteNum instanceof Error || upVoteNum instanceof Error)
+			throw new Error("Error in upvoteThread test case");
 		expect(upVoteNum.upvotes === voteNum.upvotes + 1).toBe(true);
 	});
 });

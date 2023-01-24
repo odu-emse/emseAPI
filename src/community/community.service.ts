@@ -1,13 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import {
-	ICommentCreateInput,
-	IThreadCreateInput,
-	Lesson,
-	Thread,
-	User
-} from "@/types/graphql";
+import { IThreadCreateInput, Thread } from "@/types/graphql";
 
 @Injectable()
 export class CommunityService {
@@ -35,7 +29,7 @@ export class CommunityService {
 	}
 
 	async thread(id: string) {
-		return await this.prisma.thread.findUniqueOrThrow({
+		return await this.prisma.thread.findUnique({
 			where: {
 				id
 			},

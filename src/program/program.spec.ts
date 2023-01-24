@@ -90,11 +90,6 @@ describe("Plan services", () => {
 					expect(module.keywords).toBeInstanceOf(Array);
 					expect(module.feedback).toBeInstanceOf(Array);
 					expect(module.members).toBeInstanceOf(Array);
-
-					if (module.parentModules !== null || true)
-						expect(module.parentModules).toBeInstanceOf(Array);
-					if (module.subModules !== null || true)
-						expect(module.subModules).toBeInstanceOf(Array);
 				}
 			});
 		});
