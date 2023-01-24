@@ -202,6 +202,11 @@ type Module {
 	keywords: [String!]!
 
 	"""
+	objectives in the Modules
+	"""
+	objectives: [String!]!
+
+	"""
 	Date and Time of the Module Created at
 	"""
 	createdAt: Date!

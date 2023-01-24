@@ -442,6 +442,7 @@ export interface Module {
     intro: string;
     numSlides: number;
     keywords: string[];
+    objectives: string[];
     createdAt: Date;
     updatedAt: Date;
     assignments?: Nullable<Nullable<Assignment>[]>;
