@@ -1,6 +1,5 @@
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
 import {
-	NewUser,
 	UpdateUser,
 	SocialInput,
 	UserFields,
@@ -41,8 +40,7 @@ export class UserResolver {
 	async instructorProfile(@Args("id") id: string) {
 		const usr = await this.user({ id });
 		if (usr instanceof Error) return new Error("User not found");
-		//@ts-ignore
-		else return await this.userService.instructorProfile(usr.id);
+		else return await this.userService.instructorProfile(usr[0].id);
 	}
 
 	@Mutation("updateUser")

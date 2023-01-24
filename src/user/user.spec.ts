@@ -8,13 +8,13 @@ import {
 	InstructorProfileInput,
 	SocialInput
 } from "@/types/graphql";
+import { shuffle } from "../../utils/tests";
 
 describe("Account services", () => {
 	let service: UserService;
 	let resolver: UserResolver;
 	let prisma: PrismaService;
 
-	let instructorProfileID = "62816c29ba9e5c0f14d6e71f";
 	let userID = "110686834027701244994";
 	let userDocumentID = "616701c22e17f3fb9f5085f7";
 	let socialDocumentID = "62966864bd7f125c4df63c11";
@@ -67,31 +67,40 @@ describe("Account services", () => {
 
 	describe("User", () => {
 		it("should return an array of users", async () => {
-			const users = await resolver.users();
+			const users = await resolver.user({});
 			expect(users).toBeInstanceOf(Array);
 		});
+		it("should return an error if User is not found", async () => {
+			const user = await resolver.user({ id: shuffle(userDocumentID) });
+			expect(user).toBeInstanceOf(Error);
+		});
 		it("should return User given Open ID argument", async () => {
-			const user = await resolver.user(userID);
+			const user = await resolver.user({ openID: userID });
 			expect(user).toBeDefined();
-			if (!user) return;
-			expect(user.id).toBeDefined();
-			expect(user.openID).toBeDefined();
-			expect(user.picURL).toBeDefined();
-			expect(user.email).toBeDefined();
-			expect(user.firstName).toBeDefined();
-			expect(user.lastName).toBeDefined();
-			expect(user.middleName).toBeDefined();
-			expect(user.isActive).toBeDefined();
-			expect(user.dob).toBeDefined();
-			expect(user.createdAt).toBeDefined();
+			if (!user || user instanceof Error) return new Error("User not found");
+			user.map((user: User) => {
+				expect(user.id).toBeDefined();
+				expect(user.openID).toBeDefined();
+				expect(user.picURL).toBeDefined();
+				expect(user.email).toBeDefined();
+				expect(user.firstName).toBeDefined();
+				expect(user.lastName).toBeDefined();
+				expect(user.middleName).toBeDefined();
+				expect(user.isActive).toBeDefined();
+				expect(user.dob).toBeDefined();
+				expect(user.createdAt).toBeDefined();
+			});
 		});
 		it("should populate foreign key relations", async () => {
-			const user = await resolver.user(userID);
-			expect(user).toHaveProperty("instructorProfile");
-			expect(user).toHaveProperty("social");
-			expect(user).toHaveProperty("plan");
-			expect(user).toHaveProperty("assignmentGraded");
-			expect(user).toHaveProperty("feedback");
+			const user = await resolver.user({ openID: userID });
+			if (!user || user instanceof Error) return new Error("User not found");
+			user.map((user: User) => {
+				expect(user).toHaveProperty("instructorProfile");
+				expect(user).toHaveProperty("social");
+				expect(user).toHaveProperty("plan");
+				expect(user).toHaveProperty("assignmentGraded");
+				expect(user).toHaveProperty("feedback");
+			});
 		});
 		it("should update user given input argument", async () => {
 			const updatedUserObj: UpdateUser = {
@@ -122,11 +131,14 @@ describe("Account services", () => {
 	});
 	describe("Instructor", () => {
 		it("should return Instructor Profile given the argument open ID", async () => {
-			const instructorProfile = await resolver.instructorProfile(userID);
+			const instructorProfile = await resolver.instructorProfile(
+				userDocumentID
+			);
 			expect(instructorProfile).toBeDefined();
-			if (!instructorProfile) return;
+			if (!instructorProfile || instructorProfile instanceof Error)
+				return new Error("Instructor Profile not found");
 			expect(instructorProfile.id).toBeDefined();
-			expect(instructorProfile.account?.openID).toEqual(userID);
+			expect(instructorProfile.account?.id).toEqual(userDocumentID);
 			expect(instructorProfile.title).toBeDefined();
 			expect(instructorProfile.officeLocation).toBeDefined();
 			expect(instructorProfile.officeHours).toBeDefined();
