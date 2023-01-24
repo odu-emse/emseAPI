@@ -60,6 +60,62 @@ export class ProgramService {
 		}
 	});
 
+	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
+		members: {
+			include: {
+				plan: {
+					include: {
+						student: true
+					}
+				}
+			}
+		},
+		assignments: {
+			include: {
+				assignmentResults: {
+					include: {
+						student: {
+							include: {
+								student: true,
+							}
+						},
+						gradedBy: {
+							include: {
+								social: true,
+								instructorProfile: true,
+							}
+						},
+					}
+				},
+			}
+		},
+		feedback: {
+			include: {
+				student: true
+			}
+		},
+		parentModules: true,
+		subModules: true,
+		collections: {
+			include: {
+				lessons: {
+					include: {
+						threads: {
+							include: {
+								author: true,
+								comments: true,
+								usersWatching: true,
+								parentThread: true
+							}
+						},
+						content: true
+					}
+				},
+			}
+		},
+		course: true
+	});
+
 	/// Queries
 	async module(id: string): Promise<Module | null> {
 		//find module based on id
@@ -68,61 +124,7 @@ export class ProgramService {
 				where: {
 					id
 				},
-				include: {
-					assignments: {
-						include: {
-							assignmentResults: {
-								include: {
-									gradedBy: {
-										include: {
-											social: true,
-											feedback: true,
-											assignmentGraded: true,
-											instructorProfile: true
-										}
-									}
-								}
-							}
-						}
-					},
-					feedback: {
-						include: {
-							student: {
-								include: {
-									social: true,
-									plan: {
-										include: {
-											modules: true,
-											assignmentResults: true
-										}
-									},
-									instructorProfile: true
-								}
-							},
-							module: true
-						}
-					},
-					members: {
-						include: {
-							plan: {
-								include: {
-									student: {
-										include: {
-											social: true,
-											feedback: true
-										}
-									},
-									modules: {
-										include: {
-											module: true
-										}
-									}
-								}
-							}
-						}
-					},
-					collections: true
-				}
+				include: this.moduleInclude
 			})) as Prisma.ModuleGetPayload<{}>;
 		} else {
 			return await this.prisma.module.findFirst({
@@ -225,22 +227,7 @@ export class ProgramService {
 				...where,
 				...payload
 			},
-			include: {
-				assignments: true,
-				members: {
-					include: {
-						module: true,
-						plan: {
-							include: {
-								student: true
-							}
-						}
-					}
-				},
-				feedback: true,
-				parentModules: true,
-				subModules: true
-			}
+			include: this.moduleInclude
 		});
 	}
 
@@ -569,20 +556,7 @@ export class ProgramService {
 		} else {
 			return this.prisma.module.create({
 				data,
-				include: {
-					assignments: true,
-					feedback: {
-						include: {
-							student: true
-						}
-					},
-					members: {
-						include: {
-							plan: true
-						}
-					},
-					collections: true
-				}
+				include: this.moduleInclude
 			});
 		}
 	}
@@ -610,19 +584,7 @@ export class ProgramService {
 				...(numSlides && { numSlides }),
 				...(keywords && { keywords })
 			},
-			include: {
-				assignments: true,
-				feedback: {
-					include: {
-						student: true
-					}
-				},
-				members: {
-					include: {
-						plan: true
-					}
-				}
-			}
+			include: this.moduleInclude
 		});
 	}
 
