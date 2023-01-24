@@ -36,7 +36,7 @@ model User {
   watchedThreads    Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
   watchedThreadIDs  String[]           @default([]) @db.ObjectId
   createdThreads    Thread[]           @relation(name: "createdThreads")
-  }
+}
 
 model InstructorProfile {
   id                            String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -114,11 +114,11 @@ model Module {
   assignments Assignment[]
   feedback    ModuleFeedback[]
 
-  parentModules   Module[]  @relation("parentModules",fields: [parentModuleIDs], references: [id])
-  parentModuleIDs String[]  @db.ObjectId @default([])
-  subModules       Module[] @relation("parentModules",fields: [subModuleIDs], references: [id])
-  subModuleIDs     String[] @db.ObjectId @default([])
-  collections Collection[] @relation(name: "collections")
+  parentModules   Module[]     @relation("parentModules", fields: [parentModuleIDs], references: [id])
+  parentModuleIDs String[]     @default([]) @db.ObjectId
+  subModules      Module[]     @relation("parentModules", fields: [subModuleIDs], references: [id])
+  subModuleIDs    String[]     @default([]) @db.ObjectId
+  collections     Collection[] @relation(name: "collections")
 
   courseIDs String[] @db.ObjectId
   course    Course[] @relation(fields: [courseIDs], references: [id])
@@ -129,10 +129,7 @@ model Collection {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  first     String?  @db.ObjectId
-  last      String?  @db.ObjectId
-  previous  String?  @db.ObjectId
-  next      String?  @db.ObjectId
+  position  Int      @default(0)
 
   // Relation fields
   lessons  Lesson[]
@@ -148,6 +145,7 @@ model Lesson {
   // TODO: Should not be empty EVER
   collection   Collection? @relation(fields: [collectionID], references: [id])
   collectionID String?     @db.ObjectId
+  position     Int         @default(0)
 
   content      Content[]
 

@@ -279,30 +279,11 @@ type Collection {
 	lessons: [Lesson]
 
 	"""
-	The ID of the next collection
-	"""
-	next: ID
-
-	"""
-	The ID of the previous collection
-	"""
-	previous: ID
-
-	"""
-	The ID of the first lesson in the collection
-	"""
-	first: ID
-
-	"""
-	The ID of the last lesson in the collection
-	"""
-	last: ID
-	"""
-
+	The module that this collection belongs to
 	"""
 	module: Module!
 	"""
-
+	The module's unique ID that this collection belongs to
 	"""
 	moduleID: ID!
 }
@@ -328,7 +309,6 @@ type Lesson {
     The list of threads related to the lesson
     """
     threads: [ID]
-
     """
     The collection that the lesson belongs to
     """
@@ -488,11 +468,14 @@ input ContentFields {
 
 input CreateCollectionArgs {
 	name: String!
-	first: ID
-	last: ID
-	previous: ID
-	next: ID
 	moduleID: ID!
+	lessons: [ID!]
+	positionIndex: Int!
+}
+
+input CollectionFields {
+	name: String
+	moduleID: ID
 	lessons: [ID!]
 	positionIndex: Int
 }
@@ -519,7 +502,6 @@ input ModuleFields {
 input CourseFields {
 	id: ID
 	name: String
-
 	module: ID
 }
 
@@ -839,7 +821,7 @@ type Mutation {
 	"""
 	addAssignmentResult(input: NewAssignmentResult): AssignmentResult!
 	"""
-	Assignment Reuslt is Updated
+	Updated the results of an Assignment
 	"""
 	updateAssignmentResult(id: ID!, result: Float!): AssignmentResult
 	"""
@@ -868,13 +850,21 @@ type Mutation {
 	deleteModuleEnrollment(id: ID!): ModuleEnrollment
 
     pairCourseModule(courseId: ID!, moduleId: ID!): Module!
+
     """
     Course Module is Unpaired Relating to Course Id and mobile Id
     """
     unpairCourseModule(courseId: ID!, moduleId: ID!): Module
+
     """
+	Create a new collection
     """
     createCollection(data: CreateCollectionArgs!): Collection!
+
+	"""
+	Update a collection given its ID and the new data to update
+    """
+    updateCollection(id: ID!, data: CollectionFields!): Collection!
 
     """
     Create a Lesson for an individual collection

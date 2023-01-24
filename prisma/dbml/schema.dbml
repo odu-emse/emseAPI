@@ -105,10 +105,7 @@ Table Collection {
   name String [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
-  first String
-  last String
-  previous String
-  next String
+  position Int [not null, default: 0]
   lessons Lesson [not null]
   module Module [not null]
   moduleID String [not null]
@@ -121,6 +118,7 @@ Table Lesson {
   threads Thread [not null]
   collection Collection
   collectionID String
+  position Int [not null, default: 0]
   content Content [not null]
 }
 

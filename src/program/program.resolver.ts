@@ -11,16 +11,17 @@ import {
 	AssignmentFields,
 	ModFeedbackFields,
 	AssignmentResFields,
-	ModEnrollmentFields, 
-  CreateCollectionArgs, 
-  LessonInput, 
-  LessonFields,
-  CreateContentArgs,
-  ContentFields
+	ContentFields,
+	LessonFields,
+	LessonInput,
+	CreateCollectionArgs,
+	CreateContentArgs,
+	ModEnrollmentFields,
+	CollectionFields
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
-import { Content, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
 
@@ -135,34 +136,21 @@ export class ProgramResolver {
 	}
 
 	@Query("content")
-	async content(@Args("input")input: ContentFields){
+	async content(@Args("input") input: ContentFields) {
 		return await this.programService.content(input);
 	}
 
 	@Mutation("createCollection")
 	async createCollection(@Args("data") data: CreateCollectionArgs) {
-		// const lessons = data?.lessons?.map(async (lesson) => {
-		// here is where we would want to query to see if the passed in lessons already exist or if they need to be created
-		// })
+		return await this.programService.createCollection(data);
+	}
 
-		// this allows us to add the collection to the last index in the array
-		// by getting the last element in the existing collections array on the module model
-		// and setting the next collection ID to null
-		const module = await this.programService.module(data.moduleID);
-
-		// get position index from args and set the previous collection to point to the collection before it (positionIndex - 1)
-		// if positionIndex is 0, then set the previous collection to null
-		// if positionIndex is null, then set the previous collection to the last collection in the array
-		// if positionIndex is given, next collection is the collection after it (positionIndex + 1)
-
-		const previous = module?.collections?.at(-1);
-		const next = null;
-		const input = {
-			...data,
-			previous: previous?.id || undefined,
-			next
-		};
-		return await this.programService.createCollection(input);
+	@Mutation("updateCollection")
+	async updateCollection(
+		@Args("data") data: Prisma.CollectionUpdateInput,
+		@Args("id") id: string
+	) {
+		return await this.programService.updateCollection(id, data);
 	}
 
 	@Query("lessons")
@@ -307,38 +295,32 @@ export class ProgramResolver {
 	}
 
 	@Mutation("createLesson")
-	async createLesson(
-		@Args("input")input: LessonInput
-	){
+	async createLesson(@Args("input") input: LessonInput) {
 		return await this.programService.createLesson(input);
 	}
 
 	@Mutation("updateLesson")
-	async updateLesson(
-		@Args("input")input: LessonFields
-	){
+	async updateLesson(@Args("input") input: LessonFields) {
 		return await this.programService.updateLesson(input);
 	}
 
 	@Mutation("deleteLesson")
-	async deleteLesson(
-		@Args("id")id: string
-	){
+	async deleteLesson(@Args("id") id: string) {
 		return await this.programService.deleteLesson(id);
 	}
 
 	@Mutation("createContent")
-	async createContent(@Args("input")input: CreateContentArgs){
+	async createContent(@Args("input") input: CreateContentArgs) {
 		return await this.programService.createContent(input);
 	}
 
 	@Mutation("updateContent")
-	async updateContent(@Args("input")input: ContentFields){
+	async updateContent(@Args("input") input: ContentFields) {
 		return await this.programService.updateContent(input);
 	}
 
 	@Mutation("deleteContent")
-	async deleteContent(@Args("contentID")contentID: string){
+	async deleteContent(@Args("contentID") contentID: string) {
 		return await this.programService.deleteContent(contentID);
 	}
 }
