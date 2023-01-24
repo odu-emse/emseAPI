@@ -60,6 +60,119 @@ export class ProgramService {
 		}
 	});
 
+	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
+		members: {
+			include: {
+				plan: {
+					include: {
+						student: true
+					}
+				}
+			}
+		},
+		assignments: {
+			include: {
+				assignmentResults: {
+					include: {
+						student: {
+							include: {
+								student: true,
+							}
+						},
+						gradedBy: {
+							include: {
+								social: true,
+								instructorProfile: true,
+							}
+						},
+					}
+				},
+			}
+		},
+		feedback: {
+			include: {
+				student: true
+			}
+		},
+		parentModules: true,
+		subModules: true,
+		collections: {
+			include: {
+				lessons: {
+					include: {
+						threads: {
+							include: {
+								author: true,
+								comments: true,
+								usersWatching: true,
+								parentThread: true
+							}
+						},
+						content: true
+					}
+				},
+			}
+		},
+		course: true
+	});
+
+	private moduleFeedbackInclude = Prisma.validator<Prisma.ModuleFeedbackInclude>()({
+		student: true,
+		module: true
+	});
+
+	private assignmentResultInclude = Prisma.validator<Prisma.AssignmentResultInclude>()({
+		student: {
+			include: {
+				student: true,
+			}
+		},
+		gradedBy: true,
+		assignment: {
+			include: {
+				module: true,
+			}
+		}
+	});
+
+	private moduleEnrollmentInclude = Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
+		plan: {
+			include: {
+				student: true
+			}
+		},
+		module: true
+	});
+
+	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
+		module: true,
+		lessons: {
+			include: {
+				content: true,
+				threads: {
+					include: {
+						author: true,
+						usersWatching: true,
+						parentThread: true,
+						comments: true
+					}
+				}
+			}
+		}
+	});
+
+	private lessonInclude = Prisma.validator<Prisma.LessonInclude>()({
+		content: true,
+		threads: {
+			include: {
+				author: true,
+				usersWatching: true,
+				parentThread: true,
+				comments: true
+			}
+		}
+	})
+
 	/// Queries
 	async module(id: string): Promise<Module | null> {
 		//find module based on id
@@ -68,61 +181,7 @@ export class ProgramService {
 				where: {
 					id
 				},
-				include: {
-					assignments: {
-						include: {
-							assignmentResults: {
-								include: {
-									gradedBy: {
-										include: {
-											social: true,
-											feedback: true,
-											assignmentGraded: true,
-											instructorProfile: true
-										}
-									}
-								}
-							}
-						}
-					},
-					feedback: {
-						include: {
-							student: {
-								include: {
-									social: true,
-									plan: {
-										include: {
-											modules: true,
-											assignmentResults: true
-										}
-									},
-									instructorProfile: true
-								}
-							},
-							module: true
-						}
-					},
-					members: {
-						include: {
-							plan: {
-								include: {
-									student: {
-										include: {
-											social: true,
-											feedback: true
-										}
-									},
-									modules: {
-										include: {
-											module: true
-										}
-									}
-								}
-							}
-						}
-					},
-					collections: true
-				}
+				include: this.moduleInclude
 			})) as Prisma.ModuleGetPayload<{}>;
 		} else {
 			return await this.prisma.module.findFirst({
@@ -225,22 +284,7 @@ export class ProgramService {
 				...where,
 				...payload
 			},
-			include: {
-				assignments: true,
-				members: {
-					include: {
-						module: true,
-						plan: {
-							include: {
-								student: true
-							}
-						}
-					}
-				},
-				feedback: true,
-				parentModules: true,
-				subModules: true
-			}
+			include: this.moduleInclude
 		});
 	}
 
@@ -324,10 +368,7 @@ export class ProgramService {
 
 	async moduleFeedbacks() {
 		return this.prisma.moduleFeedback.findMany({
-			include: {
-				student: true,
-				module: true
-			}
+			include: this.moduleFeedbackInclude
 		});
 	}
 
@@ -345,10 +386,7 @@ export class ProgramService {
 
 		return this.prisma.moduleFeedback.findMany({
 			where: payload,
-			include: {
-				student: true,
-				module: true
-			}
+			include: this.moduleFeedbackInclude
 		});
 	}
 
@@ -357,26 +395,13 @@ export class ProgramService {
 			where: {
 				id
 			},
-			include: {
-				student: true,
-				module: true
-			}
+			include: this.moduleFeedbackInclude
 		});
 	}
 
 	async assignmentResults() {
 		return this.prisma.assignmentResult.findMany({
-			include: {
-				student: {
-					include: {
-						student: true,
-						modules: true,
-						assignmentResults: true
-					}
-				},
-				gradedBy: true,
-				assignment: true
-			}
+			include: this.assignmentResultInclude
 		});
 	}
 
@@ -385,11 +410,7 @@ export class ProgramService {
 			where: {
 				id
 			},
-			include: {
-				student: true,
-				gradedBy: true,
-				assignment: true
-			}
+			include: this.assignmentResultInclude
 		});
 	}
 
@@ -410,25 +431,14 @@ export class ProgramService {
 
 		return this.prisma.assignmentResult.findMany({
 			where: payload,
-			include: {
-				student: true,
-				gradedBy: true,
-				assignment: true
-			}
+			include: this.assignmentResultInclude
 		});
 	}
 
 	/// Fetch all module enrollments in the database
 	async moduleEnrollments() {
 		return this.prisma.moduleEnrollment.findMany({
-			include: {
-				plan: {
-					include: {
-						student: true
-					}
-				},
-				module: true
-			}
+			include: this.moduleEnrollmentInclude
 		});
 	}
 
@@ -437,7 +447,8 @@ export class ProgramService {
 		return this.prisma.moduleEnrollment.findFirst({
 			where: {
 				id
-			}
+			},
+			include: this.moduleEnrollmentInclude
 		});
 	}
 
@@ -455,18 +466,13 @@ export class ProgramService {
 
 		return this.prisma.moduleEnrollment.findMany({
 			where: payload,
-			include: {
-				module: true,
-				plan: true
-			}
+			include: this.moduleEnrollmentInclude
 		});
 	}
 
 	async collections() {
 		return this.prisma.collection.findMany({
-			include: {
-				lessons: true
-			}
+			include: this.collectionInclude
 		});
 	}
 
@@ -475,9 +481,7 @@ export class ProgramService {
 			where: {
 				id
 			},
-			include: {
-				lessons: true
-			}
+			include: this.collectionInclude
 		});
 	}
 
@@ -496,9 +500,7 @@ export class ProgramService {
 
 		return this.prisma.lesson.findMany({
 			where,
-			include: {
-				content: true
-			}
+			include: this.lessonInclude
 		});
 	}
 
@@ -550,7 +552,8 @@ export class ProgramService {
 			where: {
 				id
 			},
-			data
+			data,
+			include: this.collectionInclude
 		});
 	}
 
@@ -569,20 +572,7 @@ export class ProgramService {
 		} else {
 			return this.prisma.module.create({
 				data,
-				include: {
-					assignments: true,
-					feedback: {
-						include: {
-							student: true
-						}
-					},
-					members: {
-						include: {
-							plan: true
-						}
-					},
-					collections: true
-				}
+				include: this.moduleInclude
 			});
 		}
 	}
@@ -610,19 +600,7 @@ export class ProgramService {
 				...(numSlides && { numSlides }),
 				...(keywords && { keywords })
 			},
-			include: {
-				assignments: true,
-				feedback: {
-					include: {
-						student: true
-					}
-				},
-				members: {
-					include: {
-						plan: true
-					}
-				}
-			}
+			include: this.moduleInclude
 		});
 	}
 
@@ -643,14 +621,11 @@ export class ProgramService {
 
 	/// Create a course and assign an initial module to that course
 	async addCourse(data: Prisma.CourseCreateInput): Promise<Course | Error> {
-		//Probably need some error checking here to make sure the module actually exists
-
-		//Make a new course
 		return await this.prisma.course.create({
 			data: {
-				// Set the name
 				name: data.name
-			}
+			},
+			include: this.courseInclude
 		});
 	}
 
@@ -662,7 +637,8 @@ export class ProgramService {
 			},
 			data: {
 				...(name && { name })
-			}
+			},
+			include: this.courseInclude
 		});
 	}
 
@@ -676,9 +652,7 @@ export class ProgramService {
 					deleteMany: {}
 				}
 			},
-			include: {
-				module: true
-			}
+			include: this.courseInclude
 		});
 
 		return await this.prisma.course.delete({
@@ -710,7 +684,8 @@ export class ProgramService {
 				name: input.name,
 				moduleId: input.module,
 				dueAt: input.dueAt
-			}
+			},
+			include: this.assignmentInclude
 		});
 	}
 
@@ -724,7 +699,8 @@ export class ProgramService {
 			data: {
 				...(name && { name }),
 				...(dueAt && { dueAt })
-			}
+			},
+			include: this.assignmentInclude
 		});
 	}
 
@@ -751,9 +727,7 @@ export class ProgramService {
 					}
 				}
 			},
-			include: {
-				feedback: true
-			}
+			include: this.moduleInclude
 		});
 	}
 
@@ -770,7 +744,8 @@ export class ProgramService {
 			data: {
 				...(feedback && { feedback }),
 				...(rating && { rating })
-			}
+			},
+			include: this.moduleFeedbackInclude
 		});
 	}
 
@@ -791,7 +766,8 @@ export class ProgramService {
 				studentId: input.student,
 				graderId: input.grader,
 				result: input.result
-			}
+			},
+			include: this.assignmentResultInclude
 		});
 	}
 
@@ -803,7 +779,8 @@ export class ProgramService {
 			},
 			data: {
 				result
-			}
+			},
+			include: this.assignmentResultInclude
 		});
 	}
 
@@ -824,7 +801,7 @@ export class ProgramService {
 			where: {
 				planID: plan,
 				moduleId: module
-			}
+			},
 		});
 
 		if (count !== 0) {
@@ -847,10 +824,7 @@ export class ProgramService {
 
 			return this.prisma.moduleEnrollment.create({
 				data: create,
-				include: {
-					module: true,
-					plan: true
-				}
+				include: this.moduleEnrollmentInclude
 			});
 		}
 	}
@@ -866,10 +840,7 @@ export class ProgramService {
 				planID: input.plan,
 				role: input.role
 			},
-			include: {
-				module: true,
-				plan: true
-			}
+			include: this.moduleEnrollmentInclude
 		});
 	}
 
@@ -891,7 +862,7 @@ export class ProgramService {
 						id: courseId
 					}
 				}
-			}
+			},
 		});
 
 		if (count != 0) {
@@ -917,7 +888,8 @@ export class ProgramService {
 				courseIDs: {
 					push: courseId
 				}
-			}
+			},
+			include: this.moduleInclude
 		});
 	}
 
@@ -978,10 +950,7 @@ export class ProgramService {
 					}
 				}
 			},
-			include: {
-				collection: true,
-				threads: true
-			}
+			include: this.lessonInclude
 		});
 
 		return this.prisma.lesson.create({
@@ -1026,16 +995,12 @@ export class ProgramService {
 					}
 				}
 			},
-			include: {
-				collection: true,
-				threads: true
-			}
 		});
 
 		return this.prisma.lesson.update({
 			where: args.where,
 			data: args.data,
-			include: args.include
+			include: this.lessonInclude
 		});
 	}
 
