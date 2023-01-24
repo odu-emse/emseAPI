@@ -104,6 +104,7 @@ describe("Community", () => {
 				body: "We are inserting this data from a test case, and this data should have been removed after the test case has finished.",
 				author: account.id
 			});
+			if (thread instanceof Error) return new Error(thread.message);
 			threadID = thread.id;
 			accountID = account.id;
 			expect(thread).toHaveProperty("title");
@@ -121,15 +122,13 @@ describe("Community", () => {
 			body: "How does this look?",
 			author: accountID
 		});
-		if (res instanceof Error) {
-			console.log(res);
-		} else {
+		if (res instanceof Error) return new Error(res.message);
+		else {
 			expect(res.author.id === accountID).toBe(true);
 			expect(res.watcherID.includes(accountID)).toBe(true);
 			expect(res.parentThreadID === threadID).toBe(true);
 		}
 	});
-	//TODO: Check if returned value is an error or not
 	it("should fail to add comment if parent ID is not found", async () => {
 		const thread = await resolver.addCommentToThread(shuffle(threadID), {
 			body: "How does this look?",

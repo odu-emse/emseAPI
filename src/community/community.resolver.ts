@@ -25,7 +25,11 @@ export class CommunityResolver {
 
 	@Mutation("createThread")
 	async createThread(@Args("data") data: IThreadCreateInput) {
-		return await this.communityService.createThread(data);
+		const newThread = await this.communityService.createThread(data);
+		if (newThread instanceof Error) {
+			return new Error("Failed to create thread");
+		}
+		return newThread;
 	}
 
 	@Mutation("deleteThread")
@@ -43,11 +47,15 @@ export class CommunityResolver {
 			return new Error("Parent thread to add comment to was not found");
 		else {
 			//creating new comment document
-			return await this.communityService.createThread({
+			const newThread = await this.createThread({
 				body: data.body,
 				author: data.author,
 				parentThread: self.id
 			});
+			if (newThread instanceof Error) {
+				return new Error("Failed to add comment to thread");
+			}
+			return newThread;
 		}
 	}
 

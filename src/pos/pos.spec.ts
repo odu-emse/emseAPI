@@ -12,7 +12,7 @@ describe("Plan services", () => {
 	const testingAccountStudentID = "616701c22e17f3fb9f5085f7";
 	const testingAccountPlanID = "620e9a07e57bd45e4e3fc88c";
 
-	beforeEach(async () => {
+	beforeAll(async () => {
 		service = new PoSService(prisma);
 		resolver = new PlanOfStudyResolver(service);
 	});

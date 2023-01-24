@@ -14,12 +14,12 @@ describe("AuthService", () => {
 	let posResolver: PlanOfStudyResolver;
 	prisma = new PrismaService();
 
-	beforeEach(async () => {
+	beforeAll(async () => {
 		posResolver = new PlanOfStudyResolver(new PoSService(prisma));
 		service = new AuthService(prisma, posResolver);
 		resolver = new AuthResolver(service);
 	});
-	afterEach(async () => {
+	afterAll(async () => {
 		await prisma.$disconnect();
 	});
 
