@@ -4,6 +4,8 @@ import { IThreadCreateInput } from "@/types/graphql";
 import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
 import { PlanOfStudyResolver, PoSService } from "@/pos";
+import { pickRandomFromArray, shuffle } from "../../utils/tests";
+import { Thread } from "@prisma/client";
 
 describe("Community", () => {
 	let service: CommunityService;
@@ -18,18 +20,12 @@ describe("Community", () => {
 	let accountID: string;
 	let threadID: string;
 
-	const pickRandomFromArray = (arr: any[]): number => {
-		return Math.floor(Math.random() * arr.length);
-	};
-
-	const shuffle = (str) => [...str].sort(() => Math.random() - 0.5).join("");
-
 	const createThread = async (input: IThreadCreateInput) => {
 		return await resolver.createThread(input);
 	};
 
 	const deleteThread = async (id: string) => {
-		return await resolver.deleteThread(id);
+		return (await resolver.deleteThread(id)) as Thread;
 	};
 
 	const deleteUser = async (id: string) => {
