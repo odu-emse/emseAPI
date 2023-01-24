@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma.service";
+import { Prisma } from "@prisma/client";
 import type { User, Social } from "@prisma/client";
 import type {
 	UpdateUser,
@@ -15,34 +16,8 @@ import moment from "moment";
 export class UserService {
 	constructor(private prisma: PrismaService) {}
 
-	// Get all users
-	async users(): Promise<User[]> {
-		return this.prisma.user.findMany({
-			include: {
-				feedback: true,
-				plan: {
-					include: {
-						modules: {
-							include: {
-								module: true
-							}
-						}
-					}
-				},
-				assignmentGraded: true,
-				instructorProfile: true
-			}
-		});
-	}
-
-	// Get a single user based on ID
-	async user(id: string): Promise<User | null> {
-		return this.prisma.user.findFirst({
-			where: {
-				openID: id
-			},
-			include: {
-				feedback: true,
+	private includeUser = Prisma.validator<Prisma.UserInclude>()({
+		feedback: true,
 				plan: {
 					include: {
 						modules: {
@@ -54,8 +29,23 @@ export class UserService {
 				},
 				assignmentGraded: true,
 				instructorProfile: true,
-				social: true
-			}
+				social: true,
+	});
+
+	// Get all users
+	async users(): Promise<User[]> {
+		return this.prisma.user.findMany({
+			include: this.includeUser
+		});
+	}
+
+	// Get a single user based on ID
+	async user(id: string): Promise<User | null> {
+		return this.prisma.user.findFirst({
+			where: {
+				openID: id
+			},
+			include: this.includeUser
 		});
 	}
 
@@ -122,13 +112,7 @@ export class UserService {
 
 		return await this.prisma.user.findMany({
 			where: payload,
-			include: {
-				social: true,
-				plan: true,
-				feedback: true,
-				assignmentGraded: true,
-				instructorProfile: true
-			}
+			include: this.includeUser
 		});
 	}
 
