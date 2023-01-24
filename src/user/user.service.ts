@@ -18,6 +18,22 @@ export class UserService {
 		this.prisma = prisma;
 	}
 
+	private includeUser = Prisma.validator<Prisma.UserInclude>()({
+		feedback: true,
+				plan: {
+					include: {
+						modules: {
+							include: {
+								module: true
+							}
+						}
+					}
+				},
+				assignmentGraded: true,
+				instructorProfile: true,
+				social: true,
+	});
+
 	/**
 	 * Get users by params in input. If `openID` or `id` fields are set in the input, the returned user is guaranteed to be unique. If no params are provided, all users are returned.
 	 *
@@ -41,22 +57,6 @@ export class UserService {
 			assignmentGraded,
 			instructorProfile
 		} = input;
-
-		const include = Prisma.validator<Prisma.UserInclude>()({
-			feedback: true,
-			plan: {
-				include: {
-					modules: {
-						include: {
-							module: true
-						}
-					}
-				}
-			},
-			assignmentGraded: true,
-			instructorProfile: true,
-			social: true
-		});
 
 		const where = Prisma.validator<Prisma.UserWhereInput>()({
 			...(firstName && {
@@ -134,7 +134,7 @@ export class UserService {
 			});
 			let res = await this.prisma.user.findUnique({
 				where: unique,
-				include
+				include: this.includeUser
 			});
 			if (!res) return new Error("User not found");
 			else result = [res];
@@ -145,7 +145,7 @@ export class UserService {
 		else {
 			let res = await this.prisma.user.findMany({
 				where,
-				include
+				include: this.includeUser
 			});
 			if (!res) return new Error("User not found");
 			result = res;
@@ -273,9 +273,7 @@ export class UserService {
 				...(isAdmin && { isAdmin }),
 				...(isActive && { isActive })
 			},
-			include: {
-				instructorProfile: true
-			}
+			include: this.includeUser
 		});
 	}
 
