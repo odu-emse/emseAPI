@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
+import { PrismaService } from "@/prisma.service";
 import type { User, Social } from "@prisma/client";
 import type {
 	UpdateUser,
@@ -10,56 +10,19 @@ import type {
 	SocialFields
 } from "gql/graphql";
 import moment from "moment";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService) {}
-
-	// Get all users
-	async users(): Promise<User[]> {
-		return this.prisma.user.findMany({
-			include: {
-				feedback: true,
-				plan: {
-					include: {
-						modules: {
-							include: {
-								module: true
-							}
-						}
-					}
-				},
-				assignmentGraded: true,
-				instructorProfile: true
-			}
-		});
+	constructor(private prisma: PrismaService) {
+		this.prisma = prisma;
 	}
 
-	// Get a single user based on ID
-	async user(id: string): Promise<User | null> {
-		return this.prisma.user.findFirst({
-			where: {
-				openID: id
-			},
-			include: {
-				feedback: true,
-				plan: {
-					include: {
-						modules: {
-							include: {
-								module: true
-							}
-						}
-					}
-				},
-				assignmentGraded: true,
-				instructorProfile: true,
-				social: true
-			}
-		});
-	}
-
-	async usersByParam(input: UserFields): Promise<User[] | null> {
+	/**
+	 * Get users by params in input. If `openID` or `id` fields are set in the input, the returned user is guaranteed to be unique. If no params are provided, all users are returned.
+	 *
+	 */
+	async usersByParam(input: UserFields) {
 		const {
 			id,
 			openID,
@@ -79,57 +42,116 @@ export class UserService {
 			instructorProfile
 		} = input;
 
-		const payload = {
-			...(id && { id }),
-			...(openID && { openID }),
-			...(email && { email }),
-			...(picURL && { picURL }),
-			...(createdAt && { createdAt }),
-			...(firstName && { firstName }),
-			...(lastName && { lastName }),
-			...(middleName && { middleName }),
+		const include = Prisma.validator<Prisma.UserInclude>()({
+			feedback: true,
+			plan: {
+				include: {
+					modules: {
+						include: {
+							module: true
+						}
+					}
+				}
+			},
+			assignmentGraded: true,
+			instructorProfile: true,
+			social: true
+		});
+
+		const where = Prisma.validator<Prisma.UserWhereInput>()({
+			...(firstName && {
+				firstName: {
+					contains: firstName
+				}
+			}),
+			...(lastName && {
+				lastName: {
+					contains: lastName
+				}
+			}),
+			...(middleName && {
+				middleName: {
+					contains: middleName
+				}
+			}),
+			...(email && {
+				email: {
+					contains: email
+				}
+			}),
 			...(isAdmin && { isAdmin }),
 			...(isActive && { isActive }),
-			...(dob && { dob })
-		};
-
-		payload["socialId"] = social ? social : undefined;
-		payload["planId"] = plan ? plan : undefined;
-
-		if (feedback) {
-			payload["feedback"] = {
-				some: {
-					id: feedback
+			...(dob && { dob }),
+			...(picURL && { picURL }),
+			...(createdAt && { createdAt }),
+			...(id && { id }),
+			...(openID && { openID }),
+			...(social && {
+				social: {
+					id: social
 				}
-			};
-		}
-
-		if (assignmentGraded) {
-			payload["assignmentGraded"] = {
-				some: {
-					id: assignmentGraded
+			}),
+			...(plan && {
+				plan: {
+					id: plan
 				}
-			};
-		}
-
-		if (instructorProfile) {
-			payload["instructorProfile"] = {
-				some: {
+			}),
+			...(feedback && {
+				feedback: {
+					some: {
+						id: feedback
+					}
+				}
+			}),
+			...(assignmentGraded && {
+				assignmentGraded: {
+					some: {
+						id: assignmentGraded
+					}
+				}
+			}),
+			...(instructorProfile && {
+				instructorProfile: {
 					id: instructorProfile
 				}
-			};
+			})
+		});
+
+		let result:
+			| Array<
+					Prisma.UserGetPayload<{
+						include: Prisma.UserInclude;
+					}>
+			  >
+			| Error;
+
+		//find a unique user
+		//returns a single user
+		if (id || openID) {
+			const unique = Prisma.validator<Prisma.UserWhereUniqueInput>()({
+				...(id && { id }),
+				...(openID && { openID })
+			});
+			let res = await this.prisma.user.findUnique({
+				where: unique,
+				include
+			});
+			if (!res) return new Error("User not found");
+			else result = [res];
 		}
 
-		return await this.prisma.user.findMany({
-			where: payload,
-			include: {
-				social: true,
-				plan: true,
-				feedback: true,
-				assignmentGraded: true,
-				instructorProfile: true
-			}
-		});
+		//find many users by scalar fields
+		//returns an array of users
+		else {
+			let res = await this.prisma.user.findMany({
+				where,
+				include
+			});
+			if (!res) return new Error("User not found");
+			result = res;
+		}
+
+		return result;
 	}
 
 	/// Get all Social Records
@@ -177,15 +199,15 @@ export class UserService {
 	}
 
 	/// Get a specific Instructor's profile by user ID
-	async instructorProfile(id: string): Promise<InstructorProfile | null> {
-		return (await this.prisma.instructorProfile.findUnique({
+	async instructorProfile(id: string) {
+		return await this.prisma.instructorProfile.findUnique({
 			where: {
 				accountID: id
 			},
 			include: {
 				account: true
 			}
-		})) as InstructorProfile;
+		});
 	}
 
 	// Update a user
@@ -259,7 +281,9 @@ export class UserService {
 
 	// delete a user by id
 	async deleteUser(id: string): Promise<User | Error> {
-		const res = await this.user(id);
+		const res = await this.usersByParam({
+			id
+		});
 
 		if (res === null) {
 			return new Error(`The user with ${id}, does not exist`);

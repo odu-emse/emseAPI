@@ -5,7 +5,7 @@
 Table User {
   id String [pk]
   openID String [unique, not null]
-  email String [unique, not null]
+  email String [not null]
   picURL String
   createdAt DateTime [default: `now()`, not null]
   firstName String [not null]
