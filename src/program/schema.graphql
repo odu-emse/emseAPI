@@ -361,7 +361,7 @@ type Query {
 	Get a list of assignments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
 	Parameters can be any of the fields that exist in a assignment
 	"""
-	assignement(input: AssignmentFields!): [Assignment!]
+	assignment(input: AssignmentFields!): [Assignment!]
 
 	"""
 	Get a list of moduleFeedbacks given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -393,7 +393,7 @@ type Query {
     """
     Retrieve lessons given a set of parameters
     """
-    lessons(input: LessonFields): [Lesson!]
+    lesson(input: LessonFields): [Lesson!]
 
 	"""
 	Retrieve Content Given a set of parameters
