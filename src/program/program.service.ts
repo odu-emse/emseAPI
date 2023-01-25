@@ -173,26 +173,7 @@ export class ProgramService {
 		}
 	})
 
-	/// Queries
-	async module(id: string): Promise<Module | null> {
-		//find module based on id
-		if (id.length === 24) {
-			return (await this.prisma.module.findFirst({
-				where: {
-					id
-				},
-				include: this.moduleInclude
-			})) as Prisma.ModuleGetPayload<{}>;
-		} else {
-			return await this.prisma.module.findFirst({
-				where: {
-					moduleNumber: parseInt(id)
-				}
-			});
-		}
-	}
-
-	async modulesByParam(params: ModuleFields) {
+	async module(params: ModuleFields) {
 		const {
 			id,
 			moduleNumber,
@@ -295,22 +276,7 @@ export class ProgramService {
 		});
 	}
 
-	async course(id: string) {
-		return this.prisma.course.findFirstOrThrow({
-			where: {
-				id
-			},
-			include: this.courseInclude
-		});
-	}
-
-	async courses() {
-		return this.prisma.course.findMany({
-			include: this.courseInclude
-		});
-	}
-
-	async courseByParam(params: CourseFields) {
+	async course(params: CourseFields) {
 		const { id, name, module } = params;
 
 		const payload = {
@@ -332,22 +298,7 @@ export class ProgramService {
 		});
 	}
 
-	async assignments() {
-		return this.prisma.assignment.findMany({
-			include: this.assignmentInclude
-		});
-	}
-
-	async assignment(id: string) {
-		return await this.prisma.assignment.findFirst({
-			where: {
-				id
-			},
-			include: this.assignmentInclude
-		});
-	}
-
-	async assignmentByParam(params: AssignmentFields) {
+	async assignment(params: AssignmentFields) {
 		const { id, updatedAt, name, dueAt, module, assignmentResult } = params;
 
 		const payload = {
@@ -373,13 +324,7 @@ export class ProgramService {
 		});
 	}
 
-	async moduleFeedbacks() {
-		return this.prisma.moduleFeedback.findMany({
-			include: this.moduleFeedbackInclude
-		});
-	}
-
-	async modFeedbackByParam(params: ModFeedbackFields) {
+	async moduleFeedback(params: ModFeedbackFields) {
 		const { id, feedback, rating, student, module } = params;
 
 		const payload = {
@@ -397,31 +342,7 @@ export class ProgramService {
 		});
 	}
 
-	async moduleFeedback(id: string) {
-		return this.prisma.moduleFeedback.findFirst({
-			where: {
-				id
-			},
-			include: this.moduleFeedbackInclude
-		});
-	}
-
-	async assignmentResults() {
-		return this.prisma.assignmentResult.findMany({
-			include: this.assignmentResultInclude
-		});
-	}
-
-	async assignmentResult(id: string) {
-		return this.prisma.assignmentResult.findFirst({
-			where: {
-				id
-			},
-			include: this.assignmentResultInclude
-		});
-	}
-
-	async assignmentResultByParam(params: AssignmentResFields) {
+	async assignmentResult(params: AssignmentResFields) {
 		const { id, submittedAt, result, feedback, student, gradedBy, assignment } =
 			params;
 
@@ -442,24 +363,8 @@ export class ProgramService {
 		});
 	}
 
-	/// Fetch all module enrollments in the database
-	async moduleEnrollments() {
-		return this.prisma.moduleEnrollment.findMany({
-			include: this.moduleEnrollmentInclude
-		});
-	}
 
-	/// Fetch a moduleEnrollment by document ID
-	async moduleEnrollment(id: string) {
-		return this.prisma.moduleEnrollment.findFirst({
-			where: {
-				id
-			},
-			include: this.moduleEnrollmentInclude
-		});
-	}
-
-	async modEnrollmentByParam(params: ModEnrollmentFields) {
+	async moduleEnrollment(params: ModEnrollmentFields) {
 		const { id, enrolledAt, role, module, plan } = params;
 
 		const payload = {
@@ -477,6 +382,7 @@ export class ProgramService {
 		});
 	}
 
+	// TODO: Add Compound Query for collections
 	async collections() {
 		return this.prisma.collection.findMany({
 			include: this.collectionInclude
@@ -493,7 +399,7 @@ export class ProgramService {
 	}
 
 	//Fetch Lessons
-	async lessons(input: LessonFields) {
+	async lesson(input: LessonFields) {
 		const { id, name, content, transcript, thread, collection } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({

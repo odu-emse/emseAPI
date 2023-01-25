@@ -7,6 +7,7 @@
 
 /* tslint:disable */
 /* eslint-disable */
+
 export enum UserRole {
     STUDENT = "STUDENT",
     TEACHER = "TEACHER",
@@ -341,27 +342,15 @@ export interface IQuery {
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     planByParams(input?: Nullable<PlanFields>): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
-    modules(): Module[] | Promise<Module[]>;
-    module(id: string): Nullable<Module> | Promise<Nullable<Module>>;
-    modulesByParam(input: ModuleFields): Nullable<Module[]> | Promise<Nullable<Module[]>>;
-    course(id: string): Nullable<Course> | Promise<Nullable<Course>>;
-    courses(): Course[] | Promise<Course[]>;
-    courseByParam(input: CourseFields): Nullable<Course[]> | Promise<Nullable<Course[]>>;
-    assignments(): Assignment[] | Promise<Assignment[]>;
-    assignment(id: string): Nullable<Assignment> | Promise<Nullable<Assignment>>;
-    assignmentByParam(input: AssignmentFields): Nullable<Assignment[]> | Promise<Nullable<Assignment[]>>;
-    moduleFeedbacks(): ModuleFeedback[] | Promise<ModuleFeedback[]>;
-    moduleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
-    modFeedbackByParam(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
-    assignmentResults(): AssignmentResult[] | Promise<AssignmentResult[]>;
-    assignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
-    assignmentResultByParam(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
-    moduleEnrollments(): ModuleEnrollment[] | Promise<ModuleEnrollment[]>;
-    moduleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
-    modEnrollmentByParam(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
+    module(input: ModuleFields): Nullable<Module[]> | Promise<Nullable<Module[]>>;
+    course(input: CourseFields): Nullable<Course[]> | Promise<Nullable<Course[]>>;
+    assignment(input: AssignmentFields): Nullable<Assignment[]> | Promise<Nullable<Assignment[]>>;
+    moduleFeedback(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
+    assignmentResult(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
+    moduleEnrollment(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
     collections(): Collection[] | Promise<Collection[]>;
     collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
-    lessons(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
+    lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     user(input?: Nullable<UserFields>): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;
