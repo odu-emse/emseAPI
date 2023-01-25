@@ -207,6 +207,7 @@ export class ProgramService {
 			members,
 			feedback,
 			parentModules,
+			objectives,
 			subModules
 		} = params;
 
@@ -277,6 +278,12 @@ export class ProgramService {
 					id: feedback!
 				}
 			} as Prisma.ModuleFeedbackListRelationFilter;
+		}
+
+		if (objectives) {
+			payload["objectives"] = {
+				hasSome: objectives
+			} as Prisma.ModuleWhereInput['objectives'];
 		}
 
 		return await this.prisma.module.findMany({

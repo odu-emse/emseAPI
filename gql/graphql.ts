@@ -81,6 +81,7 @@ export interface ModuleFields {
     keywords?: Nullable<string[]>;
     createdAt?: Nullable<Date>;
     updatedAt?: Nullable<Date>;
+    objectives?: Nullable<string[]>;
     assignments?: Nullable<string>;
     members?: Nullable<string[]>;
     feedback?: Nullable<string>;
