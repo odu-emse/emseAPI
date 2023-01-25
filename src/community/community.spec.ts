@@ -5,7 +5,7 @@ import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
 import { PlanOfStudyResolver, PoSService } from "@/pos";
 import { pickRandomFromArray, shuffle } from "../../utils/tests";
-import { Thread } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 describe("Community", () => {
 	let service: CommunityService;
@@ -15,6 +15,13 @@ describe("Community", () => {
 	let auth: AuthService;
 	let user: UserService;
 	let testingThreadID: string = "6387808aeca98a745ea97691";
+	let testingThreadDoc: Prisma.ThreadGetPayload<{
+		include: {
+			comments: true;
+			author: true;
+			usersWatching: true;
+		};
+	}>;
 	let prisma: PrismaService = new PrismaService();
 
 	let accountID: string;
@@ -25,7 +32,7 @@ describe("Community", () => {
 	};
 
 	const deleteThread = async (id: string) => {
-		return (await resolver.deleteThread(id)) as Thread;
+		return await resolver.deleteThread(id);
 	};
 
 	const deleteUser = async (id: string) => {
@@ -66,30 +73,50 @@ describe("Community", () => {
 	it("should be defined", () => {
 		expect(resolver).toBeDefined();
 	});
-	it("should return an array of threads", async () => {
-		const threads = await resolver.threads();
+	it("should return all threads if no params are inputted", async () => {
+		const threads = await resolver.thread({});
 		expect(threads).toBeInstanceOf(Array);
+		if (threads instanceof Error) return new Error(threads.message);
+		else {
+			testingThreadDoc = threads[pickRandomFromArray(threads)];
 
-		testingThreadID = threads[pickRandomFromArray(threads)].id;
+			testingThreadID = testingThreadDoc.id;
 
-		expect(threads[pickRandomFromArray(threads)].comments).toBeInstanceOf(
-			Array
-		);
-		expect(threads[pickRandomFromArray(threads)].usersWatching).toBeInstanceOf(
-			Array
-		);
-		expect(threads[pickRandomFromArray(threads)].author).toBeInstanceOf(Object);
+			expect(testingThreadDoc.comments).toBeInstanceOf(Array);
+			expect(testingThreadDoc.usersWatching).toBeInstanceOf(Array);
+			expect(testingThreadDoc.author).toBeInstanceOf(Object);
+		}
 	});
-	it("should throw an error when ID is not found", async () => {
-		const thread = await resolver.thread(shuffle(testingThreadID));
+	it("should return an error when ID is not found", async () => {
+		const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 		expect(thread instanceof Error).toBe(true);
 	});
+	it("should return threads with less upvotes than inputted", async () => {
+		const threads = await resolver.thread({ upvotesLTE: 100 });
+		if (threads instanceof Error) return new Error(threads.message);
+		else {
+			threads.map((thread) => {
+				expect(thread.upvotes < 100).toBe(true);
+			});
+		}
+	});
+	it("should return threads with more upvotes than inputted", async () => {
+		const threads = await resolver.thread({ upvotesGTE: 100 });
+		if (threads instanceof Error) return new Error(threads.message);
+		else {
+			threads.map((thread) => {
+				expect(thread.upvotes > 100).toBe(true);
+			});
+		}
+	});
 	it("should return the threads requested by ID", async () => {
-		const thread = await resolver.thread(testingThreadID);
-		if (thread !== undefined && "id" in thread) {
-			expect(thread.comments).toBeInstanceOf(Array);
-			expect(thread.usersWatching).toBeInstanceOf(Array);
-			expect(thread.author).toBeInstanceOf(Object);
+		const thread = await resolver.thread({ id: testingThreadID });
+		if (!thread || thread instanceof Error)
+			return new Error("Thread not found");
+		else {
+			thread.map((thread) => {
+				expect(thread.id).toBe(testingThreadID);
+			});
 		}
 	});
 	it("should create a thread with author", async () => {
@@ -133,10 +160,14 @@ describe("Community", () => {
 		expect(thread instanceof Error).toBe(true);
 	});
 	it("should handle a thread and ensure that the vote count has increased by 1", async () => {
-		const voteNum = await resolver.thread(threadID);
-		const upVoteNum = await resolver.upvoteThread(threadID);
-		if (voteNum instanceof Error || upVoteNum instanceof Error)
+		const voteNum = await resolver.thread({ id: threadID });
+		if (voteNum instanceof Error)
 			throw new Error("Error in upvoteThread test case");
-		expect(upVoteNum.upvotes === voteNum.upvotes + 1).toBe(true);
+
+		const upVoteNum = await resolver.upvoteThread(threadID);
+		if (upVoteNum instanceof Error)
+			throw new Error("Error in upvoteThread test case");
+
+		expect(upVoteNum.upvotes === voteNum[0].upvotes + 1).toBe(true);
 	});
 });
