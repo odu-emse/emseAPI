@@ -59,15 +59,24 @@ input ICommentCreateInput {
     author: ID!
 }
 
+input IThreadByParams {
+    id: ID
+    title: String
+    body: String
+    parentLesson: ID
+    parentThread: ID
+    comments: [ID]
+    upvotes: Int
+    upvotesGTE: Int
+    upvotesLTE: Int
+    author: ID
+}
+
 type Query {
     """
-    Get a thread by ID
+    Get a list of threads that match the given parameters. If no parameters are given, all threads are returned. If the id parameter is given, the returned thread is guaranteed to be unique.
     """
-    thread(id: ID!): Thread
-    """
-    Get a list of threads
-    """
-    threads: [Thread]!
+    thread(input: IThreadByParams): [Thread!]!
 }
 
 type Mutation {

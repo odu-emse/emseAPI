@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import { IThreadCreateInput, Thread } from "@/types/graphql";
+import { IThreadByParams, IThreadCreateInput } from "@/types/graphql";
 
 @Injectable()
 export class CommunityService {
@@ -22,19 +22,99 @@ export class CommunityService {
 		author: true
 	});
 
-	async threads() {
-		return await this.prisma.thread.findMany({
-			include: this.threadInclude
-		});
-	}
+	async thread(input: IThreadByParams) {
+		const {
+			id,
+			title,
+			body,
+			parentLesson,
+			parentThread,
+			author,
+			// comments,
+			upvotes,
+			upvotesGTE,
+			upvotesLTE
+		} = input;
 
-	async thread(id: string) {
-		return await this.prisma.thread.findUnique({
-			where: {
-				id
-			},
-			include: this.threadInclude
+		const where = Prisma.validator<Prisma.ThreadWhereInput>()({
+			...(id && { id }),
+			...(title && {
+				title: {
+					contains: title
+				}
+			}),
+			...(body && {
+				body: {
+					contains: body
+				}
+			}),
+			...(parentLesson && {
+				parentLesson: {
+					id: parentLesson
+				}
+			}),
+			...(parentThread && {
+				parentThread: {
+					id: parentThread
+				}
+			}),
+			...(author && {
+				author: {
+					id: author
+				}
+			}),
+			// ...(comments && {
+			// 	comments: {
+			// 		some: {
+			// 			id: comments
+			// 		}
+			// 	}
+			// }),
+			...(upvotes && {
+				upvotes
+			}),
+			...(upvotesGTE && {
+				upvotes: {
+					gte: upvotesGTE
+				}
+			}),
+			...(upvotesLTE && {
+				upvotes: {
+					lte: upvotesLTE
+				}
+			})
 		});
+
+		let include = this.threadInclude;
+
+		let res:
+			| Array<
+					Prisma.ThreadGetPayload<{
+						include: typeof include;
+					}>
+			  >
+			| Error;
+
+		if (id) {
+			const unique = Prisma.validator<Prisma.ThreadWhereUniqueInput>()({
+				id
+			});
+			const response = await this.prisma.thread.findUnique({
+				where: unique,
+				include: this.threadInclude
+			});
+			if (!response || response instanceof Error)
+				return new Error("Thread not found");
+			res = [response];
+		} else {
+			res = await this.prisma.thread.findMany({
+				where,
+				include: this.threadInclude
+			});
+		}
+
+		if (!res) return new Error("Thread not found");
+		else return res;
 	}
 
 	async createThread(data: IThreadCreateInput) {
@@ -75,81 +155,6 @@ export class CommunityService {
 				author: true
 			}
 		});
-	}
-
-	async addCommentToThread(
-		id: string,
-		comments: Thread[] & {
-			comments: Array<(Thread & { comments: Thread[] }) | []>;
-		},
-		data: Thread
-	) {
-		console.log({
-			id,
-			comments,
-			data
-		});
-
-		if (comments.length === 0) {
-			const update = Prisma.validator<Prisma.ThreadUpdateInput>()({
-				comments: {
-					connect: {
-						id: data.id
-					}
-				}
-			});
-
-			return await this.prisma.thread.update({
-				where: {
-					id
-				},
-				data: update
-			});
-		} else {
-			const newComments = comments.concat(data);
-
-			console.log(newComments);
-
-			const update = Prisma.validator<Prisma.ThreadUpdateInput>()({});
-
-			return await this.prisma.thread.update({
-				where: {
-					id
-				},
-				data: update
-			});
-		}
-
-		// if (comments.length > 0) {
-		// 	//save old comments
-		// 	//append new comment
-		// 	//set new comments
-		// } else {
-		// 	return await this.prisma.thread.update({
-		// 		where: {
-		// 			id
-		// 		},
-		// 		data: {
-		// 			comments: {
-		// 				set: [newComment]
-		// 			}
-		// 		}
-		// 	});
-		// }
-
-		// return await this.prisma.thread.update({
-		// 	where: {
-		// 		id
-		// 	},
-		// 	data: {
-		// 		comments: {
-		// 			//TODO: fix this with the prisma validator so we can stop using ignore
-		//
-		// 			// @ts-ignore
-		// 			push: data
-		// 		}
-		// 	}
-		// });
 	}
 
 	async upvoteThread(id: string) {
