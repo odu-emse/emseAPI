@@ -30,7 +30,7 @@ export class CommunityService {
 			parentLesson,
 			parentThread,
 			author,
-			// comments,
+			comments,
 			upvotes,
 			upvotesGTE,
 			upvotesLTE
@@ -74,6 +74,15 @@ export class CommunityService {
 			...(upvotesLTE && {
 				upvotes: {
 					lte: upvotesLTE
+				}
+			}),
+			...(comments && {
+				comments: {
+					some: {
+						id: {
+							in: comments
+						}
+					}
 				}
 			})
 		});
