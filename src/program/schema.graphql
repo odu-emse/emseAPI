@@ -346,65 +346,40 @@ type Error {
 
 type Query {
 	"""
-	List of All modules in the Query
+	Get a list of modules given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a module
 	"""
-	modules: [Module!]!
-	"""
-	Specific Module in the Modules
-	"""
-	module(id: ID!): Module
-	modulesByParam(input: ModuleFields!): [Module!]
+	module(input: ModuleFields!): [Module!]
 
 	"""
-	Specific Course in the Courses
+	Get a list of courses given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a course
 	"""
-	course(id: ID!): Course
-	"""
-	List of all courses
-	"""
-	courses: [Course!]!
-	courseByParam(input: CourseFields!): [Course!]
+	course(input: CourseFields!): [Course!]
 
 	"""
-	Specific assignment in assignments
+	Get a list of assignments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a assignment
 	"""
-	assignments: [Assignment!]!
-	"""
-	List of all assignments
-	"""
-	assignment(id: ID!): Assignment
-	assignmentByParam(input: AssignmentFields!): [Assignment!]
+	assignement(input: AssignmentFields!): [Assignment!]
 
 	"""
-	Module feedbacks
+	Get a list of moduleFeedbacks given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a moduleFeedback
 	"""
-	moduleFeedbacks: [ModuleFeedback!]!
-	"""
-	Specific module feedback in module feedbacks
-	"""
-	moduleFeedback(id: ID!): ModuleFeedback
-	modFeedbackByParam(input: ModFeedbackFields!): [ModuleFeedback!]
+	moduleFeedback(input: ModFeedbackFields!): [ModuleFeedback!]
 
 	"""
-	Specific assignment result
+	Get a list of assignmentResults given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a assignmentResult
 	"""
-	assignmentResults: [AssignmentResult!]!
-	"""
-	list of all assignment Results
-	"""
-	assignmentResult(id: ID!): AssignmentResult
-	assignmentResultByParam(input: AssignmentResFields!): [AssignmentResult!]
+	assignmentResult(input: AssignmentResFields!): [AssignmentResult!]
 
 	"""
-	List of module enrollment
+	Get a list of moduleEnrollments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a moduleEnrollment
 	"""
-	moduleEnrollments: [ModuleEnrollment!]!
-	"""
-	Retrieve a specific Module enrollment based on document ID
-	"""
-	moduleEnrollment(id: ID!): ModuleEnrollment
-
-	modEnrollmentByParam(input: ModEnrollmentFields!): [ModuleEnrollment!]
+	moduleEnrollment(input: ModEnrollmentFields!): [ModuleEnrollment!]
 
 	"""
 	List of all collections

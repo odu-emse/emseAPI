@@ -30,99 +30,36 @@ import { AuthGuard } from "@/auth.guard";
 export class ProgramResolver {
 	constructor(private readonly programService: ProgramService) {}
 
-	@Query("modules")
-	async modules() {
-		return await this.programService.modulesByParam({});
-	}
-
-	// Get a single module based on module's ID
+	// Get Module(s)
 	@Query("module")
-	async module(@Args("id") args: string) {
+	async module(@Args("input") args: ModuleFields) {
 		return await this.programService.module(args);
 	}
 
-	@Query("modulesByParam")
-	async modulesByParam(@Args("input") args: ModuleFields) {
-		return await this.programService.modulesByParam(args);
+	// Get Course(s)
+	@Query("course")
+	async course(@Args("input") args: CourseFields) {
+		return await this.programService.course(args);
 	}
 
-	// Get multiple Courses
-	@Query("courses")
-	async course(@Args("id") ID: string) {
-		return await this.programService.course(ID);
-	}
-
-	// Get multiple Courses
-	@Query("courses")
-	async courses() {
-		return await this.programService.courses();
-	}
-
-	@Query("courseByParam")
-	async courseByParam(@Args("input") args: CourseFields) {
-		return await this.programService.courseByParam(args);
-	}
-
-	// Get an assignment by its id
 	@Query("assignment")
-	async assignment(@Args("id") args: string) {
+	async assignment(@Args("input") args: AssignmentFields) {
 		return await this.programService.assignment(args);
 	}
 
-	// Get multiple assignments from the db
-	@Query("assignments")
-	async assignments() {
-		return await this.programService.assignments();
-	}
-
-	@Query("assignmentByParam")
-	async assignmentByParam(@Args("input") args: AssignmentFields) {
-		return await this.programService.assignmentByParam(args);
-	}
-
-	@Query("moduleFeedbacks")
-	async moduleFeedbacks() {
-		return await this.programService.moduleFeedbacks();
-	}
-
 	@Query("moduleFeedback")
-	async moduleFeedback(@Args("id") id: string) {
-		return await this.programService.moduleFeedback(id);
-	}
-
-	@Query("modFeedbackByParam")
-	async modFeedbackByParam(@Args("input") args: ModFeedbackFields) {
-		return await this.programService.modFeedbackByParam(args);
-	}
-
-	@Query("assignmentResults")
-	async assignmentResults() {
-		return await this.programService.assignmentResults();
+	async moduleFeedback(@Args("input") args: ModFeedbackFields) {
+		return await this.programService.moduleFeedback(args);
 	}
 
 	@Query("assignmentResult")
-	async assignmentResult(@Args("id") id: string) {
-		return await this.programService.assignmentResult(id);
-	}
-
-	@Query("assignmentResultByParam")
-	async assignmentResultByParam(@Args("input") args: AssignmentResFields) {
-		return await this.programService.assignmentResultByParam(args);
-	}
-
-	@Query("moduleEnrollments")
-	async moduleEnrollments() {
-		return await this.programService.moduleEnrollments();
+	async assignmentResult(@Args("input") args: AssignmentResFields) {
+		return await this.programService.assignmentResult(args);
 	}
 
 	@Query("moduleEnrollment")
-	async moduleEnrollment(@Args("id") id: string) {
-		return await this.programService.moduleEnrollment(id);
-	}
-
-	@Query("modEnrollmentByParam")
-	async modEnrollmentByParam(@Args("input") args: ModEnrollmentFields) {
-		return await this.programService.modEnrollmentByParam(args);
+	async moduleEnrollment(@Args("input") args: ModEnrollmentFields) {
+		return await this.programService.moduleEnrollment(args);
 	}
 
 	@Query("collections")
@@ -140,22 +77,9 @@ export class ProgramResolver {
 		return await this.programService.content(input);
 	}
 
-	@Mutation("createCollection")
-	async createCollection(@Args("data") data: CreateCollectionArgs) {
-		return await this.programService.createCollection(data);
-	}
-
-	@Mutation("updateCollection")
-	async updateCollection(
-		@Args("data") data: Prisma.CollectionUpdateInput,
-		@Args("id") id: string
-	) {
-		return await this.programService.updateCollection(id, data);
-	}
-
-	@Query("lessons")
-	async lessons(@Args("input") input: LessonFields) {
-		return await this.programService.lessons(input);
+	@Query("lesson")
+	async lesson(@Args("input") input: LessonFields) {
+		return await this.programService.lesson(input);
 	}
 
 	// Mutations
@@ -292,6 +216,19 @@ export class ProgramResolver {
 		@Args("moduleId") moduleId: string
 	) {
 		return await this.programService.unpairCourseModule(courseId, moduleId);
+	}
+
+	@Mutation("createCollection")
+	async createCollection(@Args("data") data: CreateCollectionArgs) {
+		return await this.programService.createCollection(data);
+	}
+
+	@Mutation("updateCollection")
+	async updateCollection(
+		@Args("data") data: Prisma.CollectionUpdateInput,
+		@Args("id") id: string
+	) {
+		return await this.programService.updateCollection(id, data);
 	}
 
 	@Mutation("createLesson")
