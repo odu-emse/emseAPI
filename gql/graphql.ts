@@ -37,7 +37,7 @@ export interface IThreadByParams {
     body?: Nullable<string>;
     parentLesson?: Nullable<string>;
     parentThread?: Nullable<string>;
-    comments?: Nullable<Nullable<string>[]>;
+    comments?: Nullable<string>;
     upvotes?: Nullable<number>;
     upvotesGTE?: Nullable<number>;
     upvotesLTE?: Nullable<number>;

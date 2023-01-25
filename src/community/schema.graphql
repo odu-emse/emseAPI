@@ -65,7 +65,7 @@ input IThreadByParams {
     body: String
     parentLesson: ID
     parentThread: ID
-    comments: [ID]
+    comments: ID
     upvotes: Int
     upvotesGTE: Int
     upvotesLTE: Int

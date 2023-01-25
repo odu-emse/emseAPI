@@ -18,18 +18,15 @@ export class CommunityResolver {
 
 	@Query("thread")
 	async thread(@Args("input") input: IThreadByParams) {
-		const thread = await this.communityService.thread(input);
-		if (!thread || thread instanceof Error)
-			return new Error("Thread not found");
+		const thread = await this.communityService.threadsByParam(input);
+		if (thread instanceof Error) return new Error(thread.message);
 		else return thread;
 	}
 
 	@Mutation("createThread")
 	async createThread(@Args("data") data: IThreadCreateInput) {
 		const newThread = await this.communityService.createThread(data);
-		if (newThread instanceof Error) {
-			return new Error("Failed to create thread");
-		}
+		if (newThread instanceof Error) return new Error(newThread.message);
 		return newThread;
 	}
 
@@ -44,8 +41,7 @@ export class CommunityResolver {
 		@Args("data") data: ICommentCreateInput
 	) {
 		const self = await this.thread({ id });
-		if (!self || self instanceof Error)
-			return new Error("Parent thread to add comment to was not found");
+		if (self instanceof Error) return new Error(self.message);
 		else {
 			//creating new comment document
 			const newThread = await this.createThread({
@@ -53,9 +49,7 @@ export class CommunityResolver {
 				author: data.author,
 				parentThread: self[0].id
 			});
-			if (newThread instanceof Error) {
-				return new Error("Failed to add comment to thread");
-			}
+			if (newThread instanceof Error) return new Error(newThread.message);
 			return newThread;
 		}
 	}

@@ -22,7 +22,7 @@ export class CommunityService {
 		author: true
 	});
 
-	async thread(input: IThreadByParams) {
+	async threadsByParam(input: IThreadByParams) {
 		const {
 			id,
 			title,
@@ -36,7 +36,7 @@ export class CommunityService {
 			upvotesLTE
 		} = input;
 
-		const where = Prisma.validator<Prisma.ThreadWhereInput>()({
+		let where = Prisma.validator<Prisma.ThreadWhereInput>()({
 			...(id && { id }),
 			...(title && {
 				title: {
@@ -63,13 +63,6 @@ export class CommunityService {
 					id: author
 				}
 			}),
-			// ...(comments && {
-			// 	comments: {
-			// 		some: {
-			// 			id: comments
-			// 		}
-			// 	}
-			// }),
 			...(upvotes && {
 				upvotes
 			}),
@@ -85,6 +78,32 @@ export class CommunityService {
 			})
 		});
 
+		// if both upvotes and upvotesGTE or upvotesLTE are provided, we need to throw an error since we cannot filter for exact number and range at the same time
+		if (
+			(typeof upvotes === "number" && typeof upvotesGTE === "number") ||
+			(typeof upvotes === "number" && typeof upvotesLTE === "number")
+		)
+			return new Error(
+				"Cannot use upvotes and upvotesGTE or upvotesLTE at the same time"
+			);
+
+		// if both upvotesGTE and upvotesLTE are provided, we need to use AND to get the range
+		if (typeof upvotesGTE === "number" && typeof upvotesLTE === "number") {
+			delete where["upvotes"];
+			where["AND"] = [
+				{
+					upvotes: {
+						gte: upvotesGTE
+					}
+				},
+				{
+					upvotes: {
+						lte: upvotesLTE
+					}
+				}
+			] as Prisma.ThreadWhereInput["AND"];
+		}
+
 		let include = this.threadInclude;
 
 		let res:
@@ -96,11 +115,10 @@ export class CommunityService {
 			| Error;
 
 		if (id) {
-			const unique = Prisma.validator<Prisma.ThreadWhereUniqueInput>()({
-				id
-			});
 			const response = await this.prisma.thread.findUnique({
-				where: unique,
+				where: {
+					id
+				},
 				include: this.threadInclude
 			});
 			if (!response || response instanceof Error)
@@ -112,6 +130,8 @@ export class CommunityService {
 				include: this.threadInclude
 			});
 		}
+
+		console.log(where);
 
 		if (!res) return new Error("Thread not found");
 		else return res;
