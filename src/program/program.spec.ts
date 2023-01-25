@@ -55,7 +55,7 @@ describe("Plan services", () => {
 	describe("Module", () => {
 		describe("modules Query", () => {
 			it("should return an array of modules", async () => {
-				const modules = await resolver.modules();
+				const modules = await resolver.module({});
 				expect(modules).toBeDefined();
 				expect(modules.length).toBeGreaterThan(1);
 				modules.map((module) => {
@@ -65,7 +65,7 @@ describe("Plan services", () => {
 			});
 			it("should not take longer than 1.5 seconds to return all modules", async () => {
 				const start = new Date();
-				const modules = await resolver.modules();
+				const modules = await resolver.module({});
 				expect(modules.length).toBeGreaterThan(1);
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
@@ -73,24 +73,26 @@ describe("Plan services", () => {
 		});
 		describe("module Query", () => {
 			it("should return a module", async () => {
-				const module = await resolver.module(testingModuleID);
-				expect(module).toBeDefined();
-				if (module) {
-					expect(module.id).toBe(testingModuleID);
-					expect(module.moduleName).toBeDefined();
-					expect(module.moduleNumber).toBeDefined();
-					expect(module.description).toBeDefined();
-					expect(module.createdAt).toBeDefined();
-					expect(moment(module.createdAt).isBefore(new Date())).toBe(true);
-					expect(module.updatedAt).toBeDefined();
-					expect(moment(module.updatedAt).isBefore(new Date())).toBe(true);
-					expect(module.duration).toBeDefined();
-					expect(module.numSlides).toBeDefined();
+				const module = await resolver.module({id: testingModuleID});
+				expect(module.length).toBe(1);
+				const moduleFirst = module[0];
+				expect(moduleFirst).toBeDefined();
+				if (moduleFirst) {
+					expect(moduleFirst.id).toBe(testingModuleID);
+					expect(moduleFirst.moduleName).toBeDefined();
+					expect(moduleFirst.moduleNumber).toBeDefined();
+					expect(moduleFirst.description).toBeDefined();
+					expect(moduleFirst.createdAt).toBeDefined();
+					expect(moment(moduleFirst.createdAt).isBefore(new Date())).toBe(true);
+					expect(moduleFirst.updatedAt).toBeDefined();
+					expect(moment(moduleFirst.updatedAt).isBefore(new Date())).toBe(true);
+					expect(moduleFirst.duration).toBeDefined();
+					expect(moduleFirst.numSlides).toBeDefined();
 
-					expect(module.keywords).toBeInstanceOf(Array);
-					expect(module.objectives).toBeInstanceOf(Array);
-					expect(module.feedback).toBeInstanceOf(Array);
-					expect(module.members).toBeInstanceOf(Array);
+					expect(moduleFirst.keywords).toBeInstanceOf(Array);
+					expect(moduleFirst.objectives).toBeInstanceOf(Array);
+					expect(moduleFirst.feedback).toBeInstanceOf(Array);
+					expect(moduleFirst.members).toBeInstanceOf(Array);
 				}
 			});
 		});
@@ -98,7 +100,7 @@ describe("Plan services", () => {
 	describe("Enrollment", () => {
 		describe("Query.moduleEnrollments()", () => {
 			it("should return an array of moduleEnrollments", async () => {
-				const moduleEnrollments = await resolver.moduleEnrollments();
+				const moduleEnrollments = await resolver.moduleEnrollment({});
 				expect(moduleEnrollments).toBeDefined();
 				expect(moduleEnrollments.length).toBeGreaterThan(1);
 				moduleEnrollments.map((enrollments) => {
@@ -107,7 +109,7 @@ describe("Plan services", () => {
 			});
 			it("should not take longer than 1.5 seconds to return all moduleEnrollments", async () => {
 				const start = new Date();
-				const moduleEnrollments = await resolver.moduleEnrollments();
+				const moduleEnrollments = await resolver.moduleEnrollment({});
 				expect(moduleEnrollments.length).toBeGreaterThan(1);
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
@@ -117,7 +119,7 @@ describe("Plan services", () => {
 	describe("Course", () => {
 		describe("Query.courses()", () => {
 			it("should return an array of courses", async () => {
-				const courses = await resolver.courses();
+				const courses = await resolver.course({});
 				expect(courses).toBeDefined();
 				expect(courses.length).toBeGreaterThan(1);
 				courses.map((course) => {
@@ -126,7 +128,7 @@ describe("Plan services", () => {
 				});
 			});
 			it("should return modules related to the course", async () => {
-				const courses = await resolver.courses();
+				const courses = await resolver.course({});
 				courses.map((course) => {
 					expect(course.module).toBeDefined();
 					expect(course.module).toBeInstanceOf(Array);
@@ -136,25 +138,25 @@ describe("Plan services", () => {
 			});
 			it("should not take longer than 1.5 seconds to return all courses", () => {
 				const start = new Date();
-				expect(resolver.courses()).resolves.toBeDefined();
+				expect(resolver.course({})).resolves.toBeDefined();
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
 			});
 		});
 		describe("Query.course()", () => {
 			it("should return the course specified by argument", async () => {
-				const course = await resolver.course(testingCourseID);
-				expect(course).toBeDefined();
-				expect(course.id).toBe(testingCourseID);
-				expect(course.name).toBeDefined();
-				expect(Array.isArray(course.module)).toBe(true);
+				const course = await resolver.course({id: testingCourseID});
+				expect(course[0]).toBeDefined();
+				expect(course[0].id).toBe(testingCourseID);
+				expect(course[0].name).toBeDefined();
+				expect(Array.isArray(course[0].module)).toBe(true);
 			});
 		});
 	});
 	describe("Assignment", () => {
 		describe("Query.assignments()", () => {
 			it("should return an array of assignments", async () => {
-				const assignments = await resolver.assignments();
+				const assignments = await resolver.assignment({});
 				expect(assignments).toBeDefined();
 				expect(assignments.length).toBeGreaterThan(1);
 				assignments.map((assignment) => {
@@ -175,7 +177,7 @@ describe("Plan services", () => {
 			});
 			it("should not take longer than 1.5 seconds to return all assignments", async () => {
 				const start = new Date();
-				const assignments = await resolver.assignments();
+				const assignments = await resolver.assignment({});
 				expect(assignments.length).toBeGreaterThan(1);
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
@@ -183,17 +185,20 @@ describe("Plan services", () => {
 		});
 		describe("Query.assignment()", () => {
 			it("should return a assignment", async () => {
-				const assignment = await resolver.assignment(testingAssignmentID);
+				const assignment = await resolver.assignment({id: testingAssignmentID});
 				expect(assignment).toBeDefined();
-				if (assignment) {
-					expect(assignment.id).toBe(testingAssignmentID);
-					expect(assignment.name).toBeDefined();
-					expect(assignment.moduleId).toBeDefined();
-					expect(assignment.dueAt).toBeDefined();
+				expect(assignment.length).toBe(1);
+				const assignmentFirst = assignment[0];
+				expect(assignmentFirst).toBeDefined();
+				if (assignmentFirst) {
+					expect(assignmentFirst.id).toBe(testingAssignmentID);
+					expect(assignmentFirst.name).toBeDefined();
+					expect(assignmentFirst.moduleId).toBeDefined();
+					expect(assignmentFirst.dueAt).toBeDefined();
 
 					// testing populated module field
-					const module = assignment.module;
-					expect(module.id).toBe(assignment.moduleId);
+					const module = assignmentFirst.module;
+					expect(module.id).toBe(assignmentFirst.moduleId);
 					expect(module.moduleName).toBeDefined();
 					expect(module.moduleNumber).toBeDefined();
 					expect(module.duration).toBeDefined();
@@ -207,8 +212,8 @@ describe("Plan services", () => {
 					expect(module.keywords).toBeDefined();
 
 					// testing populated assignment results field
-					if (assignment.assignmentResults !== undefined) {
-						const result = assignment.assignmentResults[0];
+					if (assignmentFirst.assignmentResults !== undefined) {
+						const result = assignmentFirst.assignmentResults[0];
 						expect(result.id).toBeDefined();
 						expect(result.submittedAt).toBeDefined();
 						expect(result.result).toBeDefined();
@@ -222,7 +227,7 @@ describe("Plan services", () => {
 		describe("Results", () => {
 			describe("Query.assignmentResults()", () => {
 				it("should return an array of assignmentResults", async () => {
-					const assignmentResults = await resolver.assignmentResults();
+					const assignmentResults = await resolver.assignmentResult({});
 					expect(assignmentResults).toBeDefined();
 					expect(assignmentResults.length).toBeGreaterThan(1);
 					assignmentResults.map((results) => {
@@ -232,7 +237,7 @@ describe("Plan services", () => {
 				});
 				it("should not take longer than 1.5 seconds to return all assignmentResults", async () => {
 					const start = new Date();
-					const assignmentResults = await resolver.assignmentResults();
+					const assignmentResults = await resolver.assignmentResult({});
 					expect(assignmentResults.length).toBeGreaterThan(1);
 					const end = new Date();
 					expect(end.getTime() - start.getTime()).toBeLessThan(1500);
@@ -240,21 +245,22 @@ describe("Plan services", () => {
 			});
 			describe("Query.assignmentResult()", () => {
 				it("should return a assignmentResult", async () => {
-					const assignmentResult = await resolver.assignmentResult(
-						testingAssignmentResultID
-					);
+					const assignmentResult = await resolver.assignmentResult({id: testingAssignmentResultID});
 					expect(assignmentResult).toBeDefined();
-					if (assignmentResult) {
-						expect(assignmentResult.id).toBeDefined();
-						expect(assignmentResult.id).toBe(testingAssignmentResultID);
-						expect(assignmentResult.submittedAt).toBeDefined();
+					expect(assignmentResult.length).toBe(1);
+					const assignmentResultFirst = assignmentResult[0];
+					expect(assignmentResultFirst).toBeDefined();
+					if (assignmentResultFirst) {
+						expect(assignmentResultFirst.id).toBeDefined();
+						expect(assignmentResultFirst.id).toBe(testingAssignmentResultID);
+						expect(assignmentResultFirst.submittedAt).toBeDefined();
 						expect(
-							moment(assignmentResult.submittedAt).isBefore(new Date())
+							moment(assignmentResultFirst.submittedAt).isBefore(new Date())
 						).toBe(true);
-						expect(assignmentResult.result).toBeDefined();
-						expect(assignmentResult.student).toBeDefined();
-						expect(assignmentResult.gradedBy).toBeDefined();
-						expect(assignmentResult.assignment).toBeDefined();
+						expect(assignmentResultFirst.result).toBeDefined();
+						expect(assignmentResultFirst.student).toBeDefined();
+						expect(assignmentResultFirst.gradedBy).toBeDefined();
+						expect(assignmentResultFirst.assignment).toBeDefined();
 					}
 				});
 			});
