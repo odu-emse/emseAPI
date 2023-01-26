@@ -2,6 +2,24 @@
 <a name="v0.2.3"></a>
 ## [v0.2.3](https://github.com/odu-emse/emseAPI/compare/v0.2.2...v0.2.3) (2023-01-13)
 
+### Bug Fixes :bug:
+* **enrollment**: Added active / inactive flag to schema #413
+* **community**: Changed parent to be a Lesson from Module #407
+
+### Test :test_tube:
+* **community**: Improved test coverage of the services and resolvers #411
+* **program**: Created passing test cases to improve coverage #403
+
+### Refactor :recycle:
+* **program**: Removed linkages between Modules and Courses #412
+
+### Features :sparkles:
+* **program**: Created collections model, and it's CRUD operations  #410
+* **community**: Created services, resolvers and model to support feature  #405
+
+### Tools :wrench:
+* **types**: Improved the type generation dev experience #404
+
 ### Pull Requests
 
 * Merge pull request [#409](https://github.com/odu-emse/emseAPI/issues/409) from odu-emse/dev
