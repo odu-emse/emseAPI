@@ -21,7 +21,7 @@ import {
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
-import { Prisma } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
 
@@ -32,8 +32,19 @@ export class ProgramResolver {
 
 	// Get Module(s)
 	@Query("module")
-	async module(@Args("input") args: ModuleFields) {
-		return await this.programService.module(args);
+	async module(@Args("input") args: ModuleFields, @Args("memberRole") role: UserRole) {
+		const result = await this.programService.module(args);
+		if (!role) {
+			return result;
+		} else {
+			const filterRes = result.map((module) =>{
+				let thisModule = module;
+				thisModule.members = module.members.filter((value) => value.role === role);
+				return thisModule;
+			});
+
+			return filterRes;
+		}
 	}
 
 	// Get Course(s)

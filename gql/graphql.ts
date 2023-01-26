@@ -7,7 +7,6 @@
 
 /* tslint:disable */
 /* eslint-disable */
-
 export enum UserRole {
     STUDENT = "STUDENT",
     TEACHER = "TEACHER",
@@ -354,7 +353,7 @@ export interface IQuery {
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     planByParams(input?: Nullable<PlanFields>): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
-    module(input: ModuleFields): Nullable<Module[]> | Promise<Nullable<Module[]>>;
+    module(input: ModuleFields, memberRole?: Nullable<UserRole>): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     course(input: CourseFields): Nullable<Course[]> | Promise<Nullable<Course[]>>;
     assignment(input: AssignmentFields): Nullable<Assignment[]> | Promise<Nullable<Assignment[]>>;
     moduleFeedback(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;

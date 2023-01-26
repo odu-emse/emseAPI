@@ -346,8 +346,9 @@ type Query {
 	"""
 	Get a list of modules given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
 	Parameters can be any of the fields that exist in a module
+	An additional parameter: memberRole, can be provided to specify that module members should only be selected if they have said role.
 	"""
-	module(input: ModuleFields!): [Module!]
+	module(input: ModuleFields!, memberRole: UserRole): [Module!]
 
 	"""
 	Get a list of courses given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -387,10 +388,10 @@ type Query {
 	Retrieve a specific collection based on document ID
 	"""
 	collection(id: ID!): Collection
-  """
-  Retrieve lessons given a set of parameters
-  """
-  lesson(input: LessonFields): [Lesson!]
+	"""
+	Retrieve lessons given a set of parameters
+	"""
+	lesson(input: LessonFields): [Lesson!]
 
 	"""
 	Retrieve Content Given a set of parameters
