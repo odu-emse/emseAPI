@@ -140,8 +140,6 @@ export class CommunityService {
 			});
 		}
 
-		console.log(where);
-
 		if (!res) return new Error("Thread not found");
 		else return res;
 	}
@@ -150,7 +148,9 @@ export class CommunityService {
 		const { title, body, parentLesson, parentThread, author } = data;
 
 		const create = Prisma.validator<Prisma.ThreadCreateInput>()({
-			title,
+			...(title && {
+				title
+			}),
 			body,
 			author: {
 				connect: {
@@ -178,11 +178,12 @@ export class CommunityService {
 			}
 		});
 
+		if (!parentThread && !title)
+			return new Error("Parent thread ID is required for comments.");
+
 		return await this.prisma.thread.create({
 			data: create,
-			include: {
-				author: true
-			}
+			include: this.threadInclude
 		});
 	}
 
@@ -208,7 +209,8 @@ export class CommunityService {
 			data: {
 				...(title && { title }),
 				...(body && { body })
-			}
+			},
+			include: this.threadInclude
 		});
 	}
 
