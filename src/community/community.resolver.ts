@@ -3,32 +3,30 @@ import { CommunityService } from "./community.service";
 import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
-import { ICommentCreateInput, IThreadCreateInput } from "@/types/graphql";
+import {
+	ICommentCreateInput,
+	IThreadCreateInput,
+	IThreadByParams
+} from "@/types/graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
 export class CommunityResolver {
-	constructor(private readonly communityService: CommunityService) {}
-
-	@Query("threads")
-	async threads() {
-		return await this.communityService.threads();
+	constructor(private readonly communityService: CommunityService) {
+		this.communityService = communityService;
 	}
 
 	@Query("thread")
-	async thread(@Args("id") id: string) {
-		const thread = await this.communityService.thread(id);
-		if (!thread) {
-			return new Error("Thread not found");
-		} else return thread;
+	async thread(@Args("input") input: IThreadByParams) {
+		const thread = await this.communityService.threadsByParam(input);
+		if (thread instanceof Error) return new Error(thread.message);
+		else return thread;
 	}
 
 	@Mutation("createThread")
 	async createThread(@Args("data") data: IThreadCreateInput) {
 		const newThread = await this.communityService.createThread(data);
-		if (newThread instanceof Error) {
-			return new Error("Failed to create thread");
-		}
+		if (newThread instanceof Error) return new Error(newThread.message);
 		return newThread;
 	}
 
@@ -42,19 +40,16 @@ export class CommunityResolver {
 		@Args("id") id: string,
 		@Args("data") data: ICommentCreateInput
 	) {
-		const self = await this.thread(id);
-		if (!self || self instanceof Error)
-			return new Error("Parent thread to add comment to was not found");
+		const self = await this.thread({ id });
+		if (self instanceof Error) return new Error(self.message);
 		else {
 			//creating new comment document
 			const newThread = await this.createThread({
 				body: data.body,
 				author: data.author,
-				parentThread: self.id
+				parentThread: self[0].id
 			});
-			if (newThread instanceof Error) {
-				return new Error("Failed to add comment to thread");
-			}
+			if (newThread instanceof Error) return new Error(newThread.message);
 			return newThread;
 		}
 	}
@@ -69,6 +64,8 @@ export class CommunityResolver {
 		@Args("id") id: string,
 		@Args("data") data: Prisma.ThreadUpdateInput
 	) {
-		return await this.communityService.updateThread(id, data);
+		const res = await this.communityService.updateThread(id, data);
+		if (!res || res instanceof Error) return new Error(res.message);
+		return res;
 	}
 }

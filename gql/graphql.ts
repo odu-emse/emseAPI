@@ -32,6 +32,19 @@ export interface ICommentCreateInput {
     author: string;
 }
 
+export interface IThreadByParams {
+    id?: Nullable<string>;
+    title?: Nullable<string>;
+    body?: Nullable<string>;
+    parentLesson?: Nullable<string>;
+    parentThread?: Nullable<string>;
+    comments?: Nullable<string>;
+    upvotes?: Nullable<number>;
+    upvotesGTE?: Nullable<number>;
+    upvotesLTE?: Nullable<number>;
+    author?: Nullable<string>;
+}
+
 export interface PlanInput {
     student?: Nullable<string>;
 }
@@ -336,8 +349,7 @@ export interface IMutation {
 
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
-    thread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
-    threads(): Nullable<Thread>[] | Promise<Nullable<Thread>[]>;
+    thread(input?: Nullable<IThreadByParams>): Thread[] | Promise<Thread[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
