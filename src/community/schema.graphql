@@ -31,7 +31,7 @@ type Thread {
     """
     usersWatching: [User!]
     """
-    TODO: Add linkage between lesson and thread once lesson schema is defined
+    Add linkage between lesson and thread once lesson schema is defined
     """
     parentLesson: Lesson
     """
@@ -47,15 +47,36 @@ type Thread {
 }
 
 input IThreadCreateInput {
+    """
+    The title of the thread. If this parameter is not given, the thread will be created as a comment to another thread, but only if the parentThread parameter is given. If this parameter is not given, the thread will be created as a new thread.
+    """
     title: String
+    """
+    The content body of the thread. Currently only supports text.
+    """
     body: String!
+    """
+    The ID of the lesson that this thread belongs to. If this parameter is not given, the thread will be created as a general social community post.
+    """
     parentLesson: ID
+    """
+    The ID of the parent thread that this comment belongs to. If this parameter is not given, the thread will be created as a new thread, and not as a comment. If this parameter is not given, the title parameter must be given.
+    """
     parentThread: ID
+    """
+    The ID of the user that is creating the thread. The thread's ID will be added to the user's list of watched threads.
+    """
     author: ID!
 }
 
 input ICommentCreateInput {
+    """
+    The content body of the comment. Currently only supports text.
+    """
     body: String!
+    """
+    The ID of the user that is creating the comment. The comment's ID will be added to the user's list of watched threads.
+    """
     author: ID!
 }
 
