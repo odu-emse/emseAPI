@@ -218,12 +218,29 @@ describe("Community", () => {
 				expect(thread.body).toBe("Is this thread updatable?");
 			}
 		});
-		it("should return Error if ID was not found", async () => {
+		it("should return Error if update ID was not found", async () => {
 			const thread = await resolver.updateThread(shuffle(threadID), {
 				title: "This is an updated thread",
 				body: "Is this thread updatable?"
 			});
 			expect(thread instanceof Error).toBe(true);
+		});
+	});
+	describe("Delete", function () {
+		it("should delete the thread", async () => {
+			const tempThread = await createThread({
+				title: "This is testing the delete thread function",
+				body: "This should not be seen by anyone",
+				author: accountID
+			});
+			if (tempThread instanceof Error) return new Error(tempThread.message);
+			else {
+				const thread = await resolver.deleteThread(tempThread.id);
+				if (thread instanceof Error) return new Error(thread.message);
+				expect(thread instanceof Error).toBe(false);
+				const findDeleted = await resolver.thread({ id: tempThread.id });
+				expect(findDeleted instanceof Error).toBe(true);
+			}
 		});
 	});
 });
