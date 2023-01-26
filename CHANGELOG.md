@@ -3,35 +3,38 @@
 ## [v0.2.3](https://github.com/odu-emse/emseAPI/compare/v0.2.2...v0.2.3) (2023-01-13)
 
 ### Bug Fixes :bug:
-* **enrollment**: Added active / inactive flag to schema #413
-* **community**: Changed parent to be a Lesson from Module #407
+* **enrollment**: Added active / inactive flag to schema [#413](https://github.com/odu-emse/emseAPI/issues/413)
+* **community**: Changed parent to be a Lesson from Module [#407](https://github.com/odu-emse/emseAPI/issues/407)
 
 ### Test :test_tube:
-* **community**: Improved test coverage of the services and resolvers #411
-* **program**: Created passing test cases to improve coverage #403
+* **community**: Improved test coverage of the services and resolvers [#411](https://github.com/odu-emse/emseAPI/issues/411)
+* **program**: Created passing test cases to improve coverage [#403](https://github.com/odu-emse/emseAPI/issues/403)
 
 ### Refactor :recycle:
-* **program**: Removed linkages between Modules and Courses #412
+* **program**: Removed linkages between Modules and Courses [#412](https://github.com/odu-emse/emseAPI/issues/412)
 
 ### Features :sparkles:
-* **program**: Created collections model, and it's CRUD operations  #410
-* **community**: Created services, resolvers and model to support feature  #405
+* **program**: Created collections model, and it's CRUD operations  [#410](https://github.com/odu-emse/emseAPI/issues/410)
+* **community**: Created services, resolvers and model to support feature  [#405](https://github.com/odu-emse/emseAPI/issues/405)
+* **program**: Created parameter based search service  [#402](https://github.com/odu-emse/emseAPI/issues/402)
 
 ### Tools :wrench:
-* **types**: Improved the type generation dev experience #404
+* **types**: Improved the type generation dev experience [#404](https://github.com/odu-emse/emseAPI/issues/404)
 
 ### Pull Requests
 
 * Merge pull request [#409](https://github.com/odu-emse/emseAPI/issues/409) from odu-emse/dev
-* Merge pull request [#413](https://github.com/odu-emse/emseAPI/issues/413) from odu-emse/ALMP-434
-* Merge pull request [#411](https://github.com/odu-emse/emseAPI/issues/411) from odu-emse/ALMP-482
-* Merge pull request [#412](https://github.com/odu-emse/emseAPI/issues/412) from odu-emse/ALMP-407
-* Merge pull request [#410](https://github.com/odu-emse/emseAPI/issues/410) from odu-emse/ALMP-440
-* Merge pull request [#407](https://github.com/odu-emse/emseAPI/issues/407) from odu-emse/ALMP-475
-* Merge pull request [#405](https://github.com/odu-emse/emseAPI/issues/405) from odu-emse/ALMP-455
-* Merge pull request [#404](https://github.com/odu-emse/emseAPI/issues/404) from odu-emse/ALMP-435
-* Merge pull request [#403](https://github.com/odu-emse/emseAPI/issues/403) from odu-emse/ALMP-325
-* Merge pull request [#402](https://github.com/odu-emse/emseAPI/issues/402) from odu-emse/ALMP-367
+
+### Tickets
+* ALMP-434
+* ALMP-482
+* ALMP-407
+* ALMP-440
+* ALMP-475
+* ALMP-455
+* ALMP-435
+* ALMP-325
+* ALMP-367
 
 
 <a name="v0.2.2"></a>
