@@ -64,6 +64,8 @@ export class CommunityResolver {
 		@Args("id") id: string,
 		@Args("data") data: Prisma.ThreadUpdateInput
 	) {
-		return await this.communityService.updateThread(id, data);
+		const res = await this.communityService.updateThread(id, data);
+		if (!res || res instanceof Error) return new Error(res.message);
+		return res;
 	}
 }

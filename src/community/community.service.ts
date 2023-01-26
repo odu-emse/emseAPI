@@ -202,16 +202,20 @@ export class CommunityService {
 
 	async updateThread(id: string, data: Prisma.ThreadUpdateInput) {
 		const { title, body } = data;
-		return await this.prisma.thread.update({
-			where: {
-				id
-			},
-			data: {
-				...(title && { title }),
-				...(body && { body })
-			},
-			include: this.threadInclude
-		});
+		try {
+			return await this.prisma.thread.update({
+				where: {
+					id
+				},
+				data: {
+					...(title && { title }),
+					...(body && { body })
+				},
+				include: this.threadInclude
+			});
+		} catch (e: any) {
+			return new Error(e);
+		}
 	}
 
 	async deleteThread(id: string) {
