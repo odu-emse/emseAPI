@@ -14,7 +14,7 @@ describe("Community", () => {
 	let posResolver: PlanOfStudyResolver;
 	let auth: AuthService;
 	let user: UserService;
-	let testingThreadID: string = "6387808aeca98a745ea97691";
+	let testingThreadID: string;
 	let testingThreadDoc: Prisma.ThreadGetPayload<{
 		include: {
 			comments: true;
@@ -26,6 +26,8 @@ describe("Community", () => {
 
 	let accountID: string;
 	let threadID: string;
+
+	const deletableThreadIDs: Array<string> = [];
 
 	const createThread = async (input: IThreadCreateInput) => {
 		return await resolver.createThread(input);
@@ -65,7 +67,9 @@ describe("Community", () => {
 	});
 
 	afterAll(async () => {
-		await deleteThread(threadID);
+		deletableThreadIDs.map(async (id) => {
+			await deleteThread(id);
+		});
 		await deleteUser(accountID);
 		await prisma.$disconnect();
 	});
@@ -81,7 +85,7 @@ describe("Community", () => {
 			testingThreadDoc = threads[pickRandomFromArray(threads)];
 
 			testingThreadID = testingThreadDoc.id;
-
+			deletableThreadIDs.push(testingThreadID);
 			expect(testingThreadDoc.comments).toBeInstanceOf(Array);
 			expect(testingThreadDoc.usersWatching).toBeInstanceOf(Array);
 			expect(testingThreadDoc.author).toBeInstanceOf(Object);
@@ -130,6 +134,7 @@ describe("Community", () => {
 			if (thread instanceof Error) return new Error(thread.message);
 			threadID = thread.id;
 			accountID = account.id;
+			deletableThreadIDs.push(threadID);
 			expect(thread).toHaveProperty("title");
 			expect(thread).toHaveProperty("body");
 			expect(thread).toHaveProperty("author");
@@ -147,6 +152,7 @@ describe("Community", () => {
 		});
 		if (res instanceof Error) return new Error(res.message);
 		else {
+			deletableThreadIDs.push(res.id);
 			expect(res.author.id === accountID).toBe(true);
 			expect(res.watcherID.includes(accountID)).toBe(true);
 			expect(res.parentThreadID === threadID).toBe(true);
@@ -169,5 +175,12 @@ describe("Community", () => {
 			throw new Error("Error in upvoteThread test case");
 
 		expect(upVoteNum.upvotes === voteNum[0].upvotes + 1).toBe(true);
+	});
+	it("should not create comment if parent thread is not given", async () => {
+		const falseComment = await resolver.createThread({
+			body: "This comment should not be created as the parent thread is not given",
+			author: accountID
+		});
+		expect(falseComment instanceof Error).toBe(true);
 	});
 });
