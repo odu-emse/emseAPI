@@ -284,6 +284,10 @@ type Collection {
 	The module's unique ID that this collection belongs to
 	"""
 	moduleID: ID!
+	"""
+	The position index of the collection in a module
+	"""
+	position: Int
 }
 
 type Lesson {
@@ -306,11 +310,16 @@ type Lesson {
 	"""
 	The list of threads related to the lesson
 	"""
-	threads: [ID]
+	threads: [Thread]
 	"""
 	The collection that the lesson belongs to
 	"""
 	collection: Collection
+
+	"""
+	The position index of the lesson in the collection it belongs to.
+	"""
+	position: Int
 }
 
 type Content {
@@ -697,6 +706,11 @@ input LessonInput {
 	The ID of the parent collection
 	"""
 	collection: ID!
+
+	"""
+	The index of the lesson in the collection
+	"""
+	position: Int
 }
 
 input LessonFields {
@@ -724,6 +738,10 @@ input LessonFields {
 	The ID of the parent collection
 	"""
 	collection: ID
+	"""
+	The index of the lesson in the collection
+	"""
+	position: Int
 }
 
 type Mutation {
