@@ -190,6 +190,7 @@ export class ProgramService {
 			members,
 			feedback,
 			parentModules,
+			objectives,
 			subModules
 		} = params;
 
@@ -260,6 +261,12 @@ export class ProgramService {
 					id: feedback!
 				}
 			} as Prisma.ModuleFeedbackListRelationFilter;
+		}
+
+		if (objectives) {
+			payload["objectives"] = {
+				hasSome: objectives
+			} as Prisma.ModuleWhereInput['objectives'];
 		}
 
 		return await this.prisma.module.findMany({
@@ -410,12 +417,13 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, transcript, thread, collection } = input;
+		const { id, name, content, transcript, thread, collection, position } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
 			...(transcript && { transcript }),
+			...(position && {position}),
 			collection: { id: collection ? collection : undefined },
 			threads: thread ? { some: { id: thread } } : undefined,
 			content: content ? { some: { id: content } } : undefined
@@ -882,6 +890,7 @@ export class ProgramService {
 		});
 	}
 	async createLesson(input: LessonInput) {
+		//TODO: Support Lessons being added in the middle of an existing collection (i.e new lesson at index 4 needs to shift right starting from original index 4)
 		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
 			data: {
 				name: input.name,
@@ -895,7 +904,8 @@ export class ProgramService {
 					connect: {
 						id: input.collection ? input.collection : undefined
 					}
-				}
+				},
+				position: input.position ? input.position : undefined
 			},
 			include: this.lessonInclude
 		});
@@ -940,7 +950,8 @@ export class ProgramService {
 					connect: {
 						id: payload.thread
 					}
-				}
+				},
+				position: input.position ? input.position : undefined
 			},
 		});
 
@@ -952,6 +963,7 @@ export class ProgramService {
 	}
 
 	async deleteLesson(id: string) {
+		// TODO: Shift left remaining lessons in the parent collection after deletion.
 		return this.prisma.lesson.delete({
 			where: {
 				id

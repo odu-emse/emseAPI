@@ -73,7 +73,7 @@ describe("Plan services", () => {
 		});
 		describe("module Query", () => {
 			it("should return a module", async () => {
-				const module = await resolver.module({id: testingModuleID});
+				const module = await resolver.module({ id: testingModuleID });
 				expect(module.length).toBe(1);
 				const moduleFirst = module[0];
 				expect(moduleFirst).toBeDefined();
@@ -145,7 +145,7 @@ describe("Plan services", () => {
 		});
 		describe("Query.course()", () => {
 			it("should return the course specified by argument", async () => {
-				const course = await resolver.course({id: testingCourseID});
+				const course = await resolver.course({ id: testingCourseID });
 				expect(course[0]).toBeDefined();
 				expect(course[0].id).toBe(testingCourseID);
 				expect(course[0].name).toBeDefined();
@@ -185,7 +185,9 @@ describe("Plan services", () => {
 		});
 		describe("Query.assignment()", () => {
 			it("should return a assignment", async () => {
-				const assignment = await resolver.assignment({id: testingAssignmentID});
+				const assignment = await resolver.assignment({
+					id: testingAssignmentID
+				});
 				expect(assignment).toBeDefined();
 				expect(assignment.length).toBe(1);
 				const assignmentFirst = assignment[0];
@@ -245,7 +247,9 @@ describe("Plan services", () => {
 			});
 			describe("Query.assignmentResult()", () => {
 				it("should return a assignmentResult", async () => {
-					const assignmentResult = await resolver.assignmentResult({id: testingAssignmentResultID});
+					const assignmentResult = await resolver.assignmentResult({
+						id: testingAssignmentResultID
+					});
 					expect(assignmentResult).toBeDefined();
 					expect(assignmentResult.length).toBe(1);
 					const assignmentResultFirst = assignmentResult[0];
@@ -322,7 +326,8 @@ describe("Collection", () => {
 		const collection = await createCollection({
 			name: "Test Collection",
 			moduleID: testingModuleID,
-			lessons
+			lessons,
+			positionIndex: 0
 		});
 
 		testingCollectionID = collection.id;
@@ -343,15 +348,19 @@ describe("Collection", () => {
 			expect(collection.id).toBe(testingCollectionID);
 			expect(collection.name).toBeDefined();
 			expect(collection.moduleID).toBeDefined();
-			expect(await resolver.module(collection.moduleID)).toBeDefined();
+			expect(await resolver.module({ id: collection.moduleID })).toBeDefined();
 		}
 	});
-	it("should populate first and last lessons properties", async () => {
+	it("should match lesson position field to array index", async () => {
 		const coll = await resolver.collection(testingCollectionID);
 		expect(coll).toBeDefined();
 		if (coll) {
-			expect(coll.first).toEqual(lessons.at(0));
-			expect(coll.last).toEqual(lessons.at(-1));
+			coll.lessons.map((lesson) => {
+				expect(lesson.position === coll.lessons[lesson.position].position).toBe(
+					true
+				);
+				expect(lesson.collectionID === coll.id).toBe(true);
+			});
 		}
 	});
 	it("should populate previous and next based on module ID", function () {

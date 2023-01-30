@@ -5,46 +5,45 @@ enum UserRole {
 }
 
 enum EnrollmentStatus {
-    ACTIVE
-    INACTIVE
+	ACTIVE
+	INACTIVE
 }
 
 type ModuleEnrollment {
-    """
-    id of the ModuleEnrollment
-    """
-    id: ID!
+	"""
+	id of the ModuleEnrollment
+	"""
+	id: ID!
 
-    """
-    TimeStamp at which the module is enrolledAt
-    """
-    enrolledAt: Date!
+	"""
+	TimeStamp at which the module is enrolledAt
+	"""
+	enrolledAt: Date!
 
-    """
-    Role of the user:Either Student, Teacher or Grader
-    """
-    role: UserRole!
+	"""
+	Role of the user:Either Student, Teacher or Grader
+	"""
+	role: UserRole!
 
-    """
-    Status of the enrollment: Either Active or Inactive
-    """
-    status: EnrollmentStatus!
+	"""
+	Status of the enrollment: Either Active or Inactive
+	"""
+	status: EnrollmentStatus!
 
-    """
-    Current Module
-    """
-    module: Module!
+	"""
+	Current Module
+	"""
+	module: Module!
 
-    """
-    Plan of study Chosen
-    """
-    plan: PlanOfStudy
+	"""
+	Plan of study Chosen
+	"""
+	plan: PlanOfStudy
 
-    """
-    Inactive plan of study
-    """
-    inactivePlan: PlanOfStudy
-
+	"""
+	Inactive plan of study
+	"""
+	inactivePlan: PlanOfStudy
 }
 
 type AssignmentResult {
@@ -231,7 +230,6 @@ type Module {
 	"""
 	feedback: [ModuleFeedback]
 
-
 	"""
 	Parent Modules of the Module
 	"""
@@ -286,6 +284,10 @@ type Collection {
 	The module's unique ID that this collection belongs to
 	"""
 	moduleID: ID!
+	"""
+	The position index of the collection in a module
+	"""
+	position: Int
 }
 
 type Lesson {
@@ -304,19 +306,24 @@ type Lesson {
 	"""
 	An optional transcript of the content data (primarily for videos)
 	"""
-	transcript: 	String
-    """
-    The list of threads related to the lesson
-    """
-    threads: [ID]
-    """
-    The collection that the lesson belongs to
-    """
-    collection: Collection
+	transcript: String
+	"""
+	The list of threads related to the lesson
+	"""
+	threads: [Thread]
+	"""
+	The collection that the lesson belongs to
+	"""
+	collection: Collection
+
+	"""
+	The position index of the lesson in the collection it belongs to.
+	"""
+	position: Int
 }
 
 type Content {
-	""" 
+	"""
 	Document ID for this content
 	"""
 	id: ID!
@@ -326,7 +333,7 @@ type Content {
 	"""
 	type: String!
 
-	""" 
+	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
 	"""
 	link: String!
@@ -348,8 +355,9 @@ type Query {
 	"""
 	Get a list of modules given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
 	Parameters can be any of the fields that exist in a module
+	An additional parameter: memberRole, can be provided to specify that module members should only be selected if they have said role.
 	"""
-	module(input: ModuleFields!): [Module!]
+	module(input: ModuleFields!, memberRole: UserRole): [Module!]
 
 	"""
 	Get a list of courses given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -361,7 +369,7 @@ type Query {
 	Get a list of assignments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
 	Parameters can be any of the fields that exist in a assignment
 	"""
-	assignement(input: AssignmentFields!): [Assignment!]
+	assignment(input: AssignmentFields!): [Assignment!]
 
 	"""
 	Get a list of moduleFeedbacks given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -385,21 +393,19 @@ type Query {
 	List of all collections
 	"""
 	collections: [Collection!]!
-    """
-    Retrieve a specific collection based on document ID
-    """
-    collection(id: ID!): Collection
-
-    """
-    Retrieve lessons given a set of parameters
-    """
-    lessons(input: LessonFields): [Lesson!]
+	"""
+	Retrieve a specific collection based on document ID
+	"""
+	collection(id: ID!): Collection
+	"""
+	Retrieve lessons given a set of parameters
+	"""
+	lesson(input: LessonFields): [Lesson!]
 
 	"""
 	Retrieve Content Given a set of parameters
 	"""
 	content(input: ContentFields): [Content!]
-   
 }
 
 input CreateContentArgs {
@@ -408,7 +414,7 @@ input CreateContentArgs {
 	"""
 	type: String!
 
-	""" 
+	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
 	"""
 	link: String!
@@ -420,7 +426,7 @@ input CreateContentArgs {
 }
 
 input ContentFields {
-	""" 
+	"""
 	Document ID for this content
 	"""
 	id: ID
@@ -430,7 +436,7 @@ input ContentFields {
 	"""
 	type: String
 
-	""" 
+	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
 	"""
 	link: String
@@ -466,7 +472,7 @@ input ModuleFields {
 	keywords: [String!]
 	createdAt: Date
 	updatedAt: Date
-
+	objectives: [String!]
 	assignments: ID
 	members: [ID!]
 	feedback: ID
@@ -665,68 +671,77 @@ input NewAssignmentResult {
 }
 
 input ModuleEnrollmentInput {
-    """
-    Relating Module to ModuleEnrollment
-    """
-    module: ID!
-    """
-    Relating Plan to Module enrollment
-    """
-    plan: ID!
-    """
-    Relating role to ModuleEnrollment
-    """
-    role: UserRole!
-    """
-    The status of the current enrollment
-    """
-    status: EnrollmentStatus!
+	"""
+	Relating Module to ModuleEnrollment
+	"""
+	module: ID!
+	"""
+	Relating Plan to Module enrollment
+	"""
+	plan: ID!
+	"""
+	Relating role to ModuleEnrollment
+	"""
+	role: UserRole!
+	"""
+	The status of the current enrollment
+	"""
+	status: EnrollmentStatus!
 }
 
 input LessonInput {
 	"""
 	Lesson Name
 	"""
-	name: 			String!
+	name: String!
 	"""
 	The link/id of the actual content data itself
 	"""
-	content: 		ID
+	content: ID
 	"""
 	An optional transcript of the content data (primarily for videos)
 	"""
-	transcript: 	String
-    """
-    The ID of the parent collection
-    """
-    collection: ID!
+	transcript: String
+	"""
+	The ID of the parent collection
+	"""
+	collection: ID!
+
+	"""
+	The index of the lesson in the collection
+	"""
+	position: Int
 }
 
 input LessonFields {
-    """
+	"""
 	document ID
 	"""
-	id: 			ID
+	id: ID
 	"""
 	Lesson Name
 	"""
-	name: 			String
+	name: String
 	"""
 	The link/id of the actual content data itself
 	"""
-	content: 		ID
+	content: ID
 	"""
 	An optional transcript of the content data (primarily for videos)
 	"""
-	transcript: 	String
-    """
-    The list of ids to threads related to the lesson (Only a single value is supported)
-    """
-    thread: ID
-    """
-    The ID of the parent collection
-    """
-    collection: ID
+	transcript: String
+	"""
+	The list of ids to threads related to the lesson (Only a single value is supported)
+	"""
+	thread: ID
+	"""
+	The ID of the parent collection
+	"""
+	collection: ID
+	"""
+	The index of the lesson in the collection
+	"""
+	position: Int
 }
 
 type Mutation {
@@ -803,10 +818,9 @@ type Mutation {
 	Assignment result is deleted
 	"""
 	deleteAssignmentResult(id: ID!): AssignmentResult
-    """
-    Course Module is paired Relating Course ID and module Id
-    """
-
+	"""
+	Course Module is paired Relating Course ID and module Id
+	"""
 	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
 	updateModuleEnrollment(
 		"""
@@ -818,39 +832,39 @@ type Mutation {
 		"""
 		input: ModuleEnrollmentInput
 	): ModuleEnrollment
-	
+
 	"""
 	Delete ModuleEnrollment
 	"""
 	deleteModuleEnrollment(id: ID!): ModuleEnrollment
 
-    pairCourseModule(courseId: ID!, moduleId: ID!): Module!
+	pairCourseModule(courseId: ID!, moduleId: ID!): Module!
 
-    """
-    Course Module is Unpaired Relating to Course Id and mobile Id
-    """
-    unpairCourseModule(courseId: ID!, moduleId: ID!): Module
+	"""
+	Course Module is Unpaired Relating to Course Id and mobile Id
+	"""
+	unpairCourseModule(courseId: ID!, moduleId: ID!): Module
 
-    """
+	"""
 	Create a new collection
-    """
-    createCollection(data: CreateCollectionArgs!): Collection!
+	"""
+	createCollection(data: CreateCollectionArgs!): Collection!
 
 	"""
 	Update a collection given its ID and the new data to update
-    """
-    updateCollection(id: ID!, data: CollectionFields!): Collection!
+	"""
+	updateCollection(id: ID!, data: CollectionFields!): Collection!
 
-    """
-    Create a Lesson for an individual collection
-    """
-    createLesson(input: LessonInput!): Lesson!
-    """
-    Update a lesson given its ID
-    """
-    updateLesson(input: LessonFields): Lesson
+	"""
+	Create a Lesson for an individual collection
+	"""
+	createLesson(input: LessonInput!): Lesson!
+	"""
+	Update a lesson given its ID
+	"""
+	updateLesson(input: LessonFields): Lesson
 
-    deleteLesson(id: String!): Lesson
+	deleteLesson(id: String!): Lesson
 
 	"""
 	Create a Content Record
@@ -866,5 +880,4 @@ type Mutation {
 	Delete an existing content record
 	"""
 	deleteContent(contentID: ID!): Content
-
 }
