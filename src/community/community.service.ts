@@ -167,7 +167,8 @@ export class CommunityService {
 
 	async updateThread(id: string, data: Prisma.ThreadUpdateInput) {
 		const { title, body } = data;
-		return await this.prisma.thread.update({
+
+		const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
 			where: {
 				id
 			},
@@ -175,7 +176,8 @@ export class CommunityService {
 				...(title && { title }),
 				...(body && { body })
 			}
-		});
+		})
+		return await this.prisma.thread.update(update);
 	}
 
 	async deleteThread(id: string) {

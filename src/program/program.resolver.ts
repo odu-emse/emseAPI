@@ -17,7 +17,8 @@ import {
 	CreateCollectionArgs,
 	CreateContentArgs,
 	ModEnrollmentFields,
-	CollectionFields
+	CollectionFields,
+	NewModule
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -86,7 +87,7 @@ export class ProgramResolver {
 
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
-	async create(@Args("input") args: Prisma.ModuleCreateInput) {
+	async create(@Args("input") args: NewModule) {
 		return await this.programService.addModule(args);
 	}
 
