@@ -11,5 +11,5 @@ COPY src/ ./src/
 RUN yarn install --pure-lockfile --silent
 
 
-FROM base as production
+FROM base as development
 

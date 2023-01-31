@@ -11,11 +11,18 @@ import {
 	AssignmentFields,
 	ModFeedbackFields,
 	AssignmentResFields,
-	ModEnrollmentFields, CreateCollectionArgs
+	ContentFields,
+	LessonFields,
+	LessonInput,
+	CreateCollectionArgs,
+	CreateContentArgs,
+	ModEnrollmentFields,
+	CollectionFields,
+	NewModule
 } from "gql/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
-import { Prisma } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
 
@@ -24,99 +31,47 @@ import { AuthGuard } from "@/auth.guard";
 export class ProgramResolver {
 	constructor(private readonly programService: ProgramService) {}
 
-	@Query("modules")
-	async modules() {
-		return await this.programService.modules();
-	}
-
-	// Get a single module based on module's ID
+	// Get Module(s)
 	@Query("module")
-	async module(@Args("id") args: string) {
-		return await this.programService.module(args);
+	async module(@Args("input") args: ModuleFields, @Args("memberRole") role: UserRole) {
+		const result = await this.programService.module(args);
+		if (!role) {
+			return result;
+		} else {
+			const filterRes = result.map((module) =>{
+				const thisModule = module;
+				thisModule.members = module.members.filter((value) => value.role === role);
+				return thisModule;
+			});
+
+			return filterRes;
+		}
 	}
 
-	@Query("modulesByParam")
-	async modulesByParam(@Args("input") args: ModuleFields) {
-		return await this.programService.modulesByParam(args);
+	// Get Course(s)
+	@Query("course")
+	async course(@Args("input") args: CourseFields) {
+		return await this.programService.course(args);
 	}
 
-	// Get multiple Courses
-	@Query("courses")
-	async course(@Args("id") ID: string) {
-		return await this.programService.course(ID);
-	}
-
-	// Get multiple Courses
-	@Query("courses")
-	async courses() {
-		return await this.programService.courses();
-	}
-
-	@Query("courseByParam")
-	async courseByParam(@Args("input") args: CourseFields) {
-		return await this.programService.courseByParam(args);
-	}
-
-	// Get an assignment by its id
 	@Query("assignment")
-	async assignment(@Args("id") args: string) {
+	async assignment(@Args("input") args: AssignmentFields) {
 		return await this.programService.assignment(args);
 	}
 
-	// Get multiple assignments from the db
-	@Query("assignments")
-	async assignments() {
-		return await this.programService.assignments();
-	}
-
-	@Query("assignmentByParam")
-	async assignmentByParam(@Args("input") args: AssignmentFields) {
-		return await this.programService.assignmentByParam(args);
-	}
-
-	@Query("moduleFeedbacks")
-	async moduleFeedbacks() {
-		return await this.programService.moduleFeedbacks();
-	}
-
 	@Query("moduleFeedback")
-	async moduleFeedback(@Args("id") id: string) {
-		return await this.programService.moduleFeedback(id);
-	}
-
-	@Query("modFeedbackByParam")
-	async modFeedbackByParam(@Args("input") args: ModFeedbackFields) {
-		return await this.programService.modFeedbackByParam(args);
-	}
-
-	@Query("assignmentResults")
-	async assignmentResults() {
-		return await this.programService.assignmentResults();
+	async moduleFeedback(@Args("input") args: ModFeedbackFields) {
+		return await this.programService.moduleFeedback(args);
 	}
 
 	@Query("assignmentResult")
-	async assignmentResult(@Args("id") id: string) {
-		return await this.programService.assignmentResult(id);
-	}
-
-	@Query("assignmentResultByParam")
-	async assignmentResultByParam(@Args("input") args: AssignmentResFields) {
-		return await this.programService.assignmentResultByParam(args);
-	}
-
-	@Query("moduleEnrollments")
-	async moduleEnrollments() {
-		return await this.programService.moduleEnrollments();
+	async assignmentResult(@Args("input") args: AssignmentResFields) {
+		return await this.programService.assignmentResult(args);
 	}
 
 	@Query("moduleEnrollment")
-	async moduleEnrollment(@Args("id") id: string) {
-		return await this.programService.moduleEnrollment(id);
-	}
-
-	@Query("modEnrollmentByParam")
-	async modEnrollmentByParam(@Args("input") args: ModEnrollmentFields){
-		return await this.programService.modEnrollmentByParam(args);
+	async moduleEnrollment(@Args("input") args: ModEnrollmentFields) {
+		return await this.programService.moduleEnrollment(args);
 	}
 
 	@Query("collections")
@@ -129,37 +84,21 @@ export class ProgramResolver {
 		return await this.programService.collection(id);
 	}
 
-	@Mutation("createCollection")
-	async createCollection(@Args("data") data: CreateCollectionArgs) {
-		// const lessons = data?.lessons?.map(async (lesson) => {
-			// here is where we would want to query to see if the passed in lessons already exist or if they need to be created
-		// })
+	@Query("content")
+	async content(@Args("input") input: ContentFields) {
+		return await this.programService.content(input);
+	}
 
-		// this allows us to add the collection to the last index in the array
-		// by getting the last element in the existing collections array on the module model
-		// and setting the next collection ID to null
-		const module = await this.programService.module(data.moduleID);
-
-		// get position index from args and set the previous collection to point to the collection before it (positionIndex - 1)
-		// if positionIndex is 0, then set the previous collection to null
-		// if positionIndex is null, then set the previous collection to the last collection in the array
-		// if positionIndex is given, next collection is the collection after it (positionIndex + 1)
-
-		const previous = module?.collections?.at(-1)
-		const next = null
-		const input = {
-			...data,
-			previous: previous?.id || undefined,
-			next
-		}
-		return await this.programService.createCollection(input);
+	@Query("lesson")
+	async lesson(@Args("input") input: LessonFields) {
+		return await this.programService.lesson(input);
 	}
 
 	// Mutations
 
 	// Add a module to the db with all required initial fields
 	@Mutation("addModule")
-	async create(@Args("input") args: Prisma.ModuleCreateInput) {
+	async create(@Args("input") args: NewModule) {
 		return await this.programService.addModule(args);
 	}
 
@@ -183,10 +122,7 @@ export class ProgramResolver {
 
 	// Update a course name
 	@Mutation("updateCourse")
-	async updateCourse(
-		@Args("id") id: string,
-		@Args("input") args: CourseInput
-	) {
+	async updateCourse(@Args("id") id: string, @Args("input") args: CourseInput) {
 		return await this.programService.updateCourse(id, args);
 	}
 
@@ -204,10 +140,7 @@ export class ProgramResolver {
 
 	// // Delete an assignment from DB
 	@Mutation("deleteAssignment")
-	async deleteAssignment(
-		@Args("module") args: string,
-		@Args("id") id: string
-	) {
+	async deleteAssignment(@Args("module") args: string, @Args("id") id: string) {
 		return await this.programService.deleteAssignment(args, id);
 	}
 
@@ -227,11 +160,7 @@ export class ProgramResolver {
 		@Args("userId") userId: string,
 		@Args("input") data: Prisma.ModuleFeedbackCreateInput
 	) {
-		return await this.programService.addModuleFeedback(
-			moduleId,
-			userId,
-			data
-		);
+		return await this.programService.addModuleFeedback(moduleId, userId, data);
 	}
 
 	/// Update a modulefeedback
@@ -301,19 +230,46 @@ export class ProgramResolver {
 		return await this.programService.unpairCourseModule(courseId, moduleId);
 	}
 
-	@Mutation("addRequirement")
-	async addRequirment(
-		@Args("parentId") parentId: string,
-		@Args("childId") childId: string
-	){
-		return await this.programService.Addrequirement(parentId,childId)
-	};
+	@Mutation("createCollection")
+	async createCollection(@Args("data") data: CreateCollectionArgs) {
+		return await this.programService.createCollection(data);
+	}
 
-	@Mutation("removeRequirement")
-	async removeRequirement(
-		@Args("parentId")parentId: string,
-		@Args("childId")childId: string
-	){
-		return await this.programService.Removerequirement(parentId,childId)
+	@Mutation("updateCollection")
+	async updateCollection(
+		@Args("data") data: Prisma.CollectionUpdateInput,
+		@Args("id") id: string
+	) {
+		return await this.programService.updateCollection(id, data);
+	}
+
+	@Mutation("createLesson")
+	async createLesson(@Args("input") input: LessonInput) {
+		return await this.programService.createLesson(input);
+	}
+
+	@Mutation("updateLesson")
+	async updateLesson(@Args("input") input: LessonFields) {
+		return await this.programService.updateLesson(input);
+	}
+
+	@Mutation("deleteLesson")
+	async deleteLesson(@Args("id") id: string) {
+		return await this.programService.deleteLesson(id);
+	}
+
+	@Mutation("createContent")
+	async createContent(@Args("input") input: CreateContentArgs) {
+		return await this.programService.createContent(input);
+	}
+
+	@Mutation("updateContent")
+	async updateContent(@Args("input") input: ContentFields) {
+		return await this.programService.updateContent(input);
+	}
+
+	@Mutation("deleteContent")
+	async deleteContent(@Args("contentID") contentID: string) {
+		return await this.programService.deleteContent(contentID);
 	}
 }

@@ -1,30 +1,30 @@
-import moment, {MomentInput} from "moment";
+import moment, { MomentInput } from "moment";
 import { Module } from "@nestjs/common";
 import { UserModule } from "./user/user.module";
-import { PoSModule } from "./pos/pos.module";
+import { PoSModule } from "@/pos";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { ProgramModule } from "./program/program.module";
-require("dotenv").config();
+import { config } from "dotenv";
 import { CustomScalar, Scalar } from "@nestjs/graphql";
 import { Kind, ValueNode } from "graphql";
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from "./auth/auth.module";
 import type { Moment } from "moment";
-import { CommunityModule } from './community/community.module';
+import { CommunityModule } from "./community/community.module";
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
 	description = "Date custom scalar type";
 
 	parseValue(value: MomentInput | unknown): Moment {
-		if(value instanceof Date) return moment(value); // value from the client
+		if (value instanceof Date) return moment(value); // value from the client
 		return moment(null);
 	}
 
 	//What we are sending to the client
 	serialize(value: MomentInput | unknown): string {
-		if(value instanceof Date) return moment(value).format("MM/DD/YYYY");
-		return ""
+		if (value instanceof Date) return moment(value).format("MM/DD/YYYY");
+		return "";
 	}
 
 	//What we are receiving from the client
@@ -48,13 +48,13 @@ export class DateScalar implements CustomScalar<string, Moment> {
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
 			introspection: true,
-			context: ({req, res}) => ({req, res})
+			context: ({ req, res }) => ({ req, res })
 		}),
 		UserModule,
 		PoSModule,
 		ProgramModule,
 		AuthModule,
-		CommunityModule,
+		CommunityModule
 	],
 	controllers: [],
 	providers: [DateScalar]

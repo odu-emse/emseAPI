@@ -4,7 +4,7 @@ type Social {
 	"""
 	id: ID!
 	"""
-	Url Poiting to Twitter
+	Url Pointing to Twitter
 	"""
 	twitter: String
 	"""
@@ -20,7 +20,7 @@ type Social {
 	"""
 	facebook: String
 	"""
-	Url poiting to porfolio
+	Url pointing to portfolio
 	"""
 	portfolio: String
 	"""
@@ -31,7 +31,7 @@ type Social {
 
 type InstructorProfile {
 	"""
-	Intrucutor Profile id
+	Instructor Profile id
 	"""
 	id: ID!
 	"""
@@ -39,7 +39,7 @@ type InstructorProfile {
 	"""
 	account: User
 	"""
-	Title of the IntructorProfile
+	Title of the Instructor Profile
 	"""
 	title: String
 	"""
@@ -63,7 +63,7 @@ type InstructorProfile {
 	"""
 	background: String
 	"""
-	Researchinterest of the User
+	Research interest of the User
 	"""
 	researchInterest: String
 	"""
@@ -71,11 +71,11 @@ type InstructorProfile {
 	"""
 	selectedPapersAndPublications: String
 	"""
-	Personal webiste of the user
+	Personal website of the user
 	"""
 	personalWebsite: String
 	"""
-	Philosopy
+	The preferred teaching philosophy of the instructor
 	"""
 	philosophy: String
 }
@@ -110,7 +110,7 @@ type User {
 	"""
 	lastName: String
 	"""
-	Middlename of the user
+	Middle name of the user
 	"""
 	middleName: String
 	"""
@@ -130,7 +130,7 @@ type User {
 	"""
 	social: Social
 	"""
-	User planofstudy
+	User plan of study
 	"""
 	plan: PlanOfStudy
 	"""
@@ -138,11 +138,11 @@ type User {
 	"""
 	tokens: [ID!]
 	"""
-	feedback of the user pointing to modulefeedback
+	feedback of the user pointing to module feedback
 	"""
 	feedback: [ModuleFeedback!]
 	"""
-	assignment graded poiting to assignment result of the user
+	assignment graded pointing to assignment result of the user
 	"""
 	assignmentGraded: [AssignmentResult!]
 	"""
@@ -192,7 +192,7 @@ input NewUser {
 	"""
 	email: String!
 	"""
-	picUrl of the Newuser
+	picUrl of the New user
 	"""
 	picURL: String!
 	"""
@@ -253,7 +253,7 @@ input UpdateUser {
 	"""
 	email: String
 	"""
-	Picurl of update user
+	Picture URL of update user
 	"""
 	picURL: String
 	"""
@@ -288,15 +288,15 @@ input UpdateUser {
 
 input InstructorProfileInput {
 	"""
-	Intructor profile title
+	Instructor profile title
 	"""
 	title: String
 	"""
-	Officelocation of Instructor Profile
+	Office-location of Instructor Profile
 	"""
 	officeLocation: String
 	"""
-	Offcie hours of Instructor Profile
+	Office hours of Instructor Profile
 	"""
 	officeHours: String
 	"""
@@ -304,11 +304,11 @@ input InstructorProfileInput {
 	"""
 	contactPolicy: String
 	"""
-	Phone of Intructor Profile
+	Phone of Instructor Profile
 	"""
 	phone: String
 	"""
-	Backgroud of Profile
+	Background of Profile
 	"""
 	background: String
 	"""
@@ -324,14 +324,14 @@ input InstructorProfileInput {
 	"""
 	personalWebsite: String
 	"""
-	Philisophy of the Instructor
+	Philosophy of the Instructor
 	"""
 	philosophy: String
 }
 
 input SocialInput {
 	"""
-	Url poiting to Twitter
+	Url pointing to Twitter
 	"""
 	twitter: String
 	"""
@@ -343,26 +343,20 @@ input SocialInput {
 	"""
 	linkedin: String
 	"""
-	Url poiting to facebook
+	Url pointing to facebook
 	"""
 	facebook: String
 	"""
-	Url poiting to portfolio
+	Url pointing to portfolio
 	"""
 	portfolio: String
 }
 
 type Query {
 	"""
-	Query that fetches User on id
+	Query that fetches User based on the passed in parameters. If openID or id fields are set in the input, the returned user is guaranteed to be unique. If no params are provided, all users are returned
 	"""
-	user(id: ID!): User
-	"""
-	Query that fetches all the users
-	"""
-	users: [User!]!
-
-	usersByParam(input: UserFields): [User!]
+	user(input: UserFields): [User!]!
 	"""
 	Query that fetches all the socials
 	"""
@@ -374,7 +368,7 @@ type Query {
 
 	socialsByParam(input: SocialFields): [Social!]
 	"""
-	Query that fetches instrctor Profile based on id
+	Query that fetches instructor Profile based on id
 	"""
 	instructorProfile(id: ID!): InstructorProfile
 }
@@ -410,7 +404,7 @@ type Mutation {
 	"""
 	deleteSocial(id: ID!): Social
 	"""
-	Delets User social
+	Deletes User social
 	"""
 	deleteUserSocial(userId: ID!): Social
 }

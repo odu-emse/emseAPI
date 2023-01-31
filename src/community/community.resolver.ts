@@ -2,37 +2,32 @@ import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CommunityService } from "./community.service";
 import { Prisma } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
-import { AuthGuard } from "../auth.guard";
+import { AuthGuard } from "@/auth.guard";
 import {
 	ICommentCreateInput,
 	IThreadCreateInput,
-	Lesson,
-	Thread,
-	User
+	IThreadByParams
 } from "@/types/graphql";
 
 @Resolver()
 // @UseGuards(AuthGuard)
 export class CommunityResolver {
-	constructor(private readonly communityService: CommunityService) {}
-
-	@Query("threads")
-	async threads() {
-		return await this.communityService.threads();
+	constructor(private readonly communityService: CommunityService) {
+		this.communityService = communityService;
 	}
 
 	@Query("thread")
-	async thread(@Args("id") id: string) {
-		try {
-			return await this.communityService.thread(id);
-		} catch (e: any) {
-			return e;
-		}
+	async thread(@Args("input") input: IThreadByParams) {
+		const thread = await this.communityService.threadsByParam(input);
+		if (thread instanceof Error) return new Error(thread.message);
+		else return thread;
 	}
 
 	@Mutation("createThread")
 	async createThread(@Args("data") data: IThreadCreateInput) {
-		return await this.communityService.createThread(data);
+		const newThread = await this.communityService.createThread(data);
+		if (newThread instanceof Error) return new Error(newThread.message);
+		return newThread;
 	}
 
 	@Mutation("deleteThread")
@@ -45,17 +40,18 @@ export class CommunityResolver {
 		@Args("id") id: string,
 		@Args("data") data: ICommentCreateInput
 	) {
-		const self = await this.communityService.thread(id);
-		if (!self) throw new Error("Thread not found");
-
-		//creating new comment document
-		const newComment = await this.communityService.createThread({
-			body: data.body,
-			author: data.author,
-			parentThread: self.id
-		});
-
-		return newComment;
+		const self = await this.thread({ id });
+		if (self instanceof Error) return new Error(self.message);
+		else {
+			//creating new comment document
+			const newThread = await this.createThread({
+				body: data.body,
+				author: data.author,
+				parentThread: self[0].id
+			});
+			if (newThread instanceof Error) return new Error(newThread.message);
+			return newThread;
+		}
 	}
 
 	@Mutation("upvoteThread")
@@ -68,6 +64,8 @@ export class CommunityResolver {
 		@Args("id") id: string,
 		@Args("data") data: Prisma.ThreadUpdateInput
 	) {
-		return await this.communityService.updateThread(id, data);
+		const res = await this.communityService.updateThread(id, data);
+		if (!res || res instanceof Error) return new Error(res.message);
+		return res;
 	}
 }

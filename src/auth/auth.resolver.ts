@@ -14,7 +14,7 @@ export class AuthResolver {
 
 	@Mutation("login")
 	//@UseGuards(AuthGuard('google'))
-	async login(@Args("code") code: String) {
+	async login(@Args("code") code: string) {
 		// Init the users login flow
 		const response = await this.authService.fetchToken(code);
 		if (!response.ok) {
@@ -31,7 +31,7 @@ export class AuthResolver {
 	@Query("refresh")
 	async refresh(
 		@Context() context: GraphQLExecutionContext,
-		@Args("token") token: String
+		@Args("token") token: string
 	) {
 		const response = await this.authService.refreshToken(token);
 		if (!response.ok) {

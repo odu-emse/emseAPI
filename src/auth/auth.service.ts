@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { NewUser, User } from "../../gql/graphql";
+import { PrismaService } from "@/prisma.service";
+import { NewUser } from "@/types/graphql";
+import { PlanOfStudyResolver } from "@/pos/pos.resolver";
+import { Prisma } from "@prisma/client";
 
 type TokenType = {
 	sub: string;
@@ -12,15 +14,14 @@ type TokenType = {
 	family_name: string;
 };
 
-interface UserOpenID {
-	openID: string;
-}
-
 @Injectable()
 export class AuthService {
-	constructor(private prisma: PrismaService) {}
+	constructor(private prisma: PrismaService, private pos: PlanOfStudyResolver) {
+		this.prisma = prisma;
+		this.pos = pos;
+	}
 
-	async fetchToken(code: String) {
+	async fetchToken(code: string) {
 		return await fetch("https://oauth2.googleapis.com/token", {
 			method: "POST",
 			credentials: "include",
@@ -75,21 +76,30 @@ export class AuthService {
 				lastName: family_name,
 				middleName: ""
 			};
+			const account = await this.registerUser(payload);
 
-			return this.registerUser(payload);
+			if (account instanceof Error) {
+				throw "Error adding plan to user.";
+			} else {
+				await this.pos.addPlan({
+					student: account.id
+				});
+			}
 		} else {
+			const update = Prisma.validator<Prisma.UserUpdateInput>()({
+				...(sub && { openID: sub }),
+				...(email && { email }),
+				...(picture && { picURL: picture }),
+				...(given_name && { firstName: given_name }),
+				...(family_name && { lastName: family_name })
+			});
+			
 			//Update an existing user
 			return this.prisma.user.update({
 				where: {
 					openID: sub
 				},
-				data: {
-					...(sub && { openID: sub }),
-					...(email && { email }),
-					...(picture && { picURL: picture }),
-					...(given_name && { firstName: given_name }),
-					...(family_name && { lastName: family_name })
-				}
+				data: update
 			});
 		}
 	}
@@ -114,17 +124,21 @@ export class AuthService {
 			lastName
 		};
 
+		const create = Prisma.validator<Prisma.UserCreateInput>()({
+			...payload
+		});
+
 		///Avoids duplicate value(email) if the exist already
 		if (count === 0) {
 			return await this.prisma.user.create({
-				data: payload
+				data: create
 			});
 		} else {
 			return new Error("User has an account already.");
 		}
 	}
 
-	async refreshToken(token: String) {
+	async refreshToken(token: string) {
 		return await fetch("https://oauth2.googleapis.com/token", {
 			method: "POST",
 			credentials: "include",
