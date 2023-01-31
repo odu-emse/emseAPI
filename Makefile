@@ -1,8 +1,10 @@
 up:
+	yarn install
 	docker-compose up
 down:
 	docker-compose down
 build:
+	yarn install
 	docker-compose build
 remvimg:
 	make down
