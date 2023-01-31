@@ -474,14 +474,6 @@ export interface Collection {
 export interface Lesson {
     id: string;
     name: string;
-    contentType: string;
-    content: string;
-    transcript?: Nullable<string>;
-}
-
-export interface Requirement {
-    id: string;
-    name: string;
     content?: Nullable<Nullable<Content>[]>;
     transcript?: Nullable<string>;
     threads?: Nullable<Nullable<Thread>[]>;
