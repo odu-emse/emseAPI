@@ -190,8 +190,12 @@ export class UserService {
 
 		payload["accountId"] = account ? account : undefined;
 
+		const where = Prisma.validator<Prisma.SocialWhereInput>()({
+			...payload
+		});
+
 		return await this.prisma.social.findMany({
-			where: payload,
+			where,
 			include: {
 				account: true
 			}
@@ -257,22 +261,24 @@ export class UserService {
 			throw new Error("Invalid date of birth");
 		}
 
+		const update = Prisma.validator<Prisma.UserUpdateInput>()({
+			...(email && { email }),
+			...(picURL && { picURL }),
+			...(firstName && { firstName }),
+			...(lastName && { lastName }),
+			...(middleName && { middleName }),
+			...(dob && {
+				dob: dob.toISOString()
+			}),
+			...(isAdmin && { isAdmin }),
+			...(isActive && { isActive })
+		});
+		
 		return await this.prisma.user.update({
 			where: {
 				openID
 			},
-			data: {
-				...(email && { email }),
-				...(picURL && { picURL }),
-				...(firstName && { firstName }),
-				...(lastName && { lastName }),
-				...(middleName && { middleName }),
-				...(dob && {
-					dob: dob.toISOString()
-				}),
-				...(isAdmin && { isAdmin }),
-				...(isActive && { isActive })
-			},
+			data: update,
 			include: this.includeUser
 		});
 	}
@@ -310,7 +316,7 @@ export class UserService {
 
 	/// Update a social by document ID
 	async updateSocial(id: string, input: SocialInput) {
-		return this.prisma.social.update({
+		const update = Prisma.validator<Prisma.SocialUpdateArgs>()({
 			where: {
 				id
 			},
@@ -324,12 +330,14 @@ export class UserService {
 			include: {
 				account: true
 			}
-		});
+		})
+
+		return this.prisma.social.update(update);
 	}
 
 	/// Update a social record by the owner (user) id
 	async updateUserSocial(userId: string, input: SocialInput) {
-		return this.prisma.social.updateMany({
+		const update = Prisma.validator<Prisma.SocialUpdateManyArgs>()({
 			where: {
 				accountID: userId
 			},
@@ -340,7 +348,9 @@ export class UserService {
 				facebook: input.facebook,
 				portfolio: input.portfolio
 			}
-		});
+		})
+		
+		return this.prisma.social.updateMany(update);
 	}
 
 	/// Delete a social record by document ID

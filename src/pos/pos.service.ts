@@ -93,8 +93,12 @@ export class PoSService {
 			};
 		}
 
+		const where = Prisma.validator<Prisma.PlanOfStudyWhereInput>()({
+			...payload
+		});
+
 		return this.prisma.planOfStudy.findMany({
-			where: payload,
+			where,
 			include: this.PlanOfStudyInclude
 		});
 	}
