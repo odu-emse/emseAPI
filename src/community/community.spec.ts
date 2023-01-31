@@ -22,7 +22,7 @@ describe("Community", () => {
 			usersWatching: true;
 		};
 	}>;
-	let prisma: PrismaService = new PrismaService();
+	const prisma: PrismaService = new PrismaService();
 
 	let accountID: string;
 	let threadID: string;

@@ -76,17 +76,17 @@ export class ProgramService {
 					include: {
 						student: {
 							include: {
-								student: true,
+								student: true
 							}
 						},
 						gradedBy: {
 							include: {
 								social: true,
-								instructorProfile: true,
+								instructorProfile: true
 							}
-						},
+						}
 					}
-				},
+				}
 			}
 		},
 		feedback: {
@@ -110,39 +110,42 @@ export class ProgramService {
 						},
 						content: true
 					}
-				},
+				}
 			}
 		},
 		course: true
 	});
 
-	private moduleFeedbackInclude = Prisma.validator<Prisma.ModuleFeedbackInclude>()({
-		student: true,
-		module: true
-	});
+	private moduleFeedbackInclude =
+		Prisma.validator<Prisma.ModuleFeedbackInclude>()({
+			student: true,
+			module: true
+		});
 
-	private assignmentResultInclude = Prisma.validator<Prisma.AssignmentResultInclude>()({
-		student: {
-			include: {
-				student: true,
+	private assignmentResultInclude =
+		Prisma.validator<Prisma.AssignmentResultInclude>()({
+			student: {
+				include: {
+					student: true
+				}
+			},
+			gradedBy: true,
+			assignment: {
+				include: {
+					module: true
+				}
 			}
-		},
-		gradedBy: true,
-		assignment: {
-			include: {
-				module: true,
-			}
-		}
-	});
+		});
 
-	private moduleEnrollmentInclude = Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
-		plan: {
-			include: {
-				student: true
-			}
-		},
-		module: true
-	});
+	private moduleEnrollmentInclude =
+		Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
+			plan: {
+				include: {
+					student: true
+				}
+			},
+			module: true
+		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
 		module: true,
@@ -171,7 +174,7 @@ export class ProgramService {
 				comments: true
 			}
 		}
-	})
+	});
 
 	async module(params: ModuleFields) {
 		const {
@@ -203,9 +206,12 @@ export class ProgramService {
 			...(updatedAt && { updatedAt })
 		};
 
-		let where: Prisma.ModuleWhereInput = {};
-
-		where["AND"] = [];
+		// use the Prisma.ModuleWhereInput type and remove the AND field. Then create a union type with the AND field added back in as an array of Prisma.ModuleWhereInput
+		const where: Omit<Prisma.ModuleWhereInput, "AND"> & {
+			AND: Array<Prisma.ModuleWhereInput>;
+		} = {
+			AND: []
+		};
 
 		if (parentModules) {
 			where.AND.push({
@@ -226,8 +232,6 @@ export class ProgramService {
 		if (members) {
 			members.forEach((member) => {
 				if (where.AND) {
-					//TODO: Fix this type error thinking that AND is not an array
-					// @ts-ignore
 					where.AND.push({
 						members: {
 							some: {
@@ -244,13 +248,13 @@ export class ProgramService {
 				some: {
 					id: assignments
 				}
-			};
+			} as Prisma.ModuleWhereInput["assignments"];
 		}
 
 		if (keywords) {
 			payload["keywords"] = {
 				hasEvery: keywords
-			} as Prisma.ModuleWhereInput;
+			} as Prisma.ModuleWhereInput["keywords"];
 		}
 
 		if (feedback) {
@@ -258,13 +262,13 @@ export class ProgramService {
 				some: {
 					id: feedback!
 				}
-			} as Prisma.ModuleFeedbackListRelationFilter;
+			} as Prisma.ModuleWhereInput["feedback"];
 		}
 
 		if (objectives) {
 			payload["objectives"] = {
 				hasSome: objectives
-			} as Prisma.ModuleWhereInput['objectives'];
+			} as Prisma.ModuleWhereInput["objectives"];
 		}
 
 		return await this.prisma.module.findMany({
@@ -363,7 +367,6 @@ export class ProgramService {
 		});
 	}
 
-
 	async moduleEnrollment(params: ModEnrollmentFields) {
 		const { id, enrolledAt, role, module, plan } = params;
 
@@ -400,13 +403,14 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, transcript, thread, collection, position } = input;
+		const { id, name, content, transcript, thread, collection, position } =
+			input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
 			...(transcript && { transcript }),
-			...(position && {position}),
+			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
 			threads: thread ? { some: { id: thread } } : undefined,
 			content: content ? { some: { id: content } } : undefined
@@ -711,11 +715,11 @@ export class ProgramService {
 	async addModuleEnrollment(input: ModuleEnrollmentInput) {
 		const { plan, module, role, status } = input;
 
-		let count = await this.prisma.moduleEnrollment.count({
+		const count = await this.prisma.moduleEnrollment.count({
 			where: {
 				planID: plan,
 				moduleId: module
-			},
+			}
 		});
 
 		if (count !== 0) {
@@ -768,7 +772,7 @@ export class ProgramService {
 
 	// Link a course and a module
 	async pairCourseModule(courseId: string, moduleId: string) {
-		let count = await this.prisma.module.count({
+		const count = await this.prisma.module.count({
 			where: {
 				id: moduleId,
 				course: {
@@ -776,7 +780,7 @@ export class ProgramService {
 						id: courseId
 					}
 				}
-			},
+			}
 		});
 
 		if (count != 0) {
@@ -911,7 +915,7 @@ export class ProgramService {
 					}
 				},
 				position: input.position ? input.position : undefined
-			},
+			}
 		});
 
 		return this.prisma.lesson.update({

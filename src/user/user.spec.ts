@@ -15,10 +15,10 @@ describe("Account services", () => {
 	let resolver: UserResolver;
 	let prisma: PrismaService;
 
-	let userID = "110686834027701244994";
-	let userDocumentID = "616701c22e17f3fb9f5085f7";
-	let socialDocumentID = "62966864bd7f125c4df63c11";
-	let socialResetInput: SocialInput = {
+	const userID = "110686834027701244994";
+	const userDocumentID = "616701c22e17f3fb9f5085f7";
+	const socialDocumentID = "62966864bd7f125c4df63c11";
+	const socialResetInput: SocialInput = {
 		twitter: "",
 		facebook: "",
 		github: "",
@@ -26,7 +26,7 @@ describe("Account services", () => {
 		portfolio: ""
 	};
 
-	let userResetInput: UpdateUser = {
+	const userResetInput: UpdateUser = {
 		firstName: "DANIEL B.",
 		lastName: "PAPP",
 		middleName: " ",
@@ -37,7 +37,7 @@ describe("Account services", () => {
 		id: userDocumentID
 	};
 
-	let updatedInstructorProfileReset: InstructorProfileInput = {
+	const updatedInstructorProfileReset: InstructorProfileInput = {
 		title: "Department Chair",
 		officeLocation: "Online",
 		officeHours: "Anytime",
@@ -151,7 +151,7 @@ describe("Account services", () => {
 			expect(instructorProfile.philosophy).toBeDefined();
 		});
 		it("should update instructor profile given input argument", async () => {
-			let updatedInstructorProfile: InstructorProfileInput = {
+			const updatedInstructorProfile: InstructorProfileInput = {
 				title: "Adjunct Professor",
 				officeLocation: "ESB 2101",
 				officeHours: "9AM - 5PM - MWF",
@@ -164,7 +164,7 @@ describe("Account services", () => {
 				personalWebsite: "https://odu.edu/emse",
 				philosophy: "I  teach people"
 			};
-			let input: UpdateUser = {
+			const input: UpdateUser = {
 				id: userDocumentID,
 				openID: userID,
 				instructorProfile: updatedInstructorProfile

@@ -36,7 +36,7 @@ export class CommunityService {
 			upvotesLTE
 		} = input;
 
-		let where = Prisma.validator<Prisma.ThreadWhereInput>()({
+		const where = Prisma.validator<Prisma.ThreadWhereInput>()({
 			...(id && { id }),
 			...(title && {
 				title: {
@@ -113,7 +113,7 @@ export class CommunityService {
 			] as Prisma.ThreadWhereInput["AND"];
 		}
 
-		let include = this.threadInclude;
+		const include = this.threadInclude;
 
 		let res:
 			| Array<

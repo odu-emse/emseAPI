@@ -20,7 +20,7 @@ export class AuthService {
 		this.pos = pos;
 	}
 
-	async fetchToken(code: String) {
+	async fetchToken(code: string) {
 		return await fetch("https://oauth2.googleapis.com/token", {
 			method: "POST",
 			credentials: "include",
@@ -131,7 +131,7 @@ export class AuthService {
 		}
 	}
 
-	async refreshToken(token: String) {
+	async refreshToken(token: string) {
 		return await fetch("https://oauth2.googleapis.com/token", {
 			method: "POST",
 			credentials: "include",

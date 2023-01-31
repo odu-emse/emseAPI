@@ -42,7 +42,7 @@ export class PrismaService
 	async onModuleInit() {
 		process.env.NODE_ENV === "development" &&
 			this.$on("query", (e) => {
-				let cleanedQuery = JSON.stringify(e.query);
+				const cleanedQuery = JSON.stringify(e.query);
 				this.logger.log(JSON.parse(cleanedQuery));
 			});
 		this.$on("error", (e) => {

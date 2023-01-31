@@ -20,18 +20,18 @@ export class UserService {
 
 	private includeUser = Prisma.validator<Prisma.UserInclude>()({
 		feedback: true,
-				plan: {
+		plan: {
+			include: {
+				modules: {
 					include: {
-						modules: {
-							include: {
-								module: true
-							}
-						}
+						module: true
 					}
-				},
-				assignmentGraded: true,
-				instructorProfile: true,
-				social: true,
+				}
+			}
+		},
+		assignmentGraded: true,
+		instructorProfile: true,
+		social: true
 	});
 
 	/**
@@ -132,7 +132,7 @@ export class UserService {
 				...(id && { id }),
 				...(openID && { openID })
 			});
-			let res = await this.prisma.user.findUnique({
+			const res = await this.prisma.user.findUnique({
 				where: unique,
 				include: this.includeUser
 			});
@@ -143,7 +143,7 @@ export class UserService {
 		//find many users by scalar fields
 		//returns an array of users
 		else {
-			let res = await this.prisma.user.findMany({
+			const res = await this.prisma.user.findMany({
 				where,
 				include: this.includeUser
 			});

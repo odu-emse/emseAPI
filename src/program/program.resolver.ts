@@ -38,7 +38,7 @@ export class ProgramResolver {
 			return result;
 		} else {
 			const filterRes = result.map((module) =>{
-				let thisModule = module;
+				const thisModule = module;
 				thisModule.members = module.members.filter((value) => value.role === role);
 				return thisModule;
 			});
