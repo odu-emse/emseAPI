@@ -59,6 +59,7 @@ export class CommunityResolver {
 		return await this.communityService.upvoteThread(id);
 	}
 
+
 	@Mutation("updateThread")
 	async updateThread(
 		@Args("id") id: string,

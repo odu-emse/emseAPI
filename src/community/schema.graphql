@@ -70,7 +70,8 @@ input IThreadCreateInput {
 }
 
 input ICommentCreateInput {
-    """
+    id: ID
+     """
     The content body of the comment. Currently only supports text.
     """
     body: String!
@@ -79,6 +80,7 @@ input ICommentCreateInput {
     """
     author: ID!
 }
+
 
 input IThreadByParams {
     """
@@ -133,15 +135,10 @@ type Query {
 type Mutation {
     """
     Creates a new thread
-    @args IThreadCreateInput
-    @prop title: String
-    @prop body: String!
-    @prop parentLesson: ID
-    @prop parentThread: ID
     """
     createThread(data:IThreadCreateInput!): Thread
 
-    addCommentToThread(id: ID!, data: ICommentCreateInput!): Thread
+    addCommentToThread(parentThreadID: ID!, data: ICommentCreateInput!): Thread
 
     upvoteThread(id: ID!): Thread
 
