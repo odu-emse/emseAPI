@@ -1,0 +1,33 @@
+type Progress {
+    """
+    The database defined ID of the progress document
+    """
+    id: ID!
+    """
+    The numerical status of the progress 0% - 100%
+    """
+    status: Float!
+    """
+    A boolean to conveniently check if the progress is completed
+    """
+    completed: Boolean!
+    """
+    The date the progress was created
+    """
+    createdAt: Date!
+    """
+    The date the progress was last updated
+    """
+    updatedAt: Date!
+}
+
+input ProgressArgs {
+    """
+    The database defined ID of the progress document
+    """
+    id: ID
+    completed: Boolean
+    status: Float
+    createdAt: Date
+    updatedAt: Date
+}

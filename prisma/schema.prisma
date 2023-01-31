@@ -229,6 +229,14 @@ model Content {
   parentID String @db.ObjectId
 }
 
+model Progress {
+	id String @id @default(auto()) @map("_id") @db.ObjectId
+	createdAt DateTime @default(now())
+	updatedAt DateTime @default(now()) @updatedAt
+	status Float
+	completed Boolean @default(false)
+}
+
 enum UserRole {
   STUDENT
   TEACHER

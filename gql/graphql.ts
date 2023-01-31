@@ -223,6 +223,14 @@ export interface LessonFields {
     position?: Nullable<number>;
 }
 
+export interface ProgressArgs {
+    id?: Nullable<string>;
+    completed?: Nullable<boolean>;
+    status?: Nullable<number>;
+    createdAt?: Nullable<Date>;
+    updatedAt?: Nullable<Date>;
+}
+
 export interface NewUser {
     openID: string;
     email: string;
@@ -490,6 +498,14 @@ export interface Content {
 
 export interface Error {
     message?: Nullable<string>;
+}
+
+export interface Progress {
+    id: string;
+    status: number;
+    completed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Social {

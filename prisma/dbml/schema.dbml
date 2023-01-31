@@ -192,6 +192,14 @@ Table Content {
   parentID String [not null]
 }
 
+Table Progress {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  status Float [not null]
+  completed Boolean [not null, default: false]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
