@@ -229,6 +229,7 @@ export interface ProgressArgs {
     status?: Nullable<number>;
     createdAt?: Nullable<Date>;
     updatedAt?: Nullable<Date>;
+    enrollmentID?: Nullable<string>;
 }
 
 export interface NewUser {
@@ -347,6 +348,9 @@ export interface IMutation {
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content> | Promise<Nullable<Content>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
+    createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
+    waiveModule(input: ProgressArgs): Progress | Promise<Progress>;
+    deleteProgress(id: string): boolean | Promise<boolean>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -374,6 +378,7 @@ export interface IQuery {
     collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
+    progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     user(input?: Nullable<UserFields>): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
@@ -506,6 +511,7 @@ export interface Progress {
     completed: boolean;
     createdAt: Date;
     updatedAt: Date;
+    enrollment: ModuleEnrollment;
 }
 
 export interface Social {

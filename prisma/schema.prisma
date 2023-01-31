@@ -173,6 +173,7 @@ model ModuleEnrollment {
   moduleId String       @db.ObjectId
   plan     PlanOfStudy? @relation(fields: [planID], references: [id])
   planID   String?      @db.ObjectId
+  progress Progress?
 }
 
 model Assignment {
@@ -233,8 +234,11 @@ model Progress {
 	id String @id @default(auto()) @map("_id") @db.ObjectId
 	createdAt DateTime @default(now())
 	updatedAt DateTime @default(now()) @updatedAt
-	status Float
+	status Float @default(0)
 	completed Boolean @default(false)
+	// Relation Fields
+	enrollment ModuleEnrollment @relation(fields: [enrollmentID], references: [id])
+	enrollmentID String @unique
 }
 
 enum UserRole {

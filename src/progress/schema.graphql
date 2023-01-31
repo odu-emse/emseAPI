@@ -19,6 +19,10 @@ type Progress {
     The date the progress was last updated
     """
     updatedAt: Date!
+    """
+    The enrollment that this progress is associated with (one-to-one)
+    """
+    enrollment: ModuleEnrollment!
 }
 
 input ProgressArgs {
@@ -30,4 +34,38 @@ input ProgressArgs {
     status: Float
     createdAt: Date
     updatedAt: Date
+    enrollmentID: ID
+}
+
+type Query {
+    """
+    Get a progress document by the given parameters. If no parameters are given, all progress documents will be returned. If the ID or enrollmentID is given, the other parameters will be ignored, and the returned document is always unique.
+    """
+    progress(
+        """
+        The database defined ID of the progress document
+        """
+        args: ProgressArgs!
+    ): [Progress]!
+}
+
+type Mutation {
+    createProgress(
+        input: ProgressArgs!
+        enrollmentID: ID!
+    ): Progress!
+
+    waiveModule(
+        input: ProgressArgs!
+    ): Progress!
+
+    """
+    Delete a progress document by the given ID. Returns true if the document was deleted, Error otherwise.
+    """
+    deleteProgress(
+        """
+        The database defined ID of the progress document to be deleted
+        """
+        id: ID!
+    ): Boolean!
 }
