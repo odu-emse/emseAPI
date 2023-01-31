@@ -2,9 +2,6 @@ FROM node:18 as base
 
 WORKDIR /usr/src/app
 
-VOLUME /api_data
-
-
 COPY ./.env ./.eslintrc.yml ./.prettierrc ./package.json ./yarn.lock ./yarn-error.log ./tsconfig.json ./tsconfig.build.json ./
 
 COPY prisma/* ./prisma/
@@ -14,5 +11,5 @@ COPY src/ ./src/
 RUN yarn install --pure-lockfile --silent
 
 
-FROM base as production
+FROM base as development
 

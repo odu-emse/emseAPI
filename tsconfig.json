@@ -19,10 +19,12 @@
 		"rootDir": "./",
 		"incremental": true,
 		"skipLibCheck": true,
+		"resolveJsonModule": true,
 		"paths": {
 			"@/*": ["src/*"],
-			"@/types/*": ["gql/*"],
-		}
+			"@/types/*": ["gql/*"]
+		},
+		"types": ["vitest/globals", "node"]
 	},
-	"exclude": ["node_modules"],
+	"exclude": ["node_modules", "./dist"]
 }

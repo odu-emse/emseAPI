@@ -1,24 +1,43 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma.service";
-import { Prisma, PlanOfStudy } from "@prisma/client";
+import { PrismaService } from "@/prisma.service";
+import { PlanOfStudy, Prisma } from "@prisma/client";
 import { PlanInput, PlanFields } from "gql/graphql";
 
 @Injectable()
 export class PoSService {
 	constructor(private prisma: PrismaService) {}
 
+	private PlanOfStudyInclude = Prisma.validator<Prisma.PlanOfStudyInclude>()({
+		modules: {
+			include: {
+				module: {
+					include: {
+						feedback: true,
+						assignments: true,
+						members: true,
+						// parentCourses: {
+						// 	include: {
+						// 		course: true
+						// 	}
+						// }
+					}
+				},
+				plan: true
+			}
+		},
+		assignmentResults: {
+			include: {
+				assignment: true,
+				gradedBy: true
+			}
+		},
+		student: true
+	});
+	
 	//✅ Find all plans recorded in the system
 	async plans(): Promise<PlanOfStudy[]> {
 		return await this.prisma.planOfStudy.findMany({
-			include: {
-				modules: {
-					include: {
-						module: true
-					}
-				},
-				assignmentResults: true,
-				student: true
-			}
+			include: this.PlanOfStudyInclude
 		});
 	}
 
@@ -28,21 +47,7 @@ export class PoSService {
 			where: {
 				id
 			},
-			include: {
-				modules: {
-					include: {
-						module: true,
-						plan: true
-					}
-				},
-				assignmentResults: {
-					include: {
-						assignment: true,
-						gradedBy: true
-					}
-				},
-				student: true
-			}
+			include: this.PlanOfStudyInclude
 		});
 	}
 
@@ -52,82 +57,50 @@ export class PoSService {
 			where: {
 				studentID
 			},
-			include: {
-				modules: {
-					include: {
-						module: {
-							include: {
-								feedback: true,
-								assignments: true,
-								members: true,
-								parentCourses: {
-									include: {
-										course: true
-									}
-								}
-							}
-						},
-						plan: true
-					}
-				},
-				assignmentResults: {
-					include: {
-						assignment: true,
-						gradedBy: true
-					}
-				},
-				student: true
-			}
+			include: this.PlanOfStudyInclude
 		});
 	}
 
-	async planByParams(params: PlanFields): Promise<PlanOfStudy[] | null> {
-		const {
-			id,
-			student,
-			module,
-			assignmentResult,
-			modulesLeft
-		} = params
+	async planByParams(params: PlanFields) {
+		const { id, student, module, assignmentResult, modulesLeft } = params;
 
 		const payload = {
-			...(id && {id})
-		}
+			...(id && { id })
+		};
 		if (student) {
-			payload['studentId'] = student
+			payload["studentId"] = student;
 		}
 
 		if (module) {
-			payload['modules'] = {
+			payload["modules"] = {
 				some: {
 					id: module
 				}
-			}
+			};
 		}
 		if (assignmentResult) {
-			payload['assignmentResults'] = {
+			payload["assignmentResults"] = {
 				some: {
 					id: assignmentResult
 				}
-			}
+			};
 		}
 		if (modulesLeft) {
-			payload['modulesLeft'] = {
+			payload["modulesLeft"] = {
 				some: {
 					id: modulesLeft
 				}
-			}
+			};
 		}
 
+		const where = Prisma.validator<Prisma.PlanOfStudyWhereInput>()({
+			...payload
+		});
+
 		return this.prisma.planOfStudy.findMany({
-			where: payload,
-			include: {
-				student: true,
-				modules: true,
-				assignmentResults: true,
-				modulesleft: true
-			}
-		})
+			where,
+			include: this.PlanOfStudyInclude
+		});
 	}
 
 	// TODO: Allow for starting modules and courses
@@ -151,11 +124,7 @@ export class PoSService {
 			data: {
 				studentID: input.student
 			},
-			include: {
-				modules: true,
-				assignmentResults: true,
-				student: true
-			}
+			include: this.PlanOfStudyInclude
 		});
 	}
 

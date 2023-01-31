@@ -1,8 +1,5 @@
 version: "3.9"
 
-volumes:
-    api_data:
-
 services:
     api:
         container_name: back_end_api
@@ -16,10 +13,28 @@ services:
         ports:
             - "4000:4000"
         volumes:
-            - api_data:/usr/src/app/
+            - ./:/usr/src/app/
         networks:
             - empiNetwork
         command: >
             bash -c "yarn db:generate && yarn dev"
+    db:
+        container_name: back_end_db
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: base
+        env_file:
+            - .env
+        expose:
+            - "5555"
+        ports:
+            - "5555:5555"
+        volumes:
+            - ./:/usr/src/app/
+        networks:
+            - empiNetwork
+        command: >
+            bash -c "yarn db:studio"
 networks:
     empiNetwork:

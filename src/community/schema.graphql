@@ -31,9 +31,9 @@ type Thread {
     """
     usersWatching: [User!]
     """
-    TODO: Add linkage between lesson and thread once lesson schema is defined
+    Add linkage between lesson and thread once lesson schema is defined
     """
-    parentLesson: Module
+    parentLesson: Lesson
     """
     """
     createdAt: Date!
@@ -47,28 +47,89 @@ type Thread {
 }
 
 input IThreadCreateInput {
+    """
+    The title of the thread. If this parameter is not given, the thread will be created as a comment to another thread, but only if the parentThread parameter is given. If this parameter is not given, the thread will be created as a new thread.
+    """
     title: String
+    """
+    The content body of the thread. Currently only supports text.
+    """
     body: String!
+    """
+    The ID of the lesson that this thread belongs to. If this parameter is not given, the thread will be created as a general social community post.
+    """
     parentLesson: ID
+    """
+    The ID of the parent thread that this comment belongs to. If this parameter is not given, the thread will be created as a new thread, and not as a comment. If this parameter is not given, the title parameter must be given.
+    """
     parentThread: ID
+    """
+    The ID of the user that is creating the thread. The thread's ID will be added to the user's list of watched threads.
+    """
     author: ID!
 }
 
 input ICommentCreateInput {
     id: ID
+     """
+    The content body of the comment. Currently only supports text.
+    """
     body: String!
+    """
+    The ID of the user that is creating the comment. The comment's ID will be added to the user's list of watched threads.
+    """
     author: ID!
+}
+
+
+input IThreadByParams {
+    """
+    The ID of the thread to be exactly equal to the given value. If this parameter is given, all other parameters are ignored. The returned thread is guaranteed to be unique, but still returned as an array.
+    """
+    id: ID
+    """
+    The title of the thread to be partially matched to the given value. Upper and lower case characters are not treated equally.
+    """
+    title: String
+    """
+    The content body of the thread to be partially matched to the given value. Upper and lower case characters are not treated equally.
+    """
+    body: String
+    """
+    The ID of the lesson to be exactly equal to the given value.
+    """
+    parentLesson: ID
+    """
+    The ID of the parent thread to be exactly equal to the given value.
+    """
+    parentThread: ID
+    """
+    The ID of a comment to be exactly equal to the given value. The query will look through all Threads that are comments and return the parent thread and the entire comments array that matches the given ID.
+    """
+    comments: ID
+    """
+    The number of upvotes for the thread to be exactly equal to the given value. If this parameter is given, upvotesGTE and upvotesLTE are ignored. If this parameter has a value of 0, the parameter is ignored.
+    """
+    upvotes: Int
+    """
+    The number of upvotes for the thread to be greater than or equal to the given value. If this parameter is given, upvotes is ignored. This parameter can be used in conjunction with upvotesLTE to create a range based search.
+    """
+    upvotesGTE: Int
+    """
+    The number of upvotes for the thread to be less than or equal to the given value. If this parameter is given, upvotes is ignored. This parameter can be used in conjunction with upvotesGTE to create a range based search.
+    """
+    upvotesLTE: Int
+    """
+    The ID of the user to be exactly equal to the given value.
+    """
+    author: ID
 }
 
 type Query {
     """
-    Get a thread by ID
+    Get a list of threads that match the given parameters. If no parameters are given, all threads are returned. If the id parameter is given, the returned thread is guaranteed to be unique.
     """
-    thread(id: ID!): Thread
-    """
-    Get a list of threads
-    """
-    threads: [Thread]!
+    thread(input: IThreadByParams): [Thread!]!
 }
 
 type Mutation {
@@ -82,4 +143,6 @@ type Mutation {
     upvoteThread(id: ID!): Thread
 
     updateThread(id: ID!, data: IThreadCreateInput!): Thread
+
+    deleteThread(id: ID!): Thread
 }

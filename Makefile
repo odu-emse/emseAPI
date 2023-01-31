@@ -1,8 +1,10 @@
 up:
+	yarn install
 	docker-compose up
 down:
 	docker-compose down
 build:
+	yarn install
 	docker-compose build
 remvimg:
 	make down
@@ -10,9 +12,6 @@ remvimg:
 rmvcont:
 	make down
 	docker rm emseapi-api
-rmvol:
-	make down
-	docker volume rm emseapi_api_data
 rncn:
 	docker ps -a
 img:
@@ -28,13 +27,11 @@ quick-reup:
 
 reup:
 	make remvimg
-	make rmvol
 	make build
 	make up
 
 reup-clean:
 	make remvimg
-	make rmvol
 	make nocache
 	make up
 
@@ -44,12 +41,3 @@ regen:
 	docker exec -i back_end_api npx prisma generate
 prune:
 	docker system prune --all
-
-dev-clean:
-	make remvimg
-	make rmvol
-	make nocache
-	make dev
-
-dev:
-	yarn concurrently -n "server,types" -c "bgBlue.bold,bgMagenta.bold" "docker-compose up api" "npx onchange \"./src/*/schema.graphql\" -v -- yarn generate"

@@ -1,10 +1,11 @@
+import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
 import {
-	Resolver,
-	Query,
-	Args,
-	Mutation,
-} from "@nestjs/graphql";
-import { NewUser, UpdateUser, SocialInput, UserFields, SocialFields } from "gql/graphql";
+	UpdateUser,
+	SocialInput,
+	UserFields,
+	SocialFields,
+	User
+} from "gql/graphql";
 import { UserService } from "./user.service";
 
 @Resolver("User")
@@ -12,21 +13,12 @@ import { UserService } from "./user.service";
 export class UserResolver {
 	constructor(private readonly userService: UserService) {}
 
-	// Get all users
-	@Query("users")
-	async users() {
-		return await this.userService.users();
-	}
-
-	// Get a single user
+	// Get users by params in input
 	@Query("user")
-	async user(@Args("id") args: string) {
-		return await this.userService.user(args);
-	}
-
-	@Query("usersByParam")
-	async usersByParam(@Args("input") params: UserFields) {
-		return await this.userService.usersByParam(params);
+	async user(@Args("input") params: UserFields) {
+		const account = await this.userService.usersByParam(params);
+		if (!account) return new Error("User not found");
+		return account;
 	}
 
 	@Query("socials")
@@ -46,15 +38,9 @@ export class UserResolver {
 
 	@Query("instructorProfile")
 	async instructorProfile(@Args("id") id: string) {
-		const usr = await this.userService.user(id);
-		if(usr) return await this.userService.instructorProfile(usr.id);
-		else throw new Error("User not found");
-	}
-
-	@Mutation("createUser")
-	async createUser(@Args("input") args: NewUser) {
-		// return await this.userService.registerUser(args);
-		return
+		const usr = await this.user({ id });
+		if (usr instanceof Error) return new Error("User not found");
+		else return await this.userService.instructorProfile(usr[0].id);
 	}
 
 	@Mutation("updateUser")

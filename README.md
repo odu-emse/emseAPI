@@ -121,7 +121,6 @@ $ make regen
 
 ```shell
 emseAPI
-├── ALMP.postman_collection.json
 ├── CHANGELOG.md
 ├── Dockerfile
 ├── Makefile
@@ -168,7 +167,6 @@ This is where TypeScript, CI/CD and Docker configuration files are stored, as we
 
 ```shell
 emseAPI
-├── ALMP.postman_collection.json
 ├── CHANGELOG.md
 ├── Dockerfile
 ├── docker-compose.yml
