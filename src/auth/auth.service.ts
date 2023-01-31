@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { NewUser } from "@/types/graphql";
 import { PlanOfStudyResolver } from "@/pos/pos.resolver";
+import { Prisma } from "@prisma/client";
 
 type TokenType = {
 	sub: string;
@@ -85,18 +86,20 @@ export class AuthService {
 				});
 			}
 		} else {
+			const update = Prisma.validator<Prisma.UserUpdateInput>()({
+				...(sub && { openID: sub }),
+				...(email && { email }),
+				...(picture && { picURL: picture }),
+				...(given_name && { firstName: given_name }),
+				...(family_name && { lastName: family_name })
+			});
+			
 			//Update an existing user
 			return this.prisma.user.update({
 				where: {
 					openID: sub
 				},
-				data: {
-					...(sub && { openID: sub }),
-					...(email && { email }),
-					...(picture && { picURL: picture }),
-					...(given_name && { firstName: given_name }),
-					...(family_name && { lastName: family_name })
-				}
+				data: update
 			});
 		}
 	}
@@ -121,10 +124,14 @@ export class AuthService {
 			lastName
 		};
 
+		const create = Prisma.validator<Prisma.UserCreateInput>()({
+			...payload
+		});
+
 		///Avoids duplicate value(email) if the exist already
 		if (count === 0) {
 			return await this.prisma.user.create({
-				data: payload
+				data: create
 			});
 		} else {
 			return new Error("User has an account already.");

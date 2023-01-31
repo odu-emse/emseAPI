@@ -19,7 +19,8 @@ import {
 	CreateCollectionArgs,
 	LessonInput,
 	CreateContentArgs,
-	ContentFields
+	ContentFields,
+	NewModule
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
@@ -76,17 +77,17 @@ export class ProgramService {
 					include: {
 						student: {
 							include: {
-								student: true,
+								student: true
 							}
 						},
 						gradedBy: {
 							include: {
 								social: true,
-								instructorProfile: true,
+								instructorProfile: true
 							}
-						},
+						}
 					}
-				},
+				}
 			}
 		},
 		feedback: {
@@ -110,39 +111,42 @@ export class ProgramService {
 						},
 						content: true
 					}
-				},
+				}
 			}
 		},
 		course: true
 	});
 
-	private moduleFeedbackInclude = Prisma.validator<Prisma.ModuleFeedbackInclude>()({
-		student: true,
-		module: true
-	});
+	private moduleFeedbackInclude =
+		Prisma.validator<Prisma.ModuleFeedbackInclude>()({
+			student: true,
+			module: true
+		});
 
-	private assignmentResultInclude = Prisma.validator<Prisma.AssignmentResultInclude>()({
-		student: {
-			include: {
-				student: true,
+	private assignmentResultInclude =
+		Prisma.validator<Prisma.AssignmentResultInclude>()({
+			student: {
+				include: {
+					student: true
+				}
+			},
+			gradedBy: true,
+			assignment: {
+				include: {
+					module: true
+				}
 			}
-		},
-		gradedBy: true,
-		assignment: {
-			include: {
-				module: true,
-			}
-		}
-	});
+		});
 
-	private moduleEnrollmentInclude = Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
-		plan: {
-			include: {
-				student: true
-			}
-		},
-		module: true
-	});
+	private moduleEnrollmentInclude =
+		Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
+			plan: {
+				include: {
+					student: true
+				}
+			},
+			module: true
+		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
 		module: true,
@@ -171,7 +175,7 @@ export class ProgramService {
 				comments: true
 			}
 		}
-	})
+	});
 
 	async module(params: ModuleFields) {
 		const {
@@ -264,7 +268,7 @@ export class ProgramService {
 		if (objectives) {
 			payload["objectives"] = {
 				hasSome: objectives
-			} as Prisma.ModuleWhereInput['objectives'];
+			} as Prisma.ModuleWhereInput["objectives"];
 		}
 
 		return await this.prisma.module.findMany({
@@ -292,8 +296,12 @@ export class ProgramService {
 			};
 		}
 
+		const where = Prisma.validator<Prisma.CourseWhereInput>()({
+			...payload
+		});
+
 		return this.prisma.course.findMany({
-			where: payload,
+			where,
 			include: this.courseInclude
 		});
 	}
@@ -318,8 +326,7 @@ export class ProgramService {
 		});
 
 		return this.prisma.assignment.findMany({
-			where: where,
-
+			where,
 			include: this.assignmentInclude
 		});
 	}
@@ -336,8 +343,12 @@ export class ProgramService {
 		payload["studentId"] = student ? student : undefined;
 		payload["moduleId"] = module ? module : undefined;
 
+		const where = Prisma.validator<Prisma.ModuleFeedbackWhereInput>()({
+			...payload
+		});
+
 		return this.prisma.moduleFeedback.findMany({
-			where: payload,
+			where,
 			include: this.moduleFeedbackInclude
 		});
 	}
@@ -357,12 +368,15 @@ export class ProgramService {
 		payload["graderId"] = gradedBy ? gradedBy : undefined;
 		payload["assignmentId"] = assignment ? assignment : undefined;
 
+		const where = Prisma.validator<Prisma.AssignmentResultWhereInput>()({
+			...payload
+		});
+
 		return this.prisma.assignmentResult.findMany({
-			where: payload,
+			where,
 			include: this.assignmentResultInclude
 		});
 	}
-
 
 	async moduleEnrollment(params: ModEnrollmentFields) {
 		const { id, enrolledAt, role, module, plan } = params;
@@ -376,8 +390,12 @@ export class ProgramService {
 		payload["moduleId"] = module ? module : undefined;
 		payload["planId"] = plan ? plan : undefined;
 
+		const where = Prisma.validator<Prisma.ModuleEnrollmentWhereInput>()({
+			...payload
+		});
+
 		return this.prisma.moduleEnrollment.findMany({
-			where: payload,
+			where,
 			include: this.moduleEnrollmentInclude
 		});
 	}
@@ -400,13 +418,14 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, transcript, thread, collection, position } = input;
+		const { id, name, content, transcript, thread, collection, position } =
+			input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
 			...(transcript && { transcript }),
-			...(position && {position}),
+			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
 			threads: thread ? { some: { id: thread } } : undefined,
 			content: content ? { some: { id: content } } : undefined
@@ -474,18 +493,23 @@ export class ProgramService {
 	//Mutations
 
 	/// Create a new module
-	async addModule(data: Prisma.ModuleCreateInput) {
-		//find out if there is a duplicate user
-		const get = await this.prisma.module.findMany({
+	async addModule(data: NewModule) {
+		const countArgs = Prisma.validator<Prisma.ModuleFindManyArgs>()({
 			where: {
 				moduleNumber: data.moduleNumber
 			}
 		});
-		if (get.length !== 0) {
+		//find out if there is a duplicate user
+		const count = await this.prisma.module.count(countArgs);
+
+		if (count !== 0) {
 			throw new Error("Module already exists.");
 		} else {
+			const create = Prisma.validator<Prisma.ModuleCreateInput>()({
+				...data
+			});
 			return this.prisma.module.create({
-				data,
+				data: create,
 				include: this.moduleInclude
 			});
 		}
@@ -502,7 +526,7 @@ export class ProgramService {
 			keywords
 		} = data;
 
-		return this.prisma.module.update({
+		const args = Prisma.validator<Prisma.ModuleUpdateArgs>()({
 			where: {
 				id: data.id
 			},
@@ -513,7 +537,12 @@ export class ProgramService {
 				...(duration && { duration }),
 				...(numSlides && { numSlides }),
 				...(keywords && { keywords })
-			},
+			}
+		});
+
+		return this.prisma.module.update({
+			where: args.where,
+			data: args.data,
 			include: this.moduleInclude
 		});
 	}
@@ -606,14 +635,20 @@ export class ProgramService {
 	/// Change an assignments data
 	async updateAssignment(id: string, data: AssignmentInput) {
 		const { name, dueAt } = data;
-		return this.prisma.assignment.update({
+
+		const args = Prisma.validator<Prisma.AssignmentUpdateArgs>()({
 			where: {
 				id: id
 			},
 			data: {
 				...(name && { name }),
 				...(dueAt && { dueAt })
-			},
+			}
+		});
+
+		return this.prisma.assignment.update({
+			where: args.where,
+			data: args.data,
 			include: this.assignmentInclude
 		});
 	}
@@ -651,14 +686,17 @@ export class ProgramService {
 		input: ModuleFeedbackUpdate
 	): Promise<ModuleFeedback> {
 		const { feedback, rating } = input;
+
+		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateInput>()({
+			...(feedback && { feedback }),
+			...(rating && { rating })
+		});
+
 		return this.prisma.moduleFeedback.update({
 			where: {
 				id
 			},
-			data: {
-				...(feedback && { feedback }),
-				...(rating && { rating })
-			},
+			data: update,
 			include: this.moduleFeedbackInclude
 		});
 	}
@@ -715,7 +753,7 @@ export class ProgramService {
 			where: {
 				planID: plan,
 				moduleId: module
-			},
+			}
 		});
 
 		if (count !== 0) {
@@ -745,7 +783,7 @@ export class ProgramService {
 
 	/// Update a ModuleEnrollment
 	async updateModuleEnrollment(id: string, input: ModuleEnrollmentInput) {
-		return this.prisma.moduleEnrollment.update({
+		const args = Prisma.validator<Prisma.ModuleEnrollmentUpdateArgs>()({
 			where: {
 				id
 			},
@@ -753,7 +791,12 @@ export class ProgramService {
 				moduleId: input.module,
 				planID: input.plan,
 				role: input.role
-			},
+			}
+		});
+
+		return this.prisma.moduleEnrollment.update({
+			where: args.where,
+			data: args.data,
 			include: this.moduleEnrollmentInclude
 		});
 	}
@@ -776,7 +819,7 @@ export class ProgramService {
 						id: courseId
 					}
 				}
-			},
+			}
 		});
 
 		if (count != 0) {
@@ -911,7 +954,7 @@ export class ProgramService {
 					}
 				},
 				position: input.position ? input.position : undefined
-			},
+			}
 		});
 
 		return this.prisma.lesson.update({

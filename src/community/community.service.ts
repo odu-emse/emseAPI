@@ -203,16 +203,16 @@ export class CommunityService {
 	async updateThread(id: string, data: Prisma.ThreadUpdateInput) {
 		const { title, body } = data;
 		try {
-			return await this.prisma.thread.update({
-				where: {
-					id
-				},
-				data: {
-					...(title && { title }),
-					...(body && { body })
-				},
-				include: this.threadInclude
-			});
+      const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
+			  where: {
+				  id
+			  },
+			  data: {
+				  ...(title && { title }),
+				  ...(body && { body })
+			  }
+		  })
+		  return await this.prisma.thread.update(update);
 		} catch (e: any) {
 			return new Error(e);
 		}
