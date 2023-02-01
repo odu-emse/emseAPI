@@ -69,5 +69,18 @@ export class ProgressService {
 		return true;
 	}
 
-	async waiveModule(args: any) {}
+	async waiveModule(enrollmentID: string) {
+		const res = await this.prisma.progress.update({
+			where: { enrollmentID },
+			data: {
+				completed: {
+					set: true
+				},
+				status: 100,
+				updatedAt: new Date()
+			}
+		});
+		if (!res) return new Error("Progress could not be updated");
+		return res;
+	}
 }

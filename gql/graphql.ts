@@ -232,6 +232,12 @@ export interface ProgressArgs {
     enrollmentID?: Nullable<string>;
 }
 
+export interface ProgressWaiveArgs {
+    enrollmentID?: Nullable<string>;
+    moduleID?: Nullable<string>;
+    planID?: Nullable<string>;
+}
+
 export interface NewUser {
     openID: string;
     email: string;
@@ -349,7 +355,7 @@ export interface IMutation {
     updateContent(input: ContentFields): Nullable<Content> | Promise<Nullable<Content>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
     createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
-    waiveModule(input: ProgressArgs): Progress | Promise<Progress>;
+    waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
     deleteProgress(id: string): boolean | Promise<boolean>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;

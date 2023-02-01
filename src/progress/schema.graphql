@@ -37,6 +37,21 @@ input ProgressArgs {
     enrollmentID: ID
 }
 
+input ProgressWaiveArgs {
+    """
+    The database defined ID of the enrollment document that holds the progress to be waived. If this is given, the other parameters will be ignored.
+    """
+    enrollmentID: ID
+    """
+    The database defined ID of the module that holds the enrollment to be accredited.
+    """
+    moduleID: ID
+    """
+    The database defined ID of the plan of study that holds the enrollment to be accredited.
+    """
+    planID: ID
+}
+
 type Query {
     """
     Get a progress document by the given parameters. If no parameters are given, all progress documents will be returned. If the ID or enrollmentID is given, the other parameters will be ignored, and the returned document is always unique.
@@ -56,7 +71,7 @@ type Mutation {
     ): Progress!
 
     waiveModule(
-        input: ProgressArgs!
+        args: ProgressWaiveArgs!
     ): Progress!
 
     """
