@@ -120,6 +120,7 @@ Table Lesson {
   collectionID String
   position Int [not null, default: 0]
   content Content [not null]
+  quizzes Quiz [not null]
 }
 
 Table ModuleFeedback {
@@ -203,6 +204,42 @@ Table Progress {
   enrollmentID String [unique, not null]
 }
 
+Table Quiz {
+  id String [pk]
+  totalPoints Float [not null]
+  dueAt DateTime [not null]
+  timeLimit Int
+  numQuestions Int [not null]
+  minScore Float [not null, default: 0]
+  parentLesson Lesson [not null]
+  parentLessonID String [not null]
+}
+
+Table QuestionPool {
+  id String [pk]
+  questions Question [not null]
+}
+
+Table Question {
+  id String [pk]
+  number Int [not null]
+  parentPool QuestionPool [not null]
+  parentPoolID String [not null]
+  text String [not null]
+  points Float [not null]
+  answers Answer [not null]
+}
+
+Table Answer {
+  id String [pk]
+  text String [not null]
+  correct Boolean [not null]
+  weight Float
+  index String
+  parentQuestion Question [not null]
+  parentID String [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -263,3 +300,9 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 Ref: Content.parentID > Lesson.id
 
 Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
+
+Ref: Quiz.parentLessonID > Lesson.id
+
+Ref: Question.parentPoolID > QuestionPool.id
+
+Ref: Answer.parentID > Question.id

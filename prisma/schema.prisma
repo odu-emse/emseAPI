@@ -93,7 +93,6 @@ model Course {
 
   moduleIDs String[] @db.ObjectId
   module    Module[] @relation(fields: [moduleIDs], references: [id])
-
 }
 
 model Module {
@@ -120,7 +119,7 @@ model Module {
   subModuleIDs    String[]     @default([]) @db.ObjectId
   collections     Collection[] @relation(name: "collections")
 
-  courseIDs String[] @db.ObjectId @default([])
+  courseIDs String[] @default([]) @db.ObjectId
   course    Course[] @relation(fields: [courseIDs], references: [id])
 }
 
@@ -147,8 +146,8 @@ model Lesson {
   collectionID String?     @db.ObjectId
   position     Int         @default(0)
 
-  content      Content[]
-
+  content Content[]
+  quizzes Quiz[]
 }
 
 model ModuleFeedback {
@@ -165,7 +164,7 @@ model ModuleFeedback {
 model ModuleEnrollment {
   id         String           @id @default(auto()) @map("_id") @db.ObjectId
   enrolledAt DateTime         @default(now())
-  role       UserRole //Allow for instructors, graders and students to take part in the module.
+  role       UserRole // Allow for instructors, graders and students to take part in the module.
   status     EnrollmentStatus @default(INACTIVE)
 
   // Relation Fields
@@ -197,7 +196,7 @@ model AssignmentResult {
   // Relation Fields
   studentId    String      @db.ObjectId
   student      PlanOfStudy @relation(fields: [studentId], references: [id])
-  graderId     String      @db.ObjectId //Same thing as the advisor, issue here, technically this should work but there is now a reference in User that doesnt need to exist maybe a module enrollment relation works better?
+  graderId     String      @db.ObjectId // Same thing as the advisor, issue here, technically this should work but there is now a reference in User that doesnt need to exist maybe a module enrollment relation works better?
   gradedBy     User        @relation(name: "graded", fields: [graderId], references: [id])
   assignmentId String      @db.ObjectId
   assignment   Assignment  @relation(fields: [assignmentId], references: [id])
@@ -223,22 +222,61 @@ model Thread {
 }
 
 model Content {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  type  String
-  link  String
-  parent Lesson @relation(fields: [parentID], references: [id])
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  type     String
+  link     String
+  parent   Lesson @relation(fields: [parentID], references: [id])
   parentID String @db.ObjectId
 }
 
 model Progress {
-	id String @id @default(auto()) @map("_id") @db.ObjectId
-	createdAt DateTime @default(now())
-	updatedAt DateTime @default(now()) @updatedAt
-	status Float @default(0)
-	completed Boolean @default(false)
-	// Relation Fields
-	enrollment ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
-	enrollmentID String @unique
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @default(now()) @updatedAt
+  status       Float            @default(0)
+  completed    Boolean          @default(false)
+  // Relation Fields
+  enrollment   ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
+  enrollmentID String           @unique
+}
+
+// Generic template for a quiz. These will belong to a lesson.
+model Quiz {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  totalPoints    Float
+  dueAt          DateTime
+  // startedAt      DateTime? Save these for responses
+  // submittedAt    DateTime?
+  timeLimit      Int?
+  numQuestions   Int
+  minScore       Float    @default(0.0)
+  parentLesson   Lesson   @relation(fields: [parentLessonID], references: [id])
+  parentLessonID String   @db.ObjectId
+}
+
+model QuestionPool {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  questions Question[]
+}
+
+model Question {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  number       Int
+  parentPool   QuestionPool @relation(fields: [parentPoolID], references: [id])
+  parentPoolID String       @db.ObjectId
+  text         String
+  points       Float
+  answers      Answer[]
+}
+
+model Answer {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  text           String
+  correct        Boolean
+  weight         Float?
+  index          String?
+  parentQuestion Question @relation(fields: [parentID], references: [id])
+  parentID       String   @db.ObjectId
 }
 
 enum UserRole {

@@ -1,0 +1,104 @@
+type Quiz {
+    """ 
+    The document ID For this quiz
+    """
+    id: ID!
+    """
+    The total amount of points possible on thie quiz
+    """
+    totalPoints: Float!
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The alloted time to take this quiz in ms
+    """
+    timeLimit: Date
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int!
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float!
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: Lesson!
+    """
+    The question pool being used to generate the questions for this quiz
+    """
+    questionPool: QuestionPool!
+}
+
+type QuestionPool {
+    """
+    The document ID for this question pool
+    """
+    id: ID!
+    """
+    The questions in this question pool
+    """
+    questions: [Question!]!
+    """
+    The quizzes that are built using this question pool
+    """
+    quizzes: [Quiz!]!
+}
+
+type Question {
+    """
+    The document ID of the question
+    """
+    id: ID!
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int!
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String!
+    """
+    The amount of points this question is worth
+    """
+    points: Float!
+    """
+    The pool this question belongs to
+    """
+    parentPool: QuestionPool!
+    """
+    The possible answers to this question
+    """
+    answers: [Answer!]!
+}
+
+type Answer {
+    """
+    The document ID of this answer
+    """
+    id: ID!
+    """
+    The actual human readable text of this answer
+    """
+    text: String!
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean!
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: Question!
+
+}

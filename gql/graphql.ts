@@ -522,6 +522,41 @@ export interface Progress {
     enrollment: ModuleEnrollment;
 }
 
+export interface Quiz {
+    id: string;
+    totalPoints: number;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<Date>;
+    numQuestions: number;
+    minScore: number;
+    parentLesson: Lesson;
+    questionPool: QuestionPool;
+}
+
+export interface QuestionPool {
+    id: string;
+    questions: Question[];
+    quizzes: Quiz[];
+}
+
+export interface Question {
+    id: string;
+    number: number;
+    text: string;
+    points: number;
+    parentPool: QuestionPool;
+    answers: Answer[];
+}
+
+export interface Answer {
+    id: string;
+    text: string;
+    correct: boolean;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion: Question;
+}
+
 export interface Social {
     id: string;
     twitter?: Nullable<string>;
