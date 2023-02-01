@@ -11,9 +11,6 @@ import { Kind, ValueNode } from "graphql";
 import { AuthModule } from "./auth/auth.module";
 import type { Moment } from "moment";
 import { CommunityModule } from "./community/community.module";
-import { QuizResolver } from './quiz/quiz.resolver';
-import { QuizService } from './quiz/quiz.service';
-import { QuizModule } from './quiz/quiz.module';
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
@@ -58,9 +55,8 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		ProgramModule,
 		AuthModule,
 		CommunityModule,
-		QuizModule
 	],
 	controllers: [],
-	providers: [DateScalar, QuizResolver, QuizService]
+	providers: [DateScalar]
 })
 export class AppModule {}
