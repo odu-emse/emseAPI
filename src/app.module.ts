@@ -11,6 +11,9 @@ import { Kind, ValueNode } from "graphql";
 import { AuthModule } from "./auth/auth.module";
 import type { Moment } from "moment";
 import { CommunityModule } from "./community/community.module";
+import { QuizResolver } from './quiz/quiz.resolver';
+import { QuizService } from './quiz/quiz.service';
+import { QuizModule } from './quiz/quiz.module';
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
@@ -41,7 +44,7 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			cors: {
 				credentials: true,
-				origin: ["http://localhost:3000", "http://localhost:4000"]
+				origin: ["http://localhost:3000", "http://localhost:4000", "http://localhost:6006"]
 			},
 			playground: true,
 			debug: process.env.NODE_ENV !== "production",
@@ -54,9 +57,10 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		PoSModule,
 		ProgramModule,
 		AuthModule,
-		CommunityModule
+		CommunityModule,
+		QuizModule
 	],
 	controllers: [],
-	providers: [DateScalar]
+	providers: [DateScalar, QuizResolver, QuizService]
 })
 export class AppModule {}
