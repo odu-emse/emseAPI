@@ -9,9 +9,11 @@ import {
 	Course,
 	PlanOfStudy,
 	User,
-	CreateCollectionArgs
+	CreateCollectionArgs,
+	NewModule
 } from "gql/graphql";
 import { Prisma } from "@prisma/client";
+import { UserInputError } from "apollo-server-express";
 
 interface IAssignment extends Assignment {
 	id: string;
@@ -278,7 +280,7 @@ describe("Collection", () => {
 	let prisma: PrismaService;
 	prisma = new PrismaService();
 
-	const createModule = async (input: Prisma.ModuleCreateInput) => {
+	const createModule = async (input: NewModule) => {
 		return await resolver.create(input);
 	};
 
@@ -318,7 +320,8 @@ describe("Collection", () => {
 			duration: 1,
 			intro: "Test Intro",
 			numSlides: 1,
-			description: "Test Description"
+			description: "Test Description",
+			keywords: ["test", "keyword"]
 		});
 
 		testingModuleID = module.id;
