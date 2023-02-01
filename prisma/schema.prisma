@@ -120,7 +120,7 @@ model Module {
   subModuleIDs    String[]     @default([]) @db.ObjectId
   collections     Collection[] @relation(name: "collections")
 
-  courseIDs String[] @db.ObjectId
+  courseIDs String[] @db.ObjectId @default([])
   course    Course[] @relation(fields: [courseIDs], references: [id])
 }
 
