@@ -146,7 +146,8 @@ export class ProgramService {
 					student: true
 				}
 			},
-			module: true
+			module: true,
+			progress: true
 		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({

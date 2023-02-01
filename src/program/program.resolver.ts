@@ -33,14 +33,22 @@ export class ProgramResolver {
 
 	// Get Module(s)
 	@Query("module")
-	async module(@Args("input") args: ModuleFields, @Args("memberRole") role: UserRole) {
+	async module(
+		@Args("input") args: ModuleFields,
+		@Args("memberRole") role: UserRole
+	) {
 		const result = await this.programService.module(args);
+		if (!result) {
+			return new Error("Module not found");
+		}
 		if (!role) {
 			return result;
 		} else {
-			const filterRes = result.map((module) =>{
+			const filterRes = result.map((module) => {
 				const thisModule = module;
-				thisModule.members = module.members.filter((value) => value.role === role);
+				thisModule.members = module.members.filter(
+					(value) => value.role === role
+				);
 				return thisModule;
 			});
 
