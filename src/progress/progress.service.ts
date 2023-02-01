@@ -21,9 +21,9 @@ export class ProgressService {
 				where: { id: args.id },
 				include: this.progressIncludes
 			});
-			const res = this.prisma.progress.findUnique(unique);
+			const res = await this.prisma.progress.findUnique(unique);
 			if (!res) return new Error("Progress not found");
-			return [res];
+			return res;
 		}
 
 		// since enrollmentID is a unique field, we can use it to find a single progress
@@ -32,12 +32,12 @@ export class ProgressService {
 				where: { enrollmentID: args.enrollmentID },
 				include: this.progressIncludes
 			});
-			const res = this.prisma.progress.findUnique(unique);
+			const res = await this.prisma.progress.findUnique(unique);
 			if (!res) return new Error("Progress not found");
-			return [res];
+			return res;
 		}
 
-		const response = this.prisma.progress.findMany({
+		const response = await this.prisma.progress.findMany({
 			where,
 			include: this.progressIncludes
 		});
