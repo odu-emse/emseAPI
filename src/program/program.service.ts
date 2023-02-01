@@ -68,7 +68,8 @@ export class ProgramService {
 					include: {
 						student: true
 					}
-				}
+				},
+				progress: true
 			}
 		},
 		assignments: {

@@ -417,6 +417,7 @@ export interface ModuleEnrollment {
     module: Module;
     plan?: Nullable<PlanOfStudy>;
     inactivePlan?: Nullable<PlanOfStudy>;
+    progress: Progress;
 }
 
 export interface AssignmentResult {

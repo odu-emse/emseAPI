@@ -44,6 +44,10 @@ type ModuleEnrollment {
 	Inactive plan of study
 	"""
 	inactivePlan: PlanOfStudy
+	"""
+	The progress that this enrollment is associated with (one-to-one)
+	"""
+	progress: Progress!
 }
 
 type AssignmentResult {
