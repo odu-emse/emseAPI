@@ -28,7 +28,7 @@ jobs:
       - name: Export DB URL
         run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
       - name: Generate Prisma types
-        run: yarn db:generate
+        run: yarn generate
       - name: Build application
         run: yarn nest build
   test:
@@ -51,7 +51,7 @@ jobs:
       - name: Generate types
         run: yarn generate
       - name: Run test suite
-        run: yarn test
+        run: yarn jest
   coverage:
     needs: [test]
     runs-on: ubuntu-latest
