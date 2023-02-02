@@ -1,13 +1,13 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
 import {
     AnswerFields,
-    ICreateQuestion,
-    ICreateQuiz,
-    IUpdateQuiz,
-    IUpdateQuestion,
+    CreateQuestion,
+    CreateQuiz,
+    UpdateQuiz,
+    UpdateQuestion,
     QuestionFields,
     QuestionPoolFields,
-    QuizFields, ICreateAnswer, IUpdateAnswer
+    QuizFields, CreateAnswer, UpdateAnswer
 } from "gql/graphql"
 
 @Resolver()
@@ -34,12 +34,12 @@ export class QuizResolver {
     }
 
     @Mutation("createQuiz")
-    async createQuiz(@Args("input") input: ICreateQuiz) {
+    async createQuiz(@Args("input") input: CreateQuiz) {
         return;
     }
 
     @Mutation("updateQuiz")
-    async updateQuiz(@Args("input") input: IUpdateQuiz) {
+    async updateQuiz(@Args("input") input: UpdateQuiz) {
         return;
     }
 
@@ -59,12 +59,12 @@ export class QuizResolver {
     }
 
     @Mutation("createQuestion")
-    async createQuestion(@Args("input") input: ICreateQuestion) {
+    async createQuestion(@Args("input") input: CreateQuestion) {
         return;
     }
 
     @Mutation("updateQuestion")
-    async updateQuestion(@Args("selectors") selectors: QuestionFields, @Args("values") values: IUpdateQuestion) {
+    async updateQuestion(@Args("selectors") selectors: QuestionFields, @Args("values") values: UpdateQuestion) {
         return;
     }
 
@@ -74,12 +74,12 @@ export class QuizResolver {
     }
 
     @Mutation("createAnswer")
-    async createAnswer(@Args("input") input: ICreateAnswer) {
+    async createAnswer(@Args("input") input: CreateAnswer) {
         return;
     }
 
     @Mutation("updateAnswer")
-    async updateAnswer(@Args("selector") selector: AnswerFields, @Args("values") values: IUpdateAnswer) {
+    async updateAnswer(@Args("selector") selector: AnswerFields, @Args("values") values: UpdateAnswer) {
         return;
     }
 
