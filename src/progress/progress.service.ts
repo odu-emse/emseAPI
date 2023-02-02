@@ -84,9 +84,16 @@ export class ProgressService {
 		return res;
 	}
 
-	async updateProgress(id: string, status: number) {
+	async updateProgress(
+		status: number,
+		id?: string | null | undefined,
+		enrollmentID?: string | null | undefined
+	) {
 		const args = Prisma.validator<Prisma.ProgressUpdateArgs>()({
-			where: { id },
+			where: {
+				enrollmentID: enrollmentID ? enrollmentID : undefined,
+				id: id ? id : undefined
+			},
 			data: {
 				status,
 				completed: {
@@ -95,8 +102,12 @@ export class ProgressService {
 			},
 			include: this.progressIncludes
 		});
-		const res = this.prisma.progress.update(args);
-		if (!res) return new Error("Progress could not be updated");
-		return res;
+		try {
+			return await this.prisma.progress.update(args);
+		} catch (err) {
+			//TODO: fix this by checking if the error is a RecordNotFound exception thrown by prisma
+			//@ts-ignore
+			return new Error(err.detail);
+		}
 	}
 }

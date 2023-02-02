@@ -154,9 +154,25 @@ export class ProgressResolver {
 	}
 
 	@Mutation("updateProgress")
-	async updateProgress(@Args("id") id: string, @Args("status") status: number) {
-		const response = await this.progressService.updateProgress(id, status);
-		if (response instanceof Error) return new Error(response.message);
-		else return response;
+	async updateProgress(
+		@Args("status") status: number,
+		@Args("id") id?: string | null | undefined,
+		@Args("enrollmentID") enrollmentID?: string | null | undefined
+	) {
+		if (status > 100) return new Error("Progress cannot be greater than 100");
+		if (status < 0) return new Error("Progress cannot be less than 0");
+		if (!enrollmentID && !id)
+			return new Error(
+				"No ID specified. Please provide an enrollment ID or a progress ID"
+			);
+		else {
+			const response = await this.progressService.updateProgress(
+				status,
+				id,
+				enrollmentID
+			);
+			if (response instanceof Error) return new Error(response.message);
+			else return response;
+		}
 	}
 }

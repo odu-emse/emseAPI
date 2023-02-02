@@ -262,4 +262,4 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Content.parentID > Lesson.id
 
-Ref: Progress.enrollmentID - ModuleEnrollment.id
+Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]

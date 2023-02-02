@@ -84,8 +84,21 @@ type Mutation {
         id: ID!
     ): Boolean!
 
+    """
+    Update a progress document by either the Progress document's ID or by the enrollmentID. Returns the updated document if successful, Error otherwise.
+    """
     updateProgress(
-        id: ID!
+        """
+        The status of the progress in a Float or Int
+        """
         status: Float!
+        """
+        The database defined ID of the progress document to be updated. If this is given, the enrollmentID parameters will be ignored.
+        """
+        id: ID
+        """
+        The database defined ID of the enrollment document that holds the progress to be updated. If this is given, the id parameter will be ignored.
+        """
+        enrollmentID: ID
     ): Progress!
 }
