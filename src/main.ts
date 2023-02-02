@@ -7,7 +7,7 @@ import sourceMapSupport from "source-map-support";
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		cors: {
-			origin: "http://localhost:3000",
+			origin: ["http://localhost:3000", "http://localhost:6006"],
 			credentials: true
 		},
 		logger: ["error", "warn", "debug", "verbose", "log"]
