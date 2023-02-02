@@ -897,11 +897,13 @@ export class ProgramService {
 		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
 			data: {
 				name: input.name,
-				content: {
-					connect: {
-						id: input.content ? input.content : undefined
+				...(input.content !== null && input.content !== undefined && {
+					content: {
+						connect: {
+							id: input.content
+						}
 					}
-				},
+				}),
 				transcript: input.transcript,
 				collection: {
 					connect: {
