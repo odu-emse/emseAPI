@@ -1,6 +1,10 @@
 import { PlanOfStudyResolver } from "@/pos";
 import { ProgramResolver } from "@/program";
-import { EnrollmentStatus, UserRole } from "@/types/graphql";
+import {
+	CreateCollectionArgs,
+	EnrollmentStatus,
+	UserRole
+} from "@/types/graphql";
 
 export const shuffle = (str) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -49,4 +53,12 @@ export const createEnrollment = async (
 	const enrollment = await resolver.addModuleEnrollment({ ...config });
 	if (enrollment) return enrollment;
 	else return new Error("Failed to create enrollment");
+};
+
+export const createCollection = async (
+	resolver: ProgramResolver,
+	input: CreateCollectionArgs
+) => {
+	const collection = await resolver.createCollection(input);
+	if (collection) return collection;
 };

@@ -14,6 +14,7 @@ import {
 } from "gql/graphql";
 import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
+import { createCollection, createModule } from "../../utils/tests";
 
 interface IAssignment extends Assignment {
 	id: string;
@@ -283,14 +284,6 @@ describe("Collection", () => {
 	let prisma: PrismaService;
 	prisma = new PrismaService();
 
-	const createModule = async (input: NewModule) => {
-		return await resolver.create(input);
-	};
-
-	const createCollection = async (input: CreateCollectionArgs) => {
-		return await resolver.createCollection(input);
-	};
-
 	const deleteModule = async (id: string) => {
 		return await prisma.module.delete({
 			where: { id }
@@ -317,25 +310,27 @@ describe("Collection", () => {
 		service = new ProgramService(prisma);
 		resolver = new ProgramResolver(service);
 
-		const module = await createModule({
+		const module = await createModule(resolver, {
 			moduleName: "Test Module",
-			moduleNumber: 1,
+			moduleNumber: 10,
 			duration: 1,
 			intro: "Test Intro",
 			numSlides: 1,
 			description: "Test Description",
 			keywords: ["test", "keyword"]
 		});
+		if (module instanceof Error) throw new Error(module.message);
 
 		testingModuleID = module.id;
 
-		const collection = await createCollection({
+		const collection = await createCollection(resolver, {
 			name: "Test Collection",
 			moduleID: testingModuleID,
 			lessons,
 			positionIndex: 0
 		});
-
+		if (typeof collection === "undefined")
+			throw new Error("Collection is undefined");
 		testingCollectionID = collection.id;
 	});
 	afterAll(async () => {
