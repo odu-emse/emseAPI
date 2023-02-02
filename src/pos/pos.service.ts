@@ -14,7 +14,7 @@ export class PoSService {
 					include: {
 						feedback: true,
 						assignments: true,
-						members: true,
+						members: true
 						// parentCourses: {
 						// 	include: {
 						// 		course: true
@@ -33,7 +33,7 @@ export class PoSService {
 		},
 		student: true
 	});
-	
+
 	//✅ Find all plans recorded in the system
 	async plans(): Promise<PlanOfStudy[]> {
 		return await this.prisma.planOfStudy.findMany({
@@ -97,10 +97,12 @@ export class PoSService {
 			...payload
 		});
 
-		return this.prisma.planOfStudy.findMany({
+		const res = await this.prisma.planOfStudy.findMany({
 			where,
 			include: this.PlanOfStudyInclude
 		});
+		if (!res || res.length === 0) return new Error("No plan found");
+		else return res;
 	}
 
 	// TODO: Allow for starting modules and courses
