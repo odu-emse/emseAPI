@@ -133,7 +133,7 @@ model Collection {
 
   // Relation fields
   lessons  Lesson[]
-  module   Module   @relation(name: "collections", fields: [moduleID], references: [id])
+  module   Module   @relation(name: "collections", fields: [moduleID], references: [id], onDelete: Cascade)
   moduleID String   @db.ObjectId
 }
 
@@ -143,7 +143,7 @@ model Lesson {
   transcript   String?
   threads      Thread[]
   // TODO: Should not be empty EVER
-  collection   Collection? @relation(fields: [collectionID], references: [id])
+  collection   Collection? @relation(fields: [collectionID], references: [id], onDelete: Cascade)
   collectionID String?     @db.ObjectId
   position     Int         @default(0)
 

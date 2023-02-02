@@ -232,9 +232,9 @@ Ref: Module.subModuleIDs > Module.id
 
 Ref: Module.courseIDs > Course.id
 
-Ref: Collection.moduleID > Module.id
+Ref: Collection.moduleID > Module.id [delete: Cascade]
 
-Ref: Lesson.collectionID > Collection.id
+Ref: Lesson.collectionID > Collection.id [delete: Cascade]
 
 Ref: ModuleFeedback.studentId > User.id
 

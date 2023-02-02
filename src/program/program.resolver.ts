@@ -33,10 +33,7 @@ export class ProgramResolver {
 
 	// Get Module(s)
 	@Query("module")
-	async module(
-		@Args("input") args: ModuleFields,
-		@Args("memberRole") role: UserRole
-	) {
+	async module(@Args("input") args: ModuleFields, @Args("memberRole") role?: UserRole) {
 		const result = await this.programService.module(args);
 		if (!result) {
 			return new Error("Module not found");
