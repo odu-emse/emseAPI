@@ -238,6 +238,91 @@ export interface ProgressWaiveArgs {
     planID?: Nullable<string>;
 }
 
+export interface QuizFields {
+    id?: Nullable<string>;
+    totalPoints?: Nullable<number>;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<Date>;
+    numQuestions?: Nullable<number>;
+    minScore?: Nullable<number>;
+    parentLesson?: Nullable<string>;
+    questionPool?: Nullable<string>;
+}
+
+export interface QuestionPoolFields {
+    id?: Nullable<string>;
+    questions?: Nullable<string[]>;
+    quizzes?: Nullable<string[]>;
+}
+
+export interface QuestionFields {
+    id?: Nullable<string>;
+    number?: Nullable<number>;
+    text?: Nullable<string>;
+    points?: Nullable<number>;
+    parentPool?: Nullable<string>;
+    answers?: Nullable<string[]>;
+}
+
+export interface AnswerFields {
+    id?: Nullable<string>;
+    text?: Nullable<string>;
+    correct?: Nullable<boolean>;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion?: Nullable<string>;
+}
+
+export interface ICreateQuiz {
+    totalPoints: number;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<Date>;
+    numQuestions: number;
+    minScore: number;
+    parentLesson: string;
+    questionPool: string;
+}
+
+export interface IUpdateQuiz {
+    totalPoints?: Nullable<number>;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<Date>;
+    numQuestions?: Nullable<number>;
+    minScore?: Nullable<number>;
+    parentLesson?: Nullable<string>;
+    questionPool?: Nullable<string>;
+}
+
+export interface ICreateQuestion {
+    number: number;
+    text: string;
+    points: number;
+    parentPool: string;
+}
+
+export interface IUpdateQuestion {
+    number?: Nullable<number>;
+    text?: Nullable<string>;
+    points?: Nullable<number>;
+    parentPool?: Nullable<string>;
+}
+
+export interface ICreateAnswer {
+    text: string;
+    correct: boolean;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion: string;
+}
+
+export interface IUpdateAnswer {
+    text?: Nullable<string>;
+    correct?: Nullable<boolean>;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion?: Nullable<string>;
+}
+
 export interface NewUser {
     openID: string;
     email: string;
@@ -358,6 +443,17 @@ export interface IMutation {
     waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
     deleteProgress(id: string): boolean | Promise<boolean>;
     updateProgress(status: number, id?: Nullable<string>, enrollmentID?: Nullable<string>): Progress | Promise<Progress>;
+    createQuiz(input?: Nullable<ICreateQuiz>): Quiz | Promise<Quiz>;
+    updateQuiz(selectors: QuizFields, values: IUpdateQuiz): Quiz[] | Promise<Quiz[]>;
+    deleteQuiz(id: string): Quiz | Promise<Quiz>;
+    createQuestionPool(): QuestionPool | Promise<QuestionPool>;
+    deleteQuestionPool(id: string): QuestionPool | Promise<QuestionPool>;
+    createQuestion(input?: Nullable<ICreateQuestion>): Question[] | Promise<Question[]>;
+    updateQuestion(selectors: QuestionFields, values: IUpdateQuestion): Question[] | Promise<Question[]>;
+    deleteQuestion(id: string): Question | Promise<Question>;
+    createAnswer(input: ICreateAnswer): Answer | Promise<Answer>;
+    updateAnswer(selector: AnswerFields, values: IUpdateAnswer): Answer[] | Promise<Answer[]>;
+    deleteAnswer(id: string): Answer | Promise<Answer>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -386,6 +482,10 @@ export interface IQuery {
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
+    quiz(input: QuizFields): Quiz[] | Promise<Quiz[]>;
+    questionPool(input: QuestionPoolFields): QuestionPool[] | Promise<QuestionPool[]>;
+    question(input: QuestionFields): Question[] | Promise<Question[]>;
+    answer(input: AnswerFields): Answer[] | Promise<Answer[]>;
     user(input?: Nullable<UserFields>): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
