@@ -83,4 +83,20 @@ export class ProgressService {
 		if (!res) return new Error("Progress could not be updated");
 		return res;
 	}
+
+	async updateProgress(id: string, status: number) {
+		const args = Prisma.validator<Prisma.ProgressUpdateArgs>()({
+			where: { id },
+			data: {
+				status,
+				completed: {
+					set: status === 100
+				}
+			},
+			include: this.progressIncludes
+		});
+		const res = this.prisma.progress.update(args);
+		if (!res) return new Error("Progress could not be updated");
+		return res;
+	}
 }

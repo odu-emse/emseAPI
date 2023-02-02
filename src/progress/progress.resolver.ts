@@ -69,26 +69,22 @@ export class ProgressResolver {
 					role: UserRole.STUDENT,
 					status: EnrollmentStatus.ACTIVE
 				});
-				// check if enrollment was created successfully
-				if (enrollment instanceof Error) return new Error(enrollment.message);
-				else {
-					// enrollment created, so we can create a new progress document
-					const progress = await this.createProgress(
-						{
-							status: 100,
-							completed: true,
-							enrollment: {
-								connect: {
-									id: enrollment.id
-								}
+				// enrollment created, so we can create a new progress document
+				const progress = await this.createProgress(
+					{
+						status: 100,
+						completed: true,
+						enrollment: {
+							connect: {
+								id: enrollment.id
 							}
-						},
-						enrollment.id
-					);
-					if (progress instanceof Error) return new Error(progress.message);
-					// progress created, so we can return it
-					else return progress;
-				}
+						}
+					},
+					enrollment.id
+				);
+				if (progress instanceof Error) return new Error(progress.message);
+				// progress created, so we can return it
+				else return progress;
 			}
 		}
 		// if enrollmentID is provided, we can use it to find the enrollment and create a new progress document or find the existing one
@@ -155,5 +151,12 @@ export class ProgressResolver {
 	@Mutation("deleteProgress")
 	async deleteProgress(@Args("id") id: string) {
 		return await this.progressService.deleteProgress(id);
+	}
+
+	@Mutation("updateProgress")
+	async updateProgress(@Args("id") id: string, @Args("status") status: number) {
+		const response = await this.progressService.updateProgress(id, status);
+		if (response instanceof Error) return new Error(response.message);
+		else return response;
 	}
 }

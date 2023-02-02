@@ -83,4 +83,9 @@ type Mutation {
         """
         id: ID!
     ): Boolean!
+
+    updateProgress(
+        id: ID!
+        status: Float!
+    ): Progress!
 }
