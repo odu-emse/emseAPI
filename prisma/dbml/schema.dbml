@@ -202,11 +202,14 @@ Table Quiz {
   minScore Float [not null, default: 0]
   parentLesson Lesson [not null]
   parentLessonID String [not null]
+  questionPool QuestionPool [not null]
+  questionPoolID String [not null]
 }
 
 Table QuestionPool {
   id String [pk]
   questions Question [not null]
+  quizzes Quiz [not null]
 }
 
 Table Question {
@@ -289,6 +292,8 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 Ref: Content.parentID > Lesson.id
 
 Ref: Quiz.parentLessonID > Lesson.id
+
+Ref: Quiz.questionPoolID > QuestionPool.id
 
 Ref: Question.parentPoolID > QuestionPool.id
 

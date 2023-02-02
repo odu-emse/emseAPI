@@ -4,7 +4,7 @@ type Quiz {
     """
     id: ID!
     """
-    The total amount of points possible on thie quiz
+    The total amount of points possible on the quiz
     """
     totalPoints: Float!
     """
@@ -12,7 +12,7 @@ type Quiz {
     """
     dueAt: Date
     """
-    The alloted time to take this quiz in ms
+    The allotted time to take this quiz in ms
     """
     timeLimit: Date
     """
@@ -94,6 +94,7 @@ type Answer {
     weight: Float
     """
     The index of the answer when listed (A, B, C, D, etc.)
+    If no value is specified then the order will be random when queried
     """
     index: String
     """
@@ -101,4 +102,335 @@ type Answer {
     """
     parentQuestion: Question!
 
+}
+
+input QuizFields {
+    """
+    The document ID For this quiz
+    """
+    id: ID
+    """
+    The total amount of points possible on this quiz
+    """
+    totalPoints: Float
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The allotted time to take this quiz in ms
+    """
+    timeLimit: Date
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: ID
+    """
+    The question pool being used to generate the questions for this quiz
+    """
+    questionPool: ID
+}
+
+input QuestionPoolFields {
+    """
+    The document ID for this question pool
+    """
+    id: ID
+    """
+    The questions in this question pool
+    """
+    questions: [ID!]
+    """
+    The quizzes that are built using this question pool
+    """
+    quizzes: [ID!]
+}
+
+input QuestionFields {
+    """
+    The document ID of the question
+    """
+    id: ID
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String
+    """
+    The amount of points this question is worth
+    """
+    points: Float
+    """
+    The pool this question belongs to
+    """
+    parentPool: ID
+    """
+    The possible answers to this question
+    """
+    answers: [ID!]
+}
+
+input AnswerFields {
+    """
+    The document ID of this answer
+    """
+    id: ID
+    """
+    The actual human readable text of this answer
+    """
+    text: String
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: ID
+}
+
+type Query {
+    """
+    Fetch a Quiz by any of its parameters. an empty object will return all quizzes and a single id will return a single quiz
+    """
+    quiz(input: QuizFields!): [Quiz!]!
+    """
+    Fetch a QuizPool by any of its parameters. An empty object as the input parameter will return all Pools, an ID will retrieve an array with just a single pool.
+    If a combination of parameters are used then only documents that match all the parameters will be included in the array.
+    """
+    questionPool(input: QuestionPoolFields!): [QuestionPool!]!
+    """
+    Fetch a Question by any of its parameters. An empty object as the input parameter will return all Questions, an ID will retrieve an array with just a single Question.
+    If a only a pool ID is provided than all questions in that pool will be returned.
+    If a combination of parameters are used then only documents that match all the parameters will be included in the array.
+    """
+    question(input: QuestionFields!): [Question!]!
+    """
+    Fetch an Answer by any of its parameters. An empty object as the input parameter will return all Answers, an ID will retrieve an array with just a single Answer.
+    If a only a Question ID is provided than all answers for that question will be returned.
+    If a combination of parameters are used then only documents that match all the parameters will be included in the array.
+    """
+    answer(input: AnswerFields!): [Answer!]!
+}
+
+# Mutations and relevant inputs
+
+input ICreateQuiz {
+    """
+    The total amount of points possible on this quiz
+    """
+    totalPoints: Float!
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The allotted time to take this quiz in ms
+    """
+    timeLimit: Date
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int!
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float!
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: ID!
+    """
+    The question pool being used to generate the questions for this quiz
+    """
+    questionPool: ID!
+}
+
+input IUpdateQuiz {
+    """
+    The total amount of points possible on this quiz
+    """
+    totalPoints: Float
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The allotted time to take this quiz in ms
+    """
+    timeLimit: Date
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: ID
+    """
+    The question pool being used to generate the questions for this quiz
+    """
+    questionPool: ID
+}
+
+input ICreateQuestion {
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int!
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String!
+    """
+    The amount of points this question is worth
+    """
+    points: Float!
+    """
+    The pool this question belongs to
+    """
+    parentPool: ID!
+}
+
+input IUpdateQuestion {
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String
+    """
+    The amount of points this question is worth
+    """
+    points: Float
+    """
+    The pool this question belongs to
+    """
+    parentPool: ID
+}
+
+input ICreateAnswer {
+    """
+    The actual human readable text of this answer
+    """
+    text: String!
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean!
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: ID!
+}
+
+input IUpdateAnswer {
+    """
+    The actual human readable text of this answer
+    """
+    text: String
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: ID
+}
+
+type Mutation {
+    """
+    Create a new quiz record and associate it with its parent Lesson
+    """
+    createQuiz(input: ICreateQuiz): Quiz!
+    """
+    Update the parameters of an existing quiz or quizzes given a list of selectors
+    These selectors are any parameters that could exist within a quiz and function in a similar way to the quiz() query
+    """
+    updateQuiz(selectors: QuizFields!, values: IUpdateQuiz!): [Quiz!]!
+    """
+    Delete a quiz record given its document ID
+    """
+    deleteQuiz(id: ID!): Quiz!
+    """
+    Create a new question pool record. This will not take any parameters as by default it will have no quizzes or
+    questions associated. These fields will be populated and modified via the Quiz and Question Mutations
+    """
+    createQuestionPool: QuestionPool!
+    """
+    Delete a question pool by its document ID.
+    It is important to note that deleting a question pool will delete all associated questions and quizzes
+    """
+    deleteQuestionPool(id: ID!): QuestionPool!
+    """
+    Create a new question. This new question must be associated with a question pool to be created
+    """
+    createQuestion(input: ICreateQuestion): [Question!]!
+    """
+    Update a single or multiple questions based upon selector fields given to it.
+    The selector fields will be a list of optional parameters that match QuestionFields.
+    All questions that match the selector parameters will be updated with the input data
+    """
+    updateQuestion(selectors: QuestionFields!, values: IUpdateQuestion!): [Question!]!
+    """
+    Delete an existing question record give its document ID.
+    It is important to note that deleting a question will also delete ALL associated Answer records
+    """
+    deleteQuestion(id: ID!): Question!
+    """
+    Create a new answer to a question. The answer must be associated with a question when created.
+    """
+    createAnswer(input: ICreateAnswer!): Answer!
+    """
+    Update one or many Answers based upon selector fields given to it.
+    The selector fields will be a list of all optional parameters that can be found int AnswerFields.
+    All documents that match all selector fields will be updated with the values passed as the second argument
+    """
+    updateAnswer(selector: AnswerFields!, values: IUpdateAnswer!): [Answer!]!
+    """
+    Delete an answer record based on its document ID
+    """
+    deleteAnswer(id: ID!): Answer!
 }

@@ -235,16 +235,19 @@ model Quiz {
   dueAt          DateTime
   // startedAt      DateTime? Save these for responses
   // submittedAt    DateTime?
-  timeLimit      Int?
-  numQuestions   Int
-  minScore       Float     @default(0.0)
-  parentLesson   Lesson    @relation(fields: [parentLessonID], references: [id])
-  parentLessonID String    @db.ObjectId
+  timeLimit       Int?
+  numQuestions    Int
+  minScore        Float     @default(0.0)
+  parentLesson    Lesson    @relation(fields: [parentLessonID], references: [id])
+  parentLessonID  String    @db.ObjectId
+  questionPool    QuestionPool @relation(fields: [questionPoolID], references: [id])
+  questionPoolID  String @db.ObjectId
 }
 
 model QuestionPool {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   questions Question[]
+  quizzes   Quiz[]
 }
 
 model Question {
