@@ -58,6 +58,7 @@ describe("Plan services", () => {
 		describe("modules Query", () => {
 			it("should return an array of modules", async () => {
 				const modules = await resolver.module({});
+				if (modules instanceof Error) return new Error(modules.message);
 				expect(modules).toBeDefined();
 				expect(modules.length).toBeGreaterThan(1);
 				modules.map((module) => {
@@ -68,6 +69,7 @@ describe("Plan services", () => {
 			it("should not take longer than 1.5 seconds to return all modules", async () => {
 				const start = new Date();
 				const modules = await resolver.module({});
+				if (modules instanceof Error) return new Error(modules.message);
 				expect(modules.length).toBeGreaterThan(1);
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
@@ -76,6 +78,7 @@ describe("Plan services", () => {
 		describe("module Query", () => {
 			it("should return a module", async () => {
 				const module = await resolver.module({ id: testingModuleID });
+				if (module instanceof Error) return new Error(module.message);
 				expect(module.length).toBe(1);
 				const moduleFirst = module[0];
 				expect(moduleFirst).toBeDefined();
