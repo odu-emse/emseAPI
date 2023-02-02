@@ -237,7 +237,7 @@ model Progress {
 	status Float @default(0)
 	completed Boolean @default(false)
 	// Relation Fields
-	enrollment ModuleEnrollment @relation(fields: [enrollmentID], references: [id])
+	enrollment ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
 	enrollmentID String @unique
 }
 
