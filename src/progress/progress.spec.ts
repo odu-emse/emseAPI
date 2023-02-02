@@ -124,23 +124,26 @@ describe("Progress", function () {
 			program
 		});
 		plan = data.plan;
+		planToDelete.push(plan.id);
 		enrollment = data.enrollment;
+		enrollmentToDelete.push(enrollment.id);
 		module = data.module;
+		moduleToDelete.push(module.id);
 	});
 	afterAll(async () => {
 		//delete created documents
 		//currently using native prisma delete, might need to be changed to delete services
-		for (const id of planToDelete) {
-			await prisma.planOfStudy.delete({ where: { id } });
-		}
-		for (const id of moduleToDelete) {
-			await prisma.module.delete({ where: { id } });
+		for (const id of progressToDelete) {
+			await resolver.deleteProgress(id);
 		}
 		for (const id of enrollmentToDelete) {
-			await prisma.moduleEnrollment.delete({ where: { id } });
+			await program.deleteModuleEnrollment(id);
 		}
-		for (const id of progressToDelete) {
-			await prisma.progress.delete({ where: { id } });
+		for (const id of planToDelete) {
+			await planRes.deletePlan(id);
+		}
+		for (const id of moduleToDelete) {
+			await program.delete(id);
 		}
 	});
 	describe("Create", function () {
@@ -193,7 +196,58 @@ describe("Progress", function () {
 			expect(result).toBeInstanceOf(Array);
 		});
 	});
-	describe("Update", function () {});
+	describe("Update", function () {
+		it("should not let status be more than 100", async function () {
+			const result = await resolver.updateProgress(
+				1000,
+				dummyProgress.id,
+				undefined
+			);
+			expect(result).toBeInstanceOf(Error);
+		});
+		it("should not let status be less than 0", async function () {
+			const result = await resolver.updateProgress(
+				-100,
+				dummyProgress.id,
+				undefined
+			);
+			expect(result).toBeInstanceOf(Error);
+		});
+		it("should set completed to true if status is set to 100", async function () {
+			const result = await resolver.updateProgress(
+				100,
+				dummyProgress.id,
+				undefined
+			);
+			if (result instanceof Error) throw new Error("Progress not updated");
+			expect(result.completed).toBe(true);
+		});
+		it("should set completed to false if status is set to less than 100", async function () {
+			const result = await resolver.updateProgress(
+				50,
+				dummyProgress.id,
+				undefined
+			);
+			if (result instanceof Error) throw new Error("Progress not updated");
+			expect(result.completed).toBe(false);
+		});
+		it("should return an error if document ID are not found", async function () {
+			const result = await resolver.updateProgress(
+				100,
+				shuffle(dummyProgress.id),
+				undefined
+			);
+			expect(result).toBeInstanceOf(Error);
+		});
+		it("should return an error if enrollment ID are not found", async function () {
+			const result = await resolver.updateProgress(
+				100,
+				undefined,
+				shuffle(dummyProgress.enrollment.id)
+			);
+			expect(result).toBeInstanceOf(Error);
+		});
+	});
 	describe("Delete", function () {});
 });
 
