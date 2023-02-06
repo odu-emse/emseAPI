@@ -51,7 +51,7 @@ jobs:
       - name: Generate types
         run: yarn generate
       - name: Run test suite
-        run: yarn jest
+        run: yarn vitest
   coverage:
     needs: [test]
     runs-on: ubuntu-latest
@@ -73,7 +73,7 @@ jobs:
       - name: Build types
         run: yarn generate
       - name: Run tests and collect coverage
-        run: yarn jest --coverage
+        run: yarn vitest --coverage
       - name: Upload coverage reports to Codecov
         run: |
           curl -Os https://uploader.codecov.io/latest/linux/codecov
