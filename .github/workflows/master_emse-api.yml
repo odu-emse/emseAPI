@@ -5,7 +5,7 @@ name: EMSE-API - CI pipeline
 
 on:
   push:
-    branches: [master, dev]
+    branches: [dev, 'ALMP-**']
   pull_request:
     branches: [ master, dev ]
 
