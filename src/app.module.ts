@@ -4,14 +4,15 @@ import { UserModule } from "./user/user.module";
 import { PoSModule } from "@/pos";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
-import { ProgramModule } from "./program/program.module";
+import { ProgramModule } from "@/program";
 import { config } from "dotenv";
 import { CustomScalar, Scalar } from "@nestjs/graphql";
 import { Kind, ValueNode } from "graphql";
 import { AuthModule } from "./auth/auth.module";
 import type { Moment } from "moment";
 import { CommunityModule } from "./community/community.module";
-import { ProgressModule } from "./progress/progress.module";
+import { ProgressModule } from "@/progress";
+import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
@@ -42,10 +43,16 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			cors: {
 				credentials: true,
-				origin: ["http://localhost:3000", "http://localhost:4000", "http://localhost:6006"]
+				origin: [
+					"http://localhost:3000",
+					"http://localhost:4000",
+					"http://localhost:6006",
+					"https://studio.apollographql.com"
+				]
 			},
-			playground: true,
-			debug: process.env.NODE_ENV !== "production",
+			playground: false,
+			plugins: [ApolloServerPluginLandingPageLocalDefault()],
+			debug: true,
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
 			introspection: true,
