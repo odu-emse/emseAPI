@@ -2,6 +2,7 @@ import { PoSService } from "./pos.service";
 import { PlanOfStudyResolver } from "./pos.resolver";
 import { PrismaService } from "@/prisma.service";
 import { PlanOfStudy } from "@/types/graphql";
+import { test, describe, beforeAll, expect } from "vitest";
 
 describe("Plan services", () => {
 	let service: PoSService;
@@ -18,7 +19,7 @@ describe("Plan services", () => {
 	});
 
 	describe("Query.plans()", () => {
-		it("should return an array of plans", async () => {
+		test("should return an array of plans", async () => {
 			const plans: PlanOfStudy[] = await resolver.plans();
 			expect(plans).toBeDefined();
 			expect(plans.length).toBeGreaterThan(0);
@@ -28,7 +29,7 @@ describe("Plan services", () => {
 				expect(plan.assignmentResults).toBeDefined();
 			});
 		});
-		it("should not take longer than 1 seconds to return all plans", async () => {
+		test("should not take longer than 1 seconds to return all plans", async () => {
 			const start = new Date();
 			const plans = await resolver.plans();
 			expect(plans.length).toBeGreaterThan(1);
@@ -38,7 +39,7 @@ describe("Plan services", () => {
 	});
 
 	describe("Query.plan()", () => {
-		it("should return a plan", async () => {
+		test("should return a plan", async () => {
 			const plan: PlanOfStudy | null = await resolver.plan(
 				testingAccountStudentID
 			);
@@ -47,11 +48,11 @@ describe("Plan services", () => {
 			expect(plan.id).toBeDefined();
 			expect(plan.student).toBeDefined();
 		});
-		it("should match studentID with query parameter", async () => {
+		test("should match studentID with query parameter", async () => {
 			const plan = await resolver.plan(testingAccountStudentID);
 			expect(plan!.studentID === testingAccountStudentID).toBeTruthy();
 		});
-		it("should match plan ID with query parameter", async () => {
+		test("should match plan ID with query parameter", async () => {
 			const plan = await resolver.planByID(testingAccountPlanID);
 			expect(plan!.id === testingAccountPlanID).toBeTruthy();
 		});

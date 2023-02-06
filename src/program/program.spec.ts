@@ -8,13 +8,10 @@ import {
 	AssignmentResult,
 	Course,
 	PlanOfStudy,
-	User,
-	CreateCollectionArgs,
-	NewModule
+	User
 } from "gql/graphql";
-import { Prisma } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { createCollection, createModule } from "../../utils/tests";
+import { test, describe, beforeAll, afterAll, expect } from "vitest";
 
 interface IAssignment extends Assignment {
 	id: string;
@@ -57,7 +54,7 @@ describe("Plan services", () => {
 
 	describe("Module", () => {
 		describe("modules Query", () => {
-			it("should return an array of modules", async () => {
+			test("should return an array of modules", async () => {
 				const modules = await resolver.module({});
 				if (modules instanceof Error) return new Error(modules.message);
 				expect(modules).toBeDefined();
@@ -67,7 +64,7 @@ describe("Plan services", () => {
 					testingModuleID = module.id;
 				});
 			});
-			it("should not take longer than 1.5 seconds to return all modules", async () => {
+			test("should not take longer than 1.5 seconds to return all modules", async () => {
 				const start = new Date();
 				const modules = await resolver.module({});
 				if (modules instanceof Error) return new Error(modules.message);
@@ -77,7 +74,7 @@ describe("Plan services", () => {
 			});
 		});
 		describe("module Query", () => {
-			it("should return a module", async () => {
+			test("should return a module", async () => {
 				const module = await resolver.module({ id: testingModuleID });
 				if (module instanceof Error) return new Error(module.message);
 				expect(module.length).toBe(1);
@@ -105,7 +102,7 @@ describe("Plan services", () => {
 	});
 	describe("Enrollment", () => {
 		describe("Query.moduleEnrollments()", () => {
-			it("should return an array of moduleEnrollments", async () => {
+			test("should return an array of moduleEnrollments", async () => {
 				const moduleEnrollments = await resolver.moduleEnrollment({});
 				expect(moduleEnrollments).toBeDefined();
 				expect(moduleEnrollments.length).toBeGreaterThan(1);
@@ -113,7 +110,7 @@ describe("Plan services", () => {
 					expect(enrollments.id).toBeDefined();
 				});
 			});
-			it("should not take longer than 1.5 seconds to return all moduleEnrollments", async () => {
+			test("should not take longer than 1.5 seconds to return all moduleEnrollments", async () => {
 				const start = new Date();
 				const moduleEnrollments = await resolver.moduleEnrollment({});
 				expect(moduleEnrollments.length).toBeGreaterThan(1);
@@ -124,7 +121,7 @@ describe("Plan services", () => {
 	});
 	describe("Course", () => {
 		describe("Query.courses()", () => {
-			it("should return an array of courses", async () => {
+			test("should return an array of courses", async () => {
 				const courses = await resolver.course({});
 				expect(courses).toBeDefined();
 				expect(courses.length).toBeGreaterThan(1);
@@ -133,7 +130,7 @@ describe("Plan services", () => {
 					expect(course.name).toBeDefined();
 				});
 			});
-			it("should return modules related to the course", async () => {
+			test("should return modules related to the course", async () => {
 				const courses = await resolver.course({});
 				courses.map((course) => {
 					expect(course.module).toBeDefined();
@@ -142,7 +139,7 @@ describe("Plan services", () => {
 					testingCourseID = course.id;
 				});
 			});
-			it("should not take longer than 1.5 seconds to return all courses", () => {
+			test("should not take longer than 1.5 seconds to return all courses", () => {
 				const start = new Date();
 				expect(resolver.course({})).resolves.toBeDefined();
 				const end = new Date();
@@ -150,7 +147,7 @@ describe("Plan services", () => {
 			});
 		});
 		describe("Query.course()", () => {
-			it("should return the course specified by argument", async () => {
+			test("should return the course specified by argument", async () => {
 				const course = await resolver.course({ id: testingCourseID });
 				expect(course[0]).toBeDefined();
 				expect(course[0].id).toBe(testingCourseID);
@@ -161,7 +158,7 @@ describe("Plan services", () => {
 	});
 	describe("Assignment", () => {
 		describe("Query.assignments()", () => {
-			it("should return an array of assignments", async () => {
+			test("should return an array of assignments", async () => {
 				const assignments = await resolver.assignment({});
 				expect(assignments).toBeDefined();
 				expect(assignments.length).toBeGreaterThan(1);
@@ -181,7 +178,7 @@ describe("Plan services", () => {
 					}
 				});
 			});
-			it("should not take longer than 1.5 seconds to return all assignments", async () => {
+			test("should not take longer than 1.5 seconds to return all assignments", async () => {
 				const start = new Date();
 				const assignments = await resolver.assignment({});
 				expect(assignments.length).toBeGreaterThan(1);
@@ -190,7 +187,7 @@ describe("Plan services", () => {
 			});
 		});
 		describe("Query.assignment()", () => {
-			it("should return a assignment", async () => {
+			test("should return a assignment", async () => {
 				const assignment = await resolver.assignment({
 					id: testingAssignmentID
 				});
@@ -234,7 +231,7 @@ describe("Plan services", () => {
 		});
 		describe("Results", () => {
 			describe("Query.assignmentResults()", () => {
-				it("should return an array of assignmentResults", async () => {
+				test("should return an array of assignmentResults", async () => {
 					const assignmentResults = await resolver.assignmentResult({});
 					expect(assignmentResults).toBeDefined();
 					expect(assignmentResults.length).toBeGreaterThan(1);
@@ -243,7 +240,7 @@ describe("Plan services", () => {
 						testingAssignmentResultID = results.id;
 					});
 				});
-				it("should not take longer than 1.5 seconds to return all assignmentResults", async () => {
+				test("should not take longer than 1.5 seconds to return all assignmentResults", async () => {
 					const start = new Date();
 					const assignmentResults = await resolver.assignmentResult({});
 					expect(assignmentResults.length).toBeGreaterThan(1);
@@ -252,7 +249,7 @@ describe("Plan services", () => {
 				});
 			});
 			describe("Query.assignmentResult()", () => {
-				it("should return a assignmentResult", async () => {
+				test("should return a assignmentResult", async () => {
 					const assignmentResult = await resolver.assignmentResult({
 						id: testingAssignmentResultID
 					});
@@ -338,11 +335,11 @@ describe("Collection", () => {
 		await deleteModule(testingModuleID);
 		prisma.$disconnect();
 	});
-	it("should return an array of collections", async () => {
+	test("should return an array of collections", async () => {
 		expect(await resolver.collections()).toBeDefined();
 		expect(await resolver.collections()).toBeInstanceOf(Array);
 	});
-	it("should return a collection", async () => {
+	test("should return a collection", async () => {
 		const collection = await resolver.collection(testingCollectionID);
 		expect(collection).toBeDefined();
 		if (collection) {
@@ -352,7 +349,7 @@ describe("Collection", () => {
 			expect(await resolver.module({ id: collection.moduleID })).toBeDefined();
 		}
 	});
-	it("should match lesson position field to array index", async () => {
+	test("should match lesson position field to array index", async () => {
 		const coll = await resolver.collection(testingCollectionID);
 		expect(coll).toBeDefined();
 		if (coll) {
@@ -364,7 +361,7 @@ describe("Collection", () => {
 			});
 		}
 	});
-	it("should populate previous and next based on module ID", function () {
+	test("should populate previous and next based on module ID", function () {
 		expect(true).toBe(true);
 	});
 });

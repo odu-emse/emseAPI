@@ -15,6 +15,7 @@ import {
 	shuffle
 } from "../../utils/tests";
 import { Prisma } from "@prisma/client";
+import { test, describe, beforeAll, afterAll, expect } from "vitest";
 
 describe("Progress", function () {
 	let resolver: ProgressResolver;
@@ -147,7 +148,7 @@ describe("Progress", function () {
 		}
 	});
 	describe("Create", function () {
-		it("should create document", async function () {
+		test("should create document", async function () {
 			const res = await resolver.createProgress(
 				{
 					enrollment: {
@@ -167,7 +168,7 @@ describe("Progress", function () {
 			moduleToDelete.push(module.id);
 			enrollmentToDelete.push(enrollment.id);
 		});
-		it("should fail to create a document", async function () {
+		test("should fail to create a document", async function () {
 			const res = await resolver.createProgress(
 				{
 					enrollment: {
@@ -182,22 +183,22 @@ describe("Progress", function () {
 		});
 	});
 	describe("Read", function () {
-		it("should return an array of progress documents", async () => {
+		test("should return an array of progress documents", async () => {
 			const result = await resolver.progress({});
 			expect(result).toBeInstanceOf(Array);
 			if (result) dummyProgress = result[0];
 		});
-		it("should thrown an error if ID was not found", async () => {
+		test("should thrown an error if ID was not found", async () => {
 			const result = await resolver.progress({ id: shuffle(dummyProgress.id) });
 			expect(result).toBeInstanceOf(Error);
 		});
-		it("should return an empty array if no results are found", async function () {
+		test("should return an empty array if no results are found", async function () {
 			const result = await resolver.progress({ status: 0, completed: true });
 			expect(result).toBeInstanceOf(Array);
 		});
 	});
 	describe("Update", function () {
-		it("should not let status be more than 100", async function () {
+		test("should not let status be more than 100", async function () {
 			const result = await resolver.updateProgress(
 				1000,
 				dummyProgress.id,
@@ -205,7 +206,7 @@ describe("Progress", function () {
 			);
 			expect(result).toBeInstanceOf(Error);
 		});
-		it("should not let status be less than 0", async function () {
+		test("should not let status be less than 0", async function () {
 			const result = await resolver.updateProgress(
 				-100,
 				dummyProgress.id,
@@ -213,7 +214,7 @@ describe("Progress", function () {
 			);
 			expect(result).toBeInstanceOf(Error);
 		});
-		it("should set completed to true if status is set to 100", async function () {
+		test("should set completed to true if status is set to 100", async function () {
 			const result = await resolver.updateProgress(
 				100,
 				dummyProgress.id,
@@ -222,7 +223,7 @@ describe("Progress", function () {
 			if (result instanceof Error) throw new Error("Progress not updated");
 			expect(result.completed).toBe(true);
 		});
-		it("should set completed to false if status is set to less than 100", async function () {
+		test("should set completed to false if status is set to less than 100", async function () {
 			const result = await resolver.updateProgress(
 				50,
 				dummyProgress.id,
@@ -231,7 +232,7 @@ describe("Progress", function () {
 			if (result instanceof Error) throw new Error("Progress not updated");
 			expect(result.completed).toBe(false);
 		});
-		it("should return an error if document ID are not found", async function () {
+		test("should return an error if document ID are not found", async function () {
 			const result = await resolver.updateProgress(
 				100,
 				shuffle(dummyProgress.id),
@@ -239,7 +240,7 @@ describe("Progress", function () {
 			);
 			expect(result).toBeInstanceOf(Error);
 		});
-		it("should return an error if enrollment ID are not found", async function () {
+		test("should return an error if enrollment ID are not found", async function () {
 			const result = await resolver.updateProgress(
 				100,
 				undefined,
