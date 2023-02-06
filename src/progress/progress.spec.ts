@@ -6,7 +6,7 @@ import {
 	PlanOfStudy,
 	Progress,
 	UserRole
-} from "../../gql/graphql";
+} from "@/types/graphql";
 import { PrismaService } from "@/prisma.service";
 import {
 	createEnrollment,
@@ -104,21 +104,21 @@ describe("Progress", function () {
 		};
 	}>;
 
+	prisma = new PrismaService();
+
+	// plan of study being instantiated here
+	planService = new PoSService(prisma);
+	planRes = new PlanOfStudyResolver(planService);
+
+	// program being instantiated here
+	programService = new ProgramService(prisma);
+	program = new ProgramResolver(programService);
+
+	// progress being instantiated here
+	progressService = new ProgressService(prisma);
+	resolver = new ProgressResolver(progressService, planRes, program);
+
 	beforeAll(async () => {
-		prisma = new PrismaService();
-
-		// plan of study being instantiated here
-		planService = new PoSService(prisma);
-		planRes = new PlanOfStudyResolver(planService);
-
-		// program being instantiated here
-		programService = new ProgramService(prisma);
-		program = new ProgramResolver(programService);
-
-		// progress being instantiated here
-		progressService = new ProgressService(prisma);
-		resolver = new ProgressResolver(progressService, planRes, program);
-
 		const data = await initializeTest({
 			dummyUserID,
 			planRes,
@@ -249,7 +249,16 @@ describe("Progress", function () {
 			expect(result).toBeInstanceOf(Error);
 		});
 	});
-	// describe("Delete", function () {});
+	describe("Delete", function () {
+		test("should delete document", async function () {
+			const res = await resolver.deleteProgress(dummyProgress.id);
+			expect(res).toBe(true);
+		});
+		test("should fail to delete a document", async function () {
+			const res = await resolver.deleteProgress(shuffle(dummyProgress.id));
+			expect(res).toBeInstanceOf(Error);
+		});
+	});
 });
 
 const initializeTest = async ({ dummyUserID, planRes, program }) => {

@@ -1,6 +1,6 @@
 import { UseGuards } from "@nestjs/common";
 import { Resolver, Query, Args, Mutation } from "@nestjs/graphql";
-import { PlanFields, PlanInput } from "gql/graphql";
+import { PlanFields, PlanInput } from "@/types/graphql";
 import { AuthGuard } from "@/auth.guard";
 import { PoSService } from "./pos.service";
 

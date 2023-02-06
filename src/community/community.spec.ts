@@ -58,14 +58,12 @@ describe("Community", () => {
 		});
 	};
 
-	beforeAll(async () => {
-		service = new CommunityService(prisma);
-		posService = new PoSService(prisma);
-		posResolver = new PlanOfStudyResolver(posService);
-		resolver = new CommunityResolver(service);
-		auth = new AuthService(prisma, posResolver);
-		user = new UserService(prisma);
-	});
+	service = new CommunityService(prisma);
+	posService = new PoSService(prisma);
+	posResolver = new PlanOfStudyResolver(posService);
+	resolver = new CommunityResolver(service);
+	auth = new AuthService(prisma, posResolver);
+	user = new UserService(prisma);
 
 	afterAll(async () => {
 		deletableThreadIDs.map(async (id) => {

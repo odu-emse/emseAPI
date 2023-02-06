@@ -51,11 +51,10 @@ describe("Account services", () => {
 		philosophy: "I  teach people"
 	};
 
-	beforeAll(async () => {
-		prisma = new PrismaService();
-		service = new UserService(prisma);
-		resolver = new UserResolver(service);
-	});
+	prisma = new PrismaService();
+	service = new UserService(prisma);
+	resolver = new UserResolver(service);
+
 	afterAll(async () => {
 		await resolver.update(userResetInput);
 		await resolver.updateSocial(socialDocumentID, socialResetInput);

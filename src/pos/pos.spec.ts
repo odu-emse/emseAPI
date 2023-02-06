@@ -1,5 +1,4 @@
-import { PoSService } from "./pos.service";
-import { PlanOfStudyResolver } from "./pos.resolver";
+import { PoSService, PlanOfStudyResolver } from "@/pos";
 import { PrismaService } from "@/prisma.service";
 import { PlanOfStudy } from "@/types/graphql";
 import { test, describe, beforeAll, expect } from "vitest";
@@ -13,10 +12,8 @@ describe("Plan services", () => {
 	const testingAccountStudentID = "616701c22e17f3fb9f5085f7";
 	const testingAccountPlanID = "620e9a07e57bd45e4e3fc88c";
 
-	beforeAll(async () => {
-		service = new PoSService(prisma);
-		resolver = new PlanOfStudyResolver(service);
-	});
+	service = new PoSService(prisma);
+	resolver = new PlanOfStudyResolver(service);
 
 	describe("Query.plans()", () => {
 		test("should return an array of plans", async () => {

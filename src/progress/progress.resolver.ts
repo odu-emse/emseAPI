@@ -7,7 +7,7 @@ import {
 	ProgressArgs,
 	ProgressWaiveArgs,
 	UserRole
-} from "../../gql/graphql";
+} from "@/types/graphql";
 import { Prisma } from "@prisma/client";
 
 @Resolver()

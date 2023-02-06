@@ -21,7 +21,7 @@ import {
 	CreateContentArgs,
 	ContentFields,
 	NewModule
-} from "gql/graphql";
+} from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -899,13 +899,14 @@ export class ProgramService {
 		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
 			data: {
 				name: input.name,
-				...(input.content !== null && input.content !== undefined && {
-					content: {
-						connect: {
-							id: input.content
+				...(input.content !== null &&
+					input.content !== undefined && {
+						content: {
+							connect: {
+								id: input.content
+							}
 						}
-					}
-				}),
+					}),
 				transcript: input.transcript,
 				collection: {
 					connect: {

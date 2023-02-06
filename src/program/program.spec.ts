@@ -9,7 +9,7 @@ import {
 	Course,
 	PlanOfStudy,
 	User
-} from "gql/graphql";
+} from "@/types/graphql";
 import { createCollection, createModule } from "../../utils/tests";
 import { test, describe, beforeAll, afterAll, expect } from "vitest";
 
