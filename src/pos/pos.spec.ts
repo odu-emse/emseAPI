@@ -1,7 +1,7 @@
 import { PoSService, PlanOfStudyResolver } from "@/pos";
 import { PrismaService } from "@/prisma.service";
 import { PlanOfStudy } from "@/types/graphql";
-import { test, describe, beforeAll, expect } from "vitest";
+import { test, describe, expect } from "vitest";
 
 describe("Plan services", () => {
 	let service: PoSService;

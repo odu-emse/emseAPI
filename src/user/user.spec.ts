@@ -9,7 +9,7 @@ import {
 	SocialInput
 } from "@/types/graphql";
 import { shuffle } from "../../utils/tests";
-import { test, describe, beforeAll, afterAll, expect } from "vitest";
+import { test, describe, afterAll, expect } from "vitest";
 
 describe("Account services", () => {
 	let service: UserService;

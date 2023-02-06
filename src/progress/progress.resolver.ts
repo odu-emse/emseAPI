@@ -114,34 +114,24 @@ export class ProgressResolver {
 					},
 					enrollmentID
 				);
-				const enrollmentUpdate = await this.program.updateModuleEnrollment(
-					enrollmentID,
-					{
-						status: EnrollmentStatus.ACTIVE,
-						role: UserRole.STUDENT,
-						plan: enrollment[0].plan.id,
-						module: enrollment[0].module.id
-					}
-				);
+				await this.program.updateModuleEnrollment(enrollmentID, {
+					status: EnrollmentStatus.ACTIVE,
+					role: UserRole.STUDENT,
+					plan: enrollment[0].plan.id,
+					module: enrollment[0].module.id
+				});
 				if (res instanceof Error) return new Error(res.message);
-				if (enrollmentUpdate instanceof Error)
-					return new Error(enrollmentUpdate.message);
 				else return res;
 			} else if (progress) {
 				// progress exists, so we can update it
 				const res = await this.progressService.waiveModule(enrollmentID);
-				const enrollmentUpdate = await this.program.updateModuleEnrollment(
-					enrollmentID,
-					{
-						status: EnrollmentStatus.ACTIVE,
-						role: UserRole.STUDENT,
-						plan: enrollment[0].plan.id,
-						module: enrollment[0].module.id
-					}
-				);
+				await this.program.updateModuleEnrollment(enrollmentID, {
+					status: EnrollmentStatus.ACTIVE,
+					role: UserRole.STUDENT,
+					plan: enrollment[0].plan.id,
+					module: enrollment[0].module.id
+				});
 				if (res instanceof Error) return new Error(res.message);
-				if (enrollmentUpdate instanceof Error)
-					return new Error(enrollmentUpdate.message);
 				else return res;
 			}
 		} else

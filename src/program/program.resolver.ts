@@ -43,15 +43,13 @@ export class ProgramResolver {
 		if (!role) {
 			return result;
 		} else {
-			const filterRes = result.map((module) => {
+			return result.map((module) => {
 				const thisModule = module;
 				thisModule.members = module.members.filter(
 					(value) => value.role === role
 				);
 				return thisModule;
 			});
-
-			return filterRes;
 		}
 	}
 

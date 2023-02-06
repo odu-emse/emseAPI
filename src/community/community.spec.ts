@@ -6,7 +6,7 @@ import { UserService } from "@/user/user.service";
 import { PlanOfStudyResolver, PoSService } from "@/pos";
 import { pickRandomFromArray, shuffle } from "../../utils/tests";
 import { Prisma } from "@prisma/client";
-import { test, describe, beforeAll, afterAll, expect } from "vitest";
+import { test, describe, afterAll, expect } from "vitest";
 
 describe("Community", () => {
 	let service: CommunityService;
@@ -201,8 +201,6 @@ describe("Community", () => {
 				throw new Error("Error in upvoteThread test case");
 
 			const upVoteNum = await resolver.upvoteThread(threadID);
-			if (upVoteNum instanceof Error)
-				throw new Error("Error in upvoteThread test case");
 
 			expect(upVoteNum.upvotes === voteNum[0].upvotes + 1).toBe(true);
 		});
@@ -234,9 +232,7 @@ describe("Community", () => {
 			});
 			if (tempThread instanceof Error) return new Error(tempThread.message);
 			else {
-				const thread = await resolver.deleteThread(tempThread.id);
-				if (thread instanceof Error) return new Error(thread.message);
-				expect(thread instanceof Error).toBe(false);
+				await resolver.deleteThread(tempThread.id);
 				const findDeleted = await resolver.thread({ id: tempThread.id });
 				expect(findDeleted instanceof Error).toBe(true);
 			}

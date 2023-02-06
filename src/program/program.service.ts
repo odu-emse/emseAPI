@@ -13,7 +13,6 @@ import {
 	AssignmentResFields,
 	ModEnrollmentFields,
 	LessonFields,
-	Module,
 	Course,
 	ModuleFeedback,
 	CreateCollectionArgs,
