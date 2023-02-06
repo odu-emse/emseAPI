@@ -249,7 +249,7 @@ describe("Progress", function () {
 			expect(result).toBeInstanceOf(Error);
 		});
 	});
-	describe("Delete", function () {});
+	// describe("Delete", function () {});
 });
 
 const initializeTest = async ({ dummyUserID, planRes, program }) => {
