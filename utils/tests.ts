@@ -6,7 +6,7 @@ import {
 	UserRole
 } from "@/types/graphql";
 
-export const shuffle = (str) =>
+export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
 
 export const pickRandomFromArray = (arr: any[]): number => {
