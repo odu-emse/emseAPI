@@ -5,7 +5,6 @@ import { PoSModule } from "@/pos";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { ProgramModule } from "@/program";
-import { config } from "dotenv";
 import { CustomScalar, Scalar } from "@nestjs/graphql";
 import { Kind, ValueNode } from "graphql";
 import { AuthModule } from "./auth/auth.module";
@@ -38,6 +37,16 @@ export class DateScalar implements CustomScalar<string, Moment> {
 	}
 }
 
+const playgroundConfig =
+	process.env.USE_APOLLO === "TRUE"
+		? {
+				playground: false,
+				plugins: [ApolloServerPluginLandingPageLocalDefault()]
+		  }
+		: {
+				playground: true
+		  };
+
 @Module({
 	imports: [
 		GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -50,9 +59,7 @@ export class DateScalar implements CustomScalar<string, Moment> {
 					"https://studio.apollographql.com"
 				]
 			},
-			playground: false,
-			plugins: [ApolloServerPluginLandingPageLocalDefault()],
-			debug: true,
+			...playgroundConfig,
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
 			introspection: true,
