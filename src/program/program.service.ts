@@ -60,7 +60,7 @@ export class ProgramService {
 		}
 	});
 
-	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
+	public moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
 		members: {
 			include: {
 				plan: {
@@ -138,7 +138,7 @@ export class ProgramService {
 			}
 		});
 
-	private moduleEnrollmentInclude =
+	public moduleEnrollmentInclude =
 		Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
 			plan: {
 				include: {
