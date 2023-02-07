@@ -1,21 +1,17 @@
 import { ProgressResolver, ProgressService } from "@/progress";
 import { PlanOfStudyResolver, PoSService } from "@/pos";
 import { ProgramResolver, ProgramService } from "@/program";
-import {
-	EnrollmentStatus,
-	PlanOfStudy,
-	Progress,
-	UserRole
-} from "@/types/graphql";
 import { PrismaService } from "@/prisma.service";
+import { Progress } from "@prisma/client";
+import { test, describe, afterAll, expect } from "vitest";
 import {
-	createEnrollment,
-	createModule,
-	createPlan,
+	createRandomModule,
+	createRandomModuleEnrollment,
+	createRandomPlanOfStudy,
+	createRandomProgress,
+	createRandomUser,
 	shuffle
-} from "../../utils/tests";
-import { Prisma } from "@prisma/client";
-import { test, describe, beforeAll, afterAll, expect } from "vitest";
+} from "../../utils";
 
 describe("Progress", function () {
 	const prisma = new PrismaService();
@@ -33,48 +29,16 @@ describe("Progress", function () {
 	const resolver = new ProgressResolver(progressService, planRes, program);
 
 	let dummyProgress: Progress;
-	const dummyUserID = "63dabf67020a625cc55f64ff";
 
-	const planToDelete: Array<string> = [];
-	const moduleToDelete: Array<string> = [];
-	const enrollmentToDelete: Array<string> = [];
 	const progressToDelete: Array<string> = [];
 
-	let plan: PlanOfStudy;
-	let enrollment: Prisma.ModuleEnrollmentGetPayload<{
-		include: typeof programService.moduleEnrollmentInclude;
-	}>;
-	let module: Prisma.ModuleGetPayload<{
-		include: typeof programService.moduleInclude;
-	}>;
+	const [user, plan, module, enrollment] = initializeTest();
 
-	beforeAll(async () => {
-		const data = await initializeTest({
-			dummyUserID,
-			planRes,
-			program
-		});
-		plan = data.plan;
-		planToDelete.push(plan.id);
-		enrollment = data.enrollment;
-		enrollmentToDelete.push(enrollment.id);
-		module = data.module;
-		moduleToDelete.push(module.id);
-	});
 	afterAll(async () => {
 		//delete created documents
 		//currently using native prisma delete, might need to be changed to delete services
 		for (const id of progressToDelete) {
 			await resolver.deleteProgress(id);
-		}
-		for (const id of enrollmentToDelete) {
-			await program.deleteModuleEnrollment(id);
-		}
-		for (const id of planToDelete) {
-			await planRes.deletePlan(id);
-		}
-		for (const id of moduleToDelete) {
-			await program.delete(id);
 		}
 	});
 	describe("Create", function () {
@@ -90,9 +54,6 @@ describe("Progress", function () {
 
 			//clean up
 			progressToDelete.push(res.id);
-			planToDelete.push(plan.id);
-			moduleToDelete.push(module.id);
-			enrollmentToDelete.push(enrollment.id);
 		});
 		test("should fail to create a document", async function () {
 			const res = await resolver.createProgress(
@@ -108,7 +69,7 @@ describe("Progress", function () {
 		test("should return an array of progress documents with no args", async () => {
 			const result = await resolver.progress({});
 			expect(result).toBeInstanceOf(Array);
-			if (result) dummyProgress = result[0];
+			if (result) dummyProgress = createRandomProgress(enrollment.id, true);
 		});
 		test("should return a single progress document as an array of one", async () => {
 			const result = await resolver.progress({ id: dummyProgress.id });
@@ -174,7 +135,7 @@ describe("Progress", function () {
 			const result = await resolver.updateProgress(
 				100,
 				undefined,
-				shuffle(dummyProgress.enrollment.id)
+				shuffle(enrollment.id)
 			);
 			expect(result).toBeInstanceOf(Error);
 		});
@@ -191,28 +152,11 @@ describe("Progress", function () {
 	});
 });
 
-const initializeTest = async ({ dummyUserID, planRes, program }) => {
-	const plan = await createPlan(planRes, { userID: dummyUserID });
-	if (plan instanceof Error) throw new Error("Plan not created");
+const initializeTest = () => {
+	const usr = createRandomUser();
+	const plan = createRandomPlanOfStudy(usr.id);
+	const module = createRandomModule();
+	const enrollment = createRandomModuleEnrollment(module.id, plan.id);
 
-	const module = await createModule(program, {
-		moduleName: "Test",
-		moduleNumber: 1,
-		description: "This is a module created from a test case",
-		duration: 1,
-		intro: "This should not be seen by anyone",
-		keywords: ["test", "module"],
-		numSlides: 1
-	});
-	if (module instanceof Error) throw new Error("Module not created");
-
-	const enrollment = await createEnrollment(program, {
-		module: module.id,
-		plan: plan.id,
-		status: EnrollmentStatus.INACTIVE,
-		role: UserRole.STUDENT
-	});
-	if (enrollment instanceof Error) throw new Error("Enrollment not created");
-
-	return { plan, module, enrollment };
+	return [usr, plan, module, enrollment];
 };
