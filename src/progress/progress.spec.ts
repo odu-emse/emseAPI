@@ -18,15 +18,22 @@ import { Prisma } from "@prisma/client";
 import { test, describe, beforeAll, afterAll, expect } from "vitest";
 
 describe("Progress", function () {
-	let resolver: ProgressResolver;
-	let prisma: PrismaService;
-	let planRes: PlanOfStudyResolver;
-	let progressService: ProgressService;
-	let program: ProgramResolver;
-	let planService: PoSService;
+	const prisma = new PrismaService();
+
+	// plan of study being instantiated here
+	const planService = new PoSService(prisma);
+	const planRes = new PlanOfStudyResolver(planService);
+
+	// program being instantiated here
+	const programService = new ProgramService(prisma);
+	const program = new ProgramResolver(programService);
+
+	// progress being instantiated here
+	const progressService = new ProgressService(prisma);
+	const resolver = new ProgressResolver(progressService, planRes, program);
+
 	let dummyProgress: Progress;
-	let programService: ProgramService;
-	let dummyUserID = "63dabf67020a625cc55f64ff";
+	const dummyUserID = "63dabf67020a625cc55f64ff";
 
 	const planToDelete: Array<string> = [];
 	const moduleToDelete: Array<string> = [];
@@ -35,88 +42,11 @@ describe("Progress", function () {
 
 	let plan: PlanOfStudy;
 	let enrollment: Prisma.ModuleEnrollmentGetPayload<{
-		include: {
-			plan: {
-				include: {
-					student: true;
-				};
-			};
-			module: true;
-			progress: true;
-		};
+		include: typeof programService.moduleEnrollmentInclude;
 	}>;
 	let module: Prisma.ModuleGetPayload<{
-		include: {
-			members: {
-				include: {
-					plan: {
-						include: {
-							student: true;
-						};
-					};
-					progress: true;
-				};
-			};
-			assignments: {
-				include: {
-					assignmentResults: {
-						include: {
-							student: {
-								include: {
-									student: true;
-								};
-							};
-							gradedBy: {
-								include: {
-									social: true;
-									instructorProfile: true;
-								};
-							};
-						};
-					};
-				};
-			};
-			feedback: {
-				include: {
-					student: true;
-				};
-			};
-			parentModules: true;
-			subModules: true;
-			collections: {
-				include: {
-					lessons: {
-						include: {
-							threads: {
-								include: {
-									author: true;
-									comments: true;
-									usersWatching: true;
-									parentThread: true;
-								};
-							};
-							content: true;
-						};
-					};
-				};
-			};
-			course: true;
-		};
+		include: typeof programService.moduleInclude;
 	}>;
-
-	prisma = new PrismaService();
-
-	// plan of study being instantiated here
-	planService = new PoSService(prisma);
-	planRes = new PlanOfStudyResolver(planService);
-
-	// program being instantiated here
-	programService = new ProgramService(prisma);
-	program = new ProgramResolver(programService);
-
-	// progress being instantiated here
-	progressService = new ProgressService(prisma);
-	resolver = new ProgressResolver(progressService, planRes, program);
 
 	beforeAll(async () => {
 		const data = await initializeTest({
@@ -151,11 +81,7 @@ describe("Progress", function () {
 		test("should create document", async function () {
 			const res = await resolver.createProgress(
 				{
-					enrollment: {
-						connect: {
-							id: enrollment.id
-						}
-					}
+					enrollmentID: enrollment.id
 				},
 				enrollment.id
 			);
@@ -171,11 +97,7 @@ describe("Progress", function () {
 		test("should fail to create a document", async function () {
 			const res = await resolver.createProgress(
 				{
-					enrollment: {
-						connect: {
-							id: shuffle(enrollment.id)
-						}
-					}
+					enrollmentID: enrollment.id
 				},
 				shuffle(enrollment.id)
 			);
@@ -183,10 +105,18 @@ describe("Progress", function () {
 		});
 	});
 	describe("Read", function () {
-		test("should return an array of progress documents", async () => {
+		test("should return an array of progress documents with no args", async () => {
 			const result = await resolver.progress({});
 			expect(result).toBeInstanceOf(Array);
 			if (result) dummyProgress = result[0];
+		});
+		test("should return a single progress document as an array of one", async () => {
+			const result = await resolver.progress({ id: dummyProgress.id });
+			if (result instanceof Error) throw new Error("Progress not found");
+			else {
+				expect(result).toBeInstanceOf(Array);
+				expect(result.length).toBe(1);
+			}
 		});
 		test("should thrown an error if ID was not found", async () => {
 			const result = await resolver.progress({ id: shuffle(dummyProgress.id) });

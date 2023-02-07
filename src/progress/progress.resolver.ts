@@ -30,7 +30,7 @@ export class ProgressResolver {
 
 	@Mutation("createProgress")
 	async createProgress(
-		@Args("input") input: Prisma.ProgressCreateInput,
+		@Args("input") input: Prisma.ProgressUncheckedCreateInput,
 		@Args("enrollmentID") enrollmentID: string
 	) {
 		const enrollment = await this.program.moduleEnrollment({
@@ -74,11 +74,7 @@ export class ProgressResolver {
 					{
 						status: 100,
 						completed: true,
-						enrollment: {
-							connect: {
-								id: enrollment.id
-							}
-						}
+						enrollmentID: enrollment.id
 					},
 					enrollment.id
 				);
@@ -106,11 +102,7 @@ export class ProgressResolver {
 					{
 						status: 100,
 						completed: true,
-						enrollment: {
-							connect: {
-								id: enrollmentID
-							}
-						}
+						enrollmentID: enrollment[0].id
 					},
 					enrollmentID
 				);
