@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { PlanOfStudy, Prisma } from "@prisma/client";
-import { PlanInput, PlanFields } from "gql/graphql";
+import { PlanInput, PlanFields } from "@/types/graphql";
 
 @Injectable()
 export class PoSService {

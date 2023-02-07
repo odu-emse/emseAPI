@@ -7,7 +7,7 @@ import {
 	ProgressArgs,
 	ProgressWaiveArgs,
 	UserRole
-} from "../../gql/graphql";
+} from "@/types/graphql";
 import { Prisma } from "@prisma/client";
 
 @Resolver()
@@ -30,7 +30,7 @@ export class ProgressResolver {
 
 	@Mutation("createProgress")
 	async createProgress(
-		@Args("input") input: Prisma.ProgressCreateInput,
+		@Args("input") input: Prisma.ProgressUncheckedCreateInput,
 		@Args("enrollmentID") enrollmentID: string
 	) {
 		const enrollment = await this.program.moduleEnrollment({
@@ -74,11 +74,7 @@ export class ProgressResolver {
 					{
 						status: 100,
 						completed: true,
-						enrollment: {
-							connect: {
-								id: enrollment.id
-							}
-						}
+						enrollmentID: enrollment.id
 					},
 					enrollment.id
 				);
@@ -106,42 +102,28 @@ export class ProgressResolver {
 					{
 						status: 100,
 						completed: true,
-						enrollment: {
-							connect: {
-								id: enrollmentID
-							}
-						}
+						enrollmentID: enrollment[0].id
 					},
 					enrollmentID
 				);
-				const enrollmentUpdate = await this.program.updateModuleEnrollment(
-					enrollmentID,
-					{
-						status: EnrollmentStatus.ACTIVE,
-						role: UserRole.STUDENT,
-						plan: enrollment[0].plan.id,
-						module: enrollment[0].module.id
-					}
-				);
+				await this.program.updateModuleEnrollment(enrollmentID, {
+					status: EnrollmentStatus.ACTIVE,
+					role: UserRole.STUDENT,
+					plan: enrollment[0].plan.id,
+					module: enrollment[0].module.id
+				});
 				if (res instanceof Error) return new Error(res.message);
-				if (enrollmentUpdate instanceof Error)
-					return new Error(enrollmentUpdate.message);
 				else return res;
 			} else if (progress) {
 				// progress exists, so we can update it
 				const res = await this.progressService.waiveModule(enrollmentID);
-				const enrollmentUpdate = await this.program.updateModuleEnrollment(
-					enrollmentID,
-					{
-						status: EnrollmentStatus.ACTIVE,
-						role: UserRole.STUDENT,
-						plan: enrollment[0].plan.id,
-						module: enrollment[0].module.id
-					}
-				);
+				await this.program.updateModuleEnrollment(enrollmentID, {
+					status: EnrollmentStatus.ACTIVE,
+					role: UserRole.STUDENT,
+					plan: enrollment[0].plan.id,
+					module: enrollment[0].module.id
+				});
 				if (res instanceof Error) return new Error(res.message);
-				if (enrollmentUpdate instanceof Error)
-					return new Error(enrollmentUpdate.message);
 				else return res;
 			}
 		} else

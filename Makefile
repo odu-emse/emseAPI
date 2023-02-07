@@ -1,6 +1,13 @@
 up:
 	yarn install
 	docker-compose up
+up-d:
+	yarn install
+	docker-compose up -d
+up-apollo:
+	yarn install
+	export "USE_APOLLO=TRUE"
+	docker-compose up -d
 down:
 	docker-compose down
 build:

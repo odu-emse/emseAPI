@@ -6,7 +6,7 @@ import {
 	UserRole
 } from "@/types/graphql";
 
-export const shuffle = (str) =>
+export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
 
 export const pickRandomFromArray = (arr: any[]): number => {
@@ -17,11 +17,16 @@ export const createPlan = async (
 	resolver: PlanOfStudyResolver,
 	config: { userID: string }
 ) => {
-	const plan = await resolver.addPlan({
-		student: config.userID
+	const self = await resolver.planByParams({
+		id: config.userID
 	});
-	if (plan) return plan;
-	else return new Error("Failed to create plan");
+	if (self instanceof Error) {
+		const plan = await resolver.addPlan({
+			student: config.userID
+		});
+		if (plan) return plan;
+		else return new Error("Failed to create plan");
+	} else return self[0];
 };
 
 export const createModule = async (

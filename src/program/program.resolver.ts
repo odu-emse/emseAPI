@@ -17,9 +17,8 @@ import {
 	CreateCollectionArgs,
 	CreateContentArgs,
 	ModEnrollmentFields,
-	CollectionFields,
 	NewModule
-} from "gql/graphql";
+} from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma, UserRole } from "@prisma/client";
@@ -33,7 +32,10 @@ export class ProgramResolver {
 
 	// Get Module(s)
 	@Query("module")
-	async module(@Args("input") args: ModuleFields, @Args("memberRole") role?: UserRole) {
+	async module(
+		@Args("input") args: ModuleFields,
+		@Args("memberRole") role?: UserRole
+	) {
 		const result = await this.programService.module(args);
 		if (!result) {
 			return new Error("Module not found");
@@ -41,15 +43,13 @@ export class ProgramResolver {
 		if (!role) {
 			return result;
 		} else {
-			const filterRes = result.map((module) => {
+			return result.map((module) => {
 				const thisModule = module;
 				thisModule.members = module.members.filter(
 					(value) => value.role === role
 				);
 				return thisModule;
 			});
-
-			return filterRes;
 		}
 	}
 
