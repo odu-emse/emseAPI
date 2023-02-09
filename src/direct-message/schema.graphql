@@ -1,0 +1,12 @@
+type Subscription {
+    listenForMessage: Message
+}
+type Mutation {
+    send(authorID: ID!, recipientID: ID!, message: String!): Boolean!
+}
+type Message {
+    author: User!
+    recipient: User!
+    message: String!
+    sentAt: Date!
+}

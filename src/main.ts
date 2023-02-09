@@ -20,7 +20,6 @@ async function bootstrap() {
 
 	await Sentry.init({
 		dsn: "https://d7d1b5e63fd145218bf3971031bae0cd@o1009779.ingest.sentry.io/5974128",
-
 		tracesSampleRate: 1.0,
 		integrations: [new Sentry.Integrations.Http({ tracing: true })],
 		release: "emseAPI@" + process.env.npm_package_version,
@@ -37,8 +36,11 @@ async function bootstrap() {
 		})
 	);
 
-	await app.listen(process.env.PORT!, () =>
-		console.log(`🕵️‍ Listening on port ${process.env.PORT || 3000}...`)
-	);
+	await app.listen(process.env.PORT!, async () => {
+		console.log(
+			`🚀 Server ready at http://localhost:${process.env.PORT}/graphql`
+		);
+		console.log(`🚀 Subscriptions ready at ws://localhost:${process.env.PORT}`);
+	});
 }
 bootstrap();

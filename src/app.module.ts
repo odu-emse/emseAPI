@@ -11,6 +11,7 @@ import { Kind, ValueNode } from "graphql";
 import { AuthModule } from "./auth/auth.module";
 import type { Moment } from "moment";
 import { CommunityModule } from "./community/community.module";
+import { DirectMessageModule } from "@/direct-message/direct-message.module";
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
@@ -41,13 +42,26 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			cors: {
 				credentials: true,
-				origin: ["http://localhost:3000", "http://localhost:4000", "http://localhost:6006"]
+				origin: [
+					"http://localhost:3000",
+					"http://localhost:4000",
+					"http://localhost:6006"
+				]
 			},
 			playground: true,
 			debug: process.env.NODE_ENV !== "production",
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
 			introspection: true,
+			subscriptions: {
+				"graphql-ws": {
+					onConnect: (context) => {
+						console.log("onConnect");
+						console.log(context);
+					}
+				},
+				"subscriptions-transport-ws": false
+			},
 			context: ({ req, res }) => ({ req, res })
 		}),
 		UserModule,
@@ -55,6 +69,7 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		ProgramModule,
 		AuthModule,
 		CommunityModule,
+		DirectMessageModule
 	],
 	controllers: [],
 	providers: [DateScalar]
