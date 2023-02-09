@@ -78,8 +78,8 @@ describe("Community", () => {
 		expect(resolver).toBeDefined();
 	});
 	describe("Param based querying", function () {
-		it("should return all threads if no params are inputted", async () => {
-			const threads = await resolver.thread({});
+		it("should return all threads if input is null", async () => {
+			const threads = await resolver.thread();
 			expect(threads).toBeInstanceOf(Array);
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -90,6 +90,22 @@ describe("Community", () => {
 				expect(testingThreadDoc.comments).toBeInstanceOf(Array);
 				expect(testingThreadDoc.usersWatching).toBeInstanceOf(Array);
 				expect(testingThreadDoc.author).toBeInstanceOf(Object);
+			}
+		});
+		it("should return all threads if input is an empty object", async () => {
+			const threads = await resolver.thread({});
+			if (threads instanceof Error) return new Error(threads.message);
+			else {
+				expect(threads).toBeInstanceOf(Array);
+				expect(threads.length).toBeGreaterThan(0);
+			}
+		});
+		it("should return all threads if input is undefined", async () => {
+			const threads = await resolver.thread(undefined);
+			if (threads instanceof Error) return new Error(threads.message);
+			else {
+				expect(threads).toBeInstanceOf(Array);
+				expect(threads.length).toBeGreaterThan(0);
 			}
 		});
 		it("should return an error when ID is not found", async () => {
@@ -140,6 +156,13 @@ describe("Community", () => {
 			const threads = await resolver.thread({
 				upvotesGTE: 100,
 				upvotes: 1000
+			});
+			expect(threads instanceof Error).toBe(true);
+		});
+		it("should return Error if both LTE and upvotes are given", async () => {
+			const threads = await resolver.thread({
+				upvotesLTE: 100,
+				upvotes: 20
 			});
 			expect(threads instanceof Error).toBe(true);
 		});

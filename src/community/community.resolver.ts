@@ -17,7 +17,7 @@ export class CommunityResolver {
 	}
 
 	@Query("thread")
-	async thread(@Args("input") input: IThreadByParams) {
+	async thread(@Args("input") input: IThreadByParams | null = null) {
 		const thread = await this.communityService.threadsByParam(input);
 		if (thread instanceof Error) return new Error(thread.message);
 		else return thread;
