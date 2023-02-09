@@ -77,8 +77,8 @@ describe("Community", () => {
 		expect(resolver).toBeDefined();
 	});
 	describe("Param based querying", function () {
-		test("should return all threads if no params are inputted", async () => {
-			const threads = await resolver.thread({});
+		it("should return all threads if input is null", async () => {
+			const threads = await resolver.thread();
 			expect(threads).toBeInstanceOf(Array);
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -91,7 +91,23 @@ describe("Community", () => {
 				expect(testingThreadDoc.author).toBeInstanceOf(Object);
 			}
 		});
-		test("should return an error when ID is not found", async () => {
+		it("should return all threads if input is an empty object", async () => {
+			const threads = await resolver.thread({});
+			if (threads instanceof Error) return new Error(threads.message);
+			else {
+				expect(threads).toBeInstanceOf(Array);
+				expect(threads.length).toBeGreaterThan(0);
+			}
+		});
+		it("should return all threads if input is undefined", async () => {
+			const threads = await resolver.thread(undefined);
+			if (threads instanceof Error) return new Error(threads.message);
+			else {
+				expect(threads).toBeInstanceOf(Array);
+				expect(threads.length).toBeGreaterThan(0);
+			}
+		});
+		it("should return an error when ID is not found", async () => {
 			const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 			expect(thread instanceof Error).toBe(true);
 		});
@@ -139,6 +155,13 @@ describe("Community", () => {
 			const threads = await resolver.thread({
 				upvotesGTE: 100,
 				upvotes: 1000
+			});
+			expect(threads instanceof Error).toBe(true);
+		});
+		it("should return Error if both LTE and upvotes are given", async () => {
+			const threads = await resolver.thread({
+				upvotesLTE: 100,
+				upvotes: 20
 			});
 			expect(threads instanceof Error).toBe(true);
 		});
@@ -221,6 +244,25 @@ describe("Community", () => {
 				body: "Is this thread updatable?"
 			});
 			expect(thread instanceof Error).toBe(true);
+		});
+		it("should update timestamp when comment is added to parent thread", async function () {
+			const thread = await resolver.thread({ id: threadID });
+			if (thread instanceof Error) return new Error(thread.message);
+			else {
+				const comment = await resolver.addCommentToThread(threadID, {
+					body: "How does this look?",
+					author: accountID
+				});
+				if (comment instanceof Error) return new Error(comment.message);
+				else {
+					const updatedThread = await resolver.thread({ id: threadID });
+					if (updatedThread instanceof Error)
+						return new Error(updatedThread.message);
+					else {
+						expect(updatedThread[0].updatedAt > thread[0].updatedAt).toBe(true);
+					}
+				}
+			}
 		});
 	});
 	describe("Delete", function () {

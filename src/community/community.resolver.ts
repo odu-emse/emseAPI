@@ -17,7 +17,7 @@ export class CommunityResolver {
 	}
 
 	@Query("thread")
-	async thread(@Args("input") input: IThreadByParams) {
+	async thread(@Args("input") input: IThreadByParams | null = null) {
 		const thread = await this.communityService.threadsByParam(input);
 		if (thread instanceof Error) return new Error(thread.message);
 		else return thread;
@@ -44,13 +44,20 @@ export class CommunityResolver {
 		if (self instanceof Error) return new Error(self.message);
 		else {
 			//creating new comment document
-			const newThread = await this.createThread({
+			const parentThread = self[0];
+			const comment = await this.createThread({
 				body: data.body,
 				author: data.author,
-				parentThread: self[0].id
+				parentThread: parentThread.id
 			});
-			if (newThread instanceof Error) return new Error(newThread.message);
-			return newThread;
+			if (comment instanceof Error) return new Error(comment.message);
+
+			//updating timestamp of parent thread
+			await this.updateThread(parentThread.id, {
+				updatedAt: new Date()
+			});
+
+			return comment;
 		}
 	}
 
@@ -59,14 +66,13 @@ export class CommunityResolver {
 		return await this.communityService.upvoteThread(id);
 	}
 
-
 	@Mutation("updateThread")
 	async updateThread(
 		@Args("id") id: string,
 		@Args("data") data: Prisma.ThreadUpdateInput
 	) {
 		const res = await this.communityService.updateThread(id, data);
-		if (!res || res instanceof Error) return new Error(res.message);
+		if (res instanceof Error) return new Error(res.message);
 		return res;
 	}
 }
