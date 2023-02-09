@@ -21,6 +21,7 @@ export class CommunityService {
 				}
 			}
 		},
+		parentThread: true,
 		parentLesson: true,
 		usersWatching: true,
 		author: true
@@ -191,14 +192,14 @@ export class CommunityService {
 		if (!parentThread && !title)
 			return new Error("Parent thread ID is required for comments.");
 
-		return await this.prisma.thread.create({
+		return this.prisma.thread.create({
 			data: create,
 			include: this.threadInclude
 		});
 	}
 
 	async upvoteThread(id: string) {
-		return await this.prisma.thread.update({
+		return this.prisma.thread.update({
 			where: {
 				id
 			},
@@ -211,7 +212,7 @@ export class CommunityService {
 	}
 
 	async updateThread(id: string, data: Prisma.ThreadUpdateInput) {
-		const { title, body } = data;
+		const { title, body, updatedAt } = data;
 		try {
 			const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
 				where: {
@@ -219,8 +220,11 @@ export class CommunityService {
 				},
 				data: {
 					...(title && { title }),
-					...(body && { body })
-				}
+
+					...(body && { body }),
+					...(updatedAt && { updatedAt })
+				},
+				include: this.threadInclude
 			});
 			return await this.prisma.thread.update(update);
 		} catch (e: any) {
@@ -229,7 +233,7 @@ export class CommunityService {
 	}
 
 	async deleteThread(id: string) {
-		return await this.prisma.thread.delete({
+		return this.prisma.thread.delete({
 			where: {
 				id
 			}
@@ -249,16 +253,14 @@ export class CommunityService {
 				}
 			}
 		});
-		console.log(update);
-		return await this.prisma.thread.update({
+
+		return this.prisma.thread.update({
 			where: {
 				id: parentThreadID
 			},
 			data: update,
-			include: {
-				comments: true,
-				author: true
-			}
+
+			include: this.threadInclude
 		});
 	}
 }
