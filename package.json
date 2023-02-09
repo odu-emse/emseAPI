@@ -31,6 +31,8 @@
 		"@nestjs/jwt": "^8.0.0",
 		"@nestjs/passport": "^9.0.0",
 		"@nestjs/platform-express": "^8.0.6",
+		"@nestjs/platform-socket.io": "^9.3.7",
+		"@nestjs/websockets": "^9.3.7",
 		"@prisma/client": "^4.0.0",
 		"@sentry/node": "^6.13.2",
 		"@sentry/tracing": "^6.13.2",
@@ -44,6 +46,8 @@
 		"google-auth-library": "^8.5.1",
 		"graphql": "^16.6.0",
 		"graphql-iso-date": "^3.6.1",
+		"graphql-subscriptions": "^2.0.0",
+		"graphql-ws": "^5.11.3",
 		"moment": "^2.29.4",
 		"passport": "^0.6.0",
 		"passport-google-oauth20": "^2.0.0",
@@ -54,6 +58,7 @@
 		"typescript": "^4.9.5"
 	},
 	"devDependencies": {
+		"@nestjs/schematics": "^9.0.4",
 		"@nestjs/testing": "^8.0.6",
 		"@types/cookie-parser": "^1.4.2",
 		"@types/jest": "^28.1.7",
