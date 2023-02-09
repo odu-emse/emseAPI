@@ -1,7 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import { IThreadByParams, IThreadCreateInput, ICommentCreateInput } from "@/types/graphql";
+import {
+	IThreadByParams,
+	IThreadCreateInput,
+	ICommentCreateInput
+} from "@/types/graphql";
 
 @Injectable()
 export class CommunityService {
@@ -17,6 +21,7 @@ export class CommunityService {
 				}
 			}
 		},
+		parentThread: true,
 		parentLesson: true,
 		usersWatching: true,
 		author: true
@@ -130,8 +135,7 @@ export class CommunityService {
 				},
 				include: this.threadInclude
 			});
-			if (!response || response instanceof Error)
-				return new Error("Thread not found");
+			if (!response) return new Error("Thread not found");
 			res = [response];
 		} else {
 			res = await this.prisma.thread.findMany({
@@ -181,14 +185,14 @@ export class CommunityService {
 		if (!parentThread && !title)
 			return new Error("Parent thread ID is required for comments.");
 
-		return await this.prisma.thread.create({
+		return this.prisma.thread.create({
 			data: create,
 			include: this.threadInclude
 		});
 	}
 
 	async upvoteThread(id: string) {
-		return await this.prisma.thread.update({
+		return this.prisma.thread.update({
 			where: {
 				id
 			},
@@ -201,53 +205,52 @@ export class CommunityService {
 	}
 
 	async updateThread(id: string, data: Prisma.ThreadUpdateInput) {
-		const { title, body } = data;
+		const { title, body, updatedAt } = data;
 		try {
-      const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
-			  where: {
-				  id
-			  },
-			  data: {
-				  ...(title && { title }),
-				  ...(body && { body })
-			  }
-		  })
-		  return await this.prisma.thread.update(update);
+			const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
+				where: {
+					id
+				},
+				data: {
+					...(title && { title }),
+					...(body && { body }),
+					...(updatedAt && { updatedAt })
+				},
+				include: this.threadInclude
+			});
+			return await this.prisma.thread.update(update);
 		} catch (e: any) {
 			return new Error(e);
 		}
 	}
 
 	async deleteThread(id: string) {
-		return await this.prisma.thread.delete({
+		return this.prisma.thread.delete({
 			where: {
 				id
 			}
 		});
 	}
-  
-  async addCommentToThread(parentThreadID: string, data: ICommentCreateInput) {
-        if(!data.id){
-            throw new Error("Comment ID is required to connect to parent thread. There was an error creating your initial comment, if this error is shown.")
-        }
-        const update = Prisma.validator<Prisma.ThreadUncheckedUpdateInput>()({
-            comments: {
-                connect: {
-                    id: data.id
-                }
-            }
-        })
-        console.log(update);
-        return await this.prisma.thread.update({
-            where: {
-                id: parentThreadID
-            },
-            data: update,
-            include: {
-                comments: true,
-                author: true
-            }
-        })
-    }
-  
+
+	async addCommentToThread(parentThreadID: string, data: ICommentCreateInput) {
+		if (!data.id) {
+			throw new Error(
+				"Comment ID is required to connect to parent thread. There was an error creating your initial comment, if this error is shown."
+			);
+		}
+		const update = Prisma.validator<Prisma.ThreadUncheckedUpdateInput>()({
+			comments: {
+				connect: {
+					id: data.id
+				}
+			}
+		});
+		return this.prisma.thread.update({
+			where: {
+				id: parentThreadID
+			},
+			data: update,
+			include: this.threadInclude
+		});
+	}
 }
