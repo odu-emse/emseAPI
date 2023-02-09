@@ -225,6 +225,25 @@ describe("Community", () => {
 			});
 			expect(thread instanceof Error).toBe(true);
 		});
+		it("should update timestamp when comment is added to parent thread", async function () {
+			const thread = await resolver.thread({ id: threadID });
+			if (thread instanceof Error) return new Error(thread.message);
+			else {
+				const comment = await resolver.addCommentToThread(threadID, {
+					body: "How does this look?",
+					author: accountID
+				});
+				if (comment instanceof Error) return new Error(comment.message);
+				else {
+					const updatedThread = await resolver.thread({ id: threadID });
+					if (updatedThread instanceof Error)
+						return new Error(updatedThread.message);
+					else {
+						expect(updatedThread[0].updatedAt > thread[0].updatedAt).toBe(true);
+					}
+				}
+			}
+		});
 	});
 	describe("Delete", function () {
 		it("should delete the thread", async () => {
