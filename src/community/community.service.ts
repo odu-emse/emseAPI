@@ -219,11 +219,56 @@ export class CommunityService {
 	}
 
 	async deleteThread(id: string) {
-		return await this.prisma.thread.delete({
+		const getUsersWatching = await this.prisma.thread.findFirst({
 			where: {
 				id
+			},
+			include: {
+				usersWatching: true
 			}
-		});
+		})
+
+		if(!getUsersWatching) return new Error("Thread not found!")
+		else {
+
+			const usersWatchingID = getUsersWatching.usersWatching.map((v) => v.id)
+
+			usersWatchingID.map(async (u) => { 
+				const user = await this.prisma.user.findFirst({ 
+					where: {
+						id: u
+					},
+					include: {
+						watchedThreads: true
+					}
+				});
+				if(!user) return new Error("User's threads not found.")
+				else {
+					const filteredThreads = user.watchedThreads.filter((watcherID) => watcherID.id !== id)
+					
+					const filteredThreadIDs = filteredThreads.map((v) => v.id)
+
+					console.log(filteredThreadIDs);
+					
+					 this.prisma.user.update({
+						where: {
+							id: user.id
+						},
+						data: {
+							watchedThreadIDs: {
+								set: filteredThreadIDs
+							}
+						}
+					})
+				}
+			})
+		
+			return await this.prisma.thread.delete({
+				where: {
+					id
+				}
+			});
+		}
 	}
   
   async addCommentToThread(parentThreadID: string, data: ICommentCreateInput) {
