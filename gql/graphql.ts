@@ -308,6 +308,7 @@ export interface IMutation {
     upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    send(authorID: string, recipientID: string, message: string): boolean | Promise<boolean>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -386,6 +387,17 @@ export interface Thread {
     updatedAt: Date;
     parentThread?: Nullable<Thread>;
     parentThreadID?: Nullable<string>;
+}
+
+export interface ISubscription {
+    listenForMessage(): Nullable<Message> | Promise<Nullable<Message>>;
+}
+
+export interface Message {
+    author: User;
+    recipient: User;
+    message: string;
+    sentAt: Date;
 }
 
 export interface PlanOfStudy {
