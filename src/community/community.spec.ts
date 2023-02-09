@@ -77,7 +77,7 @@ describe("Community", () => {
 		expect(resolver).toBeDefined();
 	});
 	describe("Param based querying", function () {
-		it("should return all threads if input is null", async () => {
+		test("should return all threads if input is null", async () => {
 			const threads = await resolver.thread();
 			expect(threads).toBeInstanceOf(Array);
 			if (threads instanceof Error) return new Error(threads.message);
@@ -91,7 +91,7 @@ describe("Community", () => {
 				expect(testingThreadDoc.author).toBeInstanceOf(Object);
 			}
 		});
-		it("should return all threads if input is an empty object", async () => {
+		test("should return all threads if input is an empty object", async () => {
 			const threads = await resolver.thread({});
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -99,7 +99,7 @@ describe("Community", () => {
 				expect(threads.length).toBeGreaterThan(0);
 			}
 		});
-		it("should return all threads if input is undefined", async () => {
+		test("should return all threads if input is undefined", async () => {
 			const threads = await resolver.thread(undefined);
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -107,7 +107,7 @@ describe("Community", () => {
 				expect(threads.length).toBeGreaterThan(0);
 			}
 		});
-		it("should return an error when ID is not found", async () => {
+		test("should return an error when ID is not found", async () => {
 			const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 			expect(thread instanceof Error).toBe(true);
 		});
