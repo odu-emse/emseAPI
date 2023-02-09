@@ -1,7 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import { IThreadByParams, IThreadCreateInput, ICommentCreateInput } from "@/types/graphql";
+import {
+	IThreadByParams,
+	IThreadCreateInput,
+	ICommentCreateInput
+} from "@/types/graphql";
 
 @Injectable()
 export class CommunityService {
@@ -22,126 +26,132 @@ export class CommunityService {
 		author: true
 	});
 
-	async threadsByParam(input: IThreadByParams) {
-		const {
-			id,
-			title,
-			body,
-			parentLesson,
-			parentThread,
-			author,
-			comments,
-			upvotes,
-			upvotesGTE,
-			upvotesLTE
-		} = input;
+	async threadsByParam(input?: IThreadByParams | null) {
+		if (!input) {
+			return this.prisma.thread.findMany({
+				include: this.threadInclude
+			});
+		} else {
+			const {
+				id,
+				title,
+				body,
+				parentLesson,
+				parentThread,
+				author,
+				comments,
+				upvotes,
+				upvotesGTE,
+				upvotesLTE
+			} = input;
 
-		const where = Prisma.validator<Prisma.ThreadWhereInput>()({
-			...(id && { id }),
-			...(title && {
-				title: {
-					contains: title
-				}
-			}),
-			...(body && {
-				body: {
-					contains: body
-				}
-			}),
-			...(parentLesson && {
-				parentLesson: {
-					id: parentLesson
-				}
-			}),
-			...(parentThread && {
-				parentThread: {
-					id: parentThread
-				}
-			}),
-			...(author && {
-				author: {
-					id: author
-				}
-			}),
-			...(upvotes && {
-				upvotes
-			}),
-			...(upvotesGTE && {
-				upvotes: {
-					gte: upvotesGTE
-				}
-			}),
-			...(upvotesLTE && {
-				upvotes: {
-					lte: upvotesLTE
-				}
-			}),
-			...(comments && {
-				comments: {
-					some: {
-						id: {
-							in: comments
-						}
+			const where = Prisma.validator<Prisma.ThreadWhereInput>()({
+				...(id && { id }),
+				...(title && {
+					title: {
+						contains: title
 					}
-				}
-			})
-		});
-
-		// if both upvotes and upvotesGTE or upvotesLTE are provided, we need to throw an error since we cannot filter for exact number and range at the same time
-		if (
-			(typeof upvotes === "number" && typeof upvotesGTE === "number") ||
-			(typeof upvotes === "number" && typeof upvotesLTE === "number")
-		)
-			return new Error(
-				"Cannot use upvotes and upvotesGTE or upvotesLTE at the same time"
-			);
-
-		// if both upvotesGTE and upvotesLTE are provided, we need to use AND to get the range
-		if (typeof upvotesGTE === "number" && typeof upvotesLTE === "number") {
-			delete where["upvotes"];
-			where["AND"] = [
-				{
+				}),
+				...(body && {
+					body: {
+						contains: body
+					}
+				}),
+				...(parentLesson && {
+					parentLesson: {
+						id: parentLesson
+					}
+				}),
+				...(parentThread && {
+					parentThread: {
+						id: parentThread
+					}
+				}),
+				...(author && {
+					author: {
+						id: author
+					}
+				}),
+				...(upvotes && {
+					upvotes
+				}),
+				...(upvotesGTE && {
 					upvotes: {
 						gte: upvotesGTE
 					}
-				},
-				{
+				}),
+				...(upvotesLTE && {
 					upvotes: {
 						lte: upvotesLTE
 					}
-				}
-			] as Prisma.ThreadWhereInput["AND"];
-		}
-
-		const include = this.threadInclude;
-
-		let res:
-			| Array<
-					Prisma.ThreadGetPayload<{
-						include: typeof include;
-					}>
-			  >
-			| Error;
-
-		if (id) {
-			const response = await this.prisma.thread.findUnique({
-				where: {
-					id
-				},
-				include: this.threadInclude
+				}),
+				...(comments && {
+					comments: {
+						some: {
+							id: {
+								in: comments
+							}
+						}
+					}
+				})
 			});
-			if (!response || response instanceof Error)
-				return new Error("Thread not found");
-			res = [response];
-		} else {
-			res = await this.prisma.thread.findMany({
-				where,
-				include: this.threadInclude
-			});
-		}
 
-		if (!res) return new Error("Thread not found");
-		else return res;
+			// if both upvotes and upvotesGTE or upvotesLTE are provided, we need to throw an error since we cannot filter for exact number and range at the same time
+			if (
+				(typeof upvotes === "number" && typeof upvotesGTE === "number") ||
+				(typeof upvotes === "number" && typeof upvotesLTE === "number")
+			)
+				return new Error(
+					"Cannot use upvotes and upvotesGTE or upvotesLTE at the same time"
+				);
+
+			// if both upvotesGTE and upvotesLTE are provided, we need to use AND to get the range
+			if (typeof upvotesGTE === "number" && typeof upvotesLTE === "number") {
+				delete where["upvotes"];
+				where["AND"] = [
+					{
+						upvotes: {
+							gte: upvotesGTE
+						}
+					},
+					{
+						upvotes: {
+							lte: upvotesLTE
+						}
+					}
+				] as Prisma.ThreadWhereInput["AND"];
+			}
+
+			const include = this.threadInclude;
+
+			let res:
+				| Array<
+						Prisma.ThreadGetPayload<{
+							include: typeof include;
+						}>
+				  >
+				| Error;
+
+			if (id) {
+				const response = await this.prisma.thread.findUnique({
+					where: {
+						id
+					},
+					include: this.threadInclude
+				});
+				if (!response || response instanceof Error)
+					return new Error("Thread not found");
+				res = [response];
+			} else {
+				res = await this.prisma.thread.findMany({
+					where,
+					include: this.threadInclude
+				});
+			}
+
+			if (!res) return new Error("Thread not found");
+			else return res;
+		}
 	}
 
 	async createThread(data: IThreadCreateInput) {
@@ -203,16 +213,16 @@ export class CommunityService {
 	async updateThread(id: string, data: Prisma.ThreadUpdateInput) {
 		const { title, body } = data;
 		try {
-      const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
-			  where: {
-				  id
-			  },
-			  data: {
-				  ...(title && { title }),
-				  ...(body && { body })
-			  }
-		  })
-		  return await this.prisma.thread.update(update);
+			const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
+				where: {
+					id
+				},
+				data: {
+					...(title && { title }),
+					...(body && { body })
+				}
+			});
+			return await this.prisma.thread.update(update);
 		} catch (e: any) {
 			return new Error(e);
 		}
@@ -225,29 +235,30 @@ export class CommunityService {
 			}
 		});
 	}
-  
-  async addCommentToThread(parentThreadID: string, data: ICommentCreateInput) {
-        if(!data.id){
-            throw new Error("Comment ID is required to connect to parent thread. There was an error creating your initial comment, if this error is shown.")
-        }
-        const update = Prisma.validator<Prisma.ThreadUncheckedUpdateInput>()({
-            comments: {
-                connect: {
-                    id: data.id
-                }
-            }
-        })
-        console.log(update);
-        return await this.prisma.thread.update({
-            where: {
-                id: parentThreadID
-            },
-            data: update,
-            include: {
-                comments: true,
-                author: true
-            }
-        })
-    }
-  
+
+	async addCommentToThread(parentThreadID: string, data: ICommentCreateInput) {
+		if (!data.id) {
+			throw new Error(
+				"Comment ID is required to connect to parent thread. There was an error creating your initial comment, if this error is shown."
+			);
+		}
+		const update = Prisma.validator<Prisma.ThreadUncheckedUpdateInput>()({
+			comments: {
+				connect: {
+					id: data.id
+				}
+			}
+		});
+		console.log(update);
+		return await this.prisma.thread.update({
+			where: {
+				id: parentThreadID
+			},
+			data: update,
+			include: {
+				comments: true,
+				author: true
+			}
+		});
+	}
 }

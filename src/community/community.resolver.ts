@@ -17,7 +17,7 @@ export class CommunityResolver {
 	}
 
 	@Query("thread")
-	async thread(@Args("input") input: IThreadByParams) {
+	async thread(@Args("input") input: IThreadByParams | null = null) {
 		const thread = await this.communityService.threadsByParam(input);
 		if (thread instanceof Error) return new Error(thread.message);
 		else return thread;
@@ -58,7 +58,6 @@ export class CommunityResolver {
 	async upvoteThread(@Args("id") id: string) {
 		return await this.communityService.upvoteThread(id);
 	}
-
 
 	@Mutation("updateThread")
 	async updateThread(
