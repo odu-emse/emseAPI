@@ -1,12 +1,17 @@
 import { Args, Mutation, Resolver, Subscription } from "@nestjs/graphql";
 import { PubSub } from "graphql-subscriptions";
 import { DirectMessageService } from "@/direct-message";
+import { Inject } from "@nestjs/common";
+import { ClientProxy, EventPattern } from "@nestjs/microservices";
 
 const pubSub: PubSub = new PubSub();
 
 @Resolver()
 export class DirectMessageResolver {
-	constructor(private readonly dmService: DirectMessageService) {}
+	constructor(
+		private readonly dmService: DirectMessageService,
+		@Inject("DM_SERVICE") private client: ClientProxy
+	) {}
 
 	@Subscription("newDirectMessage", {
 		resolve: (payload) => payload,
