@@ -223,6 +223,21 @@ export interface LessonFields {
     position?: Nullable<number>;
 }
 
+export interface ProgressArgs {
+    id?: Nullable<string>;
+    completed?: Nullable<boolean>;
+    status?: Nullable<number>;
+    createdAt?: Nullable<Date>;
+    updatedAt?: Nullable<Date>;
+    enrollmentID?: Nullable<string>;
+}
+
+export interface ProgressWaiveArgs {
+    enrollmentID?: Nullable<string>;
+    moduleID?: Nullable<string>;
+    planID?: Nullable<string>;
+}
+
 export interface NewUser {
     openID: string;
     email: string;
@@ -339,6 +354,10 @@ export interface IMutation {
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content> | Promise<Nullable<Content>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
+    createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
+    waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
+    deleteProgress(id: string): boolean | Promise<boolean>;
+    updateProgress(status: number, id?: Nullable<string>, enrollmentID?: Nullable<string>): Progress | Promise<Progress>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -366,6 +385,7 @@ export interface IQuery {
     collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
+    progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     user(input?: Nullable<UserFields>): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
@@ -404,6 +424,7 @@ export interface ModuleEnrollment {
     module: Module;
     plan?: Nullable<PlanOfStudy>;
     inactivePlan?: Nullable<PlanOfStudy>;
+    progress: Progress;
 }
 
 export interface AssignmentResult {
@@ -490,6 +511,15 @@ export interface Content {
 
 export interface Error {
     message?: Nullable<string>;
+}
+
+export interface Progress {
+    id: string;
+    status: number;
+    completed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    enrollment: ModuleEnrollment;
 }
 
 export interface Social {

@@ -141,6 +141,7 @@ Table ModuleEnrollment {
   moduleId String [not null]
   plan PlanOfStudy
   planID String
+  progress Progress
 }
 
 Table Assignment {
@@ -190,6 +191,16 @@ Table Content {
   link String [not null]
   parent Lesson [not null]
   parentID String [not null]
+}
+
+Table Progress {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  status Float [not null, default: 0]
+  completed Boolean [not null, default: false]
+  enrollment ModuleEnrollment [not null]
+  enrollmentID String [unique, not null]
 }
 
 Enum UserRole {
@@ -250,3 +261,5 @@ Ref: Thread.parentLessonID > Lesson.id
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Content.parentID > Lesson.id
+
+Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]

@@ -13,7 +13,6 @@ import {
 	AssignmentResFields,
 	ModEnrollmentFields,
 	LessonFields,
-	Module,
 	Course,
 	ModuleFeedback,
 	CreateCollectionArgs,
@@ -21,7 +20,7 @@ import {
 	CreateContentArgs,
 	ContentFields,
 	NewModule
-} from "gql/graphql";
+} from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -61,14 +60,15 @@ export class ProgramService {
 		}
 	});
 
-	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
+	public moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
 		members: {
 			include: {
 				plan: {
 					include: {
 						student: true
 					}
-				}
+				},
+				progress: true
 			}
 		},
 		assignments: {
@@ -138,14 +138,15 @@ export class ProgramService {
 			}
 		});
 
-	private moduleEnrollmentInclude =
+	public moduleEnrollmentInclude =
 		Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
 			plan: {
 				include: {
 					student: true
 				}
 			},
-			module: true
+			module: true,
+			progress: true
 		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
@@ -897,13 +898,14 @@ export class ProgramService {
 		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
 			data: {
 				name: input.name,
-				...(input.content !== null && input.content !== undefined && {
-					content: {
-						connect: {
-							id: input.content
+				...(input.content !== null &&
+					input.content !== undefined && {
+						content: {
+							connect: {
+								id: input.content
+							}
 						}
-					}
-				}),
+					}),
 				transcript: input.transcript,
 				collection: {
 					connect: {

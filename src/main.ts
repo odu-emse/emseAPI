@@ -3,11 +3,17 @@ import { AppModule } from "./app.module";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 import sourceMapSupport from "source-map-support";
+import { PrismaService } from "@/prisma.service";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		cors: {
-			origin: ["http://localhost:3000", "http://localhost:6006"],
+			origin: [
+				"http://localhost:3000",
+				"http://localhost:4000",
+				"http://localhost:6006",
+				"https://studio.apollographql.com"
+			],
 			credentials: true
 		},
 		logger: ["error", "warn", "debug", "verbose", "log"]
@@ -40,5 +46,8 @@ async function bootstrap() {
 	await app.listen(process.env.PORT!, () =>
 		console.log(`🕵️‍ Listening on port ${process.env.PORT || 3000}...`)
 	);
+
+	const prismaService = app.get(PrismaService);
+	await prismaService.enableShutdownHooks(app);
 }
 bootstrap();

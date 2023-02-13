@@ -1,6 +1,20 @@
+start: prisma/schema.prisma
+	yarn install
+	yarn prisma db push
+	yarn prisma generate
+
 up:
 	yarn install
 	docker-compose up
+up-d:
+	yarn install
+	docker-compose up -d
+	#docker exec -it back_end_db bash
+	#mongosh --host back_end_db -u root -p example --authenticationDatabase admin emse
+up-apollo:
+	yarn install
+	export "USE_APOLLO=TRUE"
+	docker-compose up -d
 down:
 	docker-compose down
 build:
@@ -29,6 +43,10 @@ reup:
 	make remvimg
 	make build
 	make up
+reup-d:
+	make remvimg
+	make build
+	make up-d
 
 reup-clean:
 	make remvimg

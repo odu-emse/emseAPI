@@ -5,7 +5,7 @@ name: EMSE-API - CI pipeline
 
 on:
   push:
-    branches: [master, dev]
+    branches: [dev, 'ALMP-**']
   pull_request:
     branches: [ master, dev ]
 
@@ -28,7 +28,7 @@ jobs:
       - name: Export DB URL
         run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
       - name: Generate Prisma types
-        run: yarn db:generate
+        run: yarn generate
       - name: Build application
         run: yarn nest build
   test:
@@ -51,7 +51,7 @@ jobs:
       - name: Generate types
         run: yarn generate
       - name: Run test suite
-        run: yarn test
+        run: yarn vitest
   coverage:
     needs: [test]
     runs-on: ubuntu-latest
@@ -73,7 +73,7 @@ jobs:
       - name: Build types
         run: yarn generate
       - name: Run tests and collect coverage
-        run: yarn jest --coverage
+        run: yarn vitest --coverage
       - name: Upload coverage reports to Codecov
         run: |
           curl -Os https://uploader.codecov.io/latest/linux/codecov
