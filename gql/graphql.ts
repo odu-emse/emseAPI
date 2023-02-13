@@ -308,7 +308,7 @@ export interface IMutation {
     upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
-    send(authorID: string, recipientID: string, message: string): boolean | Promise<boolean>;
+    createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -390,14 +390,46 @@ export interface Thread {
 }
 
 export interface ISubscription {
-    listenForMessage(): Nullable<Message> | Promise<Nullable<Message>>;
+    newDirectMessage(receiverID?: Nullable<string>): Nullable<DirectMessageResponse> | Promise<Nullable<DirectMessageResponse>>;
 }
 
-export interface Message {
+export interface CreateMessageInput {
+    authorID: string;
+    recipientID: string;
+    message: string;
+}
+
+export interface DirectMessage {
+    id?: Nullable<string>;
+    message?: Nullable<string>;
+    sender?: Nullable<string>;
+    receiverID?: Nullable<string>;
+    createdAt?: Nullable<Date>;
+}
+
+export interface DirectMessageResponse {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    body: string;
+    authorID: string;
+    recipientID: string;
     author: User;
     recipient: User;
-    message: string;
-    sentAt: Date;
+}
+
+export interface Channel {
+    id: string;
+    name: string;
+    public: boolean;
+    messages: DirectMessage[];
+    accounts: Members[];
+}
+
+export interface Group {
+    id: string;
+    name: string;
+    users: User[];
 }
 
 export interface PlanOfStudy {
@@ -557,4 +589,5 @@ export interface Token {
     token?: Nullable<string>;
 }
 
+export type Members = User | Group;
 type Nullable<T> = T | null;

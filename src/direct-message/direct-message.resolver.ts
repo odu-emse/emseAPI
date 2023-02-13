@@ -1,7 +1,6 @@
 import { Args, Mutation, Resolver, Subscription } from "@nestjs/graphql";
-import { PubSub, PubSubEngine } from "graphql-subscriptions";
+import { PubSub } from "graphql-subscriptions";
 import { DirectMessageService } from "@/direct-message";
-import { Message } from "@/types/graphql";
 
 const pubSub: PubSub = new PubSub();
 
@@ -9,25 +8,35 @@ const pubSub: PubSub = new PubSub();
 export class DirectMessageResolver {
 	constructor(private readonly dmService: DirectMessageService) {}
 
-	@Subscription("listenForMessage", {
-		resolve: (payload: Message) => payload
+	@Subscription("newDirectMessage", {
+		resolve: (payload) => payload,
+		filter: (payload, args) => {
+			console.log(payload, args);
+			return payload.recipientID === args.receiverID;
+		}
 	})
-	async listenForMessage() {
-		return pubSub.asyncIterator("directMessage");
+	async newDirectMessage() {
+		return pubSub.asyncIterator("newDirectMessage");
 	}
 
 	@Mutation()
-	async send(
-		@Args("authorID", { type: () => String }) authorID: string,
-		@Args("recipientID", { type: () => String }) recipientID: string,
-		@Args("message", { type: () => String }) message: string
+	async createDirectMessage(
+		@Args("receiverID") receiverID: string,
+		@Args("message") message: string,
+		@Args("senderID") senderID: string
 	) {
-		const newMessage = await this.dmService.sendMessage({
-			authorID,
-			recipientID,
-			message
-		});
-		await pubSub.publish("directMessage", { ...newMessage });
-		return newMessage ? true : false;
+		try {
+			const newMessage = await this.dmService.sendMessage({
+				authorID: senderID,
+				recipientID: receiverID,
+				message
+			});
+			if (newMessage instanceof Error) return new Error(newMessage.message);
+			await pubSub.publish("newDirectMessage", { ...newMessage });
+			return true;
+		} catch (err) {
+			console.log(err);
+			return false;
+		}
 	}
 }

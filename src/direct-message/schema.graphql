@@ -1,12 +1,54 @@
 type Subscription {
-    listenForMessage: Message
+    """
+    Subscribe to new messages in a channel. If the receiverID is not matched by the receiverID of the message, the message is not caught by WS.
+    """
+    newDirectMessage(receiverID: ID): DirectMessageResponse
 }
 type Mutation {
-    send(authorID: ID!, recipientID: ID!, message: String!): Boolean!
+    """
+    Send a message to a user. If the receiverID is and the senderID match, the service fails and returns an Error.
+    """
+    createDirectMessage(receiverID: ID!, message: String!, senderID: ID!): Boolean!
+#    createChannel(groupID: ID!, name: String!, publicAccess: Boolean=false): Boolean!
 }
-type Message {
+
+type CreateMessageInput {
+    authorID: ID!
+    recipientID: ID!
+    message: String!
+}
+
+type DirectMessage {
+    id: ID
+    message: String
+    sender: ID
+    receiverID: ID
+    createdAt: Date
+}
+
+type DirectMessageResponse {
+    id: ID!
+    createdAt: Date!
+    updatedAt: Date!
+    body: String!
+    authorID: ID!
+    recipientID: ID!
     author: User!
     recipient: User!
-    message: String!
-    sentAt: Date!
+}
+
+union Members = User | Group
+
+type Channel {
+    id: ID!
+    name: String!
+    public: Boolean!
+    messages: [DirectMessage!]!
+    accounts: [Members!]!
+}
+
+type Group {
+    id: ID!
+    name: String!
+    users: [User!]!
 }

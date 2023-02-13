@@ -1,39 +1,36 @@
 import { Injectable } from "@nestjs/common";
-import { Message } from "@/types/graphql";
 import { PrismaService } from "@/prisma.service";
+import { CreateMessageInput } from "@/types/graphql";
 
 @Injectable()
 export class DirectMessageService {
 	constructor(private readonly prisma: PrismaService) {}
-	async sendMessage({
-		authorID,
-		recipientID,
-		message
-	}: {
-		authorID: string;
-		recipientID: string;
-		message: string;
-	}): Promise<Message> {
+	async sendMessage({ authorID, recipientID, message }: CreateMessageInput) {
 		if (authorID === recipientID)
-			throw new Error("You can't send a message to yourself");
+			return new Error("You can't send a message to yourself");
 
-		const author = await this.prisma.user.findFirst({
-			where: {
-				id: authorID
+		const dm = await this.prisma.directMessage.create({
+			data: {
+				body: message,
+				author: {
+					connect: {
+						id: authorID
+					}
+				},
+				recipient: {
+					connect: {
+						id: recipientID
+					}
+				}
+			},
+			include: {
+				author: true,
+				recipient: true
 			}
 		});
-		if (!author) throw new Error("User not found");
 
-		const recipient = await this.prisma.user.findFirst({
-			where: { id: recipientID }
-		});
-		if (!recipient) throw new Error("Recipient not found");
+		if (!dm) return new Error("Message could not be sent");
 
-		return {
-			message,
-			author,
-			sentAt: new Date(),
-			recipient
-		};
+		return dm;
 	}
 }
