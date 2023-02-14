@@ -49,41 +49,49 @@ export class QuizResolver {
         return this.quizService.deleteQuiz(id);
     }
 
+    //TODO: createQuestionPool();
     @Mutation("createQuestionPool")
     async createQuestionPool() {
         return;
     }
 
+    //TODO deleteQuestionPool()
     @Mutation("deleteQuestionPool")
     async deleteQuestionPool(@Args("id") id: string) {
         return;
     }
 
+    //TODO createQuestion()
     @Mutation("createQuestion")
     async createQuestion(@Args("input") input: CreateQuestion) {
         return;
     }
 
+    //TODO updateQuestion()
     @Mutation("updateQuestion")
     async updateQuestion(@Args("selectors") id: string, @Args("values") values: UpdateQuestion) {
         return;
     }
 
+    //TODO deleteQuestion()
     @Mutation("deleteQuestion")
     async deleteQuestion(@Args("id") id: string) {
         return;
     }
 
+    //TODO createAnswer()
     @Mutation("createAnswer")
     async createAnswer(@Args("input") input: CreateAnswer) {
         return;
     }
 
+    //TODO updateAnswer()
     @Mutation("updateAnswer")
     async updateAnswer(@Args("selector") id: string, @Args("values") values: UpdateAnswer) {
         return;
     }
 
+    //TODO deleteAnswer()
     @Mutation("deleteAnswer")
     async deleteAnswer(@Args("id") id: string) {
         return;
