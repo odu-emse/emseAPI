@@ -42,11 +42,7 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			cors: {
 				credentials: true,
-				origin: [
-					"http://localhost:3000",
-					"http://localhost:4000",
-					"http://localhost:6006"
-				]
+				origin: ["http://localhost:3000", "http://localhost:6006"]
 			},
 			playground: true,
 			debug: process.env.NODE_ENV !== "production",
@@ -56,7 +52,7 @@ export class DateScalar implements CustomScalar<string, Moment> {
 			subscriptions: {
 				"graphql-ws": {
 					onConnect: (context) => {
-						console.log("onConnect");
+						console.log("🚀 Connected to websocket");
 						console.log(context);
 					}
 				},

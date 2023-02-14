@@ -3,8 +3,6 @@ import { AppModule } from "./app.module";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 import sourceMapSupport from "source-map-support";
-import { MicroserviceOptions, Transport } from "@nestjs/microservices";
-import { DirectMessageModule } from "@/direct-message";
 
 async function bootstrap() {
 	const app = await NestFactory;
@@ -16,17 +14,6 @@ async function bootstrap() {
 		},
 		logger: ["error", "warn", "debug", "verbose", "log"]
 	});
-
-	const ms = await app.createMicroservice<MicroserviceOptions>(
-		DirectMessageModule,
-		{
-			transport: Transport.REDIS,
-			options: {
-				host: "back_end_redis",
-				port: 6379
-			}
-		}
-	);
 
 	sourceMapSupport.install();
 
@@ -57,6 +44,5 @@ async function bootstrap() {
 		);
 		console.log(`🚀 Subscriptions ready at ws://localhost:${process.env.PORT}`);
 	});
-	await ms.listen();
 }
 bootstrap().catch((err) => console.error(err));
