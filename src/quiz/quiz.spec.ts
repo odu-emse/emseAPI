@@ -227,16 +227,19 @@ describe('Quiz Services', () => {
 
       })
       it("should return only matching records", async () => {
+        const questions = [testQuestions[0].id, testQuestions[1].id]
         const pools = await resolver.questionPool({
-          questions: [testQuestions[0].id],
+          questions,
           quizzes: [testQuiz.id]
         })
         expect(pools).toBeDefined();
         expect(pools.length).toBeGreaterThanOrEqual(1);
         expect(typeof pools).toBe(typeof []);
         pools.map((pool) =>{
-          expect(pool.questions.includes(testQuestions[0].id)).toBeTruthy();
-          expect(pool.quizzes.includes(testQuiz.id));
+          questions.map((question) =>{
+            expect(pool.questions.includes(question.id)).toBeTruthy();
+          })
+          expect(pool.quizzes.includes(testQuiz.id)).toBeTruthy();
         })
       })
     })

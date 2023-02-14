@@ -77,17 +77,43 @@ export class QuizService {
     }
 
     async questionPool(args: QuestionPoolFields) {
+        const where: Omit<Prisma.QuestionPoolWhereInput, "AND"> & {
+            AND: Array<Prisma.QuestionPoolWhereInput>
+        } = {
+            id: args.id ? args.id : undefined,
+            AND: []
+        }
+
+        if (args.questions){
+            args.questions.forEach((id) =>{
+                where.AND.push({
+                    questions: {some: {id}}
+                });
+            })
+        }
+
+        if (args.quizzes) {
+            args.quizzes.forEach((id) => {
+                where.AND.push({
+                    quizzes: {some: {id}}
+                })
+            })
+        }
+
         return this.prisma.questionPool.findMany({
+            where,
             include: this.questionPoolInclude
         })
     }
 
+    // TODO question();
     async question(args: QuestionFields) {
         return this.prisma.question.findMany({
             include: this.questionInclude
         })
     }
 
+    // TODO answer();
     async answer(args: AnswerFields) {
         return this.prisma.answer.findMany({
             include: this.answerInclude
@@ -138,6 +164,38 @@ export class QuizService {
                 id
             }
         })
+    }
+
+    async createQuestionPool() {
+        return;
+    }
+
+    async deleteQuestionPool() {
+        return;
+    }
+
+    async createQuestion() {
+        return;
+    }
+
+    async updateQuestion() {
+        return;
+    }
+
+    async deleteQuestion() {
+        return;
+    }
+
+    async createAnswer() {
+        return;
+    }
+
+    async updateAnswer() {
+        return;
+    }
+
+    async deleteAnswer() {
+        return;
     }
 
 }
