@@ -207,17 +207,20 @@ Table Progress {
 Table Quiz {
   id String [pk]
   totalPoints Float [not null]
-  dueAt DateTime [not null]
+  dueAt DateTime
   timeLimit Int
   numQuestions Int [not null]
   minScore Float [not null, default: 0]
   parentLesson Lesson [not null]
   parentLessonID String [not null]
+  questionPool QuestionPool [not null]
+  questionPoolID String [not null]
 }
 
 Table QuestionPool {
   id String [pk]
   questions Question [not null]
+  quizzes Quiz [not null]
 }
 
 Table Question {
@@ -226,7 +229,7 @@ Table Question {
   parentPool QuestionPool [not null]
   parentPoolID String [not null]
   text String [not null]
-  points Float [not null]
+  points Float [not null, default: 1]
   answers Answer [not null]
 }
 
@@ -237,7 +240,7 @@ Table Answer {
   weight Float
   index String
   parentQuestion Question [not null]
-  parentID String [not null]
+  parentQuestionID String [not null]
 }
 
 Enum UserRole {
@@ -303,6 +306,8 @@ Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
 Ref: Quiz.parentLessonID > Lesson.id
 
+Ref: Quiz.questionPoolID > QuestionPool.id
+
 Ref: Question.parentPoolID > QuestionPool.id
 
-Ref: Answer.parentID > Question.id
+Ref: Answer.parentQuestionID > Question.id

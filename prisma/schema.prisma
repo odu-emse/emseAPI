@@ -242,21 +242,24 @@ model Progress {
 
 // Generic template for a quiz. These will belong to a lesson.
 model Quiz {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
   totalPoints    Float
-  dueAt          DateTime
+  dueAt          DateTime?
   // startedAt      DateTime? Save these for responses
   // submittedAt    DateTime?
   timeLimit      Int?
   numQuestions   Int
-  minScore       Float    @default(0.0)
-  parentLesson   Lesson   @relation(fields: [parentLessonID], references: [id])
-  parentLessonID String   @db.ObjectId
+  minScore       Float        @default(0.0)
+  parentLesson   Lesson       @relation(fields: [parentLessonID], references: [id])
+  parentLessonID String       @db.ObjectId
+  questionPool   QuestionPool @relation(fields: [questionPoolID], references: [id])
+  questionPoolID String       @db.ObjectId
 }
 
 model QuestionPool {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   questions Question[]
+  quizzes   Quiz[]
 }
 
 model Question {
@@ -265,18 +268,18 @@ model Question {
   parentPool   QuestionPool @relation(fields: [parentPoolID], references: [id])
   parentPoolID String       @db.ObjectId
   text         String
-  points       Float
+  points       Float        @default(1.0)
   answers      Answer[]
 }
 
 model Answer {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  text           String
-  correct        Boolean
-  weight         Float?
-  index          String?
-  parentQuestion Question @relation(fields: [parentID], references: [id])
-  parentID       String   @db.ObjectId
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  text             String
+  correct          Boolean
+  weight           Float?
+  index            String?
+  parentQuestion   Question @relation(fields: [parentQuestionID], references: [id])
+  parentQuestionID String   @db.ObjectId
 }
 
 enum UserRole {
