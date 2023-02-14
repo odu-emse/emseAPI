@@ -14,7 +14,7 @@ type Quiz {
     """
     The allotted time to take this quiz in ms
     """
-    timeLimit: Date
+    timeLimit: Int
     """
     The number of questions on this quiz
     """
@@ -120,7 +120,7 @@ input QuizFields {
     """
     The allotted time to take this quiz in ms
     """
-    timeLimit: Date
+    timeLimit: Int
     """
     The number of questions on this quiz
     """
@@ -212,24 +212,24 @@ type Query {
     """
     Fetch a Quiz by any of its parameters. an empty object will return all quizzes and a single id will return a single quiz
     """
-    quiz(input: QuizFields!): [Quiz!]!
+    quiz(args: QuizFields!): [Quiz!]!
     """
     Fetch a QuizPool by any of its parameters. An empty object as the input parameter will return all Pools, an ID will retrieve an array with just a single pool.
     If a combination of parameters are used then only documents that match all the parameters will be included in the array.
     """
-    questionPool(input: QuestionPoolFields!): [QuestionPool!]!
+    questionPool(args: QuestionPoolFields!): [QuestionPool!]!
     """
     Fetch a Question by any of its parameters. An empty object as the input parameter will return all Questions, an ID will retrieve an array with just a single Question.
     If a only a pool ID is provided than all questions in that pool will be returned.
     If a combination of parameters are used then only documents that match all the parameters will be included in the array.
     """
-    question(input: QuestionFields!): [Question!]!
+    question(args: QuestionFields!): [Question!]!
     """
     Fetch an Answer by any of its parameters. An empty object as the input parameter will return all Answers, an ID will retrieve an array with just a single Answer.
     If a only a Question ID is provided than all answers for that question will be returned.
     If a combination of parameters are used then only documents that match all the parameters will be included in the array.
     """
-    answer(input: AnswerFields!): [Answer!]!
+    answer(args: AnswerFields!): [Answer!]!
 }
 
 # Mutations and relevant inputs
@@ -246,7 +246,7 @@ input CreateQuiz {
     """
     The allotted time to take this quiz in ms
     """
-    timeLimit: Date
+    timeLimit: Int
     """
     The number of questions on this quiz
     """
@@ -254,7 +254,7 @@ input CreateQuiz {
     """
     The minimum passing score for this quiz
     """
-    minScore: Float!
+    minScore: Float
     """
     The lesson that this quiz belongs to
     """
@@ -277,7 +277,7 @@ input UpdateQuiz {
     """
     The allotted time to take this quiz in ms
     """
-    timeLimit: Date
+    timeLimit: Int
     """
     The number of questions on this quiz
     """
@@ -308,7 +308,7 @@ input CreateQuestion {
     """
     The amount of points this question is worth
     """
-    points: Float!
+    points: Float
     """
     The pool this question belongs to
     """
@@ -379,7 +379,7 @@ input UpdateAnswer {
     """
     parentQuestion: ID
 }
-
+# TODO: Update documentation for update mutations
 type Mutation {
     """
     Create a new quiz record and associate it with its parent Lesson
@@ -389,7 +389,7 @@ type Mutation {
     Update the parameters of an existing quiz or quizzes given a list of selectors
     These selectors are any parameters that could exist within a quiz and function in a similar way to the quiz() query
     """
-    updateQuiz(selectors: QuizFields!, values: UpdateQuiz!): [Quiz!]!
+    updateQuiz(id: ID!, values: UpdateQuiz!): [Quiz!]!
     """
     Delete a quiz record given its document ID
     """
@@ -413,7 +413,7 @@ type Mutation {
     The selector fields will be a list of optional parameters that match QuestionFields.
     All questions that match the selector parameters will be updated with the input data
     """
-    updateQuestion(selectors: QuestionFields!, values: UpdateQuestion!): [Question!]!
+    updateQuestion(id: ID!, values: UpdateQuestion!): [Question!]!
     """
     Delete an existing question record give its document ID.
     It is important to note that deleting a question will also delete ALL associated Answer records
@@ -428,7 +428,7 @@ type Mutation {
     The selector fields will be a list of all optional parameters that can be found int AnswerFields.
     All documents that match all selector fields will be updated with the values passed as the second argument
     """
-    updateAnswer(selector: AnswerFields!, values: UpdateAnswer!): [Answer!]!
+    updateAnswer(id: ID!, values: UpdateAnswer!): [Answer!]!
     """
     Delete an answer record based on its document ID
     """

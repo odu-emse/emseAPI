@@ -9,43 +9,44 @@ import {
     QuestionPoolFields,
     QuizFields, CreateAnswer, UpdateAnswer
 } from "gql/graphql"
+import {QuizService} from "@/quiz/quiz.service";
 
 @Resolver()
 export class QuizResolver {
-
+    constructor(private readonly quizService: QuizService) {}
     @Query("quiz")
-    async quiz(@Args("input") input: QuizFields) {
-        return;
+    async quiz(@Args("args") args: QuizFields) {
+        return await this.quizService.quiz(args);
     }
 
     @Query("questionPool")
-    async questionPool(@Args("input") input: QuestionPoolFields) {
-        return;
+    async questionPool(@Args("args") args: QuestionPoolFields) {
+        return await this.quizService.questionPool(args);
     }
 
     @Query("question")
-    async question(@Args("input") input: QuestionFields) {
-        return;
+    async question(@Args("args") args: QuestionFields) {
+        return await this.quizService.question(args);
     }
 
     @Query("answer")
-    async answer(@Args("input") input: AnswerFields) {
-        return;
+    async answer(@Args("args") args: AnswerFields) {
+        return await this.quizService.answer(args);
     }
 
     @Mutation("createQuiz")
     async createQuiz(@Args("input") input: CreateQuiz) {
-        return;
+        return this.quizService.createQuiz(input);
     }
 
     @Mutation("updateQuiz")
-    async updateQuiz(@Args("input") input: UpdateQuiz) {
-        return;
+    async updateQuiz(@Args("seletors") id: string, @Args("values") values: UpdateQuiz) {
+        return this.quizService.updateQuiz(id, values);
     }
 
     @Mutation("deleteQuiz")
     async deleteQuiz(@Args("id") id: string) {
-        return;
+        return this.quizService.deleteQuiz(id);
     }
 
     @Mutation("createQuestionPool")
@@ -64,7 +65,7 @@ export class QuizResolver {
     }
 
     @Mutation("updateQuestion")
-    async updateQuestion(@Args("selectors") selectors: QuestionFields, @Args("values") values: UpdateQuestion) {
+    async updateQuestion(@Args("selectors") id: string, @Args("values") values: UpdateQuestion) {
         return;
     }
 
@@ -79,7 +80,7 @@ export class QuizResolver {
     }
 
     @Mutation("updateAnswer")
-    async updateAnswer(@Args("selector") selector: AnswerFields, @Args("values") values: UpdateAnswer) {
+    async updateAnswer(@Args("selector") id: string, @Args("values") values: UpdateAnswer) {
         return;
     }
 
