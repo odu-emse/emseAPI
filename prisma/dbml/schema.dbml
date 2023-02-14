@@ -203,8 +203,10 @@ Table DirectMessage {
   body String [not null]
   author User [not null]
   authorID String [not null]
-  recipient User [not null]
-  recipientID String [not null]
+  recipient User
+  recipientID String
+  group Group
+  groupID String
 }
 
 Table Group {
@@ -212,8 +214,10 @@ Table Group {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
   name String [not null]
+  public Boolean [not null, default: false]
   members User [not null]
   memberIDs String[] [not null]
+  messages DirectMessage [not null]
 }
 
 Enum UserRole {
@@ -280,5 +284,7 @@ Ref: Content.parentID > Lesson.id
 Ref: DirectMessage.authorID > User.id
 
 Ref: DirectMessage.recipientID > User.id
+
+Ref: DirectMessage.groupID > Group.id
 
 Ref: Group.memberIDs > User.id

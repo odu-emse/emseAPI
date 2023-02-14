@@ -238,17 +238,21 @@ model DirectMessage {
   body        String
   author      User     @relation(name: "sentMessages", fields: [authorID], references: [id])
   authorID    String   @db.ObjectId
-  recipient   User     @relation(name: "receivedMessages", fields: [recipientID], references: [id])
-  recipientID String   @db.ObjectId
+  recipient   User?    @relation(name: "receivedMessages", fields: [recipientID], references: [id])
+  recipientID String?  @db.ObjectId
+  group       Group?   @relation(name: "groupMessages", fields: [groupID], references: [id])
+  groupID     String?  @db.ObjectId
 }
 
 model Group {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now()) @updatedAt
   name      String
-  members   User[]   @relation(name: "groupMemeberships", fields: [memberIDs], references: [id])
-  memberIDs String[] @default([]) @db.ObjectId
+  public    Boolean         @default(false)
+  members   User[]          @relation(name: "groupMemeberships", fields: [memberIDs], references: [id])
+  memberIDs String[]        @default([]) @db.ObjectId
+  messages  DirectMessage[] @relation(name: "groupMessages")
 }
 
 enum UserRole {

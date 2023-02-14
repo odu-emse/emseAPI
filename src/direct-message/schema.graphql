@@ -1,14 +1,33 @@
 type Subscription {
     """
-    Subscribe to new messages in a channel. If the receiverID is not matched by the receiverID of the message, the message is not caught by WS.
+    Subscribe to new messages in a group. If the receiverID is not matched by the receiverID of the message, the message is not caught by WS.
     """
     newDirectMessage(receiverID: ID): DirectMessageResponse
+    newGroupMessage(groupID: ID): DirectMessageResponse
+}
+type Query {
+    """
+    Get all messages in a group.
+    """
+    directMessages(receiverID: ID!): [DirectMessageResponse!]!
+    """
+    Get all groups for a user.
+    """
+    groups(userID: ID!): [Group!]!
+    """
+    Get all messages in a group. If the receiverID is not matched by the receiverID of the message, the message is not returned.
+    """
+    groupMessages(groupID: ID!): [DirectMessageResponse!]!
 }
 type Mutation {
     """
     Send a message to a user. If the receiverID is and the senderID match, the service fails and returns an Error.
     """
     createDirectMessage(receiverID: ID!, message: String!, senderID: ID!): Boolean!
+    """
+    Send a message to a group of users.
+    """
+    newGroupMessage(groupID: ID!, message: String!, senderID: ID!): Boolean!
 #    createChannel(groupID: ID!, name: String!, publicAccess: Boolean=false): Boolean!
 }
 
@@ -16,14 +35,6 @@ type CreateMessageInput {
     authorID: ID!
     recipientID: ID!
     message: String!
-}
-
-type DirectMessage {
-    id: ID
-    message: String
-    sender: ID
-    receiverID: ID
-    createdAt: Date
 }
 
 type DirectMessageResponse {
@@ -39,16 +50,10 @@ type DirectMessageResponse {
 
 union Members = User | Group
 
-type Channel {
-    id: ID!
-    name: String!
-    public: Boolean!
-    messages: [DirectMessage!]!
-    accounts: [Members!]!
-}
-
 type Group {
     id: ID!
     name: String!
-    users: [User!]!
+    members: [User!]!
+    public: Boolean!
+    messages: [DirectMessageResponse!]!
 }

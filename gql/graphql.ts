@@ -309,6 +309,7 @@ export interface IMutation {
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
+    newGroupMessage(groupID: string, message: string, senderID: string): boolean | Promise<boolean>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -353,6 +354,9 @@ export interface IMutation {
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     thread(input?: Nullable<IThreadByParams>): Thread[] | Promise<Thread[]>;
+    directMessages(receiverID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
+    groups(userID: string): Group[] | Promise<Group[]>;
+    groupMessages(groupID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -391,20 +395,13 @@ export interface Thread {
 
 export interface ISubscription {
     newDirectMessage(receiverID?: Nullable<string>): Nullable<DirectMessageResponse> | Promise<Nullable<DirectMessageResponse>>;
+    newGroupMessage(groupID?: Nullable<string>): Nullable<DirectMessageResponse> | Promise<Nullable<DirectMessageResponse>>;
 }
 
 export interface CreateMessageInput {
     authorID: string;
     recipientID: string;
     message: string;
-}
-
-export interface DirectMessage {
-    id?: Nullable<string>;
-    message?: Nullable<string>;
-    sender?: Nullable<string>;
-    receiverID?: Nullable<string>;
-    createdAt?: Nullable<Date>;
 }
 
 export interface DirectMessageResponse {
@@ -418,18 +415,12 @@ export interface DirectMessageResponse {
     recipient: User;
 }
 
-export interface Channel {
-    id: string;
-    name: string;
-    public: boolean;
-    messages: DirectMessage[];
-    accounts: Members[];
-}
-
 export interface Group {
     id: string;
     name: string;
-    users: User[];
+    members: User[];
+    public: boolean;
+    messages: DirectMessageResponse[];
 }
 
 export interface PlanOfStudy {
