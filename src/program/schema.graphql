@@ -390,13 +390,9 @@ type Query {
 	moduleEnrollment(input: ModEnrollmentFields!): [ModuleEnrollment!]
 
 	"""
-	List of all collections
-	"""
-	collections: [Collection!]!
-	"""
 	Retrieve a specific collection based on document ID
 	"""
-	collection(id: ID!): Collection
+	collection(input: CollectionFields): [Collection]
 	"""
 	Retrieve lessons given a set of parameters
 	"""
@@ -455,9 +451,10 @@ input CreateCollectionArgs {
 }
 
 input CollectionFields {
+	id: ID
 	name: String
 	moduleID: ID
-	lessons: [ID!]
+	lessons: [ID]
 	positionIndex: Int
 }
 

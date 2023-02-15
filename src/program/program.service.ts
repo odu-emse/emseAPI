@@ -20,11 +20,13 @@ import {
 	LessonInput,
 	CreateContentArgs,
 	ContentFields,
-	NewModule
+	NewModule,
+	CollectionFields
 } from "gql/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
+import { idText } from "typescript";
 
 @Injectable()
 export class ProgramService {
@@ -401,18 +403,43 @@ export class ProgramService {
 		});
 	}
 
-	// TODO: Add Compound Query for collections
-	async collections() {
-		return this.prisma.collection.findMany({
-			include: this.collectionInclude
-		});
-	}
+	async collection(params: CollectionFields | null) {
+		if(!params){
+			return await this.prisma.collection.findMany({
+				include: this.collectionInclude
+			})
+		}
 
-	async collection(id: string) {
-		return this.prisma.collection.findFirst({
-			where: {
-				id
-			},
+		const { id, name, lessons, moduleID, positionIndex } = params;
+
+		const where = Prisma.validator<Prisma.CollectionWhereInput>()({
+			...(id && {id}),
+			...(name && {
+				name: {
+					contains: name
+				}
+			}),
+			...(moduleID && {moduleID}),
+			...(positionIndex && {position: positionIndex}),
+		})
+
+		// loop out of lessons and check with and
+		if(lessons) {
+			lessons.map((lesson) => {
+				where["AND"] = [
+					{
+						lessons: {
+							some: {
+								id: lesson
+							}
+						}
+					},
+				] as Prisma.CollectionWhereInput["AND"];
+			})
+		}
+
+		return this.prisma.collection.findMany({
+			where,
 			include: this.collectionInclude
 		});
 	}

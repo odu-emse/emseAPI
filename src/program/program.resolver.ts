@@ -74,14 +74,9 @@ export class ProgramResolver {
 		return await this.programService.moduleEnrollment(args);
 	}
 
-	@Query("collections")
-	async collections() {
-		return await this.programService.collections();
-	}
-
 	@Query("collection")
-	async collection(@Args("id") id: string) {
-		return await this.programService.collection(id);
+	async collection(@Args("input") args: CollectionFields | null = null) {
+		return await this.programService.collection(args);
 	}
 
 	@Query("content")
