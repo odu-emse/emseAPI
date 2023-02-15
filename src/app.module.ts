@@ -50,12 +50,7 @@ export class DateScalar implements CustomScalar<string, Moment> {
 			driver: ApolloDriver,
 			introspection: true,
 			subscriptions: {
-				"graphql-ws": {
-					onConnect: (context) => {
-						console.log("🚀 Connected to websocket");
-						console.log(context);
-					}
-				},
+				"graphql-ws": true,
 				"subscriptions-transport-ws": false
 			},
 			context: ({ req, res }) => ({ req, res })
