@@ -1,6 +1,15 @@
-import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
+import {
+	Args,
+	Context,
+	GraphQLExecutionContext,
+	Mutation,
+	Query,
+	Resolver,
+	Subscription
+} from "@nestjs/graphql";
 import { DirectMessageService } from "@/direct-message";
 import { PubSubService } from "@/pub-sub/pub-sub.service";
+import { DirectMessage } from "@prisma/client";
 
 @Resolver("DirectMessage")
 export class DirectMessageResolver {
@@ -21,7 +30,8 @@ export class DirectMessageResolver {
 
 	@Subscription("newDirectMessage", {
 		resolve: (payload) => payload,
-		filter: (payload, args) => {
+		filter: (payload: DirectMessage, args: { receiverID: string }) => {
+			console.log(payload, args);
 			return payload.recipientID === args.receiverID;
 		}
 	})
@@ -31,6 +41,7 @@ export class DirectMessageResolver {
 	@Subscription("newGroupMessage", {
 		resolve: (payload) => payload,
 		filter: (payload, args) => {
+			console.log(payload, args);
 			return payload.groupID === args.groupID;
 		}
 	})
@@ -44,11 +55,7 @@ export class DirectMessageResolver {
 		@Args("message") message: string,
 		@Args("senderID") senderID: string
 	) {
-		const newMessage = await this.dmService.sendMessageToGroup(
-			senderID,
-			groupID,
-			message
-		);
+		const newMessage = await this.dmService.send(senderID, groupID, message);
 		if (newMessage instanceof Error) return new Error(newMessage.message);
 		else {
 			try {
@@ -67,18 +74,13 @@ export class DirectMessageResolver {
 		@Args("message") message: string,
 		@Args("senderID") senderID: string
 	) {
-		const newMessage = await this.dmService.sendMessage({
-			authorID: senderID,
-			recipientID: receiverID,
-			message
-		});
+		const newMessage = await this.dmService.send(senderID, receiverID, message);
 		if (newMessage instanceof Error) return new Error(newMessage.message);
 		else {
 			try {
 				await this.pubSub.publish("newDirectMessage", newMessage);
 				return true;
 			} catch (e) {
-				console.log(e);
 				return false;
 			}
 		}

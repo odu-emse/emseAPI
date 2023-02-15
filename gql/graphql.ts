@@ -394,8 +394,8 @@ export interface Thread {
 }
 
 export interface ISubscription {
-    newDirectMessage(receiverID?: Nullable<string>): Nullable<DirectMessageResponse> | Promise<Nullable<DirectMessageResponse>>;
-    newGroupMessage(groupID?: Nullable<string>): Nullable<DirectMessageResponse> | Promise<Nullable<DirectMessageResponse>>;
+    newDirectMessage(receiverID?: Nullable<string>): DirectMessageResponse | Promise<DirectMessageResponse>;
+    newGroupMessage(groupID?: Nullable<string>): DirectMessageResponse | Promise<DirectMessageResponse>;
 }
 
 export interface CreateMessageInput {
@@ -412,7 +412,7 @@ export interface DirectMessageResponse {
     authorID: string;
     recipientID: string;
     author: User;
-    recipient: User;
+    recipient: Members;
 }
 
 export interface Group {

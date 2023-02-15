@@ -2,8 +2,8 @@ type Subscription {
     """
     Subscribe to new messages in a group. If the receiverID is not matched by the receiverID of the message, the message is not caught by WS.
     """
-    newDirectMessage(receiverID: ID): DirectMessageResponse
-    newGroupMessage(groupID: ID): DirectMessageResponse
+    newDirectMessage(receiverID: ID): DirectMessageResponse!
+    newGroupMessage(groupID: ID): DirectMessageResponse!
 }
 type Query {
     """
@@ -45,7 +45,7 @@ type DirectMessageResponse {
     authorID: ID!
     recipientID: ID!
     author: User!
-    recipient: User!
+    recipient: Members!
 }
 
 union Members = User | Group

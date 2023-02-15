@@ -15,7 +15,7 @@ export class PubSubService {
 		});
 	}
 
-	subscribe(event: string) {
+	async subscribe(event: string) {
 		return this.pubSub.asyncIterator(event);
 	}
 }

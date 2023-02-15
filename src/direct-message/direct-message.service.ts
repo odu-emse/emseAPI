@@ -12,151 +12,138 @@ export class DirectMessageService {
 	) {}
 
 	async getConversation(receiverID) {
-		let response: Array<DirectMessage>;
-		const cachedConversation = await this.redisClient.get(`get-${receiverID}`);
-		if (cachedConversation) {
-			response = JSON.parse(cachedConversation);
-		} else {
-			response = await this.prisma.directMessage.findMany({
-				where: {
-					recipientID: receiverID
-				},
-				include: {
-					author: true,
-					recipient: true
-				}
-			});
-			await this.redisClient.set(`get-${receiverID}`, JSON.stringify(response));
-		}
+		const response = await this.prisma.directMessage.findMany({
+			where: {
+				recipientID: receiverID
+			},
+			include: {
+				author: true,
+				recipient: true
+			}
+		});
 		if (!response) return new Error("Conversation could not be found");
 		return response;
 	}
 
 	async getGroups(userID) {
-		let response: Array<Group>;
-		const cachedGroups = await this.redisClient.get(`groups-${userID}`);
-		if (cachedGroups) {
-			response = JSON.parse(cachedGroups);
-		} else {
-			response = await this.prisma.group.findMany({
-				where: {
-					members: {
-						some: {
-							id: userID
-						}
-					}
-				},
-				include: {
-					members: true,
-					messages: {
-						include: {
-							author: true,
-							recipient: true
-						}
-					}
-				}
-			});
-			// await this.redisClient.set(`groups-${userID}`, JSON.stringify(response));
-		}
-		if (!response) return new Error("Groups could not be found");
-		return response;
-	}
-
-	async sendMessage({ authorID, recipientID, message }: CreateMessageInput) {
-		const payload = Prisma.validator<Prisma.DirectMessageCreateInput>()({
-			body: message,
-			author: {},
-			recipient: {}
-		});
-		let response: DirectMessage & {
-			author: User | undefined;
-			recipient: User | null;
-		} = {
-			id: "",
-			body: message,
-			authorID: "",
-			recipientID: "",
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			author: undefined,
-			recipient: null,
-			groupID: null
-		};
-		//check if author and recipient are the same
-		if (authorID === recipientID)
-			return new Error("You can't send a message to yourself");
-
-		//check if author and recipient are cached
-		//if they are, use the cached data
-		//if they aren't, use the data from the database
-		//set the data in the cache
-
-		const cachedAuthor = await this.redisClient.get(authorID);
-		const cachedRecipient = await this.redisClient.get(recipientID);
-
-		if (cachedAuthor) {
-			const author: User = JSON.parse(cachedAuthor);
-			response["authorID"] = author.id;
-			response["author"] = author;
-		}
-
-		if (cachedRecipient) {
-			const recipient: User = JSON.parse(cachedRecipient);
-			response["recipientID"] = recipient.id;
-			response["recipient"] = recipient;
-		}
-
-		if (!cachedRecipient || !cachedAuthor) {
-			response = await this.prisma.directMessage.create({
-				data: {
-					...payload,
-					author: {
-						connect: {
-							id: authorID
-						}
-					},
-					recipient: {
-						connect: {
-							id: recipientID
-						}
-					}
-				},
-				include: {
-					author: true,
-					recipient: true
-				}
-			});
-			await this.redisClient.set(authorID, JSON.stringify(response.author));
-			await this.redisClient.set(
-				recipientID,
-				JSON.stringify(response.recipient)
-			);
-		}
-
-		if (!response) return new Error("Message could not be sent");
-		return response;
-	}
-
-	async sendMessageToGroup(senderID, groupID, message) {
-		const response = await this.prisma.directMessage.create({
-			data: {
-				body: message,
-				author: {
-					connect: {
-						id: senderID
-					}
-				},
-				group: {
-					connect: {
-						id: groupID
+		const response = await this.prisma.group.findMany({
+			where: {
+				members: {
+					some: {
+						id: userID
 					}
 				}
 			},
 			include: {
-				author: true
+				members: true,
+				messages: {
+					include: {
+						author: true,
+						recipient: true
+					}
+				}
 			}
 		});
-		if (!response) return new Error("Message could not be sent");
+		if (!response) return new Error("Groups could not be found");
 		return response;
+	}
+
+	async send(senderID, recipientID, message) {
+		let response: DirectMessage & {
+			author: User;
+			recipient: (User | null) | (Group | null);
+			group: Group | null;
+		};
+		const include = Prisma.validator<Prisma.DirectMessageInclude>()({
+			author: true,
+			recipient: true,
+			group: {
+				include: {
+					messages: true,
+					members: true
+				}
+			}
+		});
+		const group = await this.prisma.group.findFirst({
+			where: {
+				id: recipientID
+			}
+		});
+		if (!group) {
+			//send direct message
+			const recipient = await this.prisma.user.findFirst({
+				where: {
+					id: recipientID
+				}
+			});
+			if (!recipient) return new Error("Recipient could not be found");
+			const author = await this.prisma.user.findFirst({
+				where: {
+					id: senderID
+				}
+			});
+			if (!author) return new Error("Author could not be found");
+
+			try {
+				const res = await this.prisma.directMessage.create({
+					data: {
+						body: message,
+						author: {
+							connect: {
+								id: senderID
+							}
+						},
+						recipient: {
+							connect: {
+								id: recipientID
+							}
+						}
+					},
+					include
+				});
+				if (res.recipient) {
+					res.recipient["__typename"] = "User";
+				}
+				return res;
+			} catch (e: any) {
+				return new Error(e);
+			}
+		} else {
+			//send group message
+			const author = await this.prisma.user.findFirst({
+				where: {
+					id: senderID
+				}
+			});
+			if (!author) return new Error("Author could not be found");
+
+			try {
+				response = await this.prisma.directMessage.create({
+					data: {
+						body: message,
+						author: {
+							connect: {
+								id: senderID
+							}
+						},
+						group: {
+							connect: {
+								id: recipientID
+							}
+						}
+					},
+					include
+				});
+				if (response.recipient === null) {
+					response.recipient = {
+						...response.group,
+						__typename: "Group"
+					} as Group;
+				}
+				return response;
+			} catch (e: any) {
+				return new Error(e);
+			}
+		}
 	}
 }
