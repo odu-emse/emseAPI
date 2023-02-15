@@ -222,36 +222,36 @@ type Module {
 	"""
 	Assignement in the module
 	"""
-	assignments: [Assignment]
+	assignments: [Assignment!]!
 
 	"""
 	Memebers enrolled in the Module
 	"""
-	members: [ModuleEnrollment]
+	members: [ModuleEnrollment!]!
 
 	"""
 	Feedback of the Module
 	"""
-	feedback: [ModuleFeedback]
+	feedback: [ModuleFeedback!]!
 
 	"""
 	Parent Modules of the Module
 	"""
-	parentModules: [Module]
+	parentModules: [Module!]!
 
 	"""
 	Child modules in the Module
 	"""
-	subModules: [Module]
+	subModules: [Module!]!
 	"""
 	A list of collections that have this module's materials
 	"""
-	collections: [Collection]
+	collections: [Collection!]!
 
 	"""
 	courseIDs set
 	"""
-	courseIDs: [ID]
+	courseIDs: [ID!]!
 }
 
 type Collection {
@@ -324,6 +324,10 @@ type Lesson {
 	The position index of the lesson in the collection it belongs to.
 	"""
 	position: Int
+	"""
+	The quizzes that belong to this lesson
+	"""
+	quizzes: [Quiz!]
 }
 
 type Content {

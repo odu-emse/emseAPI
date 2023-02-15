@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService} from "@/prisma.service";
 import {Prisma} from "@prisma/client";
-import {AnswerFields, CreateQuiz, QuestionFields, QuestionPoolFields, QuizFields, UpdateQuiz} from "@/types/graphql";
+import {
+    AnswerFields, CreateAnswer,
+    CreateQuestion,
+    CreateQuiz,
+    QuestionFields,
+    QuestionPoolFields,
+    QuizFields, UpdateAnswer, UpdateQuestion,
+    UpdateQuiz
+} from "@/types/graphql";
 
 @Injectable()
 export class QuizService {
@@ -106,16 +114,43 @@ export class QuizService {
         })
     }
 
-    // TODO question();
     async question(args: QuestionFields) {
+        const where: Omit<Prisma.QuestionWhereInput, "AND"> & {
+            AND: Array<Prisma.QuestionWhereInput>
+        } = {
+            id: args.id ? args.id : undefined,
+            number: args.number ? args.number : undefined,
+            text: args.text ? args.text : undefined,
+            points: args.points ? args.points : undefined,
+            parentPool: args.parentPool ? {id: args.parentPool} : undefined,
+            AND: []
+        }
+
+        if (args.answers) {
+            args.answers.forEach((id) => {
+                where.AND.push({
+                    answers: {some: {id}}
+                })
+            })
+        }
+
         return this.prisma.question.findMany({
+            where,
             include: this.questionInclude
         })
     }
 
-    // TODO answer();
     async answer(args: AnswerFields) {
+        const where = Prisma.validator<Prisma.AnswerWhereInput>()({
+            id: args.id ? args.id : undefined,
+            text: args.text ? args.text: undefined,
+            correct: args.correct ? args.correct : undefined,
+            weight: args.weight ? args.weight : undefined,
+            index: args.index ? args.index : undefined,
+            parentQuestion: args.parentQuestion ? {id: args.parentQuestion} : undefined
+        })
         return this.prisma.answer.findMany({
+            where,
             include: this.answerInclude
         })
     }
@@ -167,35 +202,100 @@ export class QuizService {
     }
 
     async createQuestionPool() {
-        return;
+        return this.prisma.questionPool.create({
+            data:{}
+        });
     }
 
-    async deleteQuestionPool() {
-        return;
+    async deleteQuestionPool(id: string) {
+        return this.prisma.questionPool.delete({
+            where: {
+                id
+            },
+            include: this.questionPoolInclude
+        });
     }
 
-    async createQuestion() {
-        return;
+    async createQuestion(input: CreateQuestion) {
+        const data = Prisma.validator<Prisma.QuestionCreateInput>()({
+            number: input.number,
+            text: input.text,
+            points: input.points ? input.points : undefined,
+            parentPool: {connect: {id: input.parentPool}}
+        })
+        return this.prisma.question.create({
+            data,
+            include: this.questionInclude
+        });
     }
 
-    async updateQuestion() {
-        return;
+    async updateQuestion(id: string, values: UpdateQuestion) {
+        const update = Prisma.validator<Prisma.QuestionUpdateArgs>()({
+            where: {
+                id
+            },
+            data: {
+                number: values.number ? values.number : undefined,
+                text: values.text ? values.text : undefined,
+                points: values.points ? values.points : undefined,
+                parentPool: values.parentPool ? {connect: {id: values.parentPool}} : undefined
+            }
+        })
+        return this.prisma.question.update({
+            ...(update),
+            include: this.questionInclude
+        });
     }
 
-    async deleteQuestion() {
-        return;
+    async deleteQuestion(id: string) {
+        return this.prisma.question.delete({
+            where: {
+                id
+            },
+            include: this.questionInclude
+        });
     }
 
-    async createAnswer() {
-        return;
+    async createAnswer(input: CreateAnswer) {
+        const data = Prisma.validator<Prisma.AnswerCreateInput>()({
+            text: input.text,
+            correct: input.correct,
+            weight: input.weight ? input.weight : undefined,
+            index: input.index ? input.index : undefined,
+            parentQuestion: {connect: {id: input.parentQuestion}}
+        })
+        return this.prisma.answer.create({
+            data,
+            include: this.answerInclude
+        });
     }
 
-    async updateAnswer() {
-        return;
+    async updateAnswer(id: string, values: UpdateAnswer) {
+        const update = Prisma.validator<Prisma.AnswerUpdateArgs>()({
+            where: {
+                id
+            },
+            data: {
+                text: values.text ? values.text : undefined,
+                correct: (values.correct != null) ? values.correct : undefined,
+                weight: values.weight ? values.weight : undefined,
+                index: values.index ? values.index : undefined,
+                parentQuestion: values.parentQuestion ? {connect: {id: values.parentQuestion}} : undefined
+            }
+        });
+        return this.prisma.answer.update({
+            ...(update),
+            include: this.answerInclude
+        });
     }
 
-    async deleteAnswer() {
-        return;
+    async deleteAnswer(id: string) {
+        return this.prisma.answer.delete({
+            where: {
+                id
+            },
+            include: this.answerInclude
+        });
     }
 
 }

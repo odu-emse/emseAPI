@@ -19,7 +19,7 @@ down:
 	docker-compose down
 build:
 	yarn install
-	docker-compose build
+	sudo docker-compose build
 remvimg:
 	make down
 	docker rmi emseapi-api

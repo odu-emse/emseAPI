@@ -302,12 +302,16 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Content.parentID > Lesson.id
 
+<<<<<<< Updated upstream
 Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
 Ref: Quiz.parentLessonID > Lesson.id
+=======
+Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
+>>>>>>> Stashed changes
 
-Ref: Quiz.questionPoolID > QuestionPool.id
+Ref: Quiz.questionPoolID > QuestionPool.id [delete: Cascade]
 
-Ref: Question.parentPoolID > QuestionPool.id
+Ref: Question.parentPoolID > QuestionPool.id [delete: Cascade]
 
-Ref: Answer.parentQuestionID > Question.id
+Ref: Answer.parentQuestionID > Question.id [delete: Cascade]

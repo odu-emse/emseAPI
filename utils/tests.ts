@@ -1,10 +1,11 @@
 import { PlanOfStudyResolver } from "@/pos";
 import { ProgramResolver } from "@/program";
 import {
-	CreateCollectionArgs,
+	CreateCollectionArgs, CreateQuiz,
 	EnrollmentStatus,
 	UserRole
 } from "@/types/graphql";
+import {QuizResolver} from "@/quiz/quiz.resolver";
 
 export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -12,6 +13,7 @@ export const shuffle = (str: string) =>
 export const pickRandomFromArray = (arr: any[]): number => {
 	return Math.floor(Math.random() * arr.length);
 };
+
 
 export const createPlan = async (
 	resolver: PlanOfStudyResolver,
@@ -67,3 +69,12 @@ export const createCollection = async (
 	const collection = await resolver.createCollection(input);
 	if (collection) return collection;
 };
+
+export const createQuiz = async (
+	resolver: QuizResolver,
+	input: CreateQuiz
+) => {
+	const quiz = await resolver.createQuiz(input);
+	if (quiz) return quiz;
+}
+

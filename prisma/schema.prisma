@@ -250,9 +250,9 @@ model Quiz {
   timeLimit      Int?
   numQuestions   Int
   minScore       Float        @default(0.0)
-  parentLesson   Lesson       @relation(fields: [parentLessonID], references: [id])
+  parentLesson   Lesson       @relation(fields: [parentLessonID], references: [id], onDelete: Cascade)
   parentLessonID String       @db.ObjectId
-  questionPool   QuestionPool @relation(fields: [questionPoolID], references: [id])
+  questionPool   QuestionPool @relation(fields: [questionPoolID], references: [id], onDelete: Cascade)
   questionPoolID String       @db.ObjectId
 }
 
@@ -265,7 +265,7 @@ model QuestionPool {
 model Question {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
   number       Int
-  parentPool   QuestionPool @relation(fields: [parentPoolID], references: [id])
+  parentPool   QuestionPool @relation(fields: [parentPoolID], references: [id], onDelete: Cascade)
   parentPoolID String       @db.ObjectId
   text         String
   points       Float        @default(1.0)
@@ -278,7 +278,7 @@ model Answer {
   correct          Boolean
   weight           Float?
   index            String?
-  parentQuestion   Question @relation(fields: [parentQuestionID], references: [id])
+  parentQuestion   Question @relation(fields: [parentQuestionID], references: [id], onDelete: Cascade)
   parentQuestionID String   @db.ObjectId
 }
 

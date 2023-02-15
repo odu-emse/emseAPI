@@ -686,19 +686,21 @@ export class ProgramService {
 	async updateModuleFeedback(
 		id: string,
 		input: ModuleFeedbackUpdate
-	): Promise<ModuleFeedback> {
+	) {
 		const { feedback, rating } = input;
 
-		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateInput>()({
-			...(feedback && { feedback }),
-			...(rating && { rating })
-		});
-
-		return this.prisma.moduleFeedback.update({
+		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateArgs>()({
 			where: {
 				id
 			},
-			data: update,
+			data: {
+				...(feedback && {feedback}),
+				...(rating && {rating})
+			}
+		});
+
+		return this.prisma.moduleFeedback.update({
+			...(update),
 			include: this.moduleFeedbackInclude
 		});
 	}

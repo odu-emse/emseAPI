@@ -36,64 +36,57 @@ export class QuizResolver {
 
     @Mutation("createQuiz")
     async createQuiz(@Args("input") input: CreateQuiz) {
-        return this.quizService.createQuiz(input);
+        return await this.quizService.createQuiz(input);
     }
 
     @Mutation("updateQuiz")
-    async updateQuiz(@Args("seletors") id: string, @Args("values") values: UpdateQuiz) {
-        return this.quizService.updateQuiz(id, values);
+    async updateQuiz(@Args("id") id: string, @Args("values") values: UpdateQuiz) {
+        return await this.quizService.updateQuiz(id, values);
     }
 
     @Mutation("deleteQuiz")
     async deleteQuiz(@Args("id") id: string) {
-        return this.quizService.deleteQuiz(id);
+        return await this.quizService.deleteQuiz(id);
     }
 
-    //TODO: createQuestionPool();
     @Mutation("createQuestionPool")
     async createQuestionPool() {
-        return;
+        return await this.quizService.createQuestionPool();
     }
 
-    //TODO deleteQuestionPool()
     @Mutation("deleteQuestionPool")
     async deleteQuestionPool(@Args("id") id: string) {
-        return;
+        return await this.quizService.deleteQuestionPool(id);
     }
 
-    //TODO createQuestion()
     @Mutation("createQuestion")
     async createQuestion(@Args("input") input: CreateQuestion) {
-        return;
+        return await this.quizService.createQuestion(input);
     }
 
-    //TODO updateQuestion()
     @Mutation("updateQuestion")
-    async updateQuestion(@Args("selectors") id: string, @Args("values") values: UpdateQuestion) {
-        return;
+    async updateQuestion(@Args("id") id: string, @Args("values") values: UpdateQuestion) {
+        return await this.quizService.updateQuestion(id, values);
     }
 
-    //TODO deleteQuestion()
     @Mutation("deleteQuestion")
     async deleteQuestion(@Args("id") id: string) {
-        return;
+        return await this.quizService.deleteQuestion(id);
     }
 
-    //TODO createAnswer()
     @Mutation("createAnswer")
     async createAnswer(@Args("input") input: CreateAnswer) {
-        return;
+        return await this.quizService.createAnswer(input);
     }
 
-    //TODO updateAnswer()
     @Mutation("updateAnswer")
-    async updateAnswer(@Args("selector") id: string, @Args("values") values: UpdateAnswer) {
-        return;
+    async updateAnswer(@Args("id") id: string, @Args("values") values: UpdateAnswer) {
+        return await this.quizService.updateAnswer(id, values);
     }
 
     //TODO deleteAnswer()
     @Mutation("deleteAnswer")
     async deleteAnswer(@Args("id") id: string) {
-        return;
+        return await this.quizService.deleteAnswer(id);
     }
 }
