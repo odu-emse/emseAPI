@@ -572,13 +572,13 @@ export interface Module {
     objectives: string[];
     createdAt: Date;
     updatedAt: Date;
-    assignments?: Nullable<Nullable<Assignment>[]>;
-    members?: Nullable<Nullable<ModuleEnrollment>[]>;
-    feedback?: Nullable<Nullable<ModuleFeedback>[]>;
-    parentModules?: Nullable<Nullable<Module>[]>;
-    subModules?: Nullable<Nullable<Module>[]>;
-    collections?: Nullable<Nullable<Collection>[]>;
-    courseIDs?: Nullable<Nullable<string>[]>;
+    assignments: Assignment[];
+    members: ModuleEnrollment[];
+    feedback: ModuleFeedback[];
+    parentModules: Module[];
+    subModules: Module[];
+    collections: Collection[];
+    courseIDs: string[];
 }
 
 export interface Collection {
@@ -600,6 +600,7 @@ export interface Lesson {
     threads?: Nullable<Nullable<Thread>[]>;
     collection?: Nullable<Collection>;
     position?: Nullable<number>;
+    quizzes?: Nullable<Quiz[]>;
 }
 
 export interface Content {

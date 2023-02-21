@@ -116,8 +116,8 @@ Table Lesson {
   name String [not null]
   transcript String
   threads Thread [not null]
-  collection Collection
-  collectionID String
+  collection Collection [not null]
+  collectionID String [not null]
   position Int [not null, default: 0]
   content Content [not null]
   quizzes Quiz [not null]
@@ -302,13 +302,9 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Content.parentID > Lesson.id
 
-<<<<<<< Updated upstream
 Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
-Ref: Quiz.parentLessonID > Lesson.id
-=======
 Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
->>>>>>> Stashed changes
 
 Ref: Quiz.questionPoolID > QuestionPool.id [delete: Cascade]
 

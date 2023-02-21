@@ -1,11 +1,13 @@
 import { PlanOfStudyResolver } from "@/pos";
 import { ProgramResolver } from "@/program";
 import {
-	CreateCollectionArgs, CreateQuiz,
-	EnrollmentStatus,
+	CreateAnswer,
+	CreateCollectionArgs, CreateQuestion, CreateQuiz,
+	EnrollmentStatus, LessonInput,
 	UserRole
 } from "@/types/graphql";
 import {QuizResolver} from "@/quiz/quiz.resolver";
+import {Answer, Collection, Lesson, Question, Quiz} from "@prisma/client";
 
 export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -48,6 +50,19 @@ export const createModule = async (
 	else return new Error("Failed to create module");
 };
 
+export const createLesson = async (
+	resolver: ProgramResolver,
+	config: Lesson
+) => {
+	const data: LessonInput = {
+		name: config.name,
+		collection: config.collectionID
+	}
+	const lesson = await resolver.createLesson({...data});
+	if(data) return lesson;
+	else return new Error("Failed to create Lesson");
+}
+
 export const createEnrollment = async (
 	resolver: ProgramResolver,
 	config: {
@@ -68,13 +83,55 @@ export const createCollection = async (
 ) => {
 	const collection = await resolver.createCollection(input);
 	if (collection) return collection;
+	else return new Error("Failed to create collection");
 };
 
 export const createQuiz = async (
 	resolver: QuizResolver,
-	input: CreateQuiz
+	input: Quiz
 ) => {
-	const quiz = await resolver.createQuiz(input);
+	const data: CreateQuiz = {
+		totalPoints: input.totalPoints,
+		dueAt: input.dueAt,
+		timeLimit: input.timeLimit,
+		numQuestions: input.numQuestions,
+		minScore: input.minScore,
+		parentLesson: input.parentLessonID,
+		questionPool: input.questionPoolID,
+	}
+	const quiz = await resolver.createQuiz(data);
 	if (quiz) return quiz;
+	else return new Error("Failed to create Quiz");
+}
+
+export const createQuestion = async (
+	resolver: QuizResolver,
+	input: Question
+) => {
+	const data: CreateQuestion = {
+		number: input.number,
+		text: input.text,
+		points: input.points,
+		parentPool: input.parentPoolID
+	}
+	const question = await resolver.createQuestion(data);
+	if(question) return question;
+	else return new Error("Failed to create question");
+}
+
+export const createAnswer = async (
+	resolver: QuizResolver,
+	input: Answer
+) => {
+	const data: CreateAnswer = {
+		text: input.text,
+		correct: input.correct,
+		weight: input.weight,
+		index: input.index,
+		parentQuestion: input.parentQuestionID
+	}
+	const answer = await resolver.createAnswer(data);
+	if (answer) return answer;
+	else return new Error("Failed to create answer");
 }
 

@@ -137,14 +137,14 @@ model Collection {
 }
 
 model Lesson {
-  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   transcript   String?
   threads      Thread[]
   // TODO: Should not be empty EVER
-  collection   Collection? @relation(fields: [collectionID], references: [id], onDelete: Cascade)
-  collectionID String?     @db.ObjectId
-  position     Int         @default(0)
+  collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
+  collectionID String     @db.ObjectId
+  position     Int        @default(0)
 
   content Content[]
   quizzes Quiz[]
