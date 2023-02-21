@@ -6,6 +6,7 @@ import { UserService } from "@/user/user.service";
 import { PlanOfStudyResolver, PoSService } from "@/pos";
 import { pickRandomFromArray, shuffle } from "../../utils/tests";
 import { Prisma } from "@prisma/client";
+import { test, describe, afterAll, expect } from "vitest";
 
 describe("Community", () => {
 	let service: CommunityService;
@@ -57,14 +58,12 @@ describe("Community", () => {
 		});
 	};
 
-	beforeAll(async () => {
-		service = new CommunityService(prisma);
-		posService = new PoSService(prisma);
-		posResolver = new PlanOfStudyResolver(posService);
-		resolver = new CommunityResolver(service);
-		auth = new AuthService(prisma, posResolver);
-		user = new UserService(prisma);
-	});
+	service = new CommunityService(prisma);
+	posService = new PoSService(prisma);
+	posResolver = new PlanOfStudyResolver(posService);
+	resolver = new CommunityResolver(service);
+	auth = new AuthService(prisma, posResolver);
+	user = new UserService(prisma);
 
 	afterAll(async () => {
 		deletableThreadIDs.map(async (id) => {
@@ -74,11 +73,11 @@ describe("Community", () => {
 		await prisma.$disconnect();
 	});
 
-	it("should be defined", () => {
+	test("should be defined", () => {
 		expect(resolver).toBeDefined();
 	});
 	describe("Param based querying", function () {
-		it("should return all threads if input is null", async () => {
+		test("should return all threads if input is null", async () => {
 			const threads = await resolver.thread();
 			expect(threads).toBeInstanceOf(Array);
 			if (threads instanceof Error) return new Error(threads.message);
@@ -92,7 +91,7 @@ describe("Community", () => {
 				expect(testingThreadDoc.author).toBeInstanceOf(Object);
 			}
 		});
-		it("should return all threads if input is an empty object", async () => {
+		test("should return all threads if input is an empty object", async () => {
 			const threads = await resolver.thread({});
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -100,7 +99,7 @@ describe("Community", () => {
 				expect(threads.length).toBeGreaterThan(0);
 			}
 		});
-		it("should return all threads if input is undefined", async () => {
+		test("should return all threads if input is undefined", async () => {
 			const threads = await resolver.thread(undefined);
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -108,11 +107,11 @@ describe("Community", () => {
 				expect(threads.length).toBeGreaterThan(0);
 			}
 		});
-		it("should return an error when ID is not found", async () => {
+		test("should return an error when ID is not found", async () => {
 			const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 			expect(thread instanceof Error).toBe(true);
 		});
-		it("should return threads with less upvotes than inputted", async () => {
+		test("should return threads with less upvotes than inputted", async () => {
 			const threads = await resolver.thread({ upvotesLTE: 100 });
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -121,7 +120,7 @@ describe("Community", () => {
 				});
 			}
 		});
-		it("should return threads with more upvotes than inputted", async () => {
+		test("should return threads with more upvotes than inputted", async () => {
 			const threads = await resolver.thread({ upvotesGTE: 100 });
 			if (threads instanceof Error) return new Error(threads.message);
 			else {
@@ -130,7 +129,7 @@ describe("Community", () => {
 				});
 			}
 		});
-		it("should return the threads requested by ID", async () => {
+		test("should return the threads requested by ID", async () => {
 			const thread = await resolver.thread({ id: testingThreadID });
 			if (!thread || thread instanceof Error)
 				return new Error("Thread not found");
@@ -140,7 +139,7 @@ describe("Community", () => {
 				});
 			}
 		});
-		it("should search for range if both GTE and LTE are given", async () => {
+		test("should search for range if both GTE and LTE are given", async () => {
 			const threads = await resolver.thread({
 				upvotesGTE: 100,
 				upvotesLTE: 1000
@@ -152,7 +151,7 @@ describe("Community", () => {
 				});
 			}
 		});
-		it("should return Error if both GTE and upvotes are given", async () => {
+		test("should return Error if both GTE and upvotes are given", async () => {
 			const threads = await resolver.thread({
 				upvotesGTE: 100,
 				upvotes: 1000
@@ -168,7 +167,7 @@ describe("Community", () => {
 		});
 	});
 	describe("Create", function () {
-		it("should create a thread with author", async () => {
+		test("should create a thread with author", async () => {
 			const account = await createUser();
 			if ("id" in account) {
 				const thread = await createThread({
@@ -190,7 +189,7 @@ describe("Community", () => {
 				expect(thread.author.watchedThreadIDs.includes(thread.id)).toBe(true);
 			}
 		});
-		it("should add comment with author as watcher", async () => {
+		test("should add comment with author as watcher", async () => {
 			const res = await resolver.addCommentToThread(threadID, {
 				body: "How does this look?",
 				author: accountID
@@ -203,14 +202,14 @@ describe("Community", () => {
 				expect(res.parentThreadID === threadID).toBe(true);
 			}
 		});
-		it("should fail to add comment if parent ID is not found", async () => {
+		test("should fail to add comment if parent ID is not found", async () => {
 			const thread = await resolver.addCommentToThread(shuffle(threadID), {
 				body: "How does this look?",
 				author: accountID
 			});
 			expect(thread instanceof Error).toBe(true);
 		});
-		it("should not create comment if parent thread is not given", async () => {
+		test("should not create comment if parent thread is not given", async () => {
 			const falseComment = await resolver.createThread({
 				body: "This comment should not be created as the parent thread is not given",
 				author: accountID
@@ -219,18 +218,16 @@ describe("Community", () => {
 		});
 	});
 	describe("Update", function () {
-		it("should increase vote count by 1", async () => {
+		test("should increase vote count by 1", async () => {
 			const voteNum = await resolver.thread({ id: threadID });
 			if (voteNum instanceof Error)
 				throw new Error("Error in upvoteThread test case");
 
 			const upVoteNum = await resolver.upvoteThread(threadID);
-			if (upVoteNum instanceof Error)
-				throw new Error("Error in upvoteThread test case");
 
 			expect(upVoteNum.upvotes === voteNum[0].upvotes + 1).toBe(true);
 		});
-		it("should update the thread with the given data", async () => {
+		test("should update the thread with the given data", async () => {
 			const thread = await resolver.updateThread(threadID, {
 				title: "This is an updated thread",
 				body: "Is this thread updatable?"
@@ -241,7 +238,7 @@ describe("Community", () => {
 				expect(thread.body).toBe("Is this thread updatable?");
 			}
 		});
-		it("should return Error if update ID was not found", async () => {
+		test("should return Error if update ID was not found", async () => {
 			const thread = await resolver.updateThread(shuffle(threadID), {
 				title: "This is an updated thread",
 				body: "Is this thread updatable?"
@@ -269,7 +266,7 @@ describe("Community", () => {
 		});
 	});
 	describe("Delete", function () {
-		it("should delete the thread", async () => {
+		test("should delete the thread", async () => {
 			const tempThread = await createThread({
 				title: "This is testing the delete thread function",
 				body: "This should not be seen by anyone",
@@ -277,9 +274,7 @@ describe("Community", () => {
 			});
 			if (tempThread instanceof Error) return new Error(tempThread.message);
 			else {
-				const thread = await resolver.deleteThread(tempThread.id);
-				if (thread instanceof Error) return new Error(thread.message);
-				expect(thread instanceof Error).toBe(false);
+				await resolver.deleteThread(tempThread.id);
 				const findDeleted = await resolver.thread({ id: tempThread.id });
 				expect(findDeleted instanceof Error).toBe(true);
 			}
