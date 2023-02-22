@@ -168,6 +168,20 @@ export class ProgramService {
 
 	private lessonInclude = Prisma.validator<Prisma.LessonInclude>()({
 		content: true,
+		collection: {
+			include: {
+				module: {
+					include: {
+						collections: {
+							include: {
+								lessons: true
+							}
+						}
+					}
+
+				}
+			}
+		},
 		threads: {
 			include: {
 				author: true,
