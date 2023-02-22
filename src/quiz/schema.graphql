@@ -31,6 +31,10 @@ type Quiz {
     The question pool being used to generate the questions for this quiz
     """
     questionPool: QuestionPool!
+    """
+    Submitted results to this quiz
+    """
+    quizResults: [Quiz]
 }
 
 type QuestionPool {
@@ -102,6 +106,29 @@ type Answer {
     """
     parentQuestion: Question!
 
+}
+
+type QuizResult {
+    """
+    The document ID of the quiz result
+    """
+    id: String!
+    """
+    The score received on this quiz
+    """
+    score: Float!
+    """
+    The list of answers provided for questions on this quiz
+    """
+    answers: [String!]!
+    """
+    The plan of study of the user who took the quiz
+    """
+    student: PlanOfStudy!
+    """
+    The quiz this result is for
+    """
+    quiz: Quiz!
 }
 
 input QuizFields {

@@ -63,6 +63,7 @@ model PlanOfStudy {
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
+  quizResults       QuizResult[]
 }
 
 model Social {
@@ -254,6 +255,7 @@ model Quiz {
   parentLessonID String       @db.ObjectId
   questionPool   QuestionPool @relation(fields: [questionPoolID], references: [id], onDelete: Cascade)
   questionPoolID String       @db.ObjectId
+  quizResults    QuizResult[]
 }
 
 model QuestionPool {
@@ -280,6 +282,17 @@ model Answer {
   index            String?
   parentQuestion   Question @relation(fields: [parentQuestionID], references: [id], onDelete: Cascade)
   parentQuestionID String   @db.ObjectId
+}
+
+model QuizResult {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  score   Float
+  answers String[]
+
+  student   PlanOfStudy @relation(fields: [studentID], references: [id])
+  studentID String      @db.ObjectId
+  quiz      Quiz        @relation(fields: [quizID], references: [id])
+  quizID    String      @db.ObjectId
 }
 
 enum UserRole {
