@@ -25,7 +25,7 @@ type Thread {
     """
     The number of upvotes for the thread
     """
-    upvotes: Int!
+    upvotes: [User!]
     """
     The list of users who are subscribed to changes/notifications on the thread
     """
@@ -107,18 +107,6 @@ input IThreadByParams {
     The ID of a comment to be exactly equal to the given value. The query will look through all Threads that are comments and return the parent thread and the entire comments array that matches the given ID.
     """
     comments: ID
-    """
-    The number of upvotes for the thread to be exactly equal to the given value. If this parameter is given, upvotesGTE and upvotesLTE are ignored. If this parameter has a value of 0, the parameter is ignored.
-    """
-    upvotes: Int
-    """
-    The number of upvotes for the thread to be greater than or equal to the given value. If this parameter is given, upvotes is ignored. This parameter can be used in conjunction with upvotesLTE to create a range based search.
-    """
-    upvotesGTE: Int
-    """
-    The number of upvotes for the thread to be less than or equal to the given value. If this parameter is given, upvotes is ignored. This parameter can be used in conjunction with upvotesGTE to create a range based search.
-    """
-    upvotesLTE: Int
     """
     The ID of the user to be exactly equal to the given value.
     """

@@ -39,9 +39,6 @@ export interface IThreadByParams {
     parentLesson?: Nullable<string>;
     parentThread?: Nullable<string>;
     comments?: Nullable<string>;
-    upvotes?: Nullable<number>;
-    upvotesGTE?: Nullable<number>;
-    upvotesLTE?: Nullable<number>;
     author?: Nullable<string>;
 }
 
@@ -399,7 +396,7 @@ export interface Thread {
     author: User;
     body: string;
     comments?: Nullable<Nullable<Thread>[]>;
-    upvotes: number;
+    upvotes?: Nullable<User[]>;
     usersWatching?: Nullable<User[]>;
     parentLesson?: Nullable<Lesson>;
     createdAt: Date;

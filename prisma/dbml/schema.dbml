@@ -23,6 +23,8 @@ Table User {
   watchedThreads Thread [not null]
   watchedThreadIDs String[] [not null]
   createdThreads Thread [not null]
+  upvotedThreads Thread [not null]
+  upvotedThreadIDs String[] [not null]
 }
 
 Table InstructorProfile {
@@ -177,12 +179,13 @@ Table Thread {
   watcherID String[] [not null]
   author User [not null]
   authorID String [not null]
-  upvotes Int [not null, default: 0]
   parentLesson Lesson
   parentLessonID String
   parentThread Thread
   parentThreadID String
   comments Thread [not null]
+  upvotes User [not null]
+  upvoteUserIDs String[] [not null]
 }
 
 Table Content {
@@ -215,6 +218,8 @@ Enum EnrollmentStatus {
 }
 
 Ref: User.watchedThreadIDs > Thread.id
+
+Ref: User.upvotedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
 
@@ -259,6 +264,8 @@ Ref: Thread.authorID > User.id
 Ref: Thread.parentLessonID > Lesson.id
 
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]
+
+Ref: Thread.upvoteUserIDs > User.id
 
 Ref: Content.parentID > Lesson.id
 
