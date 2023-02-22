@@ -78,9 +78,10 @@ export interface CreateCollectionArgs {
 }
 
 export interface CollectionFields {
+    id?: Nullable<string>;
     name?: Nullable<string>;
     moduleID?: Nullable<string>;
-    lessons?: Nullable<string[]>;
+    lessons?: Nullable<Nullable<string>[]>;
     positionIndex?: Nullable<number>;
 }
 
@@ -477,8 +478,7 @@ export interface IQuery {
     moduleFeedback(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
     assignmentResult(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
     moduleEnrollment(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
-    collections(): Collection[] | Promise<Collection[]>;
-    collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
+    collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;

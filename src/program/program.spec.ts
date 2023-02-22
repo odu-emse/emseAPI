@@ -314,7 +314,7 @@ describe("Collection", () => {
 			intro: "Test Intro",
 			numSlides: 1,
 			description: "Test Description",
-			keywords: ["test", "keyword"]
+			keywords: ["test", "keyword"],
 		});
 		if (module instanceof Error) throw new Error(module.message);
 
@@ -335,30 +335,36 @@ describe("Collection", () => {
 		await deleteModule(testingModuleID);
 		prisma.$disconnect();
 	});
-	test("should return an array of collections", async () => {
-		expect(await resolver.collections()).toBeDefined();
-		expect(await resolver.collections()).toBeInstanceOf(Array);
+	it("should return an array of collections", async () => {
+		expect(await resolver.collection()).toBeDefined();
+		expect(await resolver.collection()).toBeInstanceOf(Array);
 	});
-	test("should return a collection", async () => {
-		const collection = await resolver.collection(testingCollectionID);
+	it("should return a collection", async () => {
+		const collection = await resolver.collection({
+			moduleID: testingCollectionID
+		});
 		expect(collection).toBeDefined();
-		if (collection) {
-			expect(collection.id).toBe(testingCollectionID);
-			expect(collection.name).toBeDefined();
-			expect(collection.moduleID).toBeDefined();
-			expect(await resolver.module({ id: collection.moduleID })).toBeDefined();
+		if (collection.length > 0) {
+			collection.map(async(col) => {
+				expect(col.id).toBe(testingCollectionID);
+				expect(col.name).toBeDefined();
+				expect(col.moduleID).toBeDefined();
+				expect(await resolver.module({ id: col.moduleID })).toBeDefined();
+			})
 		}
 	});
-	test("should match lesson position field to array index", async () => {
-		const coll = await resolver.collection(testingCollectionID);
+	it("should match lesson position field to array index", async () => {
+		const coll = await resolver.collection({id:testingCollectionID});
 		expect(coll).toBeDefined();
-		if (coll) {
-			coll.lessons.map((lesson) => {
-				expect(lesson.position === coll.lessons[lesson.position].position).toBe(
-					true
-				);
-				expect(lesson.collectionID === coll.id).toBe(true);
-			});
+		if (coll.length > 0) {
+			coll.map(c => {
+				c.lessons.map((lesson) => {
+					expect(lesson.position === c.lessons[lesson.position].position).toBe(
+						true
+					);
+					expect(lesson.collectionID === c.id).toBe(true);
+				});
+			})
 		}
 	});
 	test("should populate previous and next based on module ID", function () {
