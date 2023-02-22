@@ -17,7 +17,8 @@ import {
 	CreateCollectionArgs,
 	CreateContentArgs,
 	ModEnrollmentFields,
-	NewModule
+	NewModule,
+	CollectionFields
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
