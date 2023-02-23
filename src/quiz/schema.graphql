@@ -126,7 +126,7 @@ type QuizResult {
     """
     student: PlanOfStudy!
     """
-    The quiz this result is for
+    The quiz this result is for. This field relation is immutable to protect the grading algorithm
     """
     quiz: Quiz!
 }
@@ -235,13 +235,32 @@ input AnswerFields {
     parentQuestion: ID
 }
 
+input QuizResultFields {
+    """
+    The document ID of the quiz result
+    """
+    id: String
+    """
+    The score received on this quiz
+    """
+    score: Float
+    """
+    The plan of study of the user who took the quiz
+    """
+    student: ID
+    """
+    The quiz this result is for
+    """
+    quiz: ID
+}
+
 type Query {
     """
     Fetch a Quiz by any of its parameters. an empty object will return all quizzes and a single id will return a single quiz
     """
     quiz(args: QuizFields!): [Quiz!]!
     """
-    Fetch a QuizPool by any of its parameters. An empty object as the input parameter will return all Pools, an ID will retrieve an array with just a single pool.
+    Fetch a QuestionPool by any of its parameters. An empty object as the input parameter will return all Pools, an ID will retrieve an array with just a single pool.
     If a combination of parameters are used then only documents that match all the parameters will be included in the array.
     """
     questionPool(args: QuestionPoolFields!): [QuestionPool!]!
@@ -257,6 +276,13 @@ type Query {
     If a combination of parameters are used then only documents that match all the parameters will be included in the array.
     """
     answer(args: AnswerFields!): [Answer!]!
+    """
+    Fetch a quiz result by any of its parameters. An empty object as the input parameter will get all records.
+    If just a quiz ID is provided than all results for that quiz will be shown. If just a planID is given then just that
+    users results will be shown.
+    If combinations of parameters are used then only records that match all parameters will be returned.
+    """
+    quizResult(args: QuizResultFields!): [QuizResult!]!
 }
 
 # Mutations and relevant inputs
@@ -406,6 +432,22 @@ input UpdateAnswer {
     """
     parentQuestion: ID
 }
+
+input QuizSubmission {
+    """
+    The student who submitted the quiz
+    """
+    student: ID!
+    """
+    The quiz being submitted
+    """
+    quiz: ID!
+    """
+    The list of answers that were provided for this quiz
+    """
+    answers: [String!]!
+}
+
 # TODO: Update documentation for update mutations
 type Mutation {
     """
@@ -460,4 +502,16 @@ type Mutation {
     Delete an answer record based on its document ID
     """
     deleteAnswer(id: ID!): Answer!
+    """
+    Submit a quiz to be graded. This will create a QuizResultRecord with the users score.
+    """
+    submitQuiz(input: QuizSubmission!): QuizResult
+    """
+    Update the score of a Quiz Result. Takes the quiz id and the new score.
+    """
+    updateQuizScore(id: ID!, newScore: Float!): QuizResult
+    """
+    Delete a quiz Submission given its document ID
+    """
+    deleteQuizResult(id: ID!): QuizResult
 }

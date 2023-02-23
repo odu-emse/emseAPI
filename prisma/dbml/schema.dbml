@@ -47,6 +47,7 @@ Table PlanOfStudy {
   studentID String [unique]
   modules ModuleEnrollment [not null]
   assignmentResults AssignmentResult [not null]
+  quizResults QuizResult [not null]
 }
 
 Table Social {
@@ -215,6 +216,7 @@ Table Quiz {
   parentLessonID String [not null]
   questionPool QuestionPool [not null]
   questionPoolID String [not null]
+  quizResults QuizResult [not null]
 }
 
 Table QuestionPool {
@@ -241,6 +243,17 @@ Table Answer {
   index String
   parentQuestion Question [not null]
   parentQuestionID String [not null]
+}
+
+Table QuizResult {
+  id String [pk]
+  score Float [not null]
+  answers String[] [not null]
+  submittedAt DateTime [default: `now()`, not null]
+  student PlanOfStudy [not null]
+  studentID String [not null]
+  quiz Quiz
+  quizID String [not null, default: '']
 }
 
 Enum UserRole {
@@ -311,3 +324,7 @@ Ref: Quiz.questionPoolID > QuestionPool.id [delete: Cascade]
 Ref: Question.parentPoolID > QuestionPool.id [delete: Cascade]
 
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
+
+Ref: QuizResult.studentID > PlanOfStudy.id
+
+Ref: QuizResult.quizID > Quiz.id

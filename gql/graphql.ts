@@ -274,6 +274,13 @@ export interface AnswerFields {
     parentQuestion?: Nullable<string>;
 }
 
+export interface QuizResultFields {
+    id?: Nullable<string>;
+    score?: Nullable<number>;
+    student?: Nullable<string>;
+    quiz?: Nullable<string>;
+}
+
 export interface CreateQuiz {
     totalPoints: number;
     dueAt?: Nullable<Date>;
@@ -322,6 +329,12 @@ export interface UpdateAnswer {
     weight?: Nullable<number>;
     index?: Nullable<string>;
     parentQuestion?: Nullable<string>;
+}
+
+export interface QuizSubmission {
+    student: string;
+    quiz: string;
+    answers: string[];
 }
 
 export interface NewUser {
@@ -455,6 +468,9 @@ export interface IMutation {
     createAnswer(input: CreateAnswer): Answer | Promise<Answer>;
     updateAnswer(id: string, values: UpdateAnswer): Answer[] | Promise<Answer[]>;
     deleteAnswer(id: string): Answer | Promise<Answer>;
+    submitQuiz(input: QuizSubmission): Nullable<QuizResult> | Promise<Nullable<QuizResult>>;
+    updateQuizScore(id: string, newScore: number): Nullable<QuizResult> | Promise<Nullable<QuizResult>>;
+    deleteQuizResult(id: string): Nullable<QuizResult> | Promise<Nullable<QuizResult>>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -486,6 +502,7 @@ export interface IQuery {
     questionPool(args: QuestionPoolFields): QuestionPool[] | Promise<QuestionPool[]>;
     question(args: QuestionFields): Question[] | Promise<Question[]>;
     answer(args: AnswerFields): Answer[] | Promise<Answer[]>;
+    quizResult(args: QuizResultFields): QuizResult[] | Promise<QuizResult[]>;
     user(input?: Nullable<UserFields>): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
@@ -514,6 +531,7 @@ export interface PlanOfStudy {
     modules?: Nullable<Nullable<ModuleEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
     modulesLeft?: Nullable<Nullable<ModuleEnrollment>[]>;
+    quizResults?: Nullable<QuizResult[]>;
 }
 
 export interface ModuleEnrollment {
@@ -632,6 +650,7 @@ export interface Quiz {
     minScore: number;
     parentLesson: Lesson;
     questionPool: QuestionPool;
+    quizResults?: Nullable<Nullable<Quiz>[]>;
 }
 
 export interface QuestionPool {
@@ -656,6 +675,14 @@ export interface Answer {
     weight?: Nullable<number>;
     index?: Nullable<string>;
     parentQuestion: Question;
+}
+
+export interface QuizResult {
+    id: string;
+    score: number;
+    answers: string[];
+    student: PlanOfStudy;
+    quiz: Quiz;
 }
 
 export interface Social {

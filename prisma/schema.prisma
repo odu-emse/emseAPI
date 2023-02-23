@@ -285,14 +285,15 @@ model Answer {
 }
 
 model QuizResult {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  score   Float
-  answers String[]
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  score       Float
+  answers     String[]
+  submittedAt DateTime @default(now())
 
   student   PlanOfStudy @relation(fields: [studentID], references: [id])
   studentID String      @db.ObjectId
-  quiz      Quiz        @relation(fields: [quizID], references: [id])
-  quizID    String      @db.ObjectId
+  quiz      Quiz?       @relation(fields: [quizID], references: [id])
+  quizID    String      @default("") @db.ObjectId
 }
 
 enum UserRole {
@@ -305,18 +306,3 @@ enum EnrollmentStatus {
   ACTIVE
   INACTIVE
 }
-
-// Dont need this anymore since we arent doing API Tokens
-// enum TokenType {
-//   EMAIL // used as a short lived token sent to the user's email
-//   API
-// }
-
-// I have no clue what this is for, wasnt in the Req. Document so its getting commented out unless it breaks something when i do
-// model Post {
-//     id        String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
-//     title     String
-//     content   String
-//     published Boolean  @default(false)
-//     createdAt DateTime @default(now())
-// }
