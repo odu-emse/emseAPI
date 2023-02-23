@@ -8,7 +8,6 @@ COPY prisma/* ./prisma/
 COPY gql/* ./gql/
 COPY src/ ./src/
 
-RUN yarn install --pure-lockfile --silent
 
 
 FROM base as development

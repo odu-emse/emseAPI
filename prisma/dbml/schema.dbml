@@ -118,10 +118,11 @@ Table Lesson {
   name String [not null]
   transcript String
   threads Thread [not null]
-  collection Collection
-  collectionID String
+  collection Collection [not null]
+  collectionID String [not null]
   position Int [not null, default: 0]
   content Content [not null]
+  quizzes Quiz [not null]
 }
 
 Table ModuleFeedback {
@@ -206,6 +207,45 @@ Table Progress {
   enrollmentID String [unique, not null]
 }
 
+Table Quiz {
+  id String [pk]
+  totalPoints Float [not null]
+  dueAt DateTime
+  timeLimit Int
+  numQuestions Int [not null]
+  minScore Float [not null, default: 0]
+  parentLesson Lesson [not null]
+  parentLessonID String [not null]
+  questionPool QuestionPool [not null]
+  questionPoolID String [not null]
+}
+
+Table QuestionPool {
+  id String [pk]
+  questions Question [not null]
+  quizzes Quiz [not null]
+}
+
+Table Question {
+  id String [pk]
+  number Int [not null]
+  parentPool QuestionPool [not null]
+  parentPoolID String [not null]
+  text String [not null]
+  points Float [not null, default: 1]
+  answers Answer [not null]
+}
+
+Table Answer {
+  id String [pk]
+  text String [not null]
+  correct Boolean [not null]
+  weight Float
+  index String
+  parentQuestion Question [not null]
+  parentQuestionID String [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -270,3 +310,11 @@ Ref: Thread.upvoteUserIDs > User.id
 Ref: Content.parentID > Lesson.id
 
 Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
+
+Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
+
+Ref: Quiz.questionPoolID > QuestionPool.id [delete: Cascade]
+
+Ref: Question.parentPoolID > QuestionPool.id [delete: Cascade]
+
+Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
