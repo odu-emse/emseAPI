@@ -6,6 +6,7 @@ import {
 	IThreadCreateInput,
 	ICommentCreateInput
 } from "@/types/graphql";
+import { getRunningMode } from "vitest";
 
 @Injectable()
 export class CommunityService {
@@ -41,10 +42,8 @@ export class CommunityService {
 				parentThread,
 				author,
 				comments,
-				upvotes,
-				upvotesGTE,
-				upvotesLTE
 			} = input;
+
 
 			const where = Prisma.validator<Prisma.ThreadWhereInput>()({
 				...(id && { id }),
@@ -73,19 +72,6 @@ export class CommunityService {
 						id: author
 					}
 				}),
-				...(upvotes && {
-					upvotes
-				}),
-				...(upvotesGTE && {
-					upvotes: {
-						gte: upvotesGTE
-					}
-				}),
-				...(upvotesLTE && {
-					upvotes: {
-						lte: upvotesLTE
-					}
-				}),
 				...(comments && {
 					comments: {
 						some: {
@@ -95,33 +81,7 @@ export class CommunityService {
 						}
 					}
 				})
-			});
-
-			// if both upvotes and upvotesGTE or upvotesLTE are provided, we need to throw an error since we cannot filter for exact number and range at the same time
-			if (
-				(typeof upvotes === "number" && typeof upvotesGTE === "number") ||
-				(typeof upvotes === "number" && typeof upvotesLTE === "number")
-			)
-				return new Error(
-					"Cannot use upvotes and upvotesGTE or upvotesLTE at the same time"
-				);
-
-			// if both upvotesGTE and upvotesLTE are provided, we need to use AND to get the range
-			if (typeof upvotesGTE === "number" && typeof upvotesLTE === "number") {
-				delete where["upvotes"];
-				where["AND"] = [
-					{
-						upvotes: {
-							gte: upvotesGTE
-						}
-					},
-					{
-						upvotes: {
-							lte: upvotesLTE
-						}
-					}
-				] as Prisma.ThreadWhereInput["AND"];
-			}
+			});			
 
 			const include = this.threadInclude;
 
@@ -198,14 +158,16 @@ export class CommunityService {
 		});
 	}
 
-	async upvoteThread(id: string) {
+	async upvoteThread(id: string, userID: string) {
 		return this.prisma.thread.update({
 			where: {
 				id
 			},
 			data: {
 				upvotes: {
-					increment: 1
+					connect: {
+						id: userID
+					}
 				}
 			}
 		});

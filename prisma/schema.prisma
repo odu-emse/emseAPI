@@ -36,6 +36,9 @@ model User {
   watchedThreads    Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
   watchedThreadIDs  String[]           @default([]) @db.ObjectId
   createdThreads    Thread[]           @relation(name: "createdThreads")
+  
+  upvotedThreads   Thread[] @relation(name: "upvote", fields: [upvotedThreadIDs], references: [id])
+  upvotedThreadIDs String[] @default([]) @db.ObjectId
 }
 
 model InstructorProfile {
@@ -141,7 +144,6 @@ model Lesson {
   name         String
   transcript   String?
   threads      Thread[]
-  // TODO: Should not be empty EVER
   collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
   collectionID String     @db.ObjectId
   position     Int        @default(0)
@@ -212,13 +214,15 @@ model Thread {
   watcherID      String[] @default([]) @db.ObjectId
   author         User     @relation(name: "createdThreads", fields: [authorID], references: [id])
   authorID       String   @db.ObjectId
-  upvotes        Int      @default(0)
   parentLesson   Lesson?  @relation(fields: [parentLessonID], references: [id])
   parentLessonID String?  @db.ObjectId
 
   parentThread   Thread?  @relation("subComments", fields: [parentThreadID], references: [id], onDelete: NoAction, onUpdate: NoAction)
   parentThreadID String?  @db.ObjectId
   comments       Thread[] @relation("subComments")
+
+  upvotes       User[]   @relation(name: "upvote", fields: [upvoteUserIDs], references: [id])
+  upvoteUserIDs String[] @default([]) @db.ObjectId
 }
 
 model Content {
