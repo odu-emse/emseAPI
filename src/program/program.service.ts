@@ -325,13 +325,16 @@ export class ProgramService {
 	}
 
 	async assignment(params: AssignmentFields) {
-		const { id, updatedAt, name, dueAt, module, assignmentResult } = params;
+		const { id, updatedAt, name, dueAt, contentURL, contentType, acceptedTypes, module, assignmentResult } = params;
 
 		const payload = {
 			...(id && { id }),
 			...(updatedAt && { updatedAt }),
 			...(name && { name }),
-			...(dueAt && { dueAt })
+			...(dueAt && { dueAt }),
+			...(contentURL && { contentURL }),
+			...(contentType && { contentType }),
+			...(acceptedTypes && { acceptedTypes })
 		};
 
 		payload["moduleId"] = module ? module : undefined;
@@ -372,14 +375,16 @@ export class ProgramService {
 	}
 
 	async assignmentResult(params: AssignmentResFields) {
-		const { id, submittedAt, result, feedback, student, gradedBy, assignment } =
+		const { id, submittedAt, result, feedback, submissionURL, fileType, student, gradedBy, assignment } =
 			params;
 
 		const payload = {
 			...(id && { id }),
 			...(submittedAt && { submittedAt }),
 			...(result && { result }),
-			...(feedback && { feedback })
+			...(feedback && { feedback }),
+			...(submissionURL && { submissionURL }),
+			...(fileType && { fileType })
 		};
 
 		payload["studentId"] = student ? student : undefined;
@@ -668,8 +673,15 @@ export class ProgramService {
 		return this.prisma.assignment.create({
 			data: {
 				name: input.name,
-				moduleId: input.module,
-				dueAt: input.dueAt
+				module: {
+					connect: {
+						id: input.module
+					}
+				},
+				dueAt: input.dueAt,
+				contentType: "",
+				contentURL: "",
+				acceptedTypes: "DOC"
 			},
 			include: this.assignmentInclude
 		});
@@ -762,7 +774,9 @@ export class ProgramService {
 				assignmentId: input.assignment,
 				studentId: input.student,
 				graderId: input.grader,
-				result: input.result
+				result: input.result,
+				submissionURL: "",
+    			fileType: ""
 			},
 			include: this.assignmentResultInclude
 		});

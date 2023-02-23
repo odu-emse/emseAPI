@@ -176,10 +176,13 @@ model ModuleEnrollment {
 }
 
 model Assignment {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  updatedAt DateTime @default(now()) @updatedAt
-  name      String
-  dueAt     DateTime
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  updatedAt     DateTime @default(now()) @updatedAt
+  name          String
+  dueAt         DateTime
+  contentURL    String
+  contentType   String
+  acceptedTypes FileType @default(DOC)
 
   // Relation Fields
   moduleId          String             @db.ObjectId
@@ -188,10 +191,12 @@ model Assignment {
 }
 
 model AssignmentResult {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  submittedAt DateTime @default(now())
-  result      Float
-  feedback    String?
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  submittedAt   DateTime @default(now())
+  result        Float
+  feedback      String?
+  submissionURL String
+  fileType      String
 
   // Relation Fields
   studentId    String      @db.ObjectId
@@ -291,6 +296,12 @@ enum UserRole {
 enum EnrollmentStatus {
   ACTIVE
   INACTIVE
+}
+
+enum FileType {
+  DOCX
+  DOC
+  PDF
 }
 
 // Dont need this anymore since we arent doing API Tokens

@@ -9,6 +9,12 @@ enum EnrollmentStatus {
 	INACTIVE
 }
 
+enum FileType {
+	DOCX
+	DOC
+	PDF
+}
+
 type ModuleEnrollment {
 	"""
 	id of the ModuleEnrollment
@@ -57,12 +63,12 @@ type AssignmentResult {
 	id: ID!
 
 	"""
-	Time at which the Assignement Result is given
+	Time at which the Assignment Result is given
 	"""
 	submittedAt: Date!
 
 	"""
-	result of the Assignement
+	result of the Assignment
 	"""
 	result: Float!
 
@@ -72,17 +78,27 @@ type AssignmentResult {
 	feedback: String
 
 	"""
-	Assignement Result of the student
+	s3 id of the submitted file
+	"""
+	submissionURL: String
+
+	"""
+	File type that the submission is in
+	"""
+	fileType: String
+
+	"""
+	Assignment Result of the student
 	"""
 	student: PlanOfStudy
 
 	"""
-	Assignement graded by the User
+	Assignment graded by the User
 	"""
 	gradedBy: User
 
 	"""
-	Assignement to which result is given
+	Assignment to which result is given
 	"""
 	assignment: Assignment
 }
@@ -107,6 +123,21 @@ type Assignment {
 	due of the assignment
 	"""
 	dueAt: Date
+
+	"""
+	s3 id of the content
+	"""
+	contentURL: String
+
+	"""
+	File type that the assignment is submitted in
+	"""
+	contentType: String
+
+	"""
+	Accepted file types for assignments
+	"""
+	acceptedTypes: FileType
 
 	"""
 	Assignment belonging to the module
@@ -496,6 +527,9 @@ input AssignmentFields {
 	updatedAt: Date
 	name: String
 	dueAt: Date
+	contentURL: String
+	contentType: String
+	acceptedTypes: FileType
 
 	module: ID
 	assignmentResult: ID
@@ -515,6 +549,8 @@ input AssignmentResFields {
 	submittedAt: Date
 	result: Float
 	feedback: String
+	submissionURL: String
+	fileType: String
 
 	student: ID
 	gradedBy: ID
@@ -609,6 +645,18 @@ input NewAssignment {
 	Module to which the NewAssignement Belongs to
 	"""
 	module: ID!
+	"""
+	File type that the assignment is submitted in
+	"""
+	contentType: String!
+	"""
+	s3 id of the content
+	"""
+	contentURL: String!
+	"""
+	Accepted file types for assignments
+	"""
+	acceptedTypes: FileType!
 }
 
 input AssignmentInput {
@@ -668,11 +716,18 @@ input NewAssignmentResult {
 	Relating Assignment Result to Grader
 	"""
 	grader: ID!
-
 	"""
 	result of the NewAssignement
 	"""
 	result: Float!
+	"""
+	s3 id of the submitted file
+	"""
+	submissionURL: String!
+	"""
+	File type that the submission is in
+	"""
+	fileType: String!
 }
 
 input ModuleEnrollmentInput {

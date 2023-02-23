@@ -150,6 +150,9 @@ Table Assignment {
   updatedAt DateTime [default: `now()`, not null]
   name String [not null]
   dueAt DateTime [not null]
+  contentURL String [not null]
+  contentType String [not null]
+  acceptedTypes FileType [not null, default: 'DOC']
   moduleId String [not null]
   module Module [not null]
   assignmentResults AssignmentResult [not null]
@@ -160,6 +163,8 @@ Table AssignmentResult {
   submittedAt DateTime [default: `now()`, not null]
   result Float [not null]
   feedback String
+  submissionURL String [not null]
+  fileType String [not null]
   studentId String [not null]
   student PlanOfStudy [not null]
   graderId String [not null]
@@ -252,6 +257,12 @@ Enum UserRole {
 Enum EnrollmentStatus {
   ACTIVE
   INACTIVE
+}
+
+Enum FileType {
+  DOCX
+  DOC
+  PDF
 }
 
 Ref: User.watchedThreadIDs > Thread.id
