@@ -1,17 +1,18 @@
 import { QuizService } from './quiz.service';
 import { PrismaService } from "@/prisma.service";
 import {QuizResolver} from "@/quiz/quiz.resolver";
-import {test, describe, expect, afterAll, beforeAll} from "vitest";
+import {test, describe, expect, afterAll} from "vitest";
 import {
   createAnswer,
   createCollection, createLesson,
   createModule, createQuestion,
-  createQuiz, createRandomAnswer, createRandomCollection,
+  createQuiz, createRandomAnswer,
   createRandomLesson,
   createRandomQuestion,
   createRandomQuiz,
 } from "../../utils";
 import {ProgramResolver, ProgramService} from "@/program";
+import {faker} from "@faker-js/faker";
 
 describe('Quiz Services', () => {
   // Init resolvers
@@ -20,7 +21,10 @@ describe('Quiz Services', () => {
   const resolver: QuizResolver =new QuizResolver(service);
   const progServ: ProgramService = new ProgramService(prisma);
   const progResolver: ProgramResolver = new ProgramResolver(progServ);
-  // Make mock models for iting against
+
+  // Make mock models for testing against
+  const testingAccountStudentID = "616701c22e17f3fb9f5085f7";
+  const testingAccountPlanID = "620e9a07e57bd45e4e3fc88c";
   let fakeModule;
   let fakeCollection;
   let fakeLesson;
@@ -28,8 +32,7 @@ describe('Quiz Services', () => {
   let fakeQuiz;
   let fakeQuestion;
   let fakeAnswer;
-
-  // const poolsToDelete: string[] = [];
+  let fakeSubmission;
 
   afterAll(async () => {
     await progResolver.delete(fakeModule.id);
@@ -115,6 +118,24 @@ describe('Quiz Services', () => {
         expect(fakeAnswer.parentQuestionID).toEqual(fakeQuestion.id);
         expect(end).toEqual(start + 1);
       });
+    })
+    describe("Mutation.submitQuiz", () => {
+      test("should create a QuizResult record", async() =>{
+        const answers: string[] = [];
+        for (let i = 0; i < fakeQuiz.numQuestions; i++) {
+          answers.push(faker.datatype.string(1));
+        }
+        const result = await resolver.submitQuiz({
+          student: testingAccountStudentID,
+          quiz: fakeQuiz.id,
+          answers
+        })
+        expect(result).toBeDefined();
+        expect(result.answers.length).toEqual(fakeQuiz.numQuestions);
+        expect(result.score).toBeGreaterThanOrEqual(0.0);
+        expect(result.score).toBeLessThanOrEqual(100.0);
+        fakeSubmission = result
+      })
     })
   })
 
@@ -281,6 +302,39 @@ describe('Quiz Services', () => {
         })
       });
     })
+    describe("Query.quizResult", () => {
+      test("should return a list of quizResults", async() => {
+        const results = await resolver.quizResult({});
+        expect(results).toBeDefined();
+        expect(typeof results).toBe(typeof []);
+      })
+      test("should return all records in less than 1.5s", async () =>{
+        const start = new Date();
+        const results = await resolver.quizResult({});
+        const end = new Date();
+        expect(results).toBeDefined();
+        expect(end.getTime() - start.getTime()).toBeLessThan(1500);
+      })
+      test("should return a single result given an ID", async() =>{
+        const results = await resolver.quizResult({id: fakeSubmission.id});
+        expect(results).toBeDefined();
+        expect(results.length).toEqual(1);
+        expect(results[0].id).toEqual(fakeSubmission.id);
+      })
+      test("should return only matching records", async () =>{
+        const results = await resolver.quizResult({
+          score: fakeSubmission.score,
+          student: fakeSubmission.studentID,
+          quiz: fakeSubmission.quizID
+        });
+        expect(results).toBeDefined();
+        results.map((result) =>{
+          expect(result.score).toEqual(fakeSubmission.score);
+          expect(result.studentID).toEqual(fakeSubmission.studentID);
+          expect(result.quizID).toEqual(fakeSubmission.quizID);
+        })
+      })
+    })
   })
 
   describe("Updates", () => {
@@ -346,7 +400,15 @@ describe('Quiz Services', () => {
         expect(update.parentQuestionID).toEqual(question.id);
       });
     })
-
+    describe("Mutation.updateQuizScore", () =>{
+      test("should update a quizResult score", async () =>{
+        const updated = await resolver.updateQuizScore(fakeSubmission.id, fakeSubmission.score + 1);
+        expect(updated).toBeDefined();
+        expect(updated.id).toEqual(fakeSubmission.id);
+        expect(updated.score).toEqual(fakeSubmission.score + 1);
+        fakeSubmission = updated;
+      })
+    })
   })
 
   describe("Deletes", () =>{
@@ -405,6 +467,12 @@ describe('Quiz Services', () => {
         })
       });
     })
-
+    describe("Mutation.deleteQuizResult", () => {
+      test("should delete a quiz result", async () => {
+        await resolver.deleteQuizResult(fakeSubmission.id);
+        const resultCheck = await resolver.quizResult({id: fakeSubmission.id});
+        expect(resultCheck.length).toEqual(0);
+      })
+    })
   })
 });
