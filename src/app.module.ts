@@ -53,9 +53,11 @@ const playgroundConfig =
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			cors: {
 				credentials: true,
-					"https://studio.apollographql.com"
+				origin: [
+					"https://studio.apollographql.com",
 					"http://localhost:3000",
-					"http://localhost:6006",
+					"http://localhost:6006"
+				]
 			},
 			...playgroundConfig,
 			typePaths: ["./**/*.graphql"],
@@ -72,7 +74,7 @@ const playgroundConfig =
 		ProgramModule,
 		AuthModule,
 		CommunityModule,
-		ProgressModule
+		ProgressModule,
 		DirectMessageModule
 	],
 	controllers: [],
