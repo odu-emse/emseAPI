@@ -679,8 +679,8 @@ export class ProgramService {
 					}
 				},
 				dueAt: input.dueAt,
-				contentType: "",
-				contentURL: "",
+				contentType: input.contentType,
+				contentURL: input.contentURL,
 				acceptedTypes: "DOC"
 			},
 			include: this.assignmentInclude
@@ -775,8 +775,8 @@ export class ProgramService {
 				studentId: input.student,
 				graderId: input.grader,
 				result: input.result,
-				submissionURL: "",
-    			fileType: ""
+				submissionURL: input.submissionURL,
+    			fileType: input.fileType
 			},
 			include: this.assignmentResultInclude
 		});
