@@ -18,6 +18,12 @@ export enum EnrollmentStatus {
     INACTIVE = "INACTIVE"
 }
 
+export enum FileType {
+    DOCX = "DOCX",
+    DOC = "DOC",
+    PDF = "PDF"
+}
+
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
@@ -112,6 +118,9 @@ export interface AssignmentFields {
     updatedAt?: Nullable<Date>;
     name?: Nullable<string>;
     dueAt?: Nullable<Date>;
+    contentURL?: Nullable<string>;
+    contentType?: Nullable<string>;
+    acceptedTypes?: Nullable<FileType>;
     module?: Nullable<string>;
     assignmentResult?: Nullable<string>;
 }
@@ -129,6 +138,8 @@ export interface AssignmentResFields {
     submittedAt?: Nullable<Date>;
     result?: Nullable<number>;
     feedback?: Nullable<string>;
+    submissionURL?: Nullable<string>;
+    fileType?: Nullable<string>;
     student?: Nullable<string>;
     gradedBy?: Nullable<string>;
     assignment?: Nullable<string>;
@@ -167,6 +178,9 @@ export interface NewAssignment {
     name: string;
     dueAt: Date;
     module: string;
+    contentType: string;
+    contentURL: string;
+    acceptedTypes: FileType;
 }
 
 export interface AssignmentInput {
@@ -194,6 +208,8 @@ export interface NewAssignmentResult {
     student: string;
     grader: string;
     result: number;
+    submissionURL: string;
+    fileType: string;
 }
 
 export interface ModuleEnrollmentInput {
@@ -529,6 +545,8 @@ export interface AssignmentResult {
     submittedAt: Date;
     result: number;
     feedback?: Nullable<string>;
+    submissionURL?: Nullable<string>;
+    fileType?: Nullable<string>;
     student?: Nullable<PlanOfStudy>;
     gradedBy?: Nullable<User>;
     assignment?: Nullable<Assignment>;
@@ -539,6 +557,9 @@ export interface Assignment {
     updatedAt: Date;
     name: string;
     dueAt?: Nullable<Date>;
+    contentURL?: Nullable<string>;
+    contentType?: Nullable<string>;
+    acceptedTypes?: Nullable<FileType>;
     module: Module;
     assignmentResults?: Nullable<Nullable<AssignmentResult>[]>;
 }
