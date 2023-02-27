@@ -17,7 +17,7 @@ services:
         networks:
             - apiNetwork
         command: yarn dev
-    db:
+    studio:
         depends_on:
             - mongo
         container_name: back_end_studio
@@ -30,6 +30,8 @@ services:
         volumes:
             - ./:/usr/src/app/
         networks:
+            - apiNetwork
+        command: bash -c "yarn db:studio --browser false"
     redis:
         container_name: back_end_redis
         image: redis

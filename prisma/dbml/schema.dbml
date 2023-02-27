@@ -339,6 +339,14 @@ Ref: Thread.upvoteUserIDs > User.id
 
 Ref: Content.parentID > Lesson.id
 
+Ref: DirectMessage.authorID > User.id
+
+Ref: DirectMessage.recipientID > User.id
+
+Ref: DirectMessage.groupID > Group.id
+
+Ref: Group.memberIDs > User.id
+
 Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
 Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
@@ -348,11 +356,3 @@ Ref: Quiz.questionPoolID > QuestionPool.id [delete: Cascade]
 Ref: Question.parentPoolID > QuestionPool.id [delete: Cascade]
 
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
-
-Ref: DirectMessage.authorID > User.id
-
-Ref: DirectMessage.recipientID > User.id
-
-Ref: DirectMessage.groupID > Group.id
-
-Ref: Group.memberIDs > User.id
