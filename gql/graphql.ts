@@ -39,9 +39,6 @@ export interface IThreadByParams {
     parentLesson?: Nullable<string>;
     parentThread?: Nullable<string>;
     comments?: Nullable<string>;
-    upvotes?: Nullable<number>;
-    upvotesGTE?: Nullable<number>;
-    upvotesLTE?: Nullable<number>;
     author?: Nullable<string>;
 }
 
@@ -78,9 +75,10 @@ export interface CreateCollectionArgs {
 }
 
 export interface CollectionFields {
+    id?: Nullable<string>;
     name?: Nullable<string>;
     moduleID?: Nullable<string>;
-    lessons?: Nullable<string[]>;
+    lessons?: Nullable<Nullable<string>[]>;
     positionIndex?: Nullable<number>;
 }
 
@@ -223,6 +221,106 @@ export interface LessonFields {
     position?: Nullable<number>;
 }
 
+export interface ProgressArgs {
+    id?: Nullable<string>;
+    completed?: Nullable<boolean>;
+    status?: Nullable<number>;
+    createdAt?: Nullable<Date>;
+    updatedAt?: Nullable<Date>;
+    enrollmentID?: Nullable<string>;
+}
+
+export interface ProgressWaiveArgs {
+    enrollmentID?: Nullable<string>;
+    moduleID?: Nullable<string>;
+    planID?: Nullable<string>;
+}
+
+export interface QuizFields {
+    id?: Nullable<string>;
+    totalPoints?: Nullable<number>;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<number>;
+    numQuestions?: Nullable<number>;
+    minScore?: Nullable<number>;
+    parentLesson?: Nullable<string>;
+    questionPool?: Nullable<string>;
+}
+
+export interface QuestionPoolFields {
+    id?: Nullable<string>;
+    questions?: Nullable<string[]>;
+    quizzes?: Nullable<string[]>;
+}
+
+export interface QuestionFields {
+    id?: Nullable<string>;
+    number?: Nullable<number>;
+    text?: Nullable<string>;
+    points?: Nullable<number>;
+    parentPool?: Nullable<string>;
+    answers?: Nullable<string[]>;
+}
+
+export interface AnswerFields {
+    id?: Nullable<string>;
+    text?: Nullable<string>;
+    correct?: Nullable<boolean>;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion?: Nullable<string>;
+}
+
+export interface CreateQuiz {
+    totalPoints: number;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<number>;
+    numQuestions: number;
+    minScore?: Nullable<number>;
+    parentLesson: string;
+    questionPool: string;
+}
+
+export interface UpdateQuiz {
+    totalPoints?: Nullable<number>;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<number>;
+    numQuestions?: Nullable<number>;
+    minScore?: Nullable<number>;
+    parentLesson?: Nullable<string>;
+    questionPool?: Nullable<string>;
+}
+
+export interface CreateQuestion {
+    number: number;
+    text: string;
+    points?: Nullable<number>;
+    parentPool: string;
+}
+
+export interface UpdateQuestion {
+    number?: Nullable<number>;
+    text?: Nullable<string>;
+    points?: Nullable<number>;
+    parentPool?: Nullable<string>;
+}
+
+export interface CreateAnswer {
+    text: string;
+    correct: boolean;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion: string;
+}
+
+export interface UpdateAnswer {
+    text?: Nullable<string>;
+    correct?: Nullable<boolean>;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion?: Nullable<string>;
+}
+
 export interface NewUser {
     openID: string;
     email: string;
@@ -341,6 +439,21 @@ export interface IMutation {
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content> | Promise<Nullable<Content>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
+    createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
+    waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
+    deleteProgress(id: string): boolean | Promise<boolean>;
+    updateProgress(status: number, id?: Nullable<string>, enrollmentID?: Nullable<string>): Progress | Promise<Progress>;
+    createQuiz(input?: Nullable<CreateQuiz>): Quiz | Promise<Quiz>;
+    updateQuiz(id: string, values: UpdateQuiz): Quiz[] | Promise<Quiz[]>;
+    deleteQuiz(id: string): Quiz | Promise<Quiz>;
+    createQuestionPool(): QuestionPool | Promise<QuestionPool>;
+    deleteQuestionPool(id: string): QuestionPool | Promise<QuestionPool>;
+    createQuestion(input?: Nullable<CreateQuestion>): Question[] | Promise<Question[]>;
+    updateQuestion(id: string, values: UpdateQuestion): Question[] | Promise<Question[]>;
+    deleteQuestion(id: string): Question | Promise<Question>;
+    createAnswer(input: CreateAnswer): Answer | Promise<Answer>;
+    updateAnswer(id: string, values: UpdateAnswer): Answer[] | Promise<Answer[]>;
+    deleteAnswer(id: string): Answer | Promise<Answer>;
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
@@ -367,10 +480,14 @@ export interface IQuery {
     moduleFeedback(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
     assignmentResult(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
     moduleEnrollment(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
-    collections(): Collection[] | Promise<Collection[]>;
-    collection(id: string): Nullable<Collection> | Promise<Nullable<Collection>>;
+    collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
+    progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
+    quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
+    questionPool(args: QuestionPoolFields): QuestionPool[] | Promise<QuestionPool[]>;
+    question(args: QuestionFields): Question[] | Promise<Question[]>;
+    answer(args: AnswerFields): Answer[] | Promise<Answer[]>;
     user(input?: Nullable<UserFields>): User[] | Promise<User[]>;
     socials(): Social[] | Promise<Social[]>;
     social(id: string): Nullable<Social> | Promise<Nullable<Social>>;
@@ -384,7 +501,7 @@ export interface Thread {
     author: User;
     body: string;
     comments?: Nullable<Nullable<Thread>[]>;
-    upvotes: number;
+    upvotes?: Nullable<User[]>;
     usersWatching?: Nullable<User[]>;
     parentLesson?: Nullable<Lesson>;
     createdAt: Date;
@@ -439,6 +556,7 @@ export interface ModuleEnrollment {
     module: Module;
     plan?: Nullable<PlanOfStudy>;
     inactivePlan?: Nullable<PlanOfStudy>;
+    progress: Progress;
 }
 
 export interface AssignmentResult {
@@ -486,13 +604,13 @@ export interface Module {
     objectives: string[];
     createdAt: Date;
     updatedAt: Date;
-    assignments?: Nullable<Nullable<Assignment>[]>;
-    members?: Nullable<Nullable<ModuleEnrollment>[]>;
-    feedback?: Nullable<Nullable<ModuleFeedback>[]>;
-    parentModules?: Nullable<Nullable<Module>[]>;
-    subModules?: Nullable<Nullable<Module>[]>;
-    collections?: Nullable<Nullable<Collection>[]>;
-    courseIDs?: Nullable<Nullable<string>[]>;
+    assignments: Assignment[];
+    members: ModuleEnrollment[];
+    feedback: ModuleFeedback[];
+    parentModules: Module[];
+    subModules: Module[];
+    collections: Collection[];
+    courseIDs: string[];
 }
 
 export interface Collection {
@@ -514,6 +632,7 @@ export interface Lesson {
     threads?: Nullable<Nullable<Thread>[]>;
     collection?: Nullable<Collection>;
     position?: Nullable<number>;
+    quizzes?: Nullable<Quiz[]>;
 }
 
 export interface Content {
@@ -525,6 +644,50 @@ export interface Content {
 
 export interface Error {
     message?: Nullable<string>;
+}
+
+export interface Progress {
+    id: string;
+    status: number;
+    completed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    enrollment: ModuleEnrollment;
+}
+
+export interface Quiz {
+    id: string;
+    totalPoints: number;
+    dueAt?: Nullable<Date>;
+    timeLimit?: Nullable<number>;
+    numQuestions: number;
+    minScore: number;
+    parentLesson: Lesson;
+    questionPool: QuestionPool;
+}
+
+export interface QuestionPool {
+    id: string;
+    questions: Question[];
+    quizzes: Quiz[];
+}
+
+export interface Question {
+    id: string;
+    number: number;
+    text: string;
+    points: number;
+    parentPool: QuestionPool;
+    answers: Answer[];
+}
+
+export interface Answer {
+    id: string;
+    text: string;
+    correct: boolean;
+    weight?: Nullable<number>;
+    index?: Nullable<string>;
+    parentQuestion: Question;
 }
 
 export interface Social {

@@ -13,18 +13,19 @@ import {
 	AssignmentResFields,
 	ModEnrollmentFields,
 	LessonFields,
-	Module,
 	Course,
 	ModuleFeedback,
 	CreateCollectionArgs,
 	LessonInput,
 	CreateContentArgs,
 	ContentFields,
-	NewModule
-} from "gql/graphql";
+	NewModule,
+	CollectionFields
+} from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
+import { idText } from "typescript";
 
 @Injectable()
 export class ProgramService {
@@ -61,14 +62,15 @@ export class ProgramService {
 		}
 	});
 
-	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
+	public moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
 		members: {
 			include: {
 				plan: {
 					include: {
 						student: true
 					}
-				}
+				},
+				progress: true
 			}
 		},
 		assignments: {
@@ -138,14 +140,15 @@ export class ProgramService {
 			}
 		});
 
-	private moduleEnrollmentInclude =
+	public moduleEnrollmentInclude =
 		Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
 			plan: {
 				include: {
 					student: true
 				}
 			},
-			module: true
+			module: true,
+			progress: true
 		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
@@ -167,6 +170,20 @@ export class ProgramService {
 
 	private lessonInclude = Prisma.validator<Prisma.LessonInclude>()({
 		content: true,
+		collection: {
+			include: {
+				module: {
+					include: {
+						collections: {
+							include: {
+								lessons: true
+							}
+						}
+					}
+
+				}
+			}
+		},
 		threads: {
 			include: {
 				author: true,
@@ -401,18 +418,43 @@ export class ProgramService {
 		});
 	}
 
-	// TODO: Add Compound Query for collections
-	async collections() {
-		return this.prisma.collection.findMany({
-			include: this.collectionInclude
-		});
-	}
+	async collection(params: CollectionFields | null) {
+		if(!params){
+			return await this.prisma.collection.findMany({
+				include: this.collectionInclude
+			})
+		}
 
-	async collection(id: string) {
-		return this.prisma.collection.findFirst({
-			where: {
-				id
-			},
+		const { id, name, lessons, moduleID, positionIndex } = params;
+
+		const where = Prisma.validator<Prisma.CollectionWhereInput>()({
+			...(id && {id}),
+			...(name && {
+				name: {
+					contains: name
+				}
+			}),
+			...(moduleID && {moduleID}),
+			...(positionIndex && {position: positionIndex}),
+		})
+
+		// loop out of lessons and check with and
+		if(lessons) {
+			lessons.map((lesson) => {
+				where["AND"] = [
+					{
+						lessons: {
+							some: {
+								id: lesson
+							}
+						}
+					},
+				] as Prisma.CollectionWhereInput["AND"];
+			})
+		}
+
+		return this.prisma.collection.findMany({
+			where,
 			include: this.collectionInclude
 		});
 	}
@@ -685,19 +727,21 @@ export class ProgramService {
 	async updateModuleFeedback(
 		id: string,
 		input: ModuleFeedbackUpdate
-	): Promise<ModuleFeedback> {
+	) {
 		const { feedback, rating } = input;
 
-		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateInput>()({
-			...(feedback && { feedback }),
-			...(rating && { rating })
-		});
-
-		return this.prisma.moduleFeedback.update({
+		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateArgs>()({
 			where: {
 				id
 			},
-			data: update,
+			data: {
+				...(feedback && {feedback}),
+				...(rating && {rating})
+			}
+		});
+
+		return this.prisma.moduleFeedback.update({
+			...(update),
 			include: this.moduleFeedbackInclude
 		});
 	}
@@ -897,13 +941,14 @@ export class ProgramService {
 		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
 			data: {
 				name: input.name,
-				...(input.content !== null && input.content !== undefined && {
-					content: {
-						connect: {
-							id: input.content
+				...(input.content !== null &&
+					input.content !== undefined && {
+						content: {
+							connect: {
+								id: input.content
+							}
 						}
-					}
-				}),
+					}),
 				transcript: input.transcript,
 				collection: {
 					connect: {

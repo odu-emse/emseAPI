@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 import sourceMapSupport from "source-map-support";
 import { createServer } from "http";
+import { PrismaService } from "@/prisma.service";
 
 async function startWebSocketServer(app, port = 5000) {
 	const httpServer = createServer(app);
@@ -28,7 +29,12 @@ async function bootstrap() {
 	const app = await NestFactory;
 	const client = await app.create(AppModule, {
 		cors: {
-			origin: ["http://localhost:3000", "http://localhost:6006"],
+			origin: [
+				"http://localhost:3000",
+				"http://localhost:4000",
+				"http://localhost:6006",
+				"https://studio.apollographql.com"
+			],
 			credentials: true
 		},
 		logger: ["error", "warn", "debug", "verbose", "log"]
@@ -56,6 +62,8 @@ async function bootstrap() {
 		})
 	);
 
+	const prismaService = app.get(PrismaService);
+	await prismaService.enableShutdownHooks(app);
 	await client.listen(process.env.PORT!, async () => {
 		console.log(
 			`🚀 Server ready at http://localhost:${process.env.PORT}/graphql`

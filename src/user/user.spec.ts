@@ -9,6 +9,7 @@ import {
 	SocialInput
 } from "@/types/graphql";
 import { shuffle } from "../../utils/tests";
+import { test, describe, afterAll, expect } from "vitest";
 
 describe("Account services", () => {
 	let service: UserService;
@@ -50,11 +51,10 @@ describe("Account services", () => {
 		philosophy: "I  teach people"
 	};
 
-	beforeAll(async () => {
-		prisma = new PrismaService();
-		service = new UserService(prisma);
-		resolver = new UserResolver(service);
-	});
+	prisma = new PrismaService();
+	service = new UserService(prisma);
+	resolver = new UserResolver(service);
+
 	afterAll(async () => {
 		await resolver.update(userResetInput);
 		await resolver.updateSocial(socialDocumentID, socialResetInput);
@@ -66,15 +66,15 @@ describe("Account services", () => {
 	});
 
 	describe("User", () => {
-		it("should return an array of users", async () => {
+		test("should return an array of users", async () => {
 			const users = await resolver.user({});
 			expect(users).toBeInstanceOf(Array);
 		});
-		it("should return an error if User is not found", async () => {
+		test("should return an error if User is not found", async () => {
 			const user = await resolver.user({ id: shuffle(userDocumentID) });
 			expect(user).toBeInstanceOf(Error);
 		});
-		it("should return User given Open ID argument", async () => {
+		test("should return User given Open ID argument", async () => {
 			const user = await resolver.user({ openID: userID });
 			expect(user).toBeDefined();
 			if (!user || user instanceof Error) return new Error("User not found");
@@ -91,7 +91,7 @@ describe("Account services", () => {
 				expect(user.createdAt).toBeDefined();
 			});
 		});
-		it("should populate foreign key relations", async () => {
+		test("should populate foreign key relations", async () => {
 			const user = await resolver.user({ openID: userID });
 			if (!user || user instanceof Error) return new Error("User not found");
 			user.map((user: User) => {
@@ -102,7 +102,7 @@ describe("Account services", () => {
 				expect(user).toHaveProperty("feedback");
 			});
 		});
-		it("should update user given input argument", async () => {
+		test("should update user given input argument", async () => {
 			const updatedUserObj: UpdateUser = {
 				id: userResetInput.id,
 				openID: userID,
@@ -127,10 +127,10 @@ describe("Account services", () => {
 			expect(updateUser.isAdmin).toBeDefined();
 		});
 		// TODO: test deletion of user after creation of user is supported
-		// it("should return deleteUser", async () => {});
+		// test("should return deleteUser", async () => {});
 	});
 	describe("Instructor", () => {
-		it("should return Instructor Profile given the argument open ID", async () => {
+		test("should return Instructor Profile given the argument open ID", async () => {
 			const instructorProfile = await resolver.instructorProfile(
 				userDocumentID
 			);
@@ -150,7 +150,7 @@ describe("Account services", () => {
 			expect(instructorProfile.personalWebsite).toBeDefined();
 			expect(instructorProfile.philosophy).toBeDefined();
 		});
-		it("should update instructor profile given input argument", async () => {
+		test("should update instructor profile given input argument", async () => {
 			const updatedInstructorProfile: InstructorProfileInput = {
 				title: "Adjunct Professor",
 				officeLocation: "ESB 2101",
@@ -208,7 +208,7 @@ describe("Account services", () => {
 		});
 	});
 	describe("Social", () => {
-		it("should return an array of social documents", async () => {
+		test("should return an array of social documents", async () => {
 			const socials = await resolver.socials();
 			expect(socials).toBeInstanceOf(Array);
 			if (!socials) return;
@@ -225,7 +225,7 @@ describe("Account services", () => {
 				expect(social.account.openID).toEqual(userID);
 			});
 		});
-		it("should return user a social document given the argument ID", async () => {
+		test("should return user a social document given the argument ID", async () => {
 			const social = await resolver.social(socialDocumentID);
 			expect(social).toBeDefined();
 			expect(social!.id).toBeDefined();
@@ -235,7 +235,7 @@ describe("Account services", () => {
 			expect(social!.facebook).toBeDefined();
 			expect(social!.portfolio).toBeDefined();
 		});
-		it("should update social profile given input argument", async () => {
+		test("should update social profile given input argument", async () => {
 			const updatedSocial: SocialInput = {
 				portfolio: "https://www.google.com",
 				twitter: "https://www.twitter.com",

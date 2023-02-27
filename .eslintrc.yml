@@ -16,5 +16,5 @@ ignorePatterns:
 rules: {
   no-var: warn,
   prefer-const: warn,
-  no-mixed-spaces-and-tabs: warn,
+  no-mixed-spaces-and-tabs: [warn, smart-tabs],
 }

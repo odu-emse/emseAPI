@@ -8,7 +8,7 @@ import type {
 	Error,
 	UserFields,
 	SocialFields
-} from "gql/graphql";
+} from "@/types/graphql";
 import moment from "moment";
 import { Prisma } from "@prisma/client";
 
@@ -273,7 +273,7 @@ export class UserService {
 			...(isAdmin && { isAdmin }),
 			...(isActive && { isActive })
 		});
-		
+
 		return await this.prisma.user.update({
 			where: {
 				openID
@@ -330,7 +330,7 @@ export class UserService {
 			include: {
 				account: true
 			}
-		})
+		});
 
 		return this.prisma.social.update(update);
 	}
@@ -348,8 +348,8 @@ export class UserService {
 				facebook: input.facebook,
 				portfolio: input.portfolio
 			}
-		})
-		
+		});
+
 		return this.prisma.social.updateMany(update);
 	}
 

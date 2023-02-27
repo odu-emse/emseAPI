@@ -27,6 +27,8 @@ Table User {
   receivedMessages DirectMessage [not null]
   groupMemeberships Group [not null]
   groupMembershipIDs String[] [not null]
+  upvotedThreads Thread [not null]
+  upvotedThreadIDs String[] [not null]
 }
 
 Table InstructorProfile {
@@ -120,10 +122,11 @@ Table Lesson {
   name String [not null]
   transcript String
   threads Thread [not null]
-  collection Collection
-  collectionID String
+  collection Collection [not null]
+  collectionID String [not null]
   position Int [not null, default: 0]
   content Content [not null]
+  quizzes Quiz [not null]
 }
 
 Table ModuleFeedback {
@@ -145,6 +148,7 @@ Table ModuleEnrollment {
   moduleId String [not null]
   plan PlanOfStudy
   planID String
+  progress Progress
 }
 
 Table Assignment {
@@ -180,12 +184,13 @@ Table Thread {
   watcherID String[] [not null]
   author User [not null]
   authorID String [not null]
-  upvotes Int [not null, default: 0]
   parentLesson Lesson
   parentLessonID String
   parentThread Thread
   parentThreadID String
   comments Thread [not null]
+  upvotes User [not null]
+  upvoteUserIDs String[] [not null]
 }
 
 Table Content {
@@ -220,6 +225,55 @@ Table Group {
   messages DirectMessage [not null]
 }
 
+Table Progress {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  status Float [not null, default: 0]
+  completed Boolean [not null, default: false]
+  enrollment ModuleEnrollment [not null]
+  enrollmentID String [unique, not null]
+}
+
+Table Quiz {
+  id String [pk]
+  totalPoints Float [not null]
+  dueAt DateTime
+  timeLimit Int
+  numQuestions Int [not null]
+  minScore Float [not null, default: 0]
+  parentLesson Lesson [not null]
+  parentLessonID String [not null]
+  questionPool QuestionPool [not null]
+  questionPoolID String [not null]
+}
+
+Table QuestionPool {
+  id String [pk]
+  questions Question [not null]
+  quizzes Quiz [not null]
+}
+
+Table Question {
+  id String [pk]
+  number Int [not null]
+  parentPool QuestionPool [not null]
+  parentPoolID String [not null]
+  text String [not null]
+  points Float [not null, default: 1]
+  answers Answer [not null]
+}
+
+Table Answer {
+  id String [pk]
+  text String [not null]
+  correct Boolean [not null]
+  weight Float
+  index String
+  parentQuestion Question [not null]
+  parentQuestionID String [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -234,6 +288,8 @@ Enum EnrollmentStatus {
 Ref: User.watchedThreadIDs > Thread.id
 
 Ref: User.groupMembershipIDs > Group.id
+
+Ref: User.upvotedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
 
@@ -279,7 +335,19 @@ Ref: Thread.parentLessonID > Lesson.id
 
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
+Ref: Thread.upvoteUserIDs > User.id
+
 Ref: Content.parentID > Lesson.id
+
+Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
+
+Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
+
+Ref: Quiz.questionPoolID > QuestionPool.id [delete: Cascade]
+
+Ref: Question.parentPoolID > QuestionPool.id [delete: Cascade]
+
+Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 
 Ref: DirectMessage.authorID > User.id
 

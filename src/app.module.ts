@@ -4,14 +4,15 @@ import { UserModule } from "./user/user.module";
 import { PoSModule } from "@/pos";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
-import { ProgramModule } from "./program/program.module";
-import { config } from "dotenv";
+import { ProgramModule } from "@/program";
 import { CustomScalar, Scalar } from "@nestjs/graphql";
 import { Kind, ValueNode } from "graphql";
 import { AuthModule } from "./auth/auth.module";
 import type { Moment } from "moment";
 import { CommunityModule } from "./community/community.module";
 import { DirectMessageModule } from "@/direct-message/direct-message.module";
+import { ProgressModule } from "@/progress";
+import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
@@ -37,15 +38,26 @@ export class DateScalar implements CustomScalar<string, Moment> {
 	}
 }
 
+const playgroundConfig =
+	process.env.USE_APOLLO === "TRUE"
+		? {
+				playground: false,
+				plugins: [ApolloServerPluginLandingPageLocalDefault()]
+		  }
+		: {
+				playground: true
+		  };
+
 @Module({
 	imports: [
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			cors: {
 				credentials: true,
-				origin: ["http://localhost:3000", "http://localhost:6006"]
+					"https://studio.apollographql.com"
+					"http://localhost:3000",
+					"http://localhost:6006",
 			},
-			playground: true,
-			debug: process.env.NODE_ENV !== "production",
+			...playgroundConfig,
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
 			introspection: true,
@@ -60,6 +72,7 @@ export class DateScalar implements CustomScalar<string, Moment> {
 		ProgramModule,
 		AuthModule,
 		CommunityModule,
+		ProgressModule
 		DirectMessageModule
 	],
 	controllers: [],
