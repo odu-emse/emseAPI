@@ -27,16 +27,19 @@ model User {
   isActive   Boolean   @default(false)
 
   // Relation fields
-  social            Social?            @relation(name: "social")
-  plan              PlanOfStudy?       @relation(name: "plan")
-  tokens            Token[]
-  feedback          ModuleFeedback[]
-  assignmentGraded  AssignmentResult[] @relation(name: "graded")
-  instructorProfile InstructorProfile?
-  watchedThreads    Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
-  watchedThreadIDs  String[]           @default([]) @db.ObjectId
-  createdThreads    Thread[]           @relation(name: "createdThreads")
-  
+  social             Social?            @relation(name: "social")
+  plan               PlanOfStudy?       @relation(name: "plan")
+  tokens             Token[]
+  feedback           ModuleFeedback[]
+  assignmentGraded   AssignmentResult[] @relation(name: "graded")
+  instructorProfile  InstructorProfile?
+  watchedThreads     Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
+  watchedThreadIDs   String[]           @default([]) @db.ObjectId
+  createdThreads     Thread[]           @relation(name: "createdThreads")
+  sentMessages       DirectMessage[]    @relation(name: "sentMessages")
+  receivedMessages   DirectMessage[]    @relation(name: "receivedMessages")
+  groupMemeberships  Group[]            @relation(name: "groupMemeberships", fields: [groupMembershipIDs], references: [id])
+  groupMembershipIDs String[]           @default([]) @db.ObjectId
   upvotedThreads   Thread[] @relation(name: "upvote", fields: [upvotedThreadIDs], references: [id])
   upvotedThreadIDs String[] @default([]) @db.ObjectId
 }
@@ -236,6 +239,30 @@ model Content {
   link     String
   parent   Lesson @relation(fields: [parentID], references: [id])
   parentID String @db.ObjectId
+}
+
+model DirectMessage {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  body        String
+  author      User     @relation(name: "sentMessages", fields: [authorID], references: [id])
+  authorID    String   @db.ObjectId
+  recipient   User?    @relation(name: "receivedMessages", fields: [recipientID], references: [id])
+  recipientID String?  @db.ObjectId
+  group       Group?   @relation(name: "groupMessages", fields: [groupID], references: [id])
+  groupID     String?  @db.ObjectId
+}
+
+model Group {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now()) @updatedAt
+  name      String
+  public    Boolean         @default(false)
+  members   User[]          @relation(name: "groupMemeberships", fields: [memberIDs], references: [id])
+  memberIDs String[]        @default([]) @db.ObjectId
+  messages  DirectMessage[] @relation(name: "groupMessages")
 }
 
 model Progress {

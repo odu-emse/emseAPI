@@ -23,6 +23,10 @@ Table User {
   watchedThreads Thread [not null]
   watchedThreadIDs String[] [not null]
   createdThreads Thread [not null]
+  sentMessages DirectMessage [not null]
+  receivedMessages DirectMessage [not null]
+  groupMemeberships Group [not null]
+  groupMembershipIDs String[] [not null]
   upvotedThreads Thread [not null]
   upvotedThreadIDs String[] [not null]
 }
@@ -202,6 +206,30 @@ Table Content {
   parentID String [not null]
 }
 
+Table DirectMessage {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  body String [not null]
+  author User [not null]
+  authorID String [not null]
+  recipient User
+  recipientID String
+  group Group
+  groupID String
+}
+
+Table Group {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  name String [not null]
+  public Boolean [not null, default: false]
+  members User [not null]
+  memberIDs String[] [not null]
+  messages DirectMessage [not null]
+}
+
 Table Progress {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
@@ -270,6 +298,8 @@ Enum FileType {
 
 Ref: User.watchedThreadIDs > Thread.id
 
+Ref: User.groupMembershipIDs > Group.id
+
 Ref: User.upvotedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
@@ -319,6 +349,14 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 Ref: Thread.upvoteUserIDs > User.id
 
 Ref: Content.parentID > Lesson.id
+
+Ref: DirectMessage.authorID > User.id
+
+Ref: DirectMessage.recipientID > User.id
+
+Ref: DirectMessage.groupID > Group.id
+
+Ref: Group.memberIDs > User.id
 
 Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
