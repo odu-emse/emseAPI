@@ -62,8 +62,8 @@ async function bootstrap() {
 		})
 	);
 
-	const prismaService = app.get(PrismaService);
-	await prismaService.enableShutdownHooks(app);
+	const prismaService = client.get(PrismaService);
+	await prismaService.enableShutdownHooks(client);
 	await client.listen(process.env.PORT!, async () => {
 		console.log(
 			`🚀 Server ready at http://localhost:${process.env.PORT}/graphql`
