@@ -1,18 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { DirectMessageService } from './direct-message.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { DirectMessageService } from "./direct-message.service";
+import { describe, test, beforeEach, expect } from "vitest";
 
-describe('DirectMessageService', () => {
-  let service: DirectMessageService;
+describe("DirectMessageService", () => {
+	let service: DirectMessageService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [DirectMessageService],
-    }).compile();
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			providers: [DirectMessageService]
+		}).compile();
 
-    service = module.get<DirectMessageService>(DirectMessageService);
-  });
+		service = module.get<DirectMessageService>(DirectMessageService);
+	});
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+	test("should be defined", () => {
+		expect(service).toBeDefined();
+	});
 });
