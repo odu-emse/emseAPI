@@ -158,7 +158,7 @@ describe("Community", () => {
 			});
 			expect(threads instanceof Error).toBe(true);
 		});
-		it("should return Error if both LTE and upvotes are given", async () => {
+		test("should return Error if both LTE and upvotes are given", async () => {
 			const threads = await resolver.thread({
 				upvotesLTE: 100,
 				upvotes: 20
@@ -245,7 +245,7 @@ describe("Community", () => {
 			});
 			expect(thread instanceof Error).toBe(true);
 		});
-		it("should update timestamp when comment is added to parent thread", async function () {
+		test("should update timestamp when comment is added to parent thread", async function () {
 			const thread = await resolver.thread({ id: threadID });
 			if (thread instanceof Error) return new Error(thread.message);
 			else {
