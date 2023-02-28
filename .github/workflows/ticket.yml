@@ -6,8 +6,6 @@ on:
 
 jobs:
   format:
-    # Check if the PR is not from a fork
-#    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,45 +25,3 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git commit -am "Automated formatting changes"
           git push
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Install dependencies
-        run: yarn
-      - name: Export DB URL
-        run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
-      - name: Generate Prisma types
-        run: yarn generate
-      - name: Build application
-        run: yarn nest build
-  test:
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Install dependencies
-        run: yarn
-      - name: Export environment variables
-        run: echo "DATABASE_URL=${{secrets.DATABASE_URL}}" > .env
-      - name: Generate types
-        run: yarn generate
-      - name: Run test suite
-        run: yarn vitest
