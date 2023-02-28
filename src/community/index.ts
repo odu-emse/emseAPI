@@ -1,2 +1,2 @@
-export * from './community.service';
-export * from './community.resolver';
+export * from "./community.service";
+export * from "./community.resolver";
