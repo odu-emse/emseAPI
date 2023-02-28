@@ -6,8 +6,7 @@ import {
     CreateQuestion,
     CreateQuiz,
     QuestionFields,
-    QuestionPoolFields,
-    QuizFields, UpdateAnswer, UpdateQuestion,
+    QuizFields, QuizResultFields, QuizSubmission, UpdateAnswer, UpdateQuestion,
     UpdateQuiz
 } from "@/types/graphql";
 
@@ -17,51 +16,50 @@ export class QuizService {
 
     private quizInclude = Prisma.validator<Prisma.QuizInclude>()({
         parentLesson: true,
-        questionPool: {
+        questions: {
             include: {
-                questions: true,
+                answers: true
+            }
+        },
+        quizResults: {
+            include: {
+                student: true,
             }
         }
     });
 
-    private questionPoolInclude = Prisma.validator<Prisma.QuestionPoolInclude>()({
-        questions: {
+    private questionInclude = Prisma.validator<Prisma.QuestionInclude>()({
+        answers: true,
+        parent: {
             include: {
-                answers: true,
-            }
-        },
-        quizzes: {
-            include: {
-                parentLesson: true
+                parentLesson: true,
+                quizResults: true
             }
         }
-    })
-
-    private questionInclude = Prisma.validator<Prisma.QuestionInclude>()({
-        parentPool: {
-            include: {
-                quizzes: {
-                    include: {
-                        parentLesson: true
-                    }
-                }
-            }
-        },
-        answers: true
     })
 
     private answerInclude = Prisma.validator<Prisma.AnswerInclude>()({
         parentQuestion: {
             include: {
-                parentPool: {
+                parent: {
                     include: {
-                        quizzes: {
-                            include: {
-                                parentLesson: true
-                            }
-                        }
+                        parentLesson: true,
+                        quizResults: true
                     }
                 }
+            }
+        }
+    })
+
+    private quizResultInclude = Prisma.validator<Prisma.QuizResultInclude>()({
+        student: {
+            include: {
+                student: true,
+            }
+        },
+        quiz: {
+            include: {
+                parentLesson: true,
             }
         }
     })
@@ -76,7 +74,6 @@ export class QuizService {
             numQuestions: args.numQuestions ? args.numQuestions : undefined,
             minScore: args.minScore ? args.minScore : undefined,
             parentLessonID: args.parentLesson ? args.parentLesson : undefined,
-            questionPoolID: args.questionPool ? args.questionPool : undefined
         })
         return this.prisma.quiz.findMany({
             where,
@@ -84,55 +81,13 @@ export class QuizService {
         })
     }
 
-    async questionPool(args: QuestionPoolFields) {
-        const where: Omit<Prisma.QuestionPoolWhereInput, "AND"> & {
-            AND: Array<Prisma.QuestionPoolWhereInput>
-        } = {
-            id: args.id ? args.id : undefined,
-            AND: []
-        }
-
-        if (args.questions){
-            args.questions.forEach((id) =>{
-                where.AND.push({
-                    questions: {some: {id}}
-                });
-            })
-        }
-
-        if (args.quizzes) {
-            args.quizzes.forEach((id) => {
-                where.AND.push({
-                    quizzes: {some: {id}}
-                })
-            })
-        }
-
-        return this.prisma.questionPool.findMany({
-            where,
-            include: this.questionPoolInclude
-        })
-    }
-
     async question(args: QuestionFields) {
-        const where: Omit<Prisma.QuestionWhereInput, "AND"> & {
-            AND: Array<Prisma.QuestionWhereInput>
-        } = {
+        const where = Prisma.validator<Prisma.QuestionWhereInput>()({
             id: args.id ? args.id : undefined,
             number: args.number ? args.number : undefined,
             text: args.text ? args.text : undefined,
             points: args.points ? args.points : undefined,
-            parentPool: args.parentPool ? {id: args.parentPool} : undefined,
-            AND: []
-        }
-
-        if (args.answers) {
-            args.answers.forEach((id) => {
-                where.AND.push({
-                    answers: {some: {id}}
-                })
-            })
-        }
+        })
 
         return this.prisma.question.findMany({
             where,
@@ -155,6 +110,19 @@ export class QuizService {
         })
     }
 
+    async quizResult(args: QuizResultFields) {
+        const where = Prisma.validator<Prisma.QuizResultWhereInput>()({
+            id: args.id ? args.id : undefined,
+            score: args.score ? args.score : undefined,
+            student: args.student ? {id: args.student} : undefined,
+            quiz: args.quiz ? {id: args.quiz} : undefined
+        })
+        return this.prisma.quizResult.findMany({
+            where,
+            include: this.quizResultInclude
+        })
+    }
+
     async createQuiz(input: CreateQuiz) {
         const create = Prisma.validator<Prisma.QuizCreateInput>()({
             totalPoints: input.totalPoints,
@@ -162,8 +130,7 @@ export class QuizService {
             timeLimit: input.timeLimit ? input.timeLimit : undefined,
             numQuestions: input.numQuestions,
             minScore: input.minScore ? input.minScore : undefined,
-            parentLesson: {connect: {id: input.parentLesson}},
-            questionPool: {connect: {id: input.questionPool}}
+            parentLesson: {connect: {id: input.parentLesson}}
         })
 
         return this.prisma.quiz.create({
@@ -180,7 +147,6 @@ export class QuizService {
                 numQuestions: values.numQuestions ? values.numQuestions : undefined,
                 minScore: values.minScore ? values.minScore : undefined,
                 parentLesson: values.parentLesson ? {connect: {id: values.parentLesson}} : undefined,
-                questionPool: values.questionPool ? {connect: {id: values.questionPool}} : undefined,
             },
             where: {
                 id: id
@@ -201,27 +167,14 @@ export class QuizService {
         })
     }
 
-    async createQuestionPool() {
-        return this.prisma.questionPool.create({
-            data:{}
-        });
-    }
-
-    async deleteQuestionPool(id: string) {
-        return this.prisma.questionPool.delete({
-            where: {
-                id
-            },
-            include: this.questionPoolInclude
-        });
-    }
 
     async createQuestion(input: CreateQuestion) {
         const data = Prisma.validator<Prisma.QuestionCreateInput>()({
             number: input.number,
             text: input.text,
+            variant: input.variant,
             points: input.points ? input.points : undefined,
-            parentPool: {connect: {id: input.parentPool}}
+            parent: {connect: {id: input.parentQuiz}}
         })
         return this.prisma.question.create({
             data,
@@ -238,7 +191,7 @@ export class QuizService {
                 number: values.number ? values.number : undefined,
                 text: values.text ? values.text : undefined,
                 points: values.points ? values.points : undefined,
-                parentPool: values.parentPool ? {connect: {id: values.parentPool}} : undefined
+                parent: values.parentQuiz ? {connect: {id: values.parentQuiz}} : undefined
             }
         })
         return this.prisma.question.update({
@@ -296,6 +249,45 @@ export class QuizService {
             },
             include: this.answerInclude
         });
+    }
+
+    async submitQuiz(input: QuizSubmission) {
+        //Get plan of study for the submitted user
+        const student = await this.prisma.user.findUnique({
+            where: {
+                id: input.student
+            },
+            include: {
+                plan: true
+            }
+        })
+        if(!student || !student.plan) return new Error("Could not find user plan of study");
+        const plan = student.plan.id
+
+        //TODO: Add quiz grading logic
+
+        return this.prisma.quizResult.create({
+            data: {
+                score: 100.0,
+                answers: input.answers,
+                student: {connect: {id: plan}},
+                quiz: {connect: {id: input.quiz}}
+            }
+        })
+    }
+
+    async updateQuizScore(id: string, newScore: number) {
+        return this.prisma.quizResult.update({
+            where: {id},
+            data: {score: newScore},
+            include: this.quizResultInclude
+        })
+    }
+
+    async deleteQuizResult(id: string) {
+        return this.prisma.quizResult.delete({
+            where: {id}
+        })
     }
 
 }

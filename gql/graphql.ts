@@ -247,22 +247,15 @@ export interface QuizFields {
     numQuestions?: Nullable<number>;
     minScore?: Nullable<number>;
     parentLesson?: Nullable<string>;
-    questionPool?: Nullable<string>;
-}
-
-export interface QuestionPoolFields {
-    id?: Nullable<string>;
-    questions?: Nullable<string[]>;
-    quizzes?: Nullable<string[]>;
 }
 
 export interface QuestionFields {
     id?: Nullable<string>;
     number?: Nullable<number>;
+    variant?: Nullable<number>;
     text?: Nullable<string>;
     points?: Nullable<number>;
     parentPool?: Nullable<string>;
-    answers?: Nullable<string[]>;
 }
 
 export interface AnswerFields {
@@ -288,7 +281,6 @@ export interface CreateQuiz {
     numQuestions: number;
     minScore?: Nullable<number>;
     parentLesson: string;
-    questionPool: string;
 }
 
 export interface UpdateQuiz {
@@ -298,21 +290,22 @@ export interface UpdateQuiz {
     numQuestions?: Nullable<number>;
     minScore?: Nullable<number>;
     parentLesson?: Nullable<string>;
-    questionPool?: Nullable<string>;
 }
 
 export interface CreateQuestion {
     number: number;
+    variant: number;
     text: string;
     points?: Nullable<number>;
-    parentPool: string;
+    parentQuiz: string;
 }
 
 export interface UpdateQuestion {
     number?: Nullable<number>;
+    variant?: Nullable<number>;
     text?: Nullable<string>;
     points?: Nullable<number>;
-    parentPool?: Nullable<string>;
+    parentQuiz?: Nullable<string>;
 }
 
 export interface CreateAnswer {
@@ -460,8 +453,6 @@ export interface IMutation {
     createQuiz(input?: Nullable<CreateQuiz>): Quiz | Promise<Quiz>;
     updateQuiz(id: string, values: UpdateQuiz): Quiz[] | Promise<Quiz[]>;
     deleteQuiz(id: string): Quiz | Promise<Quiz>;
-    createQuestionPool(): QuestionPool | Promise<QuestionPool>;
-    deleteQuestionPool(id: string): QuestionPool | Promise<QuestionPool>;
     createQuestion(input?: Nullable<CreateQuestion>): Question[] | Promise<Question[]>;
     updateQuestion(id: string, values: UpdateQuestion): Question[] | Promise<Question[]>;
     deleteQuestion(id: string): Question | Promise<Question>;
@@ -499,7 +490,6 @@ export interface IQuery {
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
-    questionPool(args: QuestionPoolFields): QuestionPool[] | Promise<QuestionPool[]>;
     question(args: QuestionFields): Question[] | Promise<Question[]>;
     answer(args: AnswerFields): Answer[] | Promise<Answer[]>;
     quizResult(args: QuizResultFields): QuizResult[] | Promise<QuizResult[]>;
@@ -649,23 +639,18 @@ export interface Quiz {
     numQuestions: number;
     minScore: number;
     parentLesson: Lesson;
-    questionPool: QuestionPool;
-    quizResults?: Nullable<Nullable<Quiz>[]>;
-}
-
-export interface QuestionPool {
-    id: string;
     questions: Question[];
-    quizzes: Quiz[];
+    quizResults?: Nullable<Nullable<Quiz>[]>;
 }
 
 export interface Question {
     id: string;
     number: number;
+    variant?: Nullable<number>;
     text: string;
     points: number;
-    parentPool: QuestionPool;
     answers: Answer[];
+    parent: Quiz;
 }
 
 export interface Answer {

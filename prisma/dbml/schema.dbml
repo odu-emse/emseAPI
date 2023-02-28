@@ -214,25 +214,19 @@ Table Quiz {
   minScore Float [not null, default: 0]
   parentLesson Lesson [not null]
   parentLessonID String [not null]
-  questionPool QuestionPool [not null]
-  questionPoolID String [not null]
-  quizResults QuizResult [not null]
-}
-
-Table QuestionPool {
-  id String [pk]
   questions Question [not null]
-  quizzes Quiz [not null]
+  quizResults QuizResult [not null]
 }
 
 Table Question {
   id String [pk]
   number Int [not null]
-  parentPool QuestionPool [not null]
-  parentPoolID String [not null]
+  variant Int [not null, default: 1]
   text String [not null]
   points Float [not null, default: 1]
   answers Answer [not null]
+  parent Quiz [not null]
+  parentID String [not null]
 }
 
 Table Answer {
@@ -252,7 +246,7 @@ Table QuizResult {
   submittedAt DateTime [default: `now()`, not null]
   student PlanOfStudy [not null]
   studentID String [not null]
-  quiz Quiz
+  quiz Quiz [not null]
   quizID String [not null, default: '']
 }
 
@@ -319,9 +313,7 @@ Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
 Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
 
-Ref: Quiz.questionPoolID > QuestionPool.id [delete: Cascade]
-
-Ref: Question.parentPoolID > QuestionPool.id [delete: Cascade]
+Ref: Question.parentID > Quiz.id [delete: Cascade]
 
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 

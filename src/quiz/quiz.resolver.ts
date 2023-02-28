@@ -6,7 +6,6 @@ import {
     UpdateQuiz,
     UpdateQuestion,
     QuestionFields,
-    QuestionPoolFields,
     QuizFields, CreateAnswer, UpdateAnswer, QuizResultFields, QuizSubmission
 } from "gql/graphql"
 import {QuizService} from "@/quiz/quiz.service";
@@ -17,11 +16,6 @@ export class QuizResolver {
     @Query("quiz")
     async quiz(@Args("args") args: QuizFields) {
         return await this.quizService.quiz(args);
-    }
-
-    @Query("questionPool")
-    async questionPool(@Args("args") args: QuestionPoolFields) {
-        return await this.quizService.questionPool(args);
     }
 
     @Query("question")
@@ -36,7 +30,7 @@ export class QuizResolver {
 
     @Query("quizResult")
     async quizResult(@Args("args") args: QuizResultFields) {
-        return
+        return await this.quizService.quizResult(args);
     }
 
     @Mutation("createQuiz")
@@ -52,16 +46,6 @@ export class QuizResolver {
     @Mutation("deleteQuiz")
     async deleteQuiz(@Args("id") id: string) {
         return await this.quizService.deleteQuiz(id);
-    }
-
-    @Mutation("createQuestionPool")
-    async createQuestionPool() {
-        return await this.quizService.createQuestionPool();
-    }
-
-    @Mutation("deleteQuestionPool")
-    async deleteQuestionPool(@Args("id") id: string) {
-        return await this.quizService.deleteQuestionPool(id);
     }
 
     @Mutation("createQuestion")
@@ -95,17 +79,17 @@ export class QuizResolver {
 
     @Mutation("submitQuiz")
     async submitQuiz(@Args("input") input: QuizSubmission) {
-        return
+        return await this.quizService.submitQuiz(input);
     }
     
     @Mutation("updateQuizScore")
-    async updateQuizScore(@Args("id") id: string, @Args("newScore") newScore: Float) {
-        return
+    async updateQuizScore(@Args("id") id: string, @Args("newScore") newScore: number) {
+        return await this.quizService.updateQuizScore(id, newScore)
     }
 
     @Mutation("deleteQuizResult")
     async deleteQuizResult(@Args("id") id: string) {
-        return
+        return await this.quizService.deleteQuizResult(id);
     }
 
 }

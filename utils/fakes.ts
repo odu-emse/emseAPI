@@ -15,7 +15,6 @@ import {
 	User,
 	Quiz,
 	Question,
-	QuestionPool,
 	Answer
 } from "@prisma/client";
 import { faker } from "@faker-js/faker";
@@ -200,30 +199,25 @@ export function createRandomContent(parentID?: string): Content {
 	};
 }
 
-export function createRandomQuiz(parentID?: string, poolID?: string): Quiz {
+export function createRandomQuiz(parentID?: string): Quiz {
+	const questions = faker.datatype.number({min: 5, max:15})
 	return {
 		id: faker.database.mongodbObjectId(),
-		totalPoints: faker.datatype.number(),
+		totalPoints: questions,
 		dueAt: faker.date.future(),
 		timeLimit: faker.datatype.number(),
-		numQuestions: faker.datatype.number(),
+		numQuestions: questions,
 		minScore: faker.datatype.number(),
-		parentLessonID: parentID ? parentID : faker.database.mongodbObjectId(),
-		questionPoolID: poolID ? poolID : faker.database.mongodbObjectId()
+		parentLessonID: parentID ? parentID : faker.database.mongodbObjectId()
 	}
 }
 
-export function createRandomQuestionPool(): QuestionPool {
-	return {
-		id: faker.database.mongodbObjectId()
-	}
-}
-
-export function createRandomQuestion(poolID?: string): Question {
+export function createRandomQuestion(quizID?: string): Question {
 	return {
 		id: faker.database.mongodbObjectId(),
 		number: faker.datatype.number(),
-		parentPoolID: poolID ? poolID : faker.database.mongodbObjectId(),
+		variant: faker.datatype.number({min: 1, max: 5}),
+		parentID: quizID ?quizID : faker.database.mongodbObjectId(),
 		text: faker.lorem.words(5),
 		points: faker.datatype.number(),
 	}
@@ -272,7 +266,6 @@ export const assignmentResult = createRandomAssignmentResult();
 export const thread = createRandomThread();
 export const content = createRandomContent();
 export const progress = createRandomProgress();
-export const questionPool = createRandomQuestionPool();
 export const quiz = createRandomQuiz();
 export const question = createRandomQuestion();
 export const answer = createRandomAnswer();

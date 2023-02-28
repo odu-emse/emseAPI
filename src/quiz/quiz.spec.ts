@@ -23,12 +23,11 @@ describe('Quiz Services', () => {
   const progResolver: ProgramResolver = new ProgramResolver(progServ);
 
   // Make mock models for testing against
-  const testingAccountStudentID = "616701c22e17f3fb9f5085f7";
-  const testingAccountPlanID = "620e9a07e57bd45e4e3fc88c";
+  const testingAccountStudentID = "63e51cbd14406c6ad63f73a7";
+  const testingAccountPlanID = "63e51cbd14406c6ad63f73a8";
   let fakeModule;
   let fakeCollection;
   let fakeLesson;
-  let fakePool;
   let fakeQuiz;
   let fakeQuestion;
   let fakeAnswer;
@@ -65,18 +64,9 @@ describe('Quiz Services', () => {
   })
 
   describe("Creates", () =>{
-    describe("Mutation.createQuestionPool()", () => {
-      test("should create a question pool", async () => {
-        const count = (await resolver.questionPool({})).length;
-        fakePool = await resolver.createQuestionPool();
-        const endCount = (await resolver.questionPool({})).length;
-        expect(fakePool).toBeDefined();
-        expect(endCount).toEqual(count + 1);
-      })
-    })
     describe("Mutation.createQuiz()", () => {
       test("should create a new quiz", async () => {
-        const quizData = createRandomQuiz(fakeLesson.id, fakePool.id);
+        const quizData = createRandomQuiz(fakeLesson.id);
         fakeQuiz = await createQuiz(resolver, quizData);
         if (fakeQuiz instanceof Error) throw new Error(fakeQuiz.message);
         expect(fakeQuiz).toBeDefined();
@@ -86,20 +76,20 @@ describe('Quiz Services', () => {
         expect(fakeQuiz.minScore).toEqual(quizData.minScore);
         expect(fakeQuiz.dueAt).toEqual(quizData.dueAt);
         expect(fakeQuiz.parentLessonID).toEqual(fakeLesson.id);
-        expect(fakeQuiz.questionPoolID).toEqual(fakePool.id);
       })
     })
     describe("Mutation.createQuestion", ()=>{
       test("should create a question record", async () =>{
         const start = (await resolver.question({})).length;
-        const questionData = createRandomQuestion(fakePool.id)
+        const questionData = createRandomQuestion(fakeQuiz.id)
         fakeQuestion = await createQuestion(resolver, questionData);
         if (fakeQuestion instanceof Error) throw new Error(fakeQuestion.message);
         const final = (await resolver.question({})).length;
         expect(fakeQuestion).toBeDefined();
         expect(fakeQuestion.number).toEqual(questionData.number);
+        expect(fakeQuestion.variant).toEqual(questionData.variant);
         expect(fakeQuestion.text).toEqual(questionData.text);
-        expect(fakeQuestion.parentPoolID).toEqual(fakePool.id);
+        expect(fakeQuestion.parentID).toEqual(fakeQuiz.id);
         expect(final).toEqual(start + 1);
       });
     })
@@ -130,55 +120,17 @@ describe('Quiz Services', () => {
           quiz: fakeQuiz.id,
           answers
         })
+        if (result instanceof Error) return new Error(result.message);
+        fakeSubmission = result
         expect(result).toBeDefined();
         expect(result.answers.length).toEqual(fakeQuiz.numQuestions);
         expect(result.score).toBeGreaterThanOrEqual(0.0);
         expect(result.score).toBeLessThanOrEqual(100.0);
-        fakeSubmission = result
       })
     })
   })
 
   describe("Reads", () => {
-    describe("Query.questionPool()", () =>{
-      test("should return a list of questionPools", async () =>{
-        const pools = await resolver.questionPool({});
-        expect(pools).toBeDefined();
-        expect(typeof pools).toBe(typeof []);
-        expect(pools.length).toBeGreaterThanOrEqual(1);
-        pools.map((pool) => {
-          expect(pool.id).toBeDefined();
-          expect(pool.questions).toBeDefined();
-          expect(pool.quizzes).toBeDefined();
-        })
-      })
-      test("should take less than 1.5 seconds to return all pools", async () =>{
-        const begin = new Date();
-        await resolver.questionPool({});
-        const end = new Date();
-        expect(end.getTime() - begin.getTime()).toBeLessThan(1500);
-      })
-      test("should return a single record given an ID", async() =>{
-        const pools = await resolver.questionPool({id: fakePool.id});
-        expect(pools).toBeDefined();
-        expect(pools.length).toEqual(1);
-        expect(typeof pools).toBe(typeof []);
-        expect(pools[0].id).toEqual(fakePool.id);
-      })
-      // test("should return only matching records", async () => {
-      //   const questions = [itQuestions[0].id, testQuestions[1].id]
-      //   const pools = await resolver.questionPool({
-      //     questions,
-      //     quizzes: [itQuiz.id]
-      //   })
-      //   expect(pools).toBeDefined();
-      //   expect(pools.length).toBeGreaterThanOrEqual(1);
-      //   expect(typeof pools).toBe(typeof []);
-      //   pools.map((pool) =>{
-      //     //TODO Wrteste test condition for matching list records.
-      //   })
-      // })
-    })
     describe("Query.quiz()", () => {
       test("should return a list of quizzes", async () => {
         const quizzes = await resolver.quiz({});
@@ -200,7 +152,6 @@ describe('Quiz Services', () => {
           numQuestions: fakeQuiz.numQuestions,
           minScore: fakeQuiz.minScore,
           parentLesson: fakeQuiz.parentLessonID,
-          questionPool: fakeQuiz.questionPoolID
         });
 
         expect(quizzes).toBeDefined();
@@ -210,7 +161,6 @@ describe('Quiz Services', () => {
           expect(quiz.numQuestions).toEqual(params.numQuestions);
           expect(quiz.minScore).toEqual(params.minScore);
           expect(quiz.parentLesson.id).toEqual(params.parentLessonID);
-          expect(quiz.questionPool.id).toEqual(params.questionPoolID);
         })
       })
       test("should take less than 1.5 seconds to get all quizzes", async () =>{
@@ -246,18 +196,18 @@ describe('Quiz Services', () => {
       test("should get only matching records", async () => {
         const questions = await resolver.question({
           number: fakeQuestion.number,
+          variant: fakeQuestion.variant,
           text: fakeQuestion.text,
           points: fakeQuestion.points,
-          parentPool: fakeQuestion.parentPoolID,
+          parentPool: fakeQuestion.parentID,
         })
         expect(questions).toBeDefined();
         expect(questions.length).toBeGreaterThanOrEqual(1);
         questions.map((question) => {
           expect(question.number).toEqual(fakeQuestion.number);
+          expect(question.variant).toEqual(fakeQuestion.variant);
           expect(question.text).toEqual(fakeQuestion.text);
-          expect(question.parentPoolID).toEqual(fakeQuestion.parentPoolID);
-          // TODO Write it condition for list parameters in query
-          // expect(question.answers.includes(itAnswers[0].id)).toBeTruthy();
+          expect(question.parentID).toEqual(fakeQuestion.parentID);
           expect(question.points).toEqual(fakeQuestion.points);
         })
       });
@@ -342,14 +292,12 @@ describe('Quiz Services', () => {
       test("should update all specified fields", async () =>{
         const otherLesson = await createLesson(progResolver, createRandomLesson(fakeCollection.id));
         if (otherLesson instanceof Error) throw new Error(otherLesson.message);
-        const otherPool = await resolver.createQuestionPool();
         const quizData = createRandomQuiz();
         const updatedQuiz = await resolver.updateQuiz(fakeQuiz.id, {
           totalPoints: quizData.totalPoints,
           numQuestions: quizData.numQuestions,
           minScore: quizData.minScore,
           parentLesson: otherLesson.id,
-          questionPool: otherPool.id,
           dueAt: quizData.dueAt
         });
         expect(updatedQuiz).toBeDefined();
@@ -357,30 +305,28 @@ describe('Quiz Services', () => {
         expect(updatedQuiz.numQuestions).toEqual(quizData.numQuestions);
         expect(updatedQuiz.minScore).toEqual(quizData.minScore);
         expect(updatedQuiz.parentLesson.id).toEqual(otherLesson.id);
-        expect(updatedQuiz.questionPool.id).toEqual(otherPool.id);
         expect(updatedQuiz.dueAt).toEqual(quizData.dueAt);
 
       })
     })
     describe("Mutation.updateQuestion", ()=>{
       test("should update only specified fields", async () => {
-        const newPool = await resolver.createQuestionPool();
+        // TODO add changing questions parent Quiz test case
         const questionData = createRandomQuestion();
         const updated = await resolver.updateQuestion(fakeQuestion.id, {
           number: questionData.number,
+          variant: questionData.variant,
           text: questionData.text,
-          parentPool: newPool.id
         });
         expect(updated).toBeDefined();
         expect(updated.number).toEqual(questionData.number);
         expect(updated.text).toEqual(questionData.text);
-        expect(updated.parentPoolID).toEqual(newPool.id);
       });
 
     })
     describe("Mutation.updateAnswer", () => {
       test("should update only matching fields", async () => {
-        const questionData = createRandomQuestion(fakePool.id);
+        const questionData = createRandomQuestion(fakeQuiz.id);
         const question = await createQuestion(resolver, questionData);
         if (question instanceof Error) throw new Error(question.message);
         const answerData = createRandomAnswer();
@@ -435,43 +381,18 @@ describe('Quiz Services', () => {
       });
 
     })
-    describe("Mutation.deleteQuiz()", () => {
-      test("should delete a quiz record", async () => {
-        await resolver.deleteQuiz(fakeQuiz.id);
-        const quizCheck = await resolver.quiz({id: fakeQuiz.id});
-        expect(quizCheck.length).toEqual(0);
-      })
-    })
-    describe("Mutation.deleteQuestionPool()", () => {
-      let pools;
-      test("should delete a questionPool", async () => {
-        pools = await resolver.questionPool({id: fakePool.id});
-        const deleted = await resolver.deleteQuestionPool(fakePool.id);
-        expect(deleted).toBeDefined();
-        expect(deleted.id).toEqual(fakePool.id);
-      });
-      test("should delete all child Quizzes", async () => {
-        pools[0].quizzes.map(async (quiz) => {
-          const quizzes = await resolver.quiz({id: quiz.id});
-          expect(quizzes).toBeDefined();
-          expect(typeof quizzes).toBe(typeof []);
-          expect(quizzes.length).toEqual(0);
-        })
-      });
-      test("should delete all child Questions", async () => {
-        pools[0].questions.map(async (question) => {
-          const questions = await resolver.question({id: question.id});
-          expect(questions).toBeDefined();
-          expect(typeof questions).toBe(typeof []);
-          expect(questions.length).toEqual(0);
-        })
-      });
-    })
     describe("Mutation.deleteQuizResult", () => {
       test("should delete a quiz result", async () => {
         await resolver.deleteQuizResult(fakeSubmission.id);
         const resultCheck = await resolver.quizResult({id: fakeSubmission.id});
         expect(resultCheck.length).toEqual(0);
+      })
+    })
+    describe("Mutation.deleteQuiz()", () => {
+      test("should delete a quiz record", async () => {
+        await resolver.deleteQuiz(fakeQuiz.id);
+        const quizCheck = await resolver.quiz({id: fakeQuiz.id});
+        expect(quizCheck.length).toEqual(0);
       })
     })
   })

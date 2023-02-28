@@ -28,28 +28,13 @@ type Quiz {
     """
     parentLesson: Lesson!
     """
-    The question pool being used to generate the questions for this quiz
+    The questions in this quiz
     """
-    questionPool: QuestionPool!
+    questions: [Question!]!
     """
     Submitted results to this quiz
     """
     quizResults: [Quiz]
-}
-
-type QuestionPool {
-    """
-    The document ID for this question pool
-    """
-    id: ID!
-    """
-    The questions in this question pool
-    """
-    questions: [Question!]!
-    """
-    The quizzes that are built using this question pool
-    """
-    quizzes: [Quiz!]!
 }
 
 type Question {
@@ -62,6 +47,10 @@ type Question {
     """
     number: Int!
     """
+    Which variant of the question is this record
+    """
+    variant: Int
+    """
     The text of the question (the readable question itself)
     """
     text: String!
@@ -70,13 +59,13 @@ type Question {
     """
     points: Float!
     """
-    The pool this question belongs to
-    """
-    parentPool: QuestionPool!
-    """
     The possible answers to this question
     """
     answers: [Answer!]!
+    """
+    The parent Quiz of this question
+    """
+    parent: Quiz!
 }
 
 type Answer {
@@ -160,25 +149,6 @@ input QuizFields {
     The lesson that this quiz belongs to
     """
     parentLesson: ID
-    """
-    The question pool being used to generate the questions for this quiz
-    """
-    questionPool: ID
-}
-
-input QuestionPoolFields {
-    """
-    The document ID for this question pool
-    """
-    id: ID
-    """
-    The questions in this question pool
-    """
-    questions: [ID!]
-    """
-    The quizzes that are built using this question pool
-    """
-    quizzes: [ID!]
 }
 
 input QuestionFields {
@@ -191,6 +161,10 @@ input QuestionFields {
     """
     number: Int
     """
+    The variant of the question number that this question is
+    """
+    variant: Int
+    """
     The text of the question (the readable question itself)
     """
     text: String
@@ -202,10 +176,6 @@ input QuestionFields {
     The pool this question belongs to
     """
     parentPool: ID
-    """
-    The possible answers to this question
-    """
-    answers: [ID!]
 }
 
 input AnswerFields {
@@ -260,11 +230,6 @@ type Query {
     """
     quiz(args: QuizFields!): [Quiz!]!
     """
-    Fetch a QuestionPool by any of its parameters. An empty object as the input parameter will return all Pools, an ID will retrieve an array with just a single pool.
-    If a combination of parameters are used then only documents that match all the parameters will be included in the array.
-    """
-    questionPool(args: QuestionPoolFields!): [QuestionPool!]!
-    """
     Fetch a Question by any of its parameters. An empty object as the input parameter will return all Questions, an ID will retrieve an array with just a single Question.
     If a only a pool ID is provided than all questions in that pool will be returned.
     If a combination of parameters are used then only documents that match all the parameters will be included in the array.
@@ -312,10 +277,6 @@ input CreateQuiz {
     The lesson that this quiz belongs to
     """
     parentLesson: ID!
-    """
-    The question pool being used to generate the questions for this quiz
-    """
-    questionPool: ID!
 }
 
 input UpdateQuiz {
@@ -343,10 +304,6 @@ input UpdateQuiz {
     The lesson that this quiz belongs to
     """
     parentLesson: ID
-    """
-    The question pool being used to generate the questions for this quiz
-    """
-    questionPool: ID
 }
 
 input CreateQuestion {
@@ -354,6 +311,10 @@ input CreateQuestion {
     The question number on the quiz/in the pool
     """
     number: Int!
+    """
+    The variant of the question number that this question is
+    """
+    variant: Int!
     """
     The text of the question (the readable question itself)
     """
@@ -363,9 +324,9 @@ input CreateQuestion {
     """
     points: Float
     """
-    The pool this question belongs to
+    The quiz this question belongs to
     """
-    parentPool: ID!
+    parentQuiz: ID!
 }
 
 input UpdateQuestion {
@@ -373,6 +334,10 @@ input UpdateQuestion {
     The question number on the quiz/in the pool
     """
     number: Int
+    """
+    The variant of the question number that this question is
+    """
+    variant: Int
     """
     The text of the question (the readable question itself)
     """
@@ -382,9 +347,9 @@ input UpdateQuestion {
     """
     points: Float
     """
-    The pool this question belongs to
+    The quiz this question belongs to
     """
-    parentPool: ID
+    parentQuiz: ID
 }
 
 input CreateAnswer {
@@ -455,8 +420,7 @@ type Mutation {
     """
     createQuiz(input: CreateQuiz): Quiz!
     """
-    Update the parameters of an existing quiz or quizzes given a list of selectors
-    These selectors are any parameters that could exist within a quiz and function in a similar way to the quiz() query
+    Update a single quiz record given its document ID. Most fields can be updated through this query.
     """
     updateQuiz(id: ID!, values: UpdateQuiz!): [Quiz!]!
     """
@@ -464,23 +428,11 @@ type Mutation {
     """
     deleteQuiz(id: ID!): Quiz!
     """
-    Create a new question pool record. This will not take any parameters as by default it will have no quizzes or
-    questions associated. These fields will be populated and modified via the Quiz and Question Mutations
-    """
-    createQuestionPool: QuestionPool!
-    """
-    Delete a question pool by its document ID.
-    It is important to note that deleting a question pool will delete all associated questions and quizzes
-    """
-    deleteQuestionPool(id: ID!): QuestionPool!
-    """
     Create a new question. This new question must be associated with a question pool to be created
     """
     createQuestion(input: CreateQuestion): [Question!]!
     """
-    Update a single or multiple questions based upon selector fields given to it.
-    The selector fields will be a list of optional parameters that match QuestionFields.
-    All questions that match the selector parameters will be updated with the input data
+    Update a single question record given its document ID. Most fields can be updated through this query.
     """
     updateQuestion(id: ID!, values: UpdateQuestion!): [Question!]!
     """
@@ -493,9 +445,7 @@ type Mutation {
     """
     createAnswer(input: CreateAnswer!): Answer!
     """
-    Update one or many Answers based upon selector fields given to it.
-    The selector fields will be a list of all optional parameters that can be found int AnswerFields.
-    All documents that match all selector fields will be updated with the values passed as the second argument
+    Update a single answer record given its document ID. Most fields can be updated through this query.
     """
     updateAnswer(id: ID!, values: UpdateAnswer!): [Answer!]!
     """
