@@ -130,8 +130,6 @@ describe("Community", () => {
 				});
 			}
 		});
-		
-		
 	});
 	describe("Create", function () {
 		test("should create a thread with author", async () => {

@@ -6,8 +6,7 @@ import {
     UpdateQuiz,
     UpdateQuestion,
     QuestionFields,
-    QuestionPoolFields,
-    QuizFields, CreateAnswer, UpdateAnswer
+    QuizFields, CreateAnswer, UpdateAnswer, QuizResultFields, QuizSubmission
 } from "gql/graphql"
 import {QuizService} from "@/quiz/quiz.service";
 
@@ -19,11 +18,6 @@ export class QuizResolver {
         return await this.quizService.quiz(args);
     }
 
-    @Query("questionPool")
-    async questionPool(@Args("args") args: QuestionPoolFields) {
-        return await this.quizService.questionPool(args);
-    }
-
     @Query("question")
     async question(@Args("args") args: QuestionFields) {
         return await this.quizService.question(args);
@@ -32,6 +26,11 @@ export class QuizResolver {
     @Query("answer")
     async answer(@Args("args") args: AnswerFields) {
         return await this.quizService.answer(args);
+    }
+
+    @Query("quizResult")
+    async quizResult(@Args("args") args: QuizResultFields) {
+        return await this.quizService.quizResult(args);
     }
 
     @Mutation("createQuiz")
@@ -47,16 +46,6 @@ export class QuizResolver {
     @Mutation("deleteQuiz")
     async deleteQuiz(@Args("id") id: string) {
         return await this.quizService.deleteQuiz(id);
-    }
-
-    @Mutation("createQuestionPool")
-    async createQuestionPool() {
-        return await this.quizService.createQuestionPool();
-    }
-
-    @Mutation("deleteQuestionPool")
-    async deleteQuestionPool(@Args("id") id: string) {
-        return await this.quizService.deleteQuestionPool(id);
     }
 
     @Mutation("createQuestion")
@@ -83,10 +72,24 @@ export class QuizResolver {
     async updateAnswer(@Args("id") id: string, @Args("values") values: UpdateAnswer) {
         return await this.quizService.updateAnswer(id, values);
     }
-
-    //TODO deleteAnswer()
     @Mutation("deleteAnswer")
     async deleteAnswer(@Args("id") id: string) {
         return await this.quizService.deleteAnswer(id);
     }
+
+    @Mutation("submitQuiz")
+    async submitQuiz(@Args("input") input: QuizSubmission) {
+        return await this.quizService.submitQuiz(input);
+    }
+    
+    @Mutation("updateQuizScore")
+    async updateQuizScore(@Args("id") id: string, @Args("newScore") newScore: number) {
+        return await this.quizService.updateQuizScore(id, newScore)
+    }
+
+    @Mutation("deleteQuizResult")
+    async deleteQuizResult(@Args("id") id: string) {
+        return await this.quizService.deleteQuizResult(id);
+    }
+
 }

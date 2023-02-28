@@ -27,16 +27,19 @@ model User {
   isActive   Boolean   @default(false)
 
   // Relation fields
-  social            Social?            @relation(name: "social")
-  plan              PlanOfStudy?       @relation(name: "plan")
-  tokens            Token[]
-  feedback          ModuleFeedback[]
-  assignmentGraded  AssignmentResult[] @relation(name: "graded")
-  instructorProfile InstructorProfile?
-  watchedThreads    Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
-  watchedThreadIDs  String[]           @default([]) @db.ObjectId
-  createdThreads    Thread[]           @relation(name: "createdThreads")
-  
+  social             Social?            @relation(name: "social")
+  plan               PlanOfStudy?       @relation(name: "plan")
+  tokens             Token[]
+  feedback           ModuleFeedback[]
+  assignmentGraded   AssignmentResult[] @relation(name: "graded")
+  instructorProfile  InstructorProfile?
+  watchedThreads     Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
+  watchedThreadIDs   String[]           @default([]) @db.ObjectId
+  createdThreads     Thread[]           @relation(name: "createdThreads")
+  sentMessages       DirectMessage[]    @relation(name: "sentMessages")
+  receivedMessages   DirectMessage[]    @relation(name: "receivedMessages")
+  groupMemeberships  Group[]            @relation(name: "groupMemeberships", fields: [groupMembershipIDs], references: [id])
+  groupMembershipIDs String[]           @default([]) @db.ObjectId
   upvotedThreads   Thread[] @relation(name: "upvote", fields: [upvotedThreadIDs], references: [id])
   upvotedThreadIDs String[] @default([]) @db.ObjectId
 }
@@ -66,6 +69,7 @@ model PlanOfStudy {
   // advisorId         String?            @db.ObjectId
   modules           ModuleEnrollment[]
   assignmentResults AssignmentResult[]
+  quizResults       QuizResult[]
 }
 
 model Social {
@@ -178,10 +182,13 @@ model ModuleEnrollment {
 }
 
 model Assignment {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  updatedAt DateTime @default(now()) @updatedAt
-  name      String
-  dueAt     DateTime
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  updatedAt     DateTime @default(now()) @updatedAt
+  name          String
+  dueAt         DateTime
+  contentURL    String
+  contentType   String
+  acceptedTypes FileType @default(DOC)
 
   // Relation Fields
   moduleId          String             @db.ObjectId
@@ -190,10 +197,12 @@ model Assignment {
 }
 
 model AssignmentResult {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  submittedAt DateTime @default(now())
-  result      Float
-  feedback    String?
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  submittedAt   DateTime @default(now())
+  result        Float
+  feedback      String?
+  submissionURL String
+  fileType      String
 
   // Relation Fields
   studentId    String      @db.ObjectId
@@ -233,6 +242,30 @@ model Content {
   parentID String @db.ObjectId
 }
 
+model DirectMessage {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  body        String
+  author      User     @relation(name: "sentMessages", fields: [authorID], references: [id])
+  authorID    String   @db.ObjectId
+  recipient   User?    @relation(name: "receivedMessages", fields: [recipientID], references: [id])
+  recipientID String?  @db.ObjectId
+  group       Group?   @relation(name: "groupMessages", fields: [groupID], references: [id])
+  groupID     String?  @db.ObjectId
+}
+
+model Group {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now()) @updatedAt
+  name      String
+  public    Boolean         @default(false)
+  members   User[]          @relation(name: "groupMemeberships", fields: [memberIDs], references: [id])
+  memberIDs String[]        @default([]) @db.ObjectId
+  messages  DirectMessage[] @relation(name: "groupMessages")
+}
+
 model Progress {
   id           String           @id @default(auto()) @map("_id") @db.ObjectId
   createdAt    DateTime         @default(now())
@@ -244,36 +277,28 @@ model Progress {
   enrollmentID String           @unique
 }
 
-// Generic template for a quiz. These will belong to a lesson.
 model Quiz {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   totalPoints    Float
   dueAt          DateTime?
-  // startedAt      DateTime? Save these for responses
-  // submittedAt    DateTime?
   timeLimit      Int?
   numQuestions   Int
   minScore       Float        @default(0.0)
   parentLesson   Lesson       @relation(fields: [parentLessonID], references: [id], onDelete: Cascade)
   parentLessonID String       @db.ObjectId
-  questionPool   QuestionPool @relation(fields: [questionPoolID], references: [id], onDelete: Cascade)
-  questionPoolID String       @db.ObjectId
-}
-
-model QuestionPool {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  questions Question[]
-  quizzes   Quiz[]
+  questions      Question[]
+  quizResults    QuizResult[]
 }
 
 model Question {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  number       Int
-  parentPool   QuestionPool @relation(fields: [parentPoolID], references: [id], onDelete: Cascade)
-  parentPoolID String       @db.ObjectId
-  text         String
-  points       Float        @default(1.0)
-  answers      Answer[]
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  number   Int
+  variant  Int      @default(1)
+  text     String
+  points   Float    @default(1.0)
+  answers  Answer[]
+  parent   Quiz     @relation(fields: [parentID], references: [id], onDelete: Cascade)
+  parentID String   @db.ObjectId
 }
 
 model Answer {
@@ -286,6 +311,18 @@ model Answer {
   parentQuestionID String   @db.ObjectId
 }
 
+model QuizResult {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  score       Float
+  answers     String[]
+  submittedAt DateTime @default(now())
+
+  student   PlanOfStudy @relation(fields: [studentID], references: [id])
+  studentID String      @db.ObjectId
+  quiz      Quiz?       @relation(fields: [quizID], references: [id])
+  quizID    String      @default("") @db.ObjectId
+}
+
 enum UserRole {
   STUDENT
   TEACHER
@@ -295,6 +332,12 @@ enum UserRole {
 enum EnrollmentStatus {
   ACTIVE
   INACTIVE
+}
+
+enum FileType {
+  DOCX
+  DOC
+  PDF
 }
 
 // Dont need this anymore since we arent doing API Tokens

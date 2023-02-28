@@ -10,6 +10,7 @@ import { Kind, ValueNode } from "graphql";
 import { AuthModule } from "./auth/auth.module";
 import type { Moment } from "moment";
 import { CommunityModule } from "./community/community.module";
+import { DirectMessageModule } from "@/direct-message/direct-message.module";
 import { ProgressModule } from "@/progress";
 import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
 
@@ -53,16 +54,19 @@ const playgroundConfig =
 			cors: {
 				credentials: true,
 				origin: [
+					"https://studio.apollographql.com",
 					"http://localhost:3000",
-					"http://localhost:4000",
-					"http://localhost:6006",
-					"https://studio.apollographql.com"
+					"http://localhost:6006"
 				]
 			},
 			...playgroundConfig,
 			typePaths: ["./**/*.graphql"],
 			driver: ApolloDriver,
 			introspection: true,
+			subscriptions: {
+				"graphql-ws": true,
+				"subscriptions-transport-ws": false
+			},
 			context: ({ req, res }) => ({ req, res })
 		}),
 		UserModule,
@@ -70,7 +74,8 @@ const playgroundConfig =
 		ProgramModule,
 		AuthModule,
 		CommunityModule,
-		ProgressModule
+		ProgressModule,
+		DirectMessageModule
 	],
 	controllers: [],
 	providers: [DateScalar]
