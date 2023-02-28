@@ -1,7 +1,7 @@
 name: EMSE-API - Ticket pipeline
 
 on:
-  pull_request:
+  push:
     branches: ['ALMP-**']
 
 jobs:
