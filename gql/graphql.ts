@@ -18,6 +18,12 @@ export enum EnrollmentStatus {
     INACTIVE = "INACTIVE"
 }
 
+export enum FileType {
+    DOCX = "DOCX",
+    DOC = "DOC",
+    PDF = "PDF"
+}
+
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
@@ -39,9 +45,6 @@ export interface IThreadByParams {
     parentLesson?: Nullable<string>;
     parentThread?: Nullable<string>;
     comments?: Nullable<string>;
-    upvotes?: Nullable<number>;
-    upvotesGTE?: Nullable<number>;
-    upvotesLTE?: Nullable<number>;
     author?: Nullable<string>;
 }
 
@@ -115,6 +118,9 @@ export interface AssignmentFields {
     updatedAt?: Nullable<Date>;
     name?: Nullable<string>;
     dueAt?: Nullable<Date>;
+    contentURL?: Nullable<string>;
+    contentType?: Nullable<string>;
+    acceptedTypes?: Nullable<FileType>;
     module?: Nullable<string>;
     assignmentResult?: Nullable<string>;
 }
@@ -132,6 +138,8 @@ export interface AssignmentResFields {
     submittedAt?: Nullable<Date>;
     result?: Nullable<number>;
     feedback?: Nullable<string>;
+    submissionURL?: Nullable<string>;
+    fileType?: Nullable<string>;
     student?: Nullable<string>;
     gradedBy?: Nullable<string>;
     assignment?: Nullable<string>;
@@ -170,6 +178,9 @@ export interface NewAssignment {
     name: string;
     dueAt: Date;
     module: string;
+    contentType: string;
+    contentURL: string;
+    acceptedTypes: FileType;
 }
 
 export interface AssignmentInput {
@@ -197,6 +208,8 @@ export interface NewAssignmentResult {
     student: string;
     grader: string;
     result: number;
+    submissionURL: string;
+    fileType: string;
 }
 
 export interface ModuleEnrollmentInput {
@@ -415,6 +428,8 @@ export interface IMutation {
     upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
+    newGroupMessage(groupID: string, message: string, senderID: string): boolean | Promise<boolean>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -475,6 +490,9 @@ export interface IMutation {
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     thread(input?: Nullable<IThreadByParams>): Thread[] | Promise<Thread[]>;
+    directMessages(receiverID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
+    groups(userID: string): Group[] | Promise<Group[]>;
+    groupMessages(groupID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -506,13 +524,43 @@ export interface Thread {
     author: User;
     body: string;
     comments?: Nullable<Nullable<Thread>[]>;
-    upvotes: number;
+    upvotes?: Nullable<User[]>;
     usersWatching?: Nullable<User[]>;
     parentLesson?: Nullable<Lesson>;
     createdAt: Date;
     updatedAt: Date;
     parentThread?: Nullable<Thread>;
     parentThreadID?: Nullable<string>;
+}
+
+export interface ISubscription {
+    newDirectMessage(receiverID?: Nullable<string>): DirectMessageResponse | Promise<DirectMessageResponse>;
+    newGroupMessage(groupID?: Nullable<string>): DirectMessageResponse | Promise<DirectMessageResponse>;
+}
+
+export interface CreateMessageInput {
+    authorID: string;
+    recipientID: string;
+    message: string;
+}
+
+export interface DirectMessageResponse {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    body: string;
+    authorID: string;
+    recipientID: string;
+    author: User;
+    recipient: Members;
+}
+
+export interface Group {
+    id: string;
+    name: string;
+    members: User[];
+    public: boolean;
+    messages: DirectMessageResponse[];
 }
 
 export interface PlanOfStudy {
@@ -540,6 +588,8 @@ export interface AssignmentResult {
     submittedAt: Date;
     result: number;
     feedback?: Nullable<string>;
+    submissionURL?: Nullable<string>;
+    fileType?: Nullable<string>;
     student?: Nullable<PlanOfStudy>;
     gradedBy?: Nullable<User>;
     assignment?: Nullable<Assignment>;
@@ -550,6 +600,9 @@ export interface Assignment {
     updatedAt: Date;
     name: string;
     dueAt?: Nullable<Date>;
+    contentURL?: Nullable<string>;
+    contentType?: Nullable<string>;
+    acceptedTypes?: Nullable<FileType>;
     module: Module;
     assignmentResults?: Nullable<Nullable<AssignmentResult>[]>;
 }
@@ -723,4 +776,5 @@ export interface Token {
     token?: Nullable<string>;
 }
 
+export type Members = User | Group;
 type Nullable<T> = T | null;

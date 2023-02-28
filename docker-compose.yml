@@ -17,7 +17,7 @@ services:
         networks:
             - apiNetwork
         command: yarn dev
-    db:
+    studio:
         depends_on:
             - mongo
         container_name: back_end_studio
@@ -31,7 +31,23 @@ services:
             - ./:/usr/src/app/
         networks:
             - apiNetwork
-        command: yarn db:studio
+        command: bash -c "yarn db:studio --browser false"
+    redis:
+        container_name: back_end_redis
+        image: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - apiNetwork
+    redis-insight:
+        container_name: back_end_redis_insight
+        image: redislabs/redisinsight:latest
+        volumes:
+            - redisinsight:/db
+        ports:
+            - "8001:8001"
+        networks:
+            - apiNetwork
     mongo:
         container_name: back_end_db
         restart: always
@@ -63,3 +79,6 @@ services:
 networks:
     apiNetwork:
         driver: bridge
+
+volumes:
+    redisinsight:

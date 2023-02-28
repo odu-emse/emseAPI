@@ -23,6 +23,12 @@ Table User {
   watchedThreads Thread [not null]
   watchedThreadIDs String[] [not null]
   createdThreads Thread [not null]
+  sentMessages DirectMessage [not null]
+  receivedMessages DirectMessage [not null]
+  groupMemeberships Group [not null]
+  groupMembershipIDs String[] [not null]
+  upvotedThreads Thread [not null]
+  upvotedThreadIDs String[] [not null]
 }
 
 Table InstructorProfile {
@@ -151,6 +157,9 @@ Table Assignment {
   updatedAt DateTime [default: `now()`, not null]
   name String [not null]
   dueAt DateTime [not null]
+  contentURL String [not null]
+  contentType String [not null]
+  acceptedTypes FileType [not null, default: 'DOC']
   moduleId String [not null]
   module Module [not null]
   assignmentResults AssignmentResult [not null]
@@ -161,6 +170,8 @@ Table AssignmentResult {
   submittedAt DateTime [default: `now()`, not null]
   result Float [not null]
   feedback String
+  submissionURL String [not null]
+  fileType String [not null]
   studentId String [not null]
   student PlanOfStudy [not null]
   graderId String [not null]
@@ -179,12 +190,13 @@ Table Thread {
   watcherID String[] [not null]
   author User [not null]
   authorID String [not null]
-  upvotes Int [not null, default: 0]
   parentLesson Lesson
   parentLessonID String
   parentThread Thread
   parentThreadID String
   comments Thread [not null]
+  upvotes User [not null]
+  upvoteUserIDs String[] [not null]
 }
 
 Table Content {
@@ -193,6 +205,30 @@ Table Content {
   link String [not null]
   parent Lesson [not null]
   parentID String [not null]
+}
+
+Table DirectMessage {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  body String [not null]
+  author User [not null]
+  authorID String [not null]
+  recipient User
+  recipientID String
+  group Group
+  groupID String
+}
+
+Table Group {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  name String [not null]
+  public Boolean [not null, default: false]
+  members User [not null]
+  memberIDs String[] [not null]
+  messages DirectMessage [not null]
 }
 
 Table Progress {
@@ -261,7 +297,17 @@ Enum EnrollmentStatus {
   INACTIVE
 }
 
+Enum FileType {
+  DOCX
+  DOC
+  PDF
+}
+
 Ref: User.watchedThreadIDs > Thread.id
+
+Ref: User.groupMembershipIDs > Group.id
+
+Ref: User.upvotedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
 
@@ -307,7 +353,17 @@ Ref: Thread.parentLessonID > Lesson.id
 
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
+Ref: Thread.upvoteUserIDs > User.id
+
 Ref: Content.parentID > Lesson.id
+
+Ref: DirectMessage.authorID > User.id
+
+Ref: DirectMessage.recipientID > User.id
+
+Ref: DirectMessage.groupID > Group.id
+
+Ref: Group.memberIDs > User.id
 
 Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
