@@ -26,7 +26,7 @@ export class CommunityService {
 		parentLesson: true,
 		usersWatching: true,
 		author: true,
-		upvotes:true
+		upvotes: true
 	});
 
 	async threadsByParam(input?: IThreadByParams | null) {
