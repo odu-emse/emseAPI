@@ -282,7 +282,7 @@ Table QuizResult {
   submittedAt DateTime [default: `now()`, not null]
   student PlanOfStudy [not null]
   studentID String [not null]
-  quiz Quiz [not null]
+  quiz Quiz
   quizID String [not null, default: '']
 }
 

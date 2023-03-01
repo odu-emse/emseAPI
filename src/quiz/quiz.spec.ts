@@ -1,4 +1,4 @@
-import { QuizService } from "./quiz.service";
+import { QuizService } from './quiz.service';
 import { PrismaService } from "@/prisma.service";
 import {QuizResolver} from "@/quiz/quiz.resolver";
 import {test, describe, expect, afterAll} from "vitest";
@@ -33,95 +33,36 @@ describe('Quiz Services', () => {
   let fakeAnswer;
   let fakeSubmission;
 
-	afterAll(async () => {
-		await progResolver.delete(fakeModule.id);
-	});
+  afterAll(async () => {
+    await progResolver.delete(fakeModule.id);
+  })
 
-	test("should be defined", () => {
-		expect(service).toBeDefined();
-		expect(resolver).toBeDefined();
-	});
 
-	test("should create mock dependencies", async () => {
-		fakeModule = await createModule(progResolver, {
-			moduleName: "testing3",
-			moduleNumber: 1003,
-			description: "Stuff",
-			duration: 10.0,
-			intro: "Intro",
-			keywords: ["Word", "other"],
-			numSlides: 10
-		});
+  test('should be defined', () => {
+    expect(service).toBeDefined();
+    expect(resolver).toBeDefined();
+  });
 
-		fakeCollection = await createCollection(progResolver, {
-			name: "test",
-			moduleID: fakeModule.id,
-			positionIndex: 1
-		});
+  test("should create mock dependencies", async () =>{
+    fakeModule = await createModule(progResolver, {
+      moduleName: "testing3",
+      moduleNumber: 1003,
+      description: "Stuff",
+      duration: 10.0,
+      intro: "Intro",
+      keywords: ["Word", "other"],
+      numSlides: 10
+    })
 
-		fakeLesson = await createLesson(
-			progResolver,
-			createRandomLesson(fakeCollection.id)
-		);
-	});
+    fakeCollection = await createCollection(progResolver, {
+      name: "test",
+      moduleID: fakeModule.id,
+      positionIndex: 1
+    });
 
-	describe("Creates", () => {
-		describe("Mutation.createQuestionPool()", () => {
-			test("should create a question pool", async () => {
-				const count = (await resolver.questionPool({})).length;
-				fakePool = await resolver.createQuestionPool();
-				const endCount = (await resolver.questionPool({})).length;
-				expect(fakePool).toBeDefined();
-				expect(endCount).toEqual(count + 1);
-			});
-		});
-		describe("Mutation.createQuiz()", () => {
-			test("should create a new quiz", async () => {
-				const quizData = createRandomQuiz(fakeLesson.id, fakePool.id);
-				fakeQuiz = await createQuiz(resolver, quizData);
-				if (fakeQuiz instanceof Error) throw new Error(fakeQuiz.message);
-				expect(fakeQuiz).toBeDefined();
-				expect(fakeQuiz.id).toBeDefined();
-				expect(fakeQuiz.totalPoints).toEqual(quizData.totalPoints);
-				expect(fakeQuiz.numQuestions).toEqual(quizData.numQuestions);
-				expect(fakeQuiz.minScore).toEqual(quizData.minScore);
-				expect(fakeQuiz.dueAt).toEqual(quizData.dueAt);
-				expect(fakeQuiz.parentLessonID).toEqual(fakeLesson.id);
-				expect(fakeQuiz.questionPoolID).toEqual(fakePool.id);
-			});
-		});
-		describe("Mutation.createQuestion", () => {
-			test("should create a question record", async () => {
-				const start = (await resolver.question({})).length;
-				const questionData = createRandomQuestion(fakePool.id);
-				fakeQuestion = await createQuestion(resolver, questionData);
-				if (fakeQuestion instanceof Error)
-					throw new Error(fakeQuestion.message);
-				const final = (await resolver.question({})).length;
-				expect(fakeQuestion).toBeDefined();
-				expect(fakeQuestion.number).toEqual(questionData.number);
-				expect(fakeQuestion.text).toEqual(questionData.text);
-				expect(fakeQuestion.parentPoolID).toEqual(fakePool.id);
-				expect(final).toEqual(start + 1);
-			});
-		});
-		describe("Mutation.createAnswer", () => {
-			test("should create an Answer record", async () => {
-				const start = (await resolver.answer({})).length;
-				const answerData = createRandomAnswer(fakeQuestion.id);
-				fakeAnswer = await createAnswer(resolver, answerData);
-				if (fakeAnswer instanceof Error) throw new Error(fakeAnswer.message);
-				const end = (await resolver.answer({})).length;
-				expect(fakeAnswer).toBeDefined();
-				expect(fakeAnswer.text).toEqual(answerData.text);
-				expect(fakeAnswer.correct).toEqual(answerData.correct);
-				expect(fakeAnswer.weight).toEqual(answerData.weight);
-				expect(fakeAnswer.index).toEqual(answerData.index);
-				expect(fakeAnswer.parentQuestionID).toEqual(fakeQuestion.id);
-				expect(end).toEqual(start + 1);
-			});
-		});
-	});
+    fakeLesson = await createLesson(progResolver, createRandomLesson(fakeCollection.id));
+  })
+
   describe("Creates", () =>{
     describe("Mutation.createQuiz()", () => {
       test("should create a new quiz", async () => {
