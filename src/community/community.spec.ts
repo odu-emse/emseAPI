@@ -21,6 +21,7 @@ describe("Community", () => {
 			comments: true;
 			author: true;
 			usersWatching: true;
+			upvotes:true;
 		};
 	}>;
 	const prisma: PrismaService = new PrismaService();
@@ -107,28 +108,18 @@ describe("Community", () => {
 				expect(threads.length).toBeGreaterThan(0);
 			}
 		});
+		test("should return all threads with upvotes as an array", async () => {
+			const threads = await resolver.thread({});
+			if (threads instanceof Error) return new Error(threads.message);
+			else {
+				expect(threads[0].upvotes).toBeInstanceOf(Array);
+			}
+		});
 		test("should return an error when ID is not found", async () => {
 			const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 			expect(thread instanceof Error).toBe(true);
 		});
-		test("should return threads with less upvotes than inputted", async () => {
-			const threads = await resolver.thread({ upvotesLTE: 100 });
-			if (threads instanceof Error) return new Error(threads.message);
-			else {
-				threads.map((thread) => {
-					expect(thread.upvotes < 100).toBe(true);
-				});
-			}
-		});
-		test("should return threads with more upvotes than inputted", async () => {
-			const threads = await resolver.thread({ upvotesGTE: 100 });
-			if (threads instanceof Error) return new Error(threads.message);
-			else {
-				threads.map((thread) => {
-					expect(thread.upvotes > 100).toBe(true);
-				});
-			}
-		});
+		
 		test("should return the threads requested by ID", async () => {
 			const thread = await resolver.thread({ id: testingThreadID });
 			if (!thread || thread instanceof Error)
@@ -138,32 +129,6 @@ describe("Community", () => {
 					expect(thread.id).toBe(testingThreadID);
 				});
 			}
-		});
-		test("should search for range if both GTE and LTE are given", async () => {
-			const threads = await resolver.thread({
-				upvotesGTE: 100,
-				upvotesLTE: 1000
-			});
-			if (threads instanceof Error) return new Error(threads.message);
-			else {
-				threads.map((thread) => {
-					expect(thread.upvotes >= 100 && thread.upvotes <= 1000).toBe(true);
-				});
-			}
-		});
-		test("should return Error if both GTE and upvotes are given", async () => {
-			const threads = await resolver.thread({
-				upvotesGTE: 100,
-				upvotes: 1000
-			});
-			expect(threads instanceof Error).toBe(true);
-		});
-		test("should return Error if both LTE and upvotes are given", async () => {
-			const threads = await resolver.thread({
-				upvotesLTE: 100,
-				upvotes: 20
-			});
-			expect(threads instanceof Error).toBe(true);
 		});
 	});
 	describe("Create", function () {
@@ -223,9 +188,9 @@ describe("Community", () => {
 			if (voteNum instanceof Error)
 				throw new Error("Error in upvoteThread test case");
 
-			const upVoteNum = await resolver.upvoteThread(threadID);
+			const upVoteNum = await resolver.upvoteThread(accountID,threadID);
 
-			expect(upVoteNum.upvotes === voteNum[0].upvotes + 1).toBe(true);
+			expect(upVoteNum[0].upvotes.length === voteNum[0].upvotes.length + 1).toBe(true);
 		});
 		test("should update the thread with the given data", async () => {
 			const thread = await resolver.updateThread(threadID, {

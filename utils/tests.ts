@@ -97,7 +97,6 @@ export const createQuiz = async (
 		numQuestions: input.numQuestions,
 		minScore: input.minScore,
 		parentLesson: input.parentLessonID,
-		questionPool: input.questionPoolID,
 	}
 	const quiz = await resolver.createQuiz(data);
 	if (quiz) return quiz;
@@ -110,9 +109,10 @@ export const createQuestion = async (
 ) => {
 	const data: CreateQuestion = {
 		number: input.number,
+		variant: input.variant,
 		text: input.text,
 		points: input.points,
-		parentPool: input.parentPoolID
+		parentQuiz: input.parentID
 	}
 	const question = await resolver.createQuestion(data);
 	if(question) return question;
