@@ -227,10 +227,11 @@ model Thread {
 
 model Content {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
-  type     String
+  type     ContentType
   link     String
   parent   Lesson @relation(fields: [parentID], references: [id])
   parentID String @db.ObjectId
+  primary Boolean
 }
 
 model Progress {
@@ -295,6 +296,10 @@ enum UserRole {
 enum EnrollmentStatus {
   ACTIVE
   INACTIVE
+}
+enum ContentType{
+TYPE1
+TYPE2
 }
 
 // Dont need this anymore since we arent doing API Tokens

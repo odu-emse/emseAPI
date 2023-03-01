@@ -8,6 +8,11 @@ enum EnrollmentStatus {
 	ACTIVE
 	INACTIVE
 }
+enum ContentType {
+TYPE1
+TYPE2
+}
+
 
 type ModuleEnrollment {
 	"""
@@ -339,7 +344,7 @@ type Content {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String!
+	type: ContentType!
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -350,6 +355,12 @@ type Content {
 	The lesson that this content belongs to.
 	"""
 	parent: Lesson!
+
+    """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
+
 }
 
 type Error {
@@ -416,7 +427,7 @@ input CreateContentArgs {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String!
+	type: ContentType!
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -438,7 +449,7 @@ input ContentFields {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String
+	type: ContentType
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
