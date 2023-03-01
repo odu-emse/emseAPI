@@ -2,39 +2,83 @@ version: "3.9"
 
 services:
     api:
+        depends_on:
+            - mongo
         container_name: back_end_api
-        build:
-            context: .
-            dockerfile: Dockerfile
-            target: base
-        tty: true
-        expose:
-            - "4000"
+        restart: always
+        image: node:latest
+        working_dir: /usr/src/app
+        env_file:
+            - .env
         ports:
             - "4000:4000"
         volumes:
             - ./:/usr/src/app/
         networks:
-            - empiNetwork
-        command: >
-            bash -c "yarn db:generate && yarn dev"
-    db:
-        container_name: back_end_db
-        build:
-            context: .
-            dockerfile: Dockerfile
-            target: base
+            - apiNetwork
+        command: yarn dev
+    studio:
+        depends_on:
+            - mongo
+        container_name: back_end_studio
+        image: node:latest
+        working_dir: /usr/src/app
         env_file:
             - .env
-        expose:
-            - "5555"
         ports:
             - "5555:5555"
         volumes:
             - ./:/usr/src/app/
         networks:
-            - empiNetwork
-        command: >
-            bash -c "yarn db:studio"
+            - apiNetwork
+        command: bash -c "yarn db:studio --browser false"
+    redis:
+        container_name: back_end_redis
+        image: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - apiNetwork
+    redis-insight:
+        container_name: back_end_redis_insight
+        image: redislabs/redisinsight:latest
+        volumes:
+            - redisinsight:/db
+        ports:
+            - "8001:8001"
+        networks:
+            - apiNetwork
+    mongo:
+        container_name: back_end_db
+        restart: always
+        image: mongo:latest
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: example
+        expose:
+            -   "27017"
+        ports:
+            - "27017:27017"
+        networks:
+            - apiNetwork
+    mongo-express:
+        depends_on:
+            -   mongo
+        container_name: back_end_db_express
+        restart: always
+        image: mongo-express:latest
+        environment:
+            ME_CONFIG_MONGODB_SERVER: back_end_db
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: example
+        ports:
+            - "8081:8081"
+        networks:
+            - apiNetwork
+        command: mongo-express
 networks:
-    empiNetwork:
+    apiNetwork:
+        driver: bridge
+
+volumes:
+    redisinsight:

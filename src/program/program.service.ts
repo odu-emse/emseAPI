@@ -13,18 +13,19 @@ import {
 	AssignmentResFields,
 	ModEnrollmentFields,
 	LessonFields,
-	Module,
 	Course,
 	ModuleFeedback,
 	CreateCollectionArgs,
 	LessonInput,
 	CreateContentArgs,
 	ContentFields,
-	NewModule
-} from "gql/graphql";
+	NewModule,
+	CollectionFields
+} from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
+import { idText } from "typescript";
 
 @Injectable()
 export class ProgramService {
@@ -61,14 +62,15 @@ export class ProgramService {
 		}
 	});
 
-	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
+	public moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
 		members: {
 			include: {
 				plan: {
 					include: {
 						student: true
 					}
-				}
+				},
+				progress: true
 			}
 		},
 		assignments: {
@@ -138,14 +140,15 @@ export class ProgramService {
 			}
 		});
 
-	private moduleEnrollmentInclude =
+	public moduleEnrollmentInclude =
 		Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
 			plan: {
 				include: {
 					student: true
 				}
 			},
-			module: true
+			module: true,
+			progress: true
 		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
@@ -167,6 +170,19 @@ export class ProgramService {
 
 	private lessonInclude = Prisma.validator<Prisma.LessonInclude>()({
 		content: true,
+		collection: {
+			include: {
+				module: {
+					include: {
+						collections: {
+							include: {
+								lessons: true
+							}
+						}
+					}
+				}
+			}
+		},
 		threads: {
 			include: {
 				author: true,
@@ -308,13 +324,26 @@ export class ProgramService {
 	}
 
 	async assignment(params: AssignmentFields) {
-		const { id, updatedAt, name, dueAt, module, assignmentResult } = params;
+		const {
+			id,
+			updatedAt,
+			name,
+			dueAt,
+			contentURL,
+			contentType,
+			acceptedTypes,
+			module,
+			assignmentResult
+		} = params;
 
 		const payload = {
 			...(id && { id }),
 			...(updatedAt && { updatedAt }),
 			...(name && { name }),
-			...(dueAt && { dueAt })
+			...(dueAt && { dueAt }),
+			...(contentURL && { contentURL }),
+			...(contentType && { contentType }),
+			...(acceptedTypes && { acceptedTypes })
 		};
 
 		payload["moduleId"] = module ? module : undefined;
@@ -355,14 +384,25 @@ export class ProgramService {
 	}
 
 	async assignmentResult(params: AssignmentResFields) {
-		const { id, submittedAt, result, feedback, student, gradedBy, assignment } =
-			params;
+		const {
+			id,
+			submittedAt,
+			result,
+			feedback,
+			submissionURL,
+			fileType,
+			student,
+			gradedBy,
+			assignment
+		} = params;
 
 		const payload = {
 			...(id && { id }),
 			...(submittedAt && { submittedAt }),
 			...(result && { result }),
-			...(feedback && { feedback })
+			...(feedback && { feedback }),
+			...(submissionURL && { submissionURL }),
+			...(fileType && { fileType })
 		};
 
 		payload["studentId"] = student ? student : undefined;
@@ -401,18 +441,43 @@ export class ProgramService {
 		});
 	}
 
-	// TODO: Add Compound Query for collections
-	async collections() {
-		return this.prisma.collection.findMany({
-			include: this.collectionInclude
-		});
-	}
+	async collection(params: CollectionFields | null) {
+		if (!params) {
+			return await this.prisma.collection.findMany({
+				include: this.collectionInclude
+			});
+		}
 
-	async collection(id: string) {
-		return this.prisma.collection.findFirst({
-			where: {
-				id
-			},
+		const { id, name, lessons, moduleID, positionIndex } = params;
+
+		const where = Prisma.validator<Prisma.CollectionWhereInput>()({
+			...(id && { id }),
+			...(name && {
+				name: {
+					contains: name
+				}
+			}),
+			...(moduleID && { moduleID }),
+			...(positionIndex && { position: positionIndex })
+		});
+
+		// loop out of lessons and check with and
+		if (lessons) {
+			lessons.map((lesson) => {
+				where["AND"] = [
+					{
+						lessons: {
+							some: {
+								id: lesson
+							}
+						}
+					}
+				] as Prisma.CollectionWhereInput["AND"];
+			});
+		}
+
+		return this.prisma.collection.findMany({
+			where,
 			include: this.collectionInclude
 		});
 	}
@@ -626,8 +691,15 @@ export class ProgramService {
 		return this.prisma.assignment.create({
 			data: {
 				name: input.name,
-				moduleId: input.module,
-				dueAt: input.dueAt
+				module: {
+					connect: {
+						id: input.module
+					}
+				},
+				dueAt: input.dueAt,
+				contentType: input.contentType,
+				contentURL: input.contentURL,
+				acceptedTypes: "DOC"
 			},
 			include: this.assignmentInclude
 		});
@@ -682,22 +754,21 @@ export class ProgramService {
 	}
 
 	/// Update a module feedback
-	async updateModuleFeedback(
-		id: string,
-		input: ModuleFeedbackUpdate
-	): Promise<ModuleFeedback> {
+	async updateModuleFeedback(id: string, input: ModuleFeedbackUpdate) {
 		const { feedback, rating } = input;
 
-		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateInput>()({
-			...(feedback && { feedback }),
-			...(rating && { rating })
-		});
-
-		return this.prisma.moduleFeedback.update({
+		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateArgs>()({
 			where: {
 				id
 			},
-			data: update,
+			data: {
+				...(feedback && { feedback }),
+				...(rating && { rating })
+			}
+		});
+
+		return this.prisma.moduleFeedback.update({
+			...update,
 			include: this.moduleFeedbackInclude
 		});
 	}
@@ -718,7 +789,9 @@ export class ProgramService {
 				assignmentId: input.assignment,
 				studentId: input.student,
 				graderId: input.grader,
-				result: input.result
+				result: input.result,
+				submissionURL: input.submissionURL,
+				fileType: input.fileType
 			},
 			include: this.assignmentResultInclude
 		});
@@ -897,11 +970,14 @@ export class ProgramService {
 		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
 			data: {
 				name: input.name,
-				content: {
-					connect: {
-						id: input.content ? input.content : undefined
-					}
-				},
+				...(input.content !== null &&
+					input.content !== undefined && {
+						content: {
+							connect: {
+								id: input.content
+							}
+						}
+					}),
 				transcript: input.transcript,
 				collection: {
 					connect: {

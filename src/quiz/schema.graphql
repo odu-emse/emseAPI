@@ -1,0 +1,467 @@
+type Quiz {
+    """ 
+    The document ID For this quiz
+    """
+    id: ID!
+    """
+    The total amount of points possible on the quiz
+    """
+    totalPoints: Float!
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The allotted time to take this quiz in ms
+    """
+    timeLimit: Int
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int!
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float!
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: Lesson!
+    """
+    The questions in this quiz
+    """
+    questions: [Question!]!
+    """
+    Submitted results to this quiz
+    """
+    quizResults: [Quiz]
+}
+
+type Question {
+    """
+    The document ID of the question
+    """
+    id: ID!
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int!
+    """
+    Which variant of the question is this record
+    """
+    variant: Int
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String!
+    """
+    The amount of points this question is worth
+    """
+    points: Float!
+    """
+    The possible answers to this question
+    """
+    answers: [Answer!]!
+    """
+    The parent Quiz of this question
+    """
+    parent: Quiz!
+}
+
+type Answer {
+    """
+    The document ID of this answer
+    """
+    id: ID!
+    """
+    The actual human readable text of this answer
+    """
+    text: String!
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean!
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    If no value is specified then the order will be random when queried
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: Question!
+
+}
+
+type QuizResult {
+    """
+    The document ID of the quiz result
+    """
+    id: String!
+    """
+    The score received on this quiz
+    """
+    score: Float!
+    """
+    The list of answers provided for questions on this quiz
+    """
+    answers: [String!]!
+    """
+    The plan of study of the user who took the quiz
+    """
+    student: PlanOfStudy!
+    """
+    The quiz this result is for. This field relation is immutable to protect the grading algorithm
+    """
+    quiz: Quiz!
+}
+
+input QuizFields {
+    """
+    The document ID For this quiz
+    """
+    id: ID
+    """
+    The total amount of points possible on this quiz
+    """
+    totalPoints: Float
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The allotted time to take this quiz in ms
+    """
+    timeLimit: Int
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: ID
+}
+
+input QuestionFields {
+    """
+    The document ID of the question
+    """
+    id: ID
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int
+    """
+    The variant of the question number that this question is
+    """
+    variant: Int
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String
+    """
+    The amount of points this question is worth
+    """
+    points: Float
+    """
+    The pool this question belongs to
+    """
+    parentPool: ID
+}
+
+input AnswerFields {
+    """
+    The document ID of this answer
+    """
+    id: ID
+    """
+    The actual human readable text of this answer
+    """
+    text: String
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: ID
+}
+
+input QuizResultFields {
+    """
+    The document ID of the quiz result
+    """
+    id: String
+    """
+    The score received on this quiz
+    """
+    score: Float
+    """
+    The plan of study of the user who took the quiz
+    """
+    student: ID
+    """
+    The quiz this result is for
+    """
+    quiz: ID
+}
+
+type Query {
+    """
+    Fetch a Quiz by any of its parameters. an empty object will return all quizzes and a single id will return a single quiz
+    """
+    quiz(args: QuizFields!): [Quiz!]!
+    """
+    Fetch a Question by any of its parameters. An empty object as the input parameter will return all Questions, an ID will retrieve an array with just a single Question.
+    If a only a pool ID is provided than all questions in that pool will be returned.
+    If a combination of parameters are used then only documents that match all the parameters will be included in the array.
+    """
+    question(args: QuestionFields!): [Question!]!
+    """
+    Fetch an Answer by any of its parameters. An empty object as the input parameter will return all Answers, an ID will retrieve an array with just a single Answer.
+    If a only a Question ID is provided than all answers for that question will be returned.
+    If a combination of parameters are used then only documents that match all the parameters will be included in the array.
+    """
+    answer(args: AnswerFields!): [Answer!]!
+    """
+    Fetch a quiz result by any of its parameters. An empty object as the input parameter will get all records.
+    If just a quiz ID is provided than all results for that quiz will be shown. If just a planID is given then just that
+    users results will be shown.
+    If combinations of parameters are used then only records that match all parameters will be returned.
+    """
+    quizResult(args: QuizResultFields!): [QuizResult!]!
+}
+
+# Mutations and relevant inputs
+
+input CreateQuiz {
+    """
+    The total amount of points possible on this quiz
+    """
+    totalPoints: Float!
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The allotted time to take this quiz in ms
+    """
+    timeLimit: Int
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int!
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: ID!
+}
+
+input UpdateQuiz {
+    """
+    The total amount of points possible on this quiz
+    """
+    totalPoints: Float
+    """
+    The time the Quiz is due
+    """
+    dueAt: Date
+    """
+    The allotted time to take this quiz in ms
+    """
+    timeLimit: Int
+    """
+    The number of questions on this quiz
+    """
+    numQuestions: Int
+    """
+    The minimum passing score for this quiz
+    """
+    minScore: Float
+    """
+    The lesson that this quiz belongs to
+    """
+    parentLesson: ID
+}
+
+input CreateQuestion {
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int!
+    """
+    The variant of the question number that this question is
+    """
+    variant: Int!
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String!
+    """
+    The amount of points this question is worth
+    """
+    points: Float
+    """
+    The quiz this question belongs to
+    """
+    parentQuiz: ID!
+}
+
+input UpdateQuestion {
+    """
+    The question number on the quiz/in the pool
+    """
+    number: Int
+    """
+    The variant of the question number that this question is
+    """
+    variant: Int
+    """
+    The text of the question (the readable question itself)
+    """
+    text: String
+    """
+    The amount of points this question is worth
+    """
+    points: Float
+    """
+    The quiz this question belongs to
+    """
+    parentQuiz: ID
+}
+
+input CreateAnswer {
+    """
+    The actual human readable text of this answer
+    """
+    text: String!
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean!
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: ID!
+}
+
+input UpdateAnswer {
+    """
+    The actual human readable text of this answer
+    """
+    text: String
+    """
+    If this possible is marked as a correct response
+    """
+    correct: Boolean
+    """
+    The weight towards total points this answer will have default is evenly distributed for each correct answer in a question
+    """
+    weight: Float
+    """
+    The index of the answer when listed (A, B, C, D, etc.)
+    """
+    index: String
+    """
+    The question that this answer belongs to
+    """
+    parentQuestion: ID
+}
+
+input QuizSubmission {
+    """
+    The student who submitted the quiz
+    """
+    student: ID!
+    """
+    The quiz being submitted
+    """
+    quiz: ID!
+    """
+    The list of answers that were provided for this quiz
+    """
+    answers: [String!]!
+}
+
+# TODO: Update documentation for update mutations
+type Mutation {
+    """
+    Create a new quiz record and associate it with its parent Lesson
+    """
+    createQuiz(input: CreateQuiz): Quiz!
+    """
+    Update a single quiz record given its document ID. Most fields can be updated through this query.
+    """
+    updateQuiz(id: ID!, values: UpdateQuiz!): [Quiz!]!
+    """
+    Delete a quiz record given its document ID
+    """
+    deleteQuiz(id: ID!): Quiz!
+    """
+    Create a new question. This new question must be associated with a question pool to be created
+    """
+    createQuestion(input: CreateQuestion): [Question!]!
+    """
+    Update a single question record given its document ID. Most fields can be updated through this query.
+    """
+    updateQuestion(id: ID!, values: UpdateQuestion!): [Question!]!
+    """
+    Delete an existing question record give its document ID.
+    It is important to note that deleting a question will also delete ALL associated Answer records
+    """
+    deleteQuestion(id: ID!): Question!
+    """
+    Create a new answer to a question. The answer must be associated with a question when created.
+    """
+    createAnswer(input: CreateAnswer!): Answer!
+    """
+    Update a single answer record given its document ID. Most fields can be updated through this query.
+    """
+    updateAnswer(id: ID!, values: UpdateAnswer!): [Answer!]!
+    """
+    Delete an answer record based on its document ID
+    """
+    deleteAnswer(id: ID!): Answer!
+    """
+    Submit a quiz to be graded. This will create a QuizResultRecord with the users score.
+    """
+    submitQuiz(input: QuizSubmission!): QuizResult
+    """
+    Update the score of a Quiz Result. Takes the quiz id and the new score.
+    """
+    updateQuizScore(id: ID!, newScore: Float!): QuizResult
+    """
+    Delete a quiz Submission given its document ID
+    """
+    deleteQuizResult(id: ID!): QuizResult
+}

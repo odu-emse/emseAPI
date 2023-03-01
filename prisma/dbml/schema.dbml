@@ -23,6 +23,12 @@ Table User {
   watchedThreads Thread [not null]
   watchedThreadIDs String[] [not null]
   createdThreads Thread [not null]
+  sentMessages DirectMessage [not null]
+  receivedMessages DirectMessage [not null]
+  groupMemeberships Group [not null]
+  groupMembershipIDs String[] [not null]
+  upvotedThreads Thread [not null]
+  upvotedThreadIDs String[] [not null]
 }
 
 Table InstructorProfile {
@@ -47,6 +53,7 @@ Table PlanOfStudy {
   studentID String [unique]
   modules ModuleEnrollment [not null]
   assignmentResults AssignmentResult [not null]
+  quizResults QuizResult [not null]
 }
 
 Table Social {
@@ -116,10 +123,11 @@ Table Lesson {
   name String [not null]
   transcript String
   threads Thread [not null]
-  collection Collection
-  collectionID String
+  collection Collection [not null]
+  collectionID String [not null]
   position Int [not null, default: 0]
   content Content [not null]
+  quizzes Quiz [not null]
 }
 
 Table ModuleFeedback {
@@ -141,6 +149,7 @@ Table ModuleEnrollment {
   moduleId String [not null]
   plan PlanOfStudy
   planID String
+  progress Progress
 }
 
 Table Assignment {
@@ -148,6 +157,9 @@ Table Assignment {
   updatedAt DateTime [default: `now()`, not null]
   name String [not null]
   dueAt DateTime [not null]
+  contentURL String [not null]
+  contentType String [not null]
+  acceptedTypes FileType [not null, default: 'DOC']
   moduleId String [not null]
   module Module [not null]
   assignmentResults AssignmentResult [not null]
@@ -158,6 +170,8 @@ Table AssignmentResult {
   submittedAt DateTime [default: `now()`, not null]
   result Float [not null]
   feedback String
+  submissionURL String [not null]
+  fileType String [not null]
   studentId String [not null]
   student PlanOfStudy [not null]
   graderId String [not null]
@@ -176,12 +190,13 @@ Table Thread {
   watcherID String[] [not null]
   author User [not null]
   authorID String [not null]
-  upvotes Int [not null, default: 0]
   parentLesson Lesson
   parentLessonID String
   parentThread Thread
   parentThreadID String
   comments Thread [not null]
+  upvotes User [not null]
+  upvoteUserIDs String[] [not null]
 }
 
 Table Content {
@@ -190,6 +205,85 @@ Table Content {
   link String [not null]
   parent Lesson [not null]
   parentID String [not null]
+}
+
+Table DirectMessage {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  body String [not null]
+  author User [not null]
+  authorID String [not null]
+  recipient User
+  recipientID String
+  group Group
+  groupID String
+}
+
+Table Group {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  name String [not null]
+  public Boolean [not null, default: false]
+  members User [not null]
+  memberIDs String[] [not null]
+  messages DirectMessage [not null]
+}
+
+Table Progress {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  status Float [not null, default: 0]
+  completed Boolean [not null, default: false]
+  enrollment ModuleEnrollment [not null]
+  enrollmentID String [unique, not null]
+}
+
+Table Quiz {
+  id String [pk]
+  totalPoints Float [not null]
+  dueAt DateTime
+  timeLimit Int
+  numQuestions Int [not null]
+  minScore Float [not null, default: 0]
+  parentLesson Lesson [not null]
+  parentLessonID String [not null]
+  questions Question [not null]
+  quizResults QuizResult [not null]
+}
+
+Table Question {
+  id String [pk]
+  number Int [not null]
+  variant Int [not null, default: 1]
+  text String [not null]
+  points Float [not null, default: 1]
+  answers Answer [not null]
+  parent Quiz [not null]
+  parentID String [not null]
+}
+
+Table Answer {
+  id String [pk]
+  text String [not null]
+  correct Boolean [not null]
+  weight Float
+  index String
+  parentQuestion Question [not null]
+  parentQuestionID String [not null]
+}
+
+Table QuizResult {
+  id String [pk]
+  score Float [not null]
+  answers String[] [not null]
+  submittedAt DateTime [default: `now()`, not null]
+  student PlanOfStudy [not null]
+  studentID String [not null]
+  quiz Quiz
+  quizID String [not null, default: '']
 }
 
 Enum UserRole {
@@ -203,7 +297,17 @@ Enum EnrollmentStatus {
   INACTIVE
 }
 
+Enum FileType {
+  DOCX
+  DOC
+  PDF
+}
+
 Ref: User.watchedThreadIDs > Thread.id
+
+Ref: User.groupMembershipIDs > Group.id
+
+Ref: User.upvotedThreadIDs > Thread.id
 
 Ref: InstructorProfile.accountID - User.id
 
@@ -221,9 +325,9 @@ Ref: Module.subModuleIDs > Module.id
 
 Ref: Module.courseIDs > Course.id
 
-Ref: Collection.moduleID > Module.id
+Ref: Collection.moduleID > Module.id [delete: Cascade]
 
-Ref: Lesson.collectionID > Collection.id
+Ref: Lesson.collectionID > Collection.id [delete: Cascade]
 
 Ref: ModuleFeedback.studentId > User.id
 
@@ -249,4 +353,26 @@ Ref: Thread.parentLessonID > Lesson.id
 
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
+Ref: Thread.upvoteUserIDs > User.id
+
 Ref: Content.parentID > Lesson.id
+
+Ref: DirectMessage.authorID > User.id
+
+Ref: DirectMessage.recipientID > User.id
+
+Ref: DirectMessage.groupID > Group.id
+
+Ref: Group.memberIDs > User.id
+
+Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
+
+Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
+
+Ref: Question.parentID > Quiz.id [delete: Cascade]
+
+Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
+
+Ref: QuizResult.studentID > PlanOfStudy.id
+
+Ref: QuizResult.quizID > Quiz.id

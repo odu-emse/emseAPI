@@ -5,7 +5,7 @@ import {
 	UserFields,
 	SocialFields,
 	User
-} from "gql/graphql";
+} from "@/types/graphql";
 import { UserService } from "./user.service";
 
 @Resolver("User")

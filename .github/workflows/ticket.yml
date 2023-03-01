@@ -1,0 +1,27 @@
+name: EMSE-API - Ticket pipeline
+
+on:
+  push:
+    branches: ['ALMP-**']
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Run formatter
+        run: npx prettier --config ./.prettierrc --ignore-path ./.prettierignore --write src/**/*.ts
+      - name: Check for modified files
+        id: git-check
+        run: echo "modified=$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)" >> $GITHUB_OUTPUT
+      - name: Push changes
+        if: steps.git-check.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'Dániel B. Papp'
+          git config --global user.email 'chef-danny-d@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -am "Automated formatting changes"
+          git push
