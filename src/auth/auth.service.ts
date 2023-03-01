@@ -93,7 +93,7 @@ export class AuthService {
 				...(given_name && { firstName: given_name }),
 				...(family_name && { lastName: family_name })
 			});
-			
+
 			//Update an existing user
 			return this.prisma.user.update({
 				where: {

@@ -21,7 +21,7 @@ describe("Community", () => {
 			comments: true;
 			author: true;
 			usersWatching: true;
-			upvotes:true;
+			upvotes: true;
 		};
 	}>;
 	const prisma: PrismaService = new PrismaService();
@@ -119,7 +119,7 @@ describe("Community", () => {
 			const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 			expect(thread instanceof Error).toBe(true);
 		});
-		
+
 		test("should return the threads requested by ID", async () => {
 			const thread = await resolver.thread({ id: testingThreadID });
 			if (!thread || thread instanceof Error)
@@ -188,9 +188,11 @@ describe("Community", () => {
 			if (voteNum instanceof Error)
 				throw new Error("Error in upvoteThread test case");
 
-			const upVoteNum = await resolver.upvoteThread(accountID,threadID);
+			const upVoteNum = await resolver.upvoteThread(accountID, threadID);
 
-			expect(upVoteNum[0].upvotes.length === voteNum[0].upvotes.length + 1).toBe(true);
+			expect(
+				upVoteNum[0].upvotes.length === voteNum[0].upvotes.length + 1
+			).toBe(true);
 		});
 		test("should update the thread with the given data", async () => {
 			const thread = await resolver.updateThread(threadID, {

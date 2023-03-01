@@ -1,0 +1,7 @@
+docs
+*.yml
+coverage
+dist
+node_modules
+*.lock
+*.log
