@@ -25,7 +25,8 @@ export class CommunityService {
 		parentThread: true,
 		parentLesson: true,
 		usersWatching: true,
-		author: true
+		author: true,
+		upvotes: true
 	});
 
 	async threadsByParam(input?: IThreadByParams | null) {
@@ -34,16 +35,8 @@ export class CommunityService {
 				include: this.threadInclude
 			});
 		} else {
-			const {
-				id,
-				title,
-				body,
-				parentLesson,
-				parentThread,
-				author,
-				comments,
-			} = input;
-
+			const { id, title, body, parentLesson, parentThread, author, comments } =
+				input;
 
 			const where = Prisma.validator<Prisma.ThreadWhereInput>()({
 				...(id && { id }),
@@ -81,7 +74,7 @@ export class CommunityService {
 						}
 					}
 				})
-			});			
+			});
 
 			const include = this.threadInclude;
 

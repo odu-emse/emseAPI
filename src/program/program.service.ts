@@ -180,7 +180,6 @@ export class ProgramService {
 							}
 						}
 					}
-
 				}
 			}
 		},
@@ -325,13 +324,26 @@ export class ProgramService {
 	}
 
 	async assignment(params: AssignmentFields) {
-		const { id, updatedAt, name, dueAt, module, assignmentResult } = params;
+		const {
+			id,
+			updatedAt,
+			name,
+			dueAt,
+			contentURL,
+			contentType,
+			acceptedTypes,
+			module,
+			assignmentResult
+		} = params;
 
 		const payload = {
 			...(id && { id }),
 			...(updatedAt && { updatedAt }),
 			...(name && { name }),
-			...(dueAt && { dueAt })
+			...(dueAt && { dueAt }),
+			...(contentURL && { contentURL }),
+			...(contentType && { contentType }),
+			...(acceptedTypes && { acceptedTypes })
 		};
 
 		payload["moduleId"] = module ? module : undefined;
@@ -372,14 +384,25 @@ export class ProgramService {
 	}
 
 	async assignmentResult(params: AssignmentResFields) {
-		const { id, submittedAt, result, feedback, student, gradedBy, assignment } =
-			params;
+		const {
+			id,
+			submittedAt,
+			result,
+			feedback,
+			submissionURL,
+			fileType,
+			student,
+			gradedBy,
+			assignment
+		} = params;
 
 		const payload = {
 			...(id && { id }),
 			...(submittedAt && { submittedAt }),
 			...(result && { result }),
-			...(feedback && { feedback })
+			...(feedback && { feedback }),
+			...(submissionURL && { submissionURL }),
+			...(fileType && { fileType })
 		};
 
 		payload["studentId"] = student ? student : undefined;
@@ -419,27 +442,27 @@ export class ProgramService {
 	}
 
 	async collection(params: CollectionFields | null) {
-		if(!params){
+		if (!params) {
 			return await this.prisma.collection.findMany({
 				include: this.collectionInclude
-			})
+			});
 		}
 
 		const { id, name, lessons, moduleID, positionIndex } = params;
 
 		const where = Prisma.validator<Prisma.CollectionWhereInput>()({
-			...(id && {id}),
+			...(id && { id }),
 			...(name && {
 				name: {
 					contains: name
 				}
 			}),
-			...(moduleID && {moduleID}),
-			...(positionIndex && {position: positionIndex}),
-		})
+			...(moduleID && { moduleID }),
+			...(positionIndex && { position: positionIndex })
+		});
 
 		// loop out of lessons and check with and
-		if(lessons) {
+		if (lessons) {
 			lessons.map((lesson) => {
 				where["AND"] = [
 					{
@@ -448,9 +471,9 @@ export class ProgramService {
 								id: lesson
 							}
 						}
-					},
+					}
 				] as Prisma.CollectionWhereInput["AND"];
-			})
+			});
 		}
 
 		return this.prisma.collection.findMany({
@@ -668,8 +691,15 @@ export class ProgramService {
 		return this.prisma.assignment.create({
 			data: {
 				name: input.name,
-				moduleId: input.module,
-				dueAt: input.dueAt
+				module: {
+					connect: {
+						id: input.module
+					}
+				},
+				dueAt: input.dueAt,
+				contentType: input.contentType,
+				contentURL: input.contentURL,
+				acceptedTypes: "DOC"
 			},
 			include: this.assignmentInclude
 		});
@@ -724,10 +754,7 @@ export class ProgramService {
 	}
 
 	/// Update a module feedback
-	async updateModuleFeedback(
-		id: string,
-		input: ModuleFeedbackUpdate
-	) {
+	async updateModuleFeedback(id: string, input: ModuleFeedbackUpdate) {
 		const { feedback, rating } = input;
 
 		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateArgs>()({
@@ -735,13 +762,13 @@ export class ProgramService {
 				id
 			},
 			data: {
-				...(feedback && {feedback}),
-				...(rating && {rating})
+				...(feedback && { feedback }),
+				...(rating && { rating })
 			}
 		});
 
 		return this.prisma.moduleFeedback.update({
-			...(update),
+			...update,
 			include: this.moduleFeedbackInclude
 		});
 	}
@@ -762,7 +789,9 @@ export class ProgramService {
 				assignmentId: input.assignment,
 				studentId: input.student,
 				graderId: input.grader,
-				result: input.result
+				result: input.result,
+				submissionURL: input.submissionURL,
+				fileType: input.fileType
 			},
 			include: this.assignmentResultInclude
 		});
