@@ -1022,7 +1022,7 @@ export class ProgramService {
 	}
 
 	async createContent(input: CreateContentArgs) {
-		const { type, link, parent } = input;
+		const { type, link, parent, primary } = input;
 
 		const data = Prisma.validator<Prisma.ContentCreateInput>()({
 			type,
@@ -1031,7 +1031,8 @@ export class ProgramService {
 				connect: {
 					id: parent
 				}
-			}
+			},
+			primary,
 		});
 
 		return this.prisma.content.create({

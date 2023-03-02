@@ -9,8 +9,10 @@ enum EnrollmentStatus {
 	INACTIVE
 }
 enum ContentType {
-TYPE1
-TYPE2
+PDF
+DOC
+DOCX
+VIDEO
 }
 
 
@@ -438,6 +440,11 @@ input CreateContentArgs {
 	The lesson that this content belongs to.
 	"""
 	parent: ID!
+
+	 """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
 }
 
 input ContentFields {
@@ -460,6 +467,10 @@ input ContentFields {
 	The lesson that this content belongs to.
 	"""
 	parent: ID
+	 """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
 }
 
 input CreateCollectionArgs {

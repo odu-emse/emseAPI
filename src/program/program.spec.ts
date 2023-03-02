@@ -335,11 +335,11 @@ describe("Collection", () => {
 		await deleteModule(testingModuleID);
 		prisma.$disconnect();
 	});
-	it("should return an array of collections", async () => {
+	test("should return an array of collections", async () => {
 		expect(await resolver.collection()).toBeDefined();
 		expect(await resolver.collection()).toBeInstanceOf(Array);
 	});
-	it("should return a collection", async () => {
+	test("should return a collection", async () => {
 		const collection = await resolver.collection({
 			moduleID: testingCollectionID
 		});
@@ -353,7 +353,7 @@ describe("Collection", () => {
 			})
 		}
 	});
-	it("should match lesson position field to array index", async () => {
+	test("should match lesson position field to array index", async () => {
 		const coll = await resolver.collection({id:testingCollectionID});
 		expect(coll).toBeDefined();
 		if (coll.length > 0) {

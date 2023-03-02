@@ -298,8 +298,10 @@ enum EnrollmentStatus {
   INACTIVE
 }
 enum ContentType{
-TYPE1
-TYPE2
+PDF
+DOC
+DOCX
+VIDEO
 }
 
 // Dont need this anymore since we arent doing API Tokens
