@@ -1061,7 +1061,7 @@ export class ProgramService {
 					id: parent
 				}
 			},
-			primary,
+			primary
 		});
 
 		return this.prisma.content.create({
