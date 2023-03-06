@@ -201,10 +201,11 @@ Table Thread {
 
 Table Content {
   id String [pk]
-  type String [not null]
+  type ContentType [not null]
   link String [not null]
   parent Lesson [not null]
   parentID String [not null]
+  primary Boolean [not null]
 }
 
 Table DirectMessage {
@@ -297,6 +298,12 @@ Enum EnrollmentStatus {
   INACTIVE
 }
 
+Enum ContentType {
+  PDF
+  DOC
+  DOCX
+  VIDEO
+}
 Enum FileType {
   DOCX
   DOC

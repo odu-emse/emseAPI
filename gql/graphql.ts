@@ -18,6 +18,13 @@ export enum EnrollmentStatus {
     INACTIVE = "INACTIVE"
 }
 
+export enum ContentType {
+    PDF = "PDF",
+    DOC = "DOC",
+    DOCX = "DOCX",
+    VIDEO = "VIDEO"
+}
+
 export enum FileType {
     DOCX = "DOCX",
     DOC = "DOC",
@@ -61,16 +68,18 @@ export interface PlanFields {
 }
 
 export interface CreateContentArgs {
-    type: string;
+    type: ContentType;
     link: string;
     parent: string;
+    primary: boolean;
 }
 
 export interface ContentFields {
     id?: Nullable<string>;
-    type?: Nullable<string>;
+    type?: Nullable<ContentType>;
     link?: Nullable<string>;
     parent?: Nullable<string>;
+    primary: boolean;
 }
 
 export interface CreateCollectionArgs {
@@ -666,9 +675,10 @@ export interface Lesson {
 
 export interface Content {
     id: string;
-    type: string;
+    type: ContentType;
     link: string;
     parent: Lesson;
+    primary: boolean;
 }
 
 export interface Error {
