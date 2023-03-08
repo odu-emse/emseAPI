@@ -251,8 +251,17 @@ Table Quiz {
   minScore Float [not null, default: 0]
   parentLesson Lesson [not null]
   parentLessonID String [not null]
-  questions Question [not null]
+  questionPool Question [not null]
   quizResults QuizResult [not null]
+  instances QuizInstance [not null]
+}
+
+Table QuizInstance {
+  id String [pk]
+  quiz Quiz [not null]
+  quizID String [not null]
+  questions Question [not null]
+  questionIDs String[] [not null]
 }
 
 Table Question {
@@ -264,6 +273,8 @@ Table Question {
   answers Answer [not null]
   parent Quiz [not null]
   parentID String [not null]
+  instances QuizInstance [not null]
+  instanceIDs String[] [not null]
 }
 
 Table Answer {
@@ -304,6 +315,7 @@ Enum ContentType {
   DOCX
   VIDEO
 }
+
 Enum FileType {
   DOCX
   DOC
@@ -376,7 +388,13 @@ Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
 Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
 
+Ref: QuizInstance.quizID > Quiz.id [delete: Cascade]
+
+Ref: QuizInstance.questionIDs > Question.id
+
 Ref: Question.parentID > Quiz.id [delete: Cascade]
+
+Ref: Question.instanceIDs > QuizInstance.id
 
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 

@@ -274,6 +274,7 @@ export class QuizService {
 		const plan = student.plan.id;
 
 		//TODO: Add quiz grading logic
+		// const questions =
 
 		return this.prisma.quizResult.create({
 			data: {

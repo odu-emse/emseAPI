@@ -702,8 +702,15 @@ export interface Quiz {
     numQuestions: number;
     minScore: number;
     parentLesson: Lesson;
-    questions: Question[];
+    questionPool: Question[];
     quizResults?: Nullable<Nullable<Quiz>[]>;
+    instances: QuizInstance[];
+}
+
+export interface QuizInstance {
+    id: string;
+    quiz: Quiz;
+    questions: Question[];
 }
 
 export interface Question {
@@ -714,6 +721,7 @@ export interface Question {
     points: number;
     answers: Answer[];
     parent: Quiz;
+    instances: QuizInstance[];
 }
 
 export interface Answer {

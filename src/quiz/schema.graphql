@@ -28,13 +28,32 @@ type Quiz {
     """
     parentLesson: Lesson!
     """
-    The questions in this quiz
+    The possible questions and variants of for this quiz
     """
-    questions: [Question!]!
+    questionPool: [Question!]!
     """
     Submitted results to this quiz
     """
     quizResults: [Quiz]
+    """
+    The list of actual quiz instances students are taking
+    """
+    instances: [QuizInstance!]!
+}
+
+type QuizInstance {
+    """
+    The document ID for this QuizInstance
+    """
+    id: ID!
+    """
+    The quiz template this is an instance of
+    """
+    quiz: Quiz!
+    """
+    The list of questions in this instance of a quiz. One variant for each question number will be selected
+    """
+    questions: [Question!]!
 }
 
 type Question {
@@ -66,6 +85,10 @@ type Question {
     The parent Quiz of this question
     """
     parent: Quiz!
+    """
+    The quiz instances that this question/variant is used in
+    """
+    instances: [QuizInstance!]!
 }
 
 type Answer {
