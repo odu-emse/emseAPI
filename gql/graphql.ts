@@ -271,13 +271,18 @@ export interface QuizFields {
     parentLesson?: Nullable<string>;
 }
 
+export interface QuizInstanceFields {
+    id?: Nullable<string>;
+    quiz?: Nullable<string>;
+}
+
 export interface QuestionFields {
     id?: Nullable<string>;
     number?: Nullable<number>;
     variant?: Nullable<number>;
     text?: Nullable<string>;
     points?: Nullable<number>;
-    parentPool?: Nullable<string>;
+    parent?: Nullable<string>;
 }
 
 export interface AnswerFields {
@@ -477,6 +482,8 @@ export interface IMutation {
     createQuiz(input?: Nullable<CreateQuiz>): Quiz | Promise<Quiz>;
     updateQuiz(id: string, values: UpdateQuiz): Quiz[] | Promise<Quiz[]>;
     deleteQuiz(id: string): Quiz | Promise<Quiz>;
+    createQuizInstance(quizID: string): QuizInstance | Promise<QuizInstance>;
+    deleteQuizInstance(id: string): QuizInstance | Promise<QuizInstance>;
     createQuestion(input?: Nullable<CreateQuestion>): Question[] | Promise<Question[]>;
     updateQuestion(id: string, values: UpdateQuestion): Question[] | Promise<Question[]>;
     deleteQuestion(id: string): Question | Promise<Question>;
@@ -517,6 +524,7 @@ export interface IQuery {
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
+    quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
     question(args: QuestionFields): Question[] | Promise<Question[]>;
     answer(args: AnswerFields): Answer[] | Promise<Answer[]>;
     quizResult(args: QuizResultFields): QuizResult[] | Promise<QuizResult[]>;
