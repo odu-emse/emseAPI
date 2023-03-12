@@ -1070,7 +1070,7 @@ export class ProgramService {
 	}
 
 	async updateContent(input: ContentFields) {
-		const { id, type, link, parent,primary } = input;
+		const { id, type, link, parent, primary } = input;
 
 		if (!id) {
 			throw new Error("Id not provided to updateContent");
@@ -1084,20 +1084,16 @@ export class ProgramService {
 				...(type && { type }),
 				...(link && { link }),
 				parent: parent ? { connect: { id: parent } } : undefined,
-				primary :primary
-				
+				primary: primary
 			}
 		});
-// updatecontent function implemented above is accepting only certain ID'S Content data but not Array of Content
-// Accordingly I have implemented
-// checked for primary source and setting it to secondary resource
+		// updatecontent function implemented above is accepting only certain ID'S Content data but not Array of Content
+		// Accordingly I have implemented
+		// checked for primary source and setting it to secondary resource
 
-		if(data.data.primary===true)
-		data.data.primary= false
-
+		if (data.data.primary === true) data.data.primary = false;
 
 		return this.prisma.content.update(data);
-
 	}
 
 	async deleteContent(contentID: string) {
