@@ -371,20 +371,16 @@ describe("Collection", () => {
 		expect(true).toBe(true);
 	});
 
-	test("should set first content entry of a lesson as primary content entry", async function(){
+	test("should set first content entry of a lesson as primary content entry", async function () {
 		const coll = await resolver.collection({ id: testingCollectionID });
 		expect(coll).toBeDefined();
 		if (coll.length > 0) {
 			coll.map((c) => {
 				c.lessons.map((lesson) => {
-					if(lesson.content.length==1)
-					expect(lesson.content[0].primary).toBe(
-						true
-					);
-					
+					if (lesson.content.length == 1)
+						expect(lesson.content[0].primary).toBe(true);
 				});
 			});
 		}
-
 	});
 });
