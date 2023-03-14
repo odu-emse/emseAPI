@@ -1087,7 +1087,6 @@ export class ProgramService {
 				primary: primary
 			}
 		});
-		
 	}
 
 	async deleteContent(contentID: string) {

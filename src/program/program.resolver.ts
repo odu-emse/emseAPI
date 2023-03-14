@@ -267,14 +267,17 @@ export class ProgramResolver {
 	@Mutation("updateContent")
 	/* Defined new argument inputArray below as an array of ContentFields inorder to check 
 	whether any of the elements in content array has the primary attribute set as true */
-	async updateContent(@Args("input") input: ContentFields, @Args("inputArray") inputArray: ContentFields[]) {
+	async updateContent(
+		@Args("input") input: ContentFields,
+		@Args("inputArray") inputArray: ContentFields[]
+	) {
 		/* Whenever user tries to update certain content's primary attribute in the front end, 
 		that particular content's id is passed to the constant passedId defined below */
-		const passedId = '';
-		if(inputArray) {
+		const passedId = "";
+		if (inputArray) {
 			inputArray.map((item) => {
-				item.primary = (item.id === passedId);
-			}); 
+				item.primary = item.id === passedId;
+			});
 		}
 		/* If the code implementation is as expected I will proceed to call the updatecontent method with the
 		inputArray argument passed */
