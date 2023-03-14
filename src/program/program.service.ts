@@ -1087,13 +1087,7 @@ export class ProgramService {
 				primary: primary
 			}
 		});
-		// updatecontent function implemented above is accepting only certain ID'S Content data but not Array of Content
-		// Accordingly I have implemented
-		// checked for primary source and setting it to secondary resource
-
-		if (data.data.primary === true) data.data.primary = false;
-
-		return this.prisma.content.update(data);
+		
 	}
 
 	async deleteContent(contentID: string) {
