@@ -12,7 +12,12 @@ import {
 	CreateContentArgs,
 	ContentType
 } from "@/types/graphql";
-import { createCollection, createModule, createContent, createLesson } from "../../utils/tests";
+import {
+	createCollection,
+	createModule,
+	createContent,
+	createLesson
+} from "../../utils/tests";
 import { test, describe, beforeAll, afterAll, expect } from "vitest";
 
 interface IAssignment extends Assignment {
@@ -302,12 +307,11 @@ describe("Collection", () => {
 		"640f7e381da3a0a3bc68ae6b",
 		"6410d40c9a732b04d66a8bfa",
 		"6410d40d9a732b04d66a8bff"
-		
 	];
 
 	let testingCollectionID: string;
 	let testingModuleID: string;
-	let testingModuleCreateContentArgs: CreateContentArgs
+	let testingModuleCreateContentArgs: CreateContentArgs;
 	let createNewContent;
 	let fakelessonID;
 
@@ -333,17 +337,14 @@ describe("Collection", () => {
 			moduleID: testingModuleID,
 			positionIndex: 0
 		});
-		if (collection instanceof Error)
-			throw new Error("Collection is undefined");
+		if (collection instanceof Error) throw new Error("Collection is undefined");
 		testingCollectionID = collection.id;
 
 		const lesson = await resolver.createLesson({
 			name: "Test Lesson",
 			collection: testingCollectionID
-
-
 		});
-		fakelessonID = lesson.id
+		fakelessonID = lesson.id;
 	});
 	afterAll(async () => {
 		await deleteCollection(testingCollectionID);
@@ -395,20 +396,27 @@ describe("Collection", () => {
 				testingModuleCreateContentArgs = {
 					type: ContentType.PDF,
 					link: "test",
-					parent: fakelessonID ,
+					parent: fakelessonID,
 					primary: false
-				}
-				createNewContent = await resolver.createContent(testingModuleCreateContentArgs);
+				};
+				createNewContent = await resolver.createContent(
+					testingModuleCreateContentArgs
+				);
 				if (createModule instanceof Error) throw new Error();
 				expect(createNewContent).toBeDefined();
-				expect(createNewContent.type).toEqual(testingModuleCreateContentArgs.type);
-				expect(createNewContent.link).toEqual(testingModuleCreateContentArgs.link);
-				expect(createNewContent.parentID).toEqual(testingModuleCreateContentArgs.parent);
-				expect(createNewContent.primary).toEqual(testingModuleCreateContentArgs.primary);
+				expect(createNewContent.type).toEqual(
+					testingModuleCreateContentArgs.type
+				);
+				expect(createNewContent.link).toEqual(
+					testingModuleCreateContentArgs.link
+				);
+				expect(createNewContent.parentID).toEqual(
+					testingModuleCreateContentArgs.parent
+				);
+				expect(createNewContent.primary).toEqual(
+					testingModuleCreateContentArgs.primary
+				);
 			});
 		});
 	});
-
 });
-
-
