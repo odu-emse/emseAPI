@@ -238,9 +238,10 @@ model Content {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   type     ContentType
   link     String
-  parent   Lesson @relation(fields: [parentID], references: [id])
+  parent   Lesson @relation(fields: [parentID], references: [id], onDelete: Cascade)
   parentID String @db.ObjectId
   primary Boolean
+
 }
 
 model DirectMessage {

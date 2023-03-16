@@ -4,10 +4,11 @@ import {
 	CreateAnswer,
 	CreateCollectionArgs, CreateQuestion, CreateQuiz,
 	EnrollmentStatus, LessonInput,
-	UserRole
+	UserRole, CreateContentArgs, ContentType
 } from "@/types/graphql";
 import {QuizResolver} from "@/quiz/quiz.resolver";
-import {Answer, Collection, Lesson, Question, Quiz} from "@prisma/client";
+import {Answer, Collection, Content, Lesson, Question, Quiz} from "@prisma/client";
+
 
 export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -56,7 +57,9 @@ export const createLesson = async (
 ) => {
 	const data: LessonInput = {
 		name: config.name,
-		collection: config.collectionID
+		collection: config.collectionID,
+
+
 	}
 	const lesson = await resolver.createLesson({...data});
 	if(data) return lesson;
@@ -85,6 +88,7 @@ export const createCollection = async (
 	if (collection) return collection;
 	else return new Error("Failed to create collection");
 };
+
 
 export const createQuiz = async (
 	resolver: QuizResolver,
@@ -131,6 +135,21 @@ export const createAnswer = async (
 		parentQuestion: input.parentQuestionID
 	}
 	const answer = await resolver.createAnswer(data);
+	if (answer) return answer;
+	else return new Error("Failed to create answer");
+}
+
+export const createContent = async (
+	resolver: ProgramResolver,
+	input: Content
+) => {
+	const data: CreateContentArgs = {
+		type: ContentType.PDF,
+		link: input.link,
+		parent: input.parent,
+		primary: input.primary
+	}
+	const answer = await resolver.createContent(data);
 	if (answer) return answer;
 	else return new Error("Failed to create answer");
 }
