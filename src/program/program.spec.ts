@@ -8,9 +8,11 @@ import {
 	AssignmentResult,
 	Course,
 	PlanOfStudy,
-	User
+	User,
+	CreateContentArgs,
+	ContentType
 } from "@/types/graphql";
-import { createCollection, createModule } from "../../utils/tests";
+import { createCollection, createModule, createContent, createLesson } from "../../utils/tests";
 import { test, describe, beforeAll, afterAll, expect } from "vitest";
 
 interface IAssignment extends Assignment {
@@ -47,10 +49,13 @@ describe("Plan services", () => {
 		resolver = new ProgramResolver(service);
 	});
 
-	let testingModuleID: string;
-	let testingAssignmentID: string;
+	let testingModuleID;
+	let testingAssignmentID;
 	let testingAssignmentResultID: string;
 	let testingCourseID: string;
+	let createNewContent;
+	const progServ: ProgramService = new ProgramService(prisma);
+	const progResolver: ProgramResolver = new ProgramResolver(progServ);
 
 	describe("Module", () => {
 		describe("modules Query", () => {
@@ -294,14 +299,17 @@ describe("Collection", () => {
 	};
 
 	const lessons = [
-		"639217c90482bbfb9aba86cc",
-		"639217e70482bbfb9aba86d0",
-		"639217e70482bbfb9aba86d1",
-		"639217e70482bbfb9aba86d2"
+		"640f7e381da3a0a3bc68ae6b",
+		"6410d40c9a732b04d66a8bfa",
+		"6410d40d9a732b04d66a8bff"
+		
 	];
 
 	let testingCollectionID: string;
 	let testingModuleID: string;
+	let testingModuleCreateContentArgs: CreateContentArgs
+	let createNewContent;
+	let fakelessonID;
 
 	beforeAll(async () => {
 		service = new ProgramService(prisma);
@@ -323,12 +331,19 @@ describe("Collection", () => {
 		const collection = await createCollection(resolver, {
 			name: "Test Collection",
 			moduleID: testingModuleID,
-			lessons,
 			positionIndex: 0
 		});
-		if (typeof collection === "undefined")
+		if (collection instanceof Error)
 			throw new Error("Collection is undefined");
-		testingCollectionID = collection[0].id;
+		testingCollectionID = collection.id;
+
+		const lesson = await resolver.createLesson({
+			name: "Test Lesson",
+			collection: testingCollectionID
+
+
+		});
+		fakelessonID = lesson.id
 	});
 	afterAll(async () => {
 		await deleteCollection(testingCollectionID);
@@ -370,4 +385,30 @@ describe("Collection", () => {
 	test("should populate previous and next based on module ID", function () {
 		expect(true).toBe(true);
 	});
+	test("should previous and next based on module ID", function () {
+		expect(false).toBe(true);
+	});
+
+	describe("Creates", () => {
+		describe("Query.createcontent()", () => {
+			test("should create a new module", async () => {
+				testingModuleCreateContentArgs = {
+					type: ContentType.PDF,
+					link: "test",
+					parent: fakelessonID ,
+					primary: false
+				}
+				createNewContent = await resolver.createContent(testingModuleCreateContentArgs);
+				if (createModule instanceof Error) throw new Error();
+				expect(createNewContent).toBeDefined();
+				expect(createNewContent.type).toEqual(testingModuleCreateContentArgs.type);
+				expect(createNewContent.link).toEqual(testingModuleCreateContentArgs.link);
+				expect(createNewContent.parentID).toEqual(testingModuleCreateContentArgs.parent);
+				expect(createNewContent.primary).toEqual(testingModuleCreateContentArgs.primary);
+			});
+		});
+	});
+
 });
+
+
