@@ -238,7 +238,7 @@ model Content {
   id       String      @id @default(auto()) @map("_id") @db.ObjectId
   type     ContentType
   link     String
-  parent   Lesson      @relation(fields: [parentID], references: [id])
+  parent   Lesson      @relation(fields: [parentID], references: [id], onDelete: Cascade)
   parentID String      @db.ObjectId
   primary  Boolean
 }
@@ -288,8 +288,8 @@ model Quiz {
   parentLesson   Lesson         @relation(fields: [parentLessonID], references: [id], onDelete: Cascade)
   parentLessonID String         @db.ObjectId
   questionPool   Question[]
-  quizResults    QuizResult[]
   instances      QuizInstance[]
+  QuizResult     QuizResult[]
 }
 
 model QuizInstance {

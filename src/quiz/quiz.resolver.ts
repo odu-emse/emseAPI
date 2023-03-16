@@ -10,7 +10,7 @@ import {
 	CreateAnswer,
 	UpdateAnswer,
 	QuizResultFields,
-	QuizSubmission
+	QuizSubmission, QuizInstanceFields
 } from "gql/graphql";
 import { QuizService } from "@/quiz/quiz.service";
 
@@ -20,6 +20,11 @@ export class QuizResolver {
 	@Query("quiz")
 	async quiz(@Args("args") args: QuizFields) {
 		return await this.quizService.quiz(args);
+	}
+
+	@Query("quizInstance")
+	async quizInstance(@Args("args") args: QuizInstanceFields) {
+		return await this.quizService.quizInstance(args);
 	}
 
 	@Query("question")
@@ -39,6 +44,7 @@ export class QuizResolver {
 
 	@Mutation("createQuiz")
 	async createQuiz(@Args("input") input: CreateQuiz) {
+		console.log("Hello")
 		return await this.quizService.createQuiz(input);
 	}
 
@@ -50,6 +56,16 @@ export class QuizResolver {
 	@Mutation("deleteQuiz")
 	async deleteQuiz(@Args("id") id: string) {
 		return await this.quizService.deleteQuiz(id);
+	}
+
+	@Mutation("createQuizInstance")
+	async createQuizInstance(@Args("quizID") quizID: string) {
+		return await this.quizService.createQuizInstance(quizID);
+	}
+
+	@Mutation("deleteQuizInstance")
+	async deleteQuizInstance(@Args("id") id: string) {
+		return await this.quizService.deleteQuizInstance(id);
 	}
 
 	@Mutation("createQuestion")
