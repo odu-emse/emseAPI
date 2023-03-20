@@ -6,20 +6,31 @@ import {
 	IThreadCreateInput,
 	ICommentCreateInput
 } from "@/types/graphql";
-import { getRunningMode } from "vitest";
 
 @Injectable()
 export class CommunityService {
 	constructor(private prisma: PrismaService) {}
 
 	private threadInclude = Prisma.validator<Prisma.ThreadInclude>()({
+		// populating L1 comments
 		comments: {
 			include: {
+				// populating L2 comments
 				comments: {
 					include: {
-						comments: true
+						// populating L3 comments
+						comments: {
+							include: {
+								// populating L3 author
+								author: true
+							}
+						},
+						// populating L2 comment author
+						author: true
 					}
-				}
+				},
+				// populating L1 comment author
+				author: true
 			}
 		},
 		parentThread: true,
@@ -162,7 +173,8 @@ export class CommunityService {
 						id: userID
 					}
 				}
-			}
+			},
+			include: this.threadInclude
 		});
 	}
 
