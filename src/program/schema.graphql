@@ -652,6 +652,11 @@ input UpdateModule {
 	Keywords in UpdateModule
 	"""
 	keywords: [String!]
+	"""
+	Objectives for the modules
+	"""
+	objectives: String
+	
 }
 
 input NewAssignment {

@@ -589,7 +589,8 @@ export class ProgramService {
 			description,
 			duration,
 			numSlides,
-			keywords
+			keywords,
+			objectives
 		} = data;
 
 		const args = Prisma.validator<Prisma.ModuleUpdateArgs>()({
@@ -602,7 +603,8 @@ export class ProgramService {
 				...(description && { description }),
 				...(duration && { duration }),
 				...(numSlides && { numSlides }),
-				...(keywords && { keywords })
+				...(keywords && { keywords }),
+				...(objectives && { objectives })
 			}
 		});
 
