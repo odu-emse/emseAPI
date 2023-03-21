@@ -353,7 +353,7 @@ export interface UpdateAnswer {
 
 export interface QuizSubmission {
     student: string;
-    quiz: string;
+    quizInstance: string;
     answers: string[];
 }
 

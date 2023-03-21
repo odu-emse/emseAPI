@@ -327,7 +327,7 @@ model Answer {
 model QuizResult {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   score       Float
-  answers     String[]
+  // answers     String[]
   submittedAt DateTime @default(now())
 
   student      PlanOfStudy   @relation(fields: [studentID], references: [id])

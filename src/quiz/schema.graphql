@@ -447,13 +447,13 @@ input QuizSubmission {
     """
     student: ID!
     """
-    The quiz being submitted
+    The quiz Instance this is a submission for.
     """
-    quiz: ID!
+    quizInstance: ID!
     """
     The list of answers that were provided for this quiz
     """
-    answers: [String!]!
+    answers: [ID!]!
 }
 
 # TODO: Update documentation for update mutations

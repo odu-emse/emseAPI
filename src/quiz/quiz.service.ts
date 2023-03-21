@@ -352,18 +352,37 @@ export class QuizService {
 		if (!student || !student.plan)
 			return new Error("Could not find user plan of study");
 		const plan = student.plan.id;
+		//Score counter;
+		let score = 0.0
+		//Check all answers
+		const results = input.answers.map(async (answer) => {
+			const answerObj = await this.prisma.answer.findUnique({
+				where: {
+					id: answer
+				},
+				include: {
+					parentQuestion: true
+				}
+			});
+			if (!answerObj) {
+				return new Error("Could not find answer given ID");
+			}
+			if (answerObj.correct) {
+				score += answerObj.parentQuestion.points;
+			}
+		})
 
+		return Promise.all(results).then(() => this.prisma.quizResult.create({
+			data: {
+				score: score,
+				// answers: input.answers,
+				student: { connect: { id: plan } },
+				quizInstance: { connect: { id: input.quizInstance } }
+			}
+		}))
 		//TODO: Add quiz grading logic
 		// const questions =
 
-		return this.prisma.quizResult.create({
-			data: {
-				score: 100.0,
-				answers: input.answers,
-				student: { connect: { id: plan } },
-				quizInstance: { connect: { id: input.quiz } }
-			}
-		});
 	}
 
 	async updateQuizScore(id: string, newScore: number) {

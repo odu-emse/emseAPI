@@ -291,7 +291,6 @@ Table Answer {
 Table QuizResult {
   id String [pk]
   score Float [not null]
-  answers String[] [not null]
   submittedAt DateTime [default: `now()`, not null]
   student PlanOfStudy [not null]
   studentID String [not null]
