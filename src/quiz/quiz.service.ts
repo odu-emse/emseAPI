@@ -75,9 +75,12 @@ export class QuizService {
 				student: true
 			}
 		},
-		quiz: {
+		quizInstance: {
 			include: {
-				parentLesson: true
+				quiz: true,
+				questions: {
+
+				}
 			}
 		}
 	});
@@ -144,7 +147,7 @@ export class QuizService {
 			id: args.id ? args.id : undefined,
 			score: args.score ? args.score : undefined,
 			student: args.student ? { id: args.student } : undefined,
-			quiz: args.quiz ? { id: args.quiz } : undefined
+			quizInstance: args.quizInstance ? { id: args.quizInstance } : undefined
 		});
 		return this.prisma.quizResult.findMany({
 			where,
@@ -222,7 +225,6 @@ export class QuizService {
 			//Get all the variants of this question
 			const questions = quiz.questionPool.filter(question => question.number === i);
 			//Select a random question variant
-			// console.log("selected variant ", Math.floor(Math.random() * questions.length), "for question " + i);
 			questionIDs.push({id: questions[Math.floor(Math.random() * questions.length)].id});
 		}
 		return this.prisma.quizInstance.create({
@@ -352,7 +354,7 @@ export class QuizService {
 				score: 100.0,
 				answers: input.answers,
 				student: { connect: { id: plan } },
-				quiz: { connect: { id: input.quiz } }
+				quizInstance: { connect: { id: input.quiz } }
 			}
 		});
 	}

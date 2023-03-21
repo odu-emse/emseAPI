@@ -32,10 +32,6 @@ type Quiz {
     """
     questionPool: [Question!]!
     """
-    Submitted results to this quiz
-    """
-    quizResults: [Quiz]
-    """
     The list of actual quiz instances students are taking
     """
     instances: [QuizInstance!]!
@@ -54,6 +50,10 @@ type QuizInstance {
     The list of questions in this instance of a quiz. One variant for each question number will be selected
     """
     questions: [Question!]!
+    """
+    The submission for this instance
+    """
+    quizResult: QuizResult!
 }
 
 type Question {
@@ -134,13 +134,17 @@ type QuizResult {
     """
     answers: [String!]!
     """
+    The time and date that this result was submitted at.
+    """
+    submittedAt: Date
+    """
     The plan of study of the user who took the quiz
     """
     student: PlanOfStudy!
     """
     The quiz this result is for. This field relation is immutable to protect the grading algorithm
     """
-    quiz: Quiz!
+    quizInstance: QuizInstance!
 }
 
 input QuizFields {
@@ -253,9 +257,9 @@ input QuizResultFields {
     """
     student: ID
     """
-    The quiz this result is for
+    The quiz instance that this is a submission for.
     """
-    quiz: ID
+    quizInstance: ID
 }
 
 type Query {

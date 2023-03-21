@@ -289,15 +289,16 @@ model Quiz {
   parentLessonID String         @db.ObjectId
   questionPool   Question[]
   instances      QuizInstance[]
-  QuizResult     QuizResult[]
 }
 
 model QuizInstance {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  quiz        Quiz       @relation(fields: [quizID], references: [id], onDelete: Cascade)
-  quizID      String     @db.ObjectId
-  questions   Question[] @relation(fields: [questionIDs], references: [id])
-  questionIDs String[]   @default([]) @db.ObjectId
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  quiz         Quiz        @relation(fields: [quizID], references: [id], onDelete: Cascade)
+  quizID       String      @db.ObjectId
+  questions    Question[]  @relation(fields: [questionIDs], references: [id])
+  questionIDs  String[]    @default([]) @db.ObjectId
+  quizResult   QuizResult? @relation(fields: [quizResultID], references: [id])
+  quizResultID String?     @unique @db.ObjectId
 }
 
 model Question {
@@ -329,10 +330,9 @@ model QuizResult {
   answers     String[]
   submittedAt DateTime @default(now())
 
-  student   PlanOfStudy @relation(fields: [studentID], references: [id])
-  studentID String      @db.ObjectId
-  quiz      Quiz?       @relation(fields: [quizID], references: [id])
-  quizID    String      @default("") @db.ObjectId
+  student      PlanOfStudy   @relation(fields: [studentID], references: [id])
+  studentID    String        @db.ObjectId
+  quizInstance QuizInstance?
 }
 
 enum UserRole {

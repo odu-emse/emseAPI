@@ -252,7 +252,6 @@ Table Quiz {
   parentLesson Lesson [not null]
   parentLessonID String [not null]
   questionPool Question [not null]
-  quizResults QuizResult [not null]
   instances QuizInstance [not null]
 }
 
@@ -262,6 +261,8 @@ Table QuizInstance {
   quizID String [not null]
   questions Question [not null]
   questionIDs String[] [not null]
+  quizResult QuizResult
+  quizResultID String [unique]
 }
 
 Table Question {
@@ -294,8 +295,7 @@ Table QuizResult {
   submittedAt DateTime [default: `now()`, not null]
   student PlanOfStudy [not null]
   studentID String [not null]
-  quiz Quiz
-  quizID String [not null, default: '']
+  quizInstance QuizInstance
 }
 
 Enum UserRole {
@@ -374,7 +374,7 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Thread.upvoteUserIDs > User.id
 
-Ref: Content.parentID > Lesson.id
+Ref: Content.parentID > Lesson.id [delete: Cascade]
 
 Ref: DirectMessage.authorID > User.id
 
@@ -392,6 +392,8 @@ Ref: QuizInstance.quizID > Quiz.id [delete: Cascade]
 
 Ref: QuizInstance.questionIDs > Question.id
 
+Ref: QuizInstance.quizResultID - QuizResult.id
+
 Ref: Question.parentID > Quiz.id [delete: Cascade]
 
 Ref: Question.instanceIDs > QuizInstance.id
@@ -399,5 +401,3 @@ Ref: Question.instanceIDs > QuizInstance.id
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 
 Ref: QuizResult.studentID > PlanOfStudy.id
-
-Ref: QuizResult.quizID > Quiz.id

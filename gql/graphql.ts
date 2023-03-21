@@ -298,7 +298,7 @@ export interface QuizResultFields {
     id?: Nullable<string>;
     score?: Nullable<number>;
     student?: Nullable<string>;
-    quiz?: Nullable<string>;
+    quizInstance?: Nullable<string>;
 }
 
 export interface CreateQuiz {
@@ -711,7 +711,6 @@ export interface Quiz {
     minScore: number;
     parentLesson: Lesson;
     questionPool: Question[];
-    quizResults?: Nullable<Nullable<Quiz>[]>;
     instances: QuizInstance[];
 }
 
@@ -719,6 +718,7 @@ export interface QuizInstance {
     id: string;
     quiz: Quiz;
     questions: Question[];
+    quizResult: QuizResult;
 }
 
 export interface Question {
@@ -745,8 +745,9 @@ export interface QuizResult {
     id: string;
     score: number;
     answers: string[];
+    submittedAt?: Nullable<Date>;
     student: PlanOfStudy;
-    quiz: Quiz;
+    quizInstance: QuizInstance;
 }
 
 export interface Social {
