@@ -1070,7 +1070,7 @@ export class ProgramService {
 	}
 
 	async updateContent(input: ContentFields) {
-		const { id, type, link, parent,primary } = input;
+		const { id, type, link, parent, primary } = input;
 
 		if (!id) {
 			throw new Error("Id not provided to updateContent");
