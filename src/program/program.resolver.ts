@@ -105,7 +105,7 @@ export class ProgramResolver {
 
 	// Update a single module's data in the db
 	@Mutation("updateModule")
-	async update(@Args("input") args: UpdateModule, ) {
+	async update(@Args("input") args: UpdateModule) {
 		return await this.programService.updateModule(args);
 	}
 
