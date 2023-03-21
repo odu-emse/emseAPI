@@ -1070,7 +1070,7 @@ export class ProgramService {
 	}
 
 	async updateContent(input: ContentFields) {
-		const { id, type, link, parent } = input;
+		const { id, type, link, parent,primary } = input;
 
 		if (!id) {
 			throw new Error("Id not provided to updateContent");
@@ -1083,7 +1083,8 @@ export class ProgramService {
 			data: {
 				...(type && { type }),
 				...(link && { link }),
-				parent: parent ? { connect: { id: parent } } : undefined
+				parent: parent ? { connect: { id: parent } } : undefined,
+				primary: primary
 			}
 		});
 
