@@ -351,7 +351,7 @@ export class QuizService {
 			return new Error("Could not find user plan of study");
 		const plan = student.plan.id;
 		//Score counter;
-		let score = 0.0
+		let score = 0.0;
 		//Check all answers
 		const results = input.answers.map(async (answer) => {
 			const answerObj = await this.prisma.answer.findUnique({
@@ -368,19 +368,20 @@ export class QuizService {
 			if (answerObj.correct) {
 				score += answerObj.parentQuestion.points;
 			}
-		})
+		});
 
-		return Promise.all(results).then(() => this.prisma.quizResult.create({
-			data: {
-				score: score,
-				// answers: input.answers,
-				student: { connect: { id: plan } },
-				quizInstance: { connect: { id: input.quizInstance } }
-			}
-		}))
+		return Promise.all(results).then(() =>
+			this.prisma.quizResult.create({
+				data: {
+					score: score,
+					// answers: input.answers,
+					student: { connect: { id: plan } },
+					quizInstance: { connect: { id: input.quizInstance } }
+				}
+			})
+		);
 		//TODO: Add quiz grading logic
 		// const questions =
-
 	}
 
 	async updateQuizScore(id: string, newScore: number) {
