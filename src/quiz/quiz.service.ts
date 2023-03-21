@@ -79,9 +79,7 @@ export class QuizService {
 		quizInstance: {
 			include: {
 				quiz: true,
-				questions: {
-
-				}
+				questions: {}
 			}
 		}
 	});
