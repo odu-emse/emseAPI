@@ -10,7 +10,8 @@ import {
 	CreateAnswer,
 	UpdateAnswer,
 	QuizResultFields,
-	QuizSubmission, QuizInstanceFields
+	QuizSubmission,
+	QuizInstanceFields
 } from "gql/graphql";
 import { QuizService } from "@/quiz/quiz.service";
 
@@ -44,7 +45,7 @@ export class QuizResolver {
 
 	@Mutation("createQuiz")
 	async createQuiz(@Args("input") input: CreateQuiz) {
-		console.log("Hello")
+		console.log("Hello");
 		return await this.quizService.createQuiz(input);
 	}
 

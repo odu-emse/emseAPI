@@ -7,7 +7,8 @@ import {
 	CreateQuestion,
 	CreateQuiz,
 	QuestionFields,
-	QuizFields, QuizInstanceFields,
+	QuizFields,
+	QuizInstanceFields,
 	QuizResultFields,
 	QuizSubmission,
 	UpdateAnswer,
@@ -37,7 +38,7 @@ export class QuizService {
 					include: {
 						answers: true
 					}
-				},
+				}
 			}
 		},
 		questions: {
@@ -46,13 +47,13 @@ export class QuizService {
 				parent: true
 			}
 		}
-	})
+	});
 
 	private questionInclude = Prisma.validator<Prisma.QuestionInclude>()({
 		answers: true,
 		parent: {
 			include: {
-				parentLesson: true,
+				parentLesson: true
 			}
 		}
 	});
@@ -62,7 +63,7 @@ export class QuizService {
 			include: {
 				parent: {
 					include: {
-						parentLesson: true,
+						parentLesson: true
 					}
 				}
 			}
@@ -105,11 +106,11 @@ export class QuizService {
 		const where = Prisma.validator<Prisma.QuizInstanceWhereInput>()({
 			id: args.id ? args.id : undefined,
 			quizID: args.quiz ? args.quiz : undefined
-		})
+		});
 		return this.prisma.quizInstance.findMany({
 			where,
 			include: this.quizInstanceInclude
-		})
+		});
 	}
 
 	async question(args: QuestionFields) {
@@ -216,27 +217,33 @@ export class QuizService {
 			}
 		});
 		if (quiz === null) {
-			return new Error("Could not find a quiz with given document ID: " + quizID);
+			return new Error(
+				"Could not find a quiz with given document ID: " + quizID
+			);
 		}
 		//Start an array of question IDs
-		const questionIDs: Array<{id: string}> = [];
+		const questionIDs: Array<{ id: string }> = [];
 		//For each question that should be on the quiz
 		for (let i = 1; i <= quiz.numQuestions; i++) {
 			//Get all the variants of this question
-			const questions = quiz.questionPool.filter(question => question.number === i);
+			const questions = quiz.questionPool.filter(
+				(question) => question.number === i
+			);
 			//Select a random question variant
-			questionIDs.push({id: questions[Math.floor(Math.random() * questions.length)].id});
+			questionIDs.push({
+				id: questions[Math.floor(Math.random() * questions.length)].id
+			});
 		}
 		return this.prisma.quizInstance.create({
 			data: {
 				quiz: {
-					connect: {id: quizID}
+					connect: { id: quizID }
 				},
 				questions: {
 					connect: questionIDs
 				}
 			}
-		})
+		});
 	}
 
 	async deleteQuizInstance(id: string) {
@@ -244,7 +251,7 @@ export class QuizService {
 			where: {
 				id
 			}
-		})
+		});
 	}
 
 	async createQuestion(input: CreateQuestion) {
