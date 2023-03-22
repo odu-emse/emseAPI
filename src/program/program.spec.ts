@@ -15,7 +15,7 @@ import {
 } from "@/types/graphql";
 import {
 	createCollection,
-	createModule,     
+	createModule,
 	//createContent,
 	createLesson
 } from "../../utils/tests";
@@ -300,8 +300,6 @@ describe("Collection", () => {
 	let prisma: PrismaService;
 	prisma = new PrismaService();
 
-
-
 	const deleteModule = async (id: string) => {
 		return await prisma.module.delete({
 			where: { id }
@@ -368,14 +366,12 @@ describe("Collection", () => {
 		createNewContent = await resolver.createContent(
 			testingModuleCreateContentArgs
 		);
-		
 	});
 	afterAll(async () => {
 		await deleteCollection(testingCollectionID);
 		await deleteModule(testingModuleID);
 		await prisma.$disconnect();
 	});
-
 
 	test("should return an array of collections", async () => {
 		expect(await resolver.collection()).toBeDefined();
@@ -453,7 +449,6 @@ describe("Collection", () => {
 					link: "test",
 					parent: fakelessonID,
 					primary: false
-				
 				};
 				const content = await resolver.content({
 					primary: false,
@@ -462,18 +457,15 @@ describe("Collection", () => {
 				expect(content).toBeDefined();
 				expect(typeof content).toBe(typeof []);
 
-
-			test("should read all the modules", async () => {
-				const content = await resolver.content({
-	primary: false
-});
-				expect(content).toBeDefined();
-				expect(typeof content).toBe(typeof []);
-				expect(content[0]).toBeGreaterThanOrEqual(1)
+				test("should read all the modules", async () => {
+					const content = await resolver.content({
+						primary: false
+					});
+					expect(content).toBeDefined();
+					expect(typeof content).toBe(typeof []);
+					expect(content[0]).toBeGreaterThanOrEqual(1);
 				});
-				
 			});
 		});
 	});
 });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
