@@ -1084,7 +1084,7 @@ export class ProgramService {
 				...(type && { type }),
 				...(link && { link }),
 				parent: parent ? { connect: { id: parent } } : undefined,
-			    primary : primary !== null ? primary:undefined
+				primary: primary !== null ? primary : undefined
 			}
 		});
 

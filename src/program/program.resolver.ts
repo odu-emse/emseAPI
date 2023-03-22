@@ -269,55 +269,52 @@ export class ProgramResolver {
 	@Mutation("updateContent")
 	async updateContent(@Args("input") input: ContentFields) {
 		let id = input.id;
-		console.log(id)
-		console.log(input.primary)
+		console.log(id);
+		console.log(input.primary);
 		const original = await this.programService.content({
 			parent: input.parent,
 			primary: input.primary
 		});
-		console.log(original)
+		console.log(original);
 		if (input.primary == true) {
-			
 			await original.map(async (org) => {
 				if (org.primary == true) {
 					org.primary = false;
-				const result=	await this.programService.updateContent({
+					const result = await this.programService.updateContent({
 						id: org.id,
 						primary: false
 					});
-				const result1=	await this.programService.updateContent({
+					const result1 = await this.programService.updateContent({
 						primary: input.primary,
 						id: input.id
 					});
 				}
 			});
-		} 
-		else if (input.primary == false  ) {
+		} else if (input.primary == false) {
 			//      if (original.filter(org => org.primary == true).length == 0) {
 
 			await original.map(async (org) => {
 				if (org.primary == true) {
 					org.primary = false;
-				await this.programService.updateContent({
+					await this.programService.updateContent({
 						id: org.id,
 						primary: org.primary
 					});
 				}
 			});
-			
-			if(input.id == original[0].id){
-				input.primary=true
+
+			if (input.id == original[0].id) {
+				input.primary = true;
 			}
 			original[0].primary = true;
-		 const data= await this.programService.updateContent({
+			const data = await this.programService.updateContent({
 				id: original[0].id,
 				primary: original[0].primary
 			});
-			console.log(data)
-			
+			console.log(data);
 		}
-		console.log(original)
-        console.log(input)
+		console.log(original);
+		console.log(input);
 		return await this.programService.updateContent(input);
 	}
 	@Mutation("deleteContent")
