@@ -655,7 +655,7 @@ input UpdateModule {
 	"""
 	Objectives for the modules
 	"""
-	objectives: String
+	objectives: [String!]
 	
 }
 

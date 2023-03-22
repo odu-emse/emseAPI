@@ -128,7 +128,7 @@ type Mutation {
 
     addCommentToThread(parentThreadID: ID!, data: ICommentCreateInput!): Thread
 
-    upvoteThread(id: ID!, userID: ID!): Thread
+    upvoteThread(id: ID!): Thread
 
     updateThread(id: ID!, data: IThreadCreateInput!): Thread
 

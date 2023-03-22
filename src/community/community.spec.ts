@@ -188,7 +188,7 @@ describe("Community", () => {
 			if (voteNum instanceof Error)
 				throw new Error("Error in upvoteThread test case");
 
-			const upVoteNum = await resolver.upvoteThread(threadID, accountID);
+			const upVoteNum = await resolver.upvoteThread(accountID, threadID);
 
 			expect(upVoteNum.upvotes.length === voteNum[0].upvotes.length + 1).toBe(
 				true
