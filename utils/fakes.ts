@@ -198,7 +198,14 @@ export function createRandomContent(parentID?: string): Content {
 		link: faker.internet.url()
 	};
 }
-
+export function createRandomInputContent(parentID?: string): Content {
+	return {
+		id: faker.database.mongodbObjectId(),
+		parentID: parentID ? parentID : faker.database.mongodbObjectId(),
+		type: faker.helpers.arrayElement(["TEXT", "IMAGE", "VIDEO", "AUDIO"]),
+		link: faker.internet.url()
+	};
+}
 export function createRandomQuiz(parentID?: string): Quiz {
 	const questions = faker.datatype.number({min: 5, max:15})
 	return {
@@ -265,6 +272,8 @@ export const assignment = createRandomAssignment();
 export const assignmentResult = createRandomAssignmentResult();
 export const thread = createRandomThread();
 export const content = createRandomContent();
+export const contentInput = createRandomInputContent();
+
 export const progress = createRandomProgress();
 export const quiz = createRandomQuiz();
 export const question = createRandomQuestion();

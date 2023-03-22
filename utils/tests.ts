@@ -2,12 +2,12 @@ import { PlanOfStudyResolver } from "@/pos";
 import { ProgramResolver } from "@/program";
 import {
 	CreateAnswer,
-	CreateCollectionArgs, CreateQuestion, CreateQuiz,
+	CreateCollectionArgs, CreateQuestion, CreateQuiz, CreateContentArgs,
 	EnrollmentStatus, LessonInput,
-	UserRole
+	UserRole, ContentType
 } from "@/types/graphql";
 import {QuizResolver} from "@/quiz/quiz.resolver";
-import {Answer, Collection, Lesson, Question, Quiz} from "@prisma/client";
+import {Answer, Collection, Lesson, Question, Quiz, Content} from "@prisma/client";
 
 export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -133,5 +133,21 @@ export const createAnswer = async (
 	const answer = await resolver.createAnswer(data);
 	if (answer) return answer;
 	else return new Error("Failed to create answer");
+}
+
+export const createContent = async (
+	resolver: ProgramResolver,
+	input: Content
+) => {
+	const data: CreateContentArgs = {
+		
+		type: ContentType.PDF,
+		link: input.link,
+		parent: input.parentID,
+		primary: input.primary,
+	}
+	const content = await resolver.createContent(data);
+	if (content) return content;
+	else return new Error("Failed to create content");
 }
 
