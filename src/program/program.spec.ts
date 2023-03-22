@@ -392,17 +392,18 @@ describe("Collection", () => {
 
 	describe("Creates", () => {
 		describe("Query.createcontent()", () => {
-			test("should create a new module", async () => {
+			test("should create new content", async () => {
 				testingModuleCreateContentArgs = {
 					type: ContentType.PDF,
 					link: "test",
 					parent: fakelessonID,
 					primary: false
 				};
-				createNewContent = await resolver.createContent(
+			const createNewContent = await resolver.createContent(
 					testingModuleCreateContentArgs
 				);
-				if (createModule instanceof Error) throw new Error();
+			
+				if (createContent instanceof Error) throw new Error();
 				expect(createNewContent).toBeDefined();
 				expect(createNewContent.type).toEqual(
 					testingModuleCreateContentArgs.type
