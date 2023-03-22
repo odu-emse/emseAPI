@@ -399,10 +399,10 @@ describe("Collection", () => {
 					parent: fakelessonID,
 					primary: false
 				};
-			const createNewContent = await resolver.createContent(
+				const createNewContent = await resolver.createContent(
 					testingModuleCreateContentArgs
 				);
-			
+
 				if (createContent instanceof Error) throw new Error();
 				expect(createNewContent).toBeDefined();
 				expect(createNewContent.type).toEqual(
