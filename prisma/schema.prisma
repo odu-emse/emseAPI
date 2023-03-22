@@ -55,7 +55,7 @@ model InstructorProfile {
   phone                         String?
   background                    String?
   researchInterest              String?
-  selectedPapersAndPublications String?
+  selectedPapersAndPublications String[] @default([])
   personalWebsite               String?
   philosophy                    String?
 }

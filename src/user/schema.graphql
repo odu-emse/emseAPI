@@ -69,7 +69,7 @@ type InstructorProfile {
 	"""
 	The papers and publications selected
 	"""
-	selectedPapersAndPublications: String
+	selectedPapersAndPublications:[String!]!
 	"""
 	Personal website of the user
 	"""
@@ -318,7 +318,7 @@ input InstructorProfileInput {
 	"""
 	Selected Papers and Publications of the Instructor
 	"""
-	selectedPapersAndPublications: String
+	selectedPapersAndPublications: [String!]!
 	"""
 	Personal Website of the Instructor
 	"""
