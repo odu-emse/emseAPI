@@ -434,7 +434,7 @@ export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     addCommentToThread(parentThreadID: string, data: ICommentCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
-    upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    upvoteThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;

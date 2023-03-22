@@ -162,7 +162,8 @@ export class CommunityService {
 						id: userID
 					}
 				}
-			}
+			},
+			include: this.threadInclude
 		});
 	}
 
