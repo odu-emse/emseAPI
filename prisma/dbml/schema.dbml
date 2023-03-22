@@ -42,7 +42,7 @@ Table InstructorProfile {
   phone String
   background String
   researchInterest String
-  selectedPapersAndPublications String
+  selectedPapersAndPublications String[] [not null]
   personalWebsite String
   philosophy String
 }
@@ -304,6 +304,7 @@ Enum ContentType {
   DOCX
   VIDEO
 }
+
 Enum FileType {
   DOCX
   DOC
@@ -362,7 +363,7 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Thread.upvoteUserIDs > User.id
 
-Ref: Content.parentID > Lesson.id
+Ref: Content.parentID > Lesson.id [delete: Cascade]
 
 Ref: DirectMessage.authorID > User.id
 
