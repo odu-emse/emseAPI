@@ -10,12 +10,13 @@ import {
 	PlanOfStudy,
 	User,
 	CreateContentArgs,
+	ReadContentArgs,
 	ContentType
 } from "@/types/graphql";
 import {
 	createCollection,
-	createModule,
-	createContent,
+	createModule,     
+	//createContent,
 	createLesson
 } from "../../utils/tests";
 import { test, describe, beforeAll, afterAll, expect } from "vitest";
@@ -53,12 +54,20 @@ describe("Plan services", () => {
 		service = new ProgramService(prisma);
 		resolver = new ProgramResolver(service);
 	});
+	afterAll(async () => {
+		await progResolver.delete(module.id);
+	});
+
+	test("should be defined", () => {
+		expect(service).toBeDefined();
+		expect(resolver).toBeDefined();
+	});
 
 	let testingModuleID;
 	let testingAssignmentID;
 	let testingAssignmentResultID: string;
 	let testingCourseID: string;
-	let createNewContent;
+	//let createNewContent;
 	const progServ: ProgramService = new ProgramService(prisma);
 	const progResolver: ProgramResolver = new ProgramResolver(progServ);
 
@@ -291,6 +300,8 @@ describe("Collection", () => {
 	let prisma: PrismaService;
 	prisma = new PrismaService();
 
+
+
 	const deleteModule = async (id: string) => {
 		return await prisma.module.delete({
 			where: { id }
@@ -313,7 +324,9 @@ describe("Collection", () => {
 	let testingModuleID: string;
 	let testingModuleCreateContentArgs: CreateContentArgs;
 	let createNewContent;
+	//let readNewContent;
 	let fakelessonID;
+	let testingreadContentArgs: ReadContentArgs;
 
 	beforeAll(async () => {
 		service = new ProgramService(prisma);
@@ -345,12 +358,25 @@ describe("Collection", () => {
 			collection: testingCollectionID
 		});
 		fakelessonID = lesson.id;
+
+		testingModuleCreateContentArgs = {
+			type: ContentType.PDF,
+			link: "test",
+			parent: fakelessonID,
+			primary: false
+		};
+		createNewContent = await resolver.createContent(
+			testingModuleCreateContentArgs
+		);
+		
 	});
 	afterAll(async () => {
 		await deleteCollection(testingCollectionID);
 		await deleteModule(testingModuleID);
 		await prisma.$disconnect();
 	});
+
+
 	test("should return an array of collections", async () => {
 		expect(await resolver.collection()).toBeDefined();
 		expect(await resolver.collection()).toBeInstanceOf(Array);
@@ -419,4 +445,35 @@ describe("Collection", () => {
 			});
 		});
 	});
+	describe("Reads", () => {
+		describe("Query.content()", () => {
+			test("should read a particular module", async () => {
+				testingreadContentArgs = {
+					type: ContentType.PDF,
+					link: "test",
+					parent: fakelessonID,
+					primary: false
+				
+				};
+				const content = await resolver.content({
+					primary: false,
+					id: createNewContent.id
+				});
+				expect(content).toBeDefined();
+				expect(typeof content).toBe(typeof []);
+
+
+			test("should read all the modules", async () => {
+				const content = await resolver.content({
+	primary: false
 });
+				expect(content).toBeDefined();
+				expect(typeof content).toBe(typeof []);
+				expect(content[0]).toBeGreaterThanOrEqual(1)
+				});
+				
+			});
+		});
+	});
+});
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
