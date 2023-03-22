@@ -9,12 +9,20 @@ import {
 	Course,
 	PlanOfStudy,
 	User,
-	ContentType,
-
+	ContentType
 } from "@/types/graphql";
-import { createCollection, createModule, createContent,  } from "../../utils/tests";
+import {
+	createCollection,
+	createModule,
+	createContent
+} from "../../utils/tests";
 import { test, describe, beforeAll, afterAll, expect } from "vitest";
-import { createRandomLesson, createRandomQuiz, createRandomContent, createRandomInputContent } from "utils";
+import {
+	createRandomLesson,
+	createRandomQuiz,
+	createRandomContent,
+	createRandomInputContent
+} from "utils";
 import { TcpContext } from "@nestjs/microservices";
 
 interface IAssignment extends Assignment {
@@ -306,7 +314,7 @@ describe("Collection", () => {
 
 	let testingCollectionID: string;
 	let testingModuleID: string;
-	let testingContentID :string;
+	let testingContentID: string;
 	let fakeContent;
 
 	beforeAll(async () => {
@@ -376,8 +384,6 @@ describe("Collection", () => {
 	test("should populate previous and next based on module ID", function () {
 		expect(true).toBe(true);
 	});
-
-	
 });
 describe("Content", () => {
 	let service: ProgramService;
@@ -385,106 +391,70 @@ describe("Content", () => {
 	let prisma: PrismaService;
 	prisma = new PrismaService();
 
-
 	let testingCollectionID: string;
 	let testingModuleID: string;
-	let testingContentID :string;
+	let testingContentID: string;
 	let fakeContent;
 
 	beforeAll(async () => {
 		service = new ProgramService(prisma);
 		resolver = new ProgramResolver(service);
-
-		
 	});
 	afterAll(async () => {
-	
 		await prisma.$disconnect();
 	});
-	
 
-	test("should set first content entry of a lesson as primary content entry", async function(){
+	test("should set first content entry of a lesson as primary content entry", async function () {
 		const coll = await resolver.collection({ id: testingCollectionID });
 		//content
 		expect(coll).toBeDefined();
 		if (coll.length > 0) {
 			coll.map((c) => {
 				c.lessons.map((lesson) => {
-					if(lesson.content.length==1)
-					expect(lesson.content[0].primary).toBe(
-						true
-					);
-					
+					if (lesson.content.length == 1)
+						expect(lesson.content[0].primary).toBe(true);
 				});
 			});
 		}
-
 	});
 	describe("Mutation.updateContent()", async () => {
-		const inputContent= createRandomContent()
-		const DBContent= await resolver.content({
-			parent:inputContent.parentID
-		})
-
-		test("When input-content passed as PRIMARY, content array should update older-primary-content as SECONDARY and passed-input-content as PRIMARY", 
-		
-		
-		
-		
-		async () => {
-			
-           
-		
-			const filteredContentFalse= DBContent.filter(org => org.primary == false)
-			const filteredContentTrue= DBContent.filter(org => org.primary == true)
-			filteredContentTrue.map((contTrue)=>{
-				if(contTrue.id==inputContent.id)
-				{
-					expect(contTrue.primary).toBe(
-						true
-					);
-				}
-				else{
-					expect(contTrue.primary).toBe(
-						false
-					);
-				}
-			 })
-			 filteredContentFalse.map((contFalse)=>{
-				if(contFalse.id==inputContent.id)
-				{
-					expect(contFalse.primary).toBe(
-						true
-					);
-				}
-				else{
-					expect(contFalse.primary).toBe(
-						false
-					);
-				}
-			 })
+		const inputContent = createRandomContent();
+		const DBContent = await resolver.content({
+			parent: inputContent.parentID
 		});
-		test("When input content is passed as secondary, CONTENT ARRAY'S FIRST ELEMENT should get updated to PRIMARY and the rest elements to SECONDARY", 
-		async () => {
-			
-		     DBContent.map((cont)=>{
-				expect(cont.primary).toBe(
-					false
-				);
-			 })
 
-			 expect(DBContent[0].primary).toBe(
-				true
+		test("When input-content passed as PRIMARY, content array should update older-primary-content as SECONDARY and passed-input-content as PRIMARY", async () => {
+			const filteredContentFalse = DBContent.filter(
+				(org) => org.primary == false
 			);
+			const filteredContentTrue = DBContent.filter(
+				(org) => org.primary == true
+			);
+			filteredContentTrue.map((contTrue) => {
+				if (contTrue.id == inputContent.id) {
+					expect(contTrue.primary).toBe(true);
+				} else {
+					expect(contTrue.primary).toBe(false);
+				}
+			});
+			filteredContentFalse.map((contFalse) => {
+				if (contFalse.id == inputContent.id) {
+					expect(contFalse.primary).toBe(true);
+				} else {
+					expect(contFalse.primary).toBe(false);
+				}
+			});
 		});
-		test("If the input content is passed as secondary and if it's 1st element in the database where it seems to be primary, then the input-content should set as TRUE(PRIMARY) ", 
-		 async () => {
-			
-		    if(inputContent.id==DBContent[0].id)
-			{
-				expect(inputContent.primary).toBe(
-					true
-				);
+		test("When input content is passed as secondary, CONTENT ARRAY'S FIRST ELEMENT should get updated to PRIMARY and the rest elements to SECONDARY", async () => {
+			DBContent.map((cont) => {
+				expect(cont.primary).toBe(false);
+			});
+
+			expect(DBContent[0].primary).toBe(true);
+		});
+		test("If the input content is passed as secondary and if it's 1st element in the database where it seems to be primary, then the input-content should set as TRUE(PRIMARY) ", async () => {
+			if (inputContent.id == DBContent[0].id) {
+				expect(inputContent.primary).toBe(true);
 			}
 		});
 	});
