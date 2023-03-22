@@ -501,7 +501,7 @@ input ContentFields {
 	 """
 	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
 	"""
-	primary: Boolean!
+	primary: Boolean
 }
 
 input CreateCollectionArgs {
