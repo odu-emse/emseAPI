@@ -386,10 +386,10 @@ describe("Collection", () => {
 	});
 });
 describe("Content", () => {
-	let service: ProgramService;
-	let resolver: ProgramResolver;
 	let prisma: PrismaService;
 	prisma = new PrismaService();
+	let service = new ProgramService(prisma);
+	const resolver = new ProgramResolver(service);;
 
 	let testingCollectionID: string;
 	let testingModuleID: string;
@@ -397,8 +397,12 @@ describe("Content", () => {
 	let fakeContent;
 
 	beforeAll(async () => {
+<<<<<<< HEAD
 		service = new ProgramService(prisma);
 		resolver = new ProgramResolver(service);
+=======
+		
+>>>>>>> cace1d7 (Requested Changes)
 	});
 	afterAll(async () => {
 		await prisma.$disconnect();
@@ -418,6 +422,7 @@ describe("Content", () => {
 		}
 	});
 	describe("Mutation.updateContent()", async () => {
+<<<<<<< HEAD
 		const inputContent = createRandomContent();
 		const DBContent = await resolver.content({
 			parent: inputContent.parentID
@@ -456,6 +461,71 @@ describe("Content", () => {
 			if (inputContent.id == DBContent[0].id) {
 				expect(inputContent.primary).toBe(true);
 			}
+=======
+		const inputContent= createRandomContent()
+		const DBContent= await resolver.content({parent:inputContent.parentID})
+
+		test("When input-content passed as PRIMARY, content array should update older-primary-content as SECONDARY and passed-input-content as PRIMARY", 
+	
+		async () => {
+	
+			const filteredContentFalse= DBContent.filter(org => org.primary == false)
+			const filteredContentTrue= DBContent.filter(org => org.primary == true)
+			filteredContentTrue.map((contTrue)=>{
+				if(contTrue.id==inputContent.id)
+				{
+					expect(contTrue.primary).toBe(
+						true
+					);
+				}
+				else{
+					expect(contTrue.primary).toBe(
+						false
+					);
+				}
+			 })
+			 filteredContentFalse.map((contFalse)=>{
+				if(contFalse.id==inputContent.id)
+				{
+					expect(contFalse.primary).toBe(
+						true
+					);
+				}
+				else{
+					expect(contFalse.primary).toBe(
+						false
+					);
+				}
+			 })
+		});
+		test("When input content is passed as secondary, CONTENT ARRAY'S FIRST ELEMENT should get updated to PRIMARY and the rest elements to SECONDARY", 
+		async () => {
+			DBContent.map((dbcont)=>{
+				expect(dbcont[0].primary).toBe(
+					true
+				);
+			 })
+			
+		    const filteredContent= DBContent.slice(1)
+			filteredContent.map((cont)=>{
+				expect(cont.primary).toBe(
+					false
+				);
+			 })
+			
+		});
+		test("If the input content is passed as secondary and if it's 1st element in the database where it seems to be primary, then the input-content should set as TRUE(PRIMARY) ", 
+		 async () => {
+			DBContent.map((dbcont)=>{
+				if(inputContent.id==dbcont[0].id)
+				{
+					expect(inputContent.primary).toBe(
+						true
+					);
+				}
+			 })
+		  
+>>>>>>> cace1d7 (Requested Changes)
 		});
 	});
 });
