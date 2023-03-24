@@ -14,6 +14,8 @@ Table User {
   dob DateTime [default: `now()`]
   isAdmin Boolean [not null, default: false]
   isActive Boolean [not null, default: false]
+  biography String
+  phoneNumber String
   social Social
   plan PlanOfStudy
   tokens Token [not null]

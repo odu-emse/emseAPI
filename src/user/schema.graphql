@@ -88,7 +88,7 @@ type User {
 	"""
 	User OpenID
 	"""
-	openID: ID!
+	openID: String!
 	"""
 	User Email
 	"""
@@ -161,6 +161,14 @@ type User {
 	The list of threads that the user has created
 	"""
 	createdThreads: [Thread!]
+	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
 }
 
 type Error {
@@ -207,6 +215,14 @@ input NewUser {
 	middle name of new user
 	"""
 	middleName: String!
+	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
 	
 }
 
@@ -227,6 +243,8 @@ input UserFields {
 	feedback: String
 	assignmentGraded: String
 	instructorProfile: String
+	biography: String
+	phoneNumber: String
 }
 
 input SocialFields {
@@ -243,11 +261,11 @@ input UpdateUser {
 	"""
 	The document's unique ID field
 	"""
-	id: String!
+	id: ID!
 	"""
 	Google's Open ID field that is unique to each Google Account
 	"""
-	openID: ID!
+	openID: String!
 	"""
 	The email of the update user
 	"""
@@ -284,6 +302,14 @@ input UpdateUser {
 	instructor of the Update user
 	"""
 	instructorProfile: InstructorProfileInput
+	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
 }
 
 input InstructorProfileInput {

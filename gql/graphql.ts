@@ -360,6 +360,8 @@ export interface NewUser {
     firstName: string;
     lastName: string;
     middleName: string;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
 }
 
 export interface UserFields {
@@ -379,6 +381,8 @@ export interface UserFields {
     feedback?: Nullable<string>;
     assignmentGraded?: Nullable<string>;
     instructorProfile?: Nullable<string>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
 }
 
 export interface SocialFields {
@@ -403,6 +407,8 @@ export interface UpdateUser {
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
     instructorProfile?: Nullable<InstructorProfileInput>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
 }
 
 export interface InstructorProfileInput {
@@ -780,6 +786,8 @@ export interface User {
     watchedThreads?: Nullable<Thread[]>;
     watchedThreadIDs?: Nullable<string[]>;
     createdThreads?: Nullable<Thread[]>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
 }
 
 export interface Token {

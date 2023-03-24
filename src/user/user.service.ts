@@ -55,7 +55,9 @@ export class UserService {
 			plan,
 			feedback,
 			assignmentGraded,
-			instructorProfile
+			instructorProfile,
+			biography,
+			phoneNumber
 		} = input;
 
 		const where = Prisma.validator<Prisma.UserWhereInput>()({
@@ -114,7 +116,10 @@ export class UserService {
 				instructorProfile: {
 					id: instructorProfile
 				}
-			})
+			}),
+			...(biography && { biography }),
+			...(phoneNumber && { phoneNumber }),
+			
 		});
 
 		let result:
@@ -229,7 +234,9 @@ export class UserService {
 			dob,
 			isAdmin,
 			isActive,
-			instructorProfile
+			instructorProfile,
+			biography,
+			phoneNumber
 		} = params;
 
 		const res = await this.prisma.user.count({
@@ -242,7 +249,7 @@ export class UserService {
 			throw new Error(`The user with ${openID}, does not exist`);
 		}
 
-		if (instructorProfile !== null) {
+		if (instructorProfile && id!== null) {
 			try {
 				await this.prisma.instructorProfile.update({
 					where: {
@@ -267,6 +274,8 @@ export class UserService {
 			...(firstName && { firstName }),
 			...(lastName && { lastName }),
 			...(middleName && { middleName }),
+			...(biography && { biography }),
+			...(phoneNumber && { phoneNumber }),
 			...(dob && {
 				dob: dob.toISOString()
 			}),

@@ -25,6 +25,8 @@ model User {
   dob        DateTime? @default(now())
   isAdmin    Boolean   @default(false)
   isActive   Boolean   @default(false)
+  biography  String?
+  phoneNumber String?
 
   // Relation fields
   social             Social?            @relation(name: "social")

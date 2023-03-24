@@ -10,6 +10,7 @@ import {
 } from "@/types/graphql";
 import { shuffle } from "../../utils/tests";
 import { test, describe, afterAll, expect } from "vitest";
+import { IsPhoneNumber } from "class-validator";
 
 describe("Account services", () => {
 	let service: UserService;
@@ -111,7 +112,9 @@ describe("Account services", () => {
 				firstName: "Testing",
 				lastName: "User",
 				middleName: "Jest",
-				dob: new Date()
+				dob: new Date(),
+				biography: "test-1234",
+				phoneNumber: "12345678"
 			};
 			const updateUser = await resolver.update(updatedUserObj);
 			expect(updateUser).toBeDefined();
@@ -125,6 +128,8 @@ describe("Account services", () => {
 			expect(updateUser.dob).toBeDefined();
 			expect(updateUser.dob).toStrictEqual(updatedUserObj.dob);
 			expect(updateUser.isAdmin).toBeDefined();
+			expect(updateUser.biography).toStrictEqual(updatedUserObj.biography);
+			expect(updateUser.phoneNumber).toStrictEqual(updatedUserObj.phoneNumber);
 		});
 		// TODO: test deletion of user after creation of user is supported
 		// test("should return deleteUser", async () => {});
@@ -162,7 +167,7 @@ describe("Account services", () => {
 				researchInterest: "Technology",
 				selectedPapersAndPublications: "",
 				personalWebsite: "https://odu.edu/emse",
-				philosophy: "I  teach people"
+				philosophy: "I  teach people",
 			};
 			const input: UpdateUser = {
 				id: userDocumentID,
