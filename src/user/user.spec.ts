@@ -167,7 +167,7 @@ describe("Account services", () => {
 				researchInterest: "Technology",
 				selectedPapersAndPublications: "",
 				personalWebsite: "https://odu.edu/emse",
-				philosophy: "I  teach people",
+				philosophy: "I  teach people"
 			};
 			const input: UpdateUser = {
 				id: userDocumentID,

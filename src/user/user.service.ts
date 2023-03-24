@@ -118,8 +118,7 @@ export class UserService {
 				}
 			}),
 			...(biography && { biography }),
-			...(phoneNumber && { phoneNumber }),
-			
+			...(phoneNumber && { phoneNumber })
 		});
 
 		let result:
@@ -249,7 +248,7 @@ export class UserService {
 			throw new Error(`The user with ${openID}, does not exist`);
 		}
 
-		if (instructorProfile && id!== null) {
+		if (instructorProfile && id !== null) {
 			try {
 				await this.prisma.instructorProfile.update({
 					where: {
