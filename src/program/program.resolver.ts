@@ -153,13 +153,10 @@ export class ProgramResolver {
 	) {
 		return await this.programService.updateAssignment(id, args);
 	}
-	
+
 	//Adds objective to the Module
 	@Mutation("addObjectives")
-	async addObjectives(
-		@Args("id") id: string,
-		@Args("input") data: string[]
-	) {
+	async addObjectives(@Args("id") id: string, @Args("input") data: string[]) {
 		return await this.programService.addObjectives(id, data);
 	}
 

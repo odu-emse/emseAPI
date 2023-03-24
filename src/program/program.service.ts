@@ -333,7 +333,7 @@ export class ProgramService {
 			contentType,
 			acceptedTypes,
 			module,
-			assignmentResult,
+			assignmentResult
 		} = params;
 
 		const payload = {
@@ -522,7 +522,7 @@ export class ProgramService {
 		name,
 		lessons,
 		positionIndex,
-		moduleID,
+		moduleID
 	}: CreateCollectionArgs) {
 		const create = Prisma.validator<Prisma.CollectionCreateInput>()({
 			name,
@@ -726,25 +726,19 @@ export class ProgramService {
 		});
 	}
 
-	
-  
-	async addObjectives(
-		id: string,
-		data: string[],
-	) {
-		const module=await this.prisma.module.update({
+	async addObjectives(id: string, data: string[]) {
+		const module = await this.prisma.module.update({
 			where: {
-				id: id,
+				id: id
 			},
-			data:{
-				objectives:{
-					set:data,
-				},
-			},
+			data: {
+				objectives: {
+					set: data
+				}
+			}
 		});
 		return module;
 	}
-
 
 	/// Create a module feedback and link it to the user and module
 	async addModuleFeedback(
