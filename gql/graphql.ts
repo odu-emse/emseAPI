@@ -494,6 +494,7 @@ export interface IMutation {
     updateUserSocial(userId: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
     deleteSocial(id: string): Nullable<Social> | Promise<Nullable<Social>>;
     deleteUserSocial(userId: string): Nullable<Social> | Promise<Nullable<Social>>;
+    addObjectives(id: string): Nullable<Social> | Promise<Nullable<Social>>;
 }
 
 export interface IQuery {

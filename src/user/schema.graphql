@@ -168,8 +168,8 @@ type Error {
 	Error message
 	"""
 	message: String
-	
 }
+
 type Token {
 	"""
 	token id
@@ -206,8 +206,7 @@ input NewUser {
 	"""
 	middle name of new user
 	"""
-	middleName: String!
-	
+	middleName: String!	
 }
 
 input UserFields {
@@ -407,6 +406,10 @@ type Mutation {
 	Deletes User social
 	"""
 	deleteUserSocial(userId: ID!): Social
+	"""
+	Adds Objectives to the ModuleFeedback
+	"""
+	addObjectives(id: ID!): Social
 }
 
 scalar Date
