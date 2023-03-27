@@ -67,7 +67,7 @@ describe("Community", () => {
 	user = new UserService(prisma);
 
 	afterAll(async () => {
-		deletableThreadIDs.map(async id => {
+		deletableThreadIDs.map(async (id) => {
 			await deleteThread(id);
 		});
 		await deleteUser(accountID);
@@ -77,7 +77,7 @@ describe("Community", () => {
 	test("should be defined", () => {
 		expect(resolver).toBeDefined();
 	});
-	describe("Param based querying", function() {
+	describe("Param based querying", function () {
 		test("should return all threads if input is null", async () => {
 			const threads = await resolver.thread();
 			expect(threads).toBeInstanceOf(Array);
@@ -124,7 +124,7 @@ describe("Community", () => {
 			if (!thread || thread instanceof Error)
 				return new Error("Thread not found");
 			else {
-				thread.map(thread => {
+				thread.map((thread) => {
 					expect(thread.id).toBe(testingThreadID);
 				});
 			}
@@ -156,14 +156,13 @@ describe("Community", () => {
 			}
 		});
 	});
-	describe("Create", function() {
+	describe("Create", function () {
 		test("should create a thread with author", async () => {
 			const account = await createUser();
 			if ("id" in account) {
 				const thread = await createThread({
 					title: "This is a test thread",
-					body:
-						"We are inserting this data from a test case, and this data should have been removed after the test case has finished.",
+					body: "We are inserting this data from a test case, and this data should have been removed after the test case has finished.",
 					author: account.id
 				});
 				if (thread instanceof Error) return new Error(thread.message);
@@ -202,14 +201,13 @@ describe("Community", () => {
 		});
 		test("should not create comment if parent thread is not given", async () => {
 			const falseComment = await resolver.createThread({
-				body:
-					"This comment should not be created as the parent thread is not given",
+				body: "This comment should not be created as the parent thread is not given",
 				author: accountID
 			});
 			expect(falseComment instanceof Error).toBe(true);
 		});
 	});
-	describe("Update", function() {
+	describe("Update", function () {
 		test("should increase vote count by 1", async () => {
 			const voteNum = await resolver.thread({ id: threadID });
 			if (voteNum instanceof Error)
@@ -239,7 +237,7 @@ describe("Community", () => {
 			});
 			expect(thread instanceof Error).toBe(true);
 		});
-		test("should update timestamp when comment is added to parent thread", async function() {
+		test("should update timestamp when comment is added to parent thread", async function () {
 			const thread = await resolver.thread({ id: threadID });
 			if (thread instanceof Error) return new Error(thread.message);
 			else {
@@ -259,7 +257,7 @@ describe("Community", () => {
 			}
 		});
 	});
-	describe("Delete", function() {
+	describe("Delete", function () {
 		test("should delete the thread", async () => {
 			const tempThread = await createThread({
 				title: "This is testing the delete thread function",
