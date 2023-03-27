@@ -25,7 +25,6 @@ import {
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import { idText } from "typescript";
 
 @Injectable()
 export class ProgramService {
@@ -510,7 +509,7 @@ export class ProgramService {
 			...(id && { id }),
 			...(type && { type }),
 			...(link && { link }),
-			parent: { id: parent ? parent : undefined }
+			...(parent && { parent: { id: parent } })
 		});
 
 		return this.prisma.content.findMany({

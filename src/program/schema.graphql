@@ -956,7 +956,7 @@ type Mutation {
 	"""
 	Update a content Record
 	"""
-	updateContent(input: ContentFields!): Content
+	updateContent(input: ContentFields!): [Content!]
 
 	"""
 	Delete an existing content record

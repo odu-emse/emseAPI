@@ -267,55 +267,72 @@ export class ProgramResolver {
 	}
 
 	@Mutation("updateContent")
-	async updateContent(@Args("input") input: ContentFields) {
-		let id = input.id;
-		console.log(id);
-		console.log(input.primary);
+	async updateContent(
+		@Args("input") input: Omit<ContentFields, "id"> & { id: string }
+	) {
+		// since we need the ID to update a content, we need to make sure it's there
+		if (!input.id) throw new Error("ID field is required");
+		// we get the content based on the ID passed in, in order to get the parent lesson ID
 		const original = await this.programService.content({
-			parent: input.parent,
-			primary: input.primary
+			id: input.id
 		});
-		console.log(original);
+		// we get the lesson based on the parent ID of the content
+		const lesson = await this.programService.lesson({
+			id: original[0].parentID
+		});
+
+		// we make a copy of the content array, so we can manipulate it
+		let updatedContentArray = [...lesson[0].content];
+
+		// if the change is to make the content primary, we need to make sure there's only one primary content
 		if (input.primary == true) {
-			await original.map(async (org) => {
+			// we map through the array and make all the content secondary
+			updatedContentArray = updatedContentArray.map((org) => {
 				if (org.primary == true) {
 					org.primary = false;
-					const result = await this.programService.updateContent({
-						id: org.id,
-						primary: false
-					});
-					const result1 = await this.programService.updateContent({
-						primary: input.primary,
-						id: input.id
-					});
 				}
-			});
-		} else if (input.primary == false) {
-			//      if (original.filter(org => org.primary == true).length == 0) {
-
-			await original.map(async (org) => {
-				if (org.primary == true) {
-					org.primary = false;
-					await this.programService.updateContent({
-						id: org.id,
-						primary: org.primary
-					});
-				}
+				return org;
 			});
 
-			if (input.id == original[0].id) {
-				input.primary = true;
-			}
-			original[0].primary = true;
-			const data = await this.programService.updateContent({
-				id: original[0].id,
-				primary: original[0].primary
+			// we map through the array and make the content that was passed in primary
+			updatedContentArray = updatedContentArray.map((org) => {
+				if (org.id == input.id) {
+					org.primary = true;
+				}
+				return org;
 			});
-			console.log(data);
 		}
-		console.log(original);
-		console.log(input);
-		return await this.programService.updateContent(input);
+
+		// if the change is to make the content secondary, we need to make sure there's at least one primary content
+		// if there is no primary content, we make the first content in the array primary
+		if (input.primary == false) {
+			// we map through the array and make the content that was passed in secondary
+			updatedContentArray = updatedContentArray.map((org) => {
+				if (org.id == input.id) {
+					org.primary = false;
+				}
+				// we make all the content secondary
+				if (org.primary == true) {
+					org.primary = false;
+				}
+				return org;
+			});
+			// we make the first content in the array primary
+			updatedContentArray[0].primary = true;
+		}
+
+		// we map through the array and update the content using the service
+		const res = updatedContentArray.map(async (content) => {
+			return await this.programService.updateContent({
+				id: content.id,
+				primary: content.primary
+			});
+		});
+
+		// we resolve the promise and return the result
+		return Promise.all(res)
+			.then((res) => res)
+			.catch((err) => new Error(err));
 	}
 	@Mutation("deleteContent")
 	async deleteContent(@Args("contentID") contentID: string) {
