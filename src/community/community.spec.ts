@@ -220,9 +220,9 @@ describe("Community", () => {
 			);
 		});
 		test("should decrease vote count by 1", async () => {
-            const voteNum = await resolver.thread({ id: threadID });
-            if (voteNum instanceof Error)
-                throw new Error("Error in upvoteThread test case");
+			const voteNum = await resolver.thread({ id: threadID });
+			if (voteNum instanceof Error)
+				throw new Error("Error in upvoteThread test case");
 
             const upVoteNum = await resolver.upvoteThread(threadID, accountID);
 			// stuck at upvoted status, attempting to upvote a upvoted thread (self) for a second time will not increment the count
@@ -230,15 +230,19 @@ describe("Community", () => {
                 false
             );
 			// expect accountID inside of the upvotes Users array
-            expect(upVoteNum.upvotes.some(upvote => upvote.id === accountID)).toBe(true);
+			expect(upVoteNum.upvotes.some((upvote) => upvote.id === accountID)).toBe(
+				true
+			);
 			// resolver on downvoteThread function
 			const downVoteNum = await resolver.downvoteThread(threadID, accountID);
 			// after downvote mutation, size of upvotes array should decrement by 1
 			expect(downVoteNum.upvotes.length === voteNum[0].upvotes.length - 1).toBe(
-                true
-            );
+				true
+			);
 			// accountID should no longer be found in the updated Array (after downvote)
-            expect(downVoteNum.upvotes.some(upvote => upvote.id === accountID)).toBe(false);
+			expect(
+				downVoteNum.upvotes.some((upvote) => upvote.id === accountID)
+			).toBe(false);
 		});
 		test("should update the thread with the given data", async () => {
 			const thread = await resolver.updateThread(threadID, {
