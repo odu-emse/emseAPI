@@ -169,14 +169,14 @@ export class CommunityService {
 				id
 			},
 			include: {
-				upvotes: true,
+				upvotes: true
 			}
 		});
 
 		if (!thread) {
-			throw new Error('Thread not found');
+			throw new Error("Thread not found");
 		}
-		
+
 		return this.prisma.thread.update({
 			where: {
 				id
@@ -202,15 +202,15 @@ export class CommunityService {
 		});
 
 		if (!thread) {
-			throw new Error('Thread not found');
+			throw new Error("Thread not found");
 		}
 
 		// Check if the userID is in the upvotes array
-		const userUpvoted = thread.upvotes.some(upvote => upvote.id === userID);
+		const userUpvoted = thread.upvotes.some((upvote) => upvote.id === userID);
 
 		// If the userID is not in the upvotes array, return an error
 		if (!userUpvoted) {
-			throw new Error('User has not upvoted this thread');
+			throw new Error("User has not upvoted this thread");
 		}
 
 		// Update the thread, removing the userID from the upvotes array
@@ -223,7 +223,7 @@ export class CommunityService {
 					disconnect: {
 						id: userID
 					}
-				},
+				}
 			},
 			include: this.threadInclude
 		});
