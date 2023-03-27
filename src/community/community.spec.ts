@@ -226,9 +226,9 @@ describe("Community", () => {
 
             const upVoteNum = await resolver.upvoteThread(threadID, accountID);
 			// stuck at upvoted status, attempting to upvote a upvoted thread (self) for a second time will not increment the count
-            expect(upVoteNum.upvotes.length === voteNum[0].upvotes.length + 1).toBe(
-                false
-            );
+			expect(upVoteNum.upvotes.length === voteNum[0].upvotes.length + 1).toBe(
+				false
+			);
 			// expect accountID inside of the upvotes Users array
 			expect(upVoteNum.upvotes.some((upvote) => upvote.id === accountID)).toBe(
 				true
