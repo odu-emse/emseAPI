@@ -130,6 +130,8 @@ type Mutation {
 
     upvoteThread(id: ID!, userID: ID!): Thread
 
+    downvoteThread(id: ID!, userID: ID!): Thread
+
     updateThread(id: ID!, data: IThreadCreateInput!): Thread
 
     deleteThread(id: ID!): Thread
