@@ -66,6 +66,11 @@ export class CommunityResolver {
 		return await this.communityService.upvoteThread(id, userID);
 	}
 
+	@Mutation("downvoteThread")
+	async downvoteThread(@Args("id") id: string, @Args("userID") userID: string) {
+		return await this.communityService.downvoteThread(id, userID);
+	}
+
 	@Mutation("updateThread")
 	async updateThread(
 		@Args("id") id: string,
