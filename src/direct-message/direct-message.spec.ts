@@ -67,7 +67,7 @@ describe("DirectMessage", function() {
 			);
 			if (sendGroupMessage instanceof Error)
 				throw new Error("Failed to send message to Group");
-
+				
 			expect(sendGroupMessage).toBe(true);
 		});
 
@@ -87,7 +87,6 @@ describe("DirectMessage", function() {
 		test("should return an array of groups the user is connected to with the passed in receiverID ", async function() {
 			const readGroups = await resolver.groups(receiverID);
 			if (readGroups instanceof Error) throw new Error("Failed to find group");
-
 			expect(readGroups).toBeDefined();
 			expect(readGroups.length).toBeGreaterThanOrEqual(0);
 
@@ -106,7 +105,7 @@ describe("DirectMessage", function() {
 				const isAuthorInGroup = groupMemberID.map(id => {
 					return messageAuthorID.includes(id);
 				});
-				
+
 				expect(isAuthorInGroup).toBe(true);
 			});
 		});
@@ -130,9 +129,7 @@ describe("DirectMessage", function() {
 			if (newSubGroupMessage instanceof Error)
 				throw new Error("Failed to find any subscribed group messages");
 		});
-	});
-
-	
+	});	
 });
 
 const initializeTest = () => {
