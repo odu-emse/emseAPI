@@ -151,7 +151,35 @@ export class ProgramService {
 					student: true
 				}
 			},
-			module: true,
+			module: {
+				include: {
+					collections: {
+						include: {
+							lessons: {
+								include: {
+									threads: {
+										include: {
+											author: true,
+											comments: {
+												include: {
+													author: true,
+													comments: {
+														include: {
+															author: true,
+															comments: true
+														}
+													}
+												}
+											},
+											upvotes: true
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
 			progress: true
 		});
 
@@ -432,8 +460,12 @@ export class ProgramService {
 			...(role && { role })
 		};
 
-		payload["moduleId"] = module ? module : undefined;
-		payload["planId"] = plan ? plan : undefined;
+		payload["moduleId"] = module
+			? module
+			: (undefined as Prisma.ModuleEnrollmentWhereInput["moduleId"]);
+		payload["planID"] = plan
+			? plan
+			: (undefined as Prisma.ModuleEnrollmentWhereInput["planID"]);
 
 		const where = Prisma.validator<Prisma.ModuleEnrollmentWhereInput>()({
 			...payload
