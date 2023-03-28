@@ -34,7 +34,15 @@ export class CommunityService {
 			}
 		},
 		parentThread: true,
-		parentLesson: true,
+		parentLesson: {
+			include: {
+				collection: {
+					include: {
+						module: true
+					}
+				}
+			}
+		},
 		usersWatching: true,
 		author: true,
 		upvotes: true
