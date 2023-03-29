@@ -417,7 +417,7 @@ export interface InstructorProfileInput {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<string[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }
@@ -770,7 +770,7 @@ export interface InstructorProfile {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<string[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }

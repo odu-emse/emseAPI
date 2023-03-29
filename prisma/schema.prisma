@@ -45,9 +45,9 @@ model User {
 }
 
 model InstructorProfile {
-  id                            String  @id @default(auto()) @map("_id") @db.ObjectId
-  account                       User?   @relation(fields: [accountID], references: [id])
-  accountID                     String? @unique @db.ObjectId
+  id                            String   @id @default(auto()) @map("_id") @db.ObjectId
+  account                       User?    @relation(fields: [accountID], references: [id])
+  accountID                     String?  @unique @db.ObjectId
   title                         String?
   officeLocation                String?
   officeHours                   String?
@@ -55,7 +55,7 @@ model InstructorProfile {
   phone                         String?
   background                    String?
   researchInterest              String?
-  selectedPapersAndPublications String?
+  selectedPapersAndPublications String[] @default([])
   personalWebsite               String?
   philosophy                    String?
 }
