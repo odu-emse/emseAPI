@@ -156,11 +156,10 @@ describe("Progress", function () {
 			const result = await resolver.waiveModule({
 				enrollmentID: enrollment.id
 			});
-			if (result instanceof Error || typeof result === "undefined")
-				throw new Error("Progress not waived.");
+			if (result instanceof Error) throw new Error("Progress not waived.");
 			else {
-				expect(result.completed).toBe(true);
-				expect(result.status).toBe(100);
+				expect(result?.completed).toBe(true);
+				expect(result?.status).toBe(100);
 			}
 		});
 	});
