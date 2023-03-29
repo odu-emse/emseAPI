@@ -2,13 +2,15 @@ import { PlanOfStudyResolver } from "@/pos";
 import { ProgramResolver } from "@/program";
 import {
 	CreateAnswer,
-	CreateCollectionArgs, CreateQuestion, CreateQuiz,
-	EnrollmentStatus, LessonInput,
-	UserRole, CreateContentArgs, ContentType
+	CreateCollectionArgs,
+	CreateQuestion,
+	CreateQuiz,
+	EnrollmentStatus,
+	LessonInput,
+	UserRole
 } from "@/types/graphql";
-import {QuizResolver} from "@/quiz/quiz.resolver";
-import {Answer, Collection, Content, Lesson, Question, Quiz} from "@prisma/client";
-
+import { QuizResolver } from "@/quiz/quiz.resolver";
+import { Answer, Lesson, Question, Quiz } from "@prisma/client";
 
 export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -16,7 +18,6 @@ export const shuffle = (str: string) =>
 export const pickRandomFromArray = (arr: any[]): number => {
 	return Math.floor(Math.random() * arr.length);
 };
-
 
 export const createPlan = async (
 	resolver: PlanOfStudyResolver,
@@ -57,14 +58,12 @@ export const createLesson = async (
 ) => {
 	const data: LessonInput = {
 		name: config.name,
-		collection: config.collectionID,
-
-
-	}
-	const lesson = await resolver.createLesson({...data});
-	if(data) return lesson;
+		collection: config.collectionID
+	};
+	const lesson = await resolver.createLesson({ ...data });
+	if (data) return lesson;
 	else return new Error("Failed to create Lesson");
-}
+};
 
 export const createEnrollment = async (
 	resolver: ProgramResolver,
@@ -89,23 +88,19 @@ export const createCollection = async (
 	else return new Error("Failed to create collection");
 };
 
-
-export const createQuiz = async (
-	resolver: QuizResolver,
-	input: Quiz
-) => {
+export const createQuiz = async (resolver: QuizResolver, input: Quiz) => {
 	const data: CreateQuiz = {
 		totalPoints: input.totalPoints,
 		dueAt: input.dueAt,
 		timeLimit: input.timeLimit,
 		numQuestions: input.numQuestions,
 		minScore: input.minScore,
-		parentLesson: input.parentLessonID,
-	}
+		parentLesson: input.parentLessonID
+	};
 	const quiz = await resolver.createQuiz(data);
 	if (quiz) return quiz;
 	else return new Error("Failed to create Quiz");
-}
+};
 
 export const createQuestion = async (
 	resolver: QuizResolver,
@@ -117,40 +112,21 @@ export const createQuestion = async (
 		text: input.text,
 		points: input.points,
 		parentQuiz: input.parentID
-	}
+	};
 	const question = await resolver.createQuestion(data);
-	if(question) return question;
+	if (question) return question;
 	else return new Error("Failed to create question");
-}
+};
 
-export const createAnswer = async (
-	resolver: QuizResolver,
-	input: Answer
-) => {
+export const createAnswer = async (resolver: QuizResolver, input: Answer) => {
 	const data: CreateAnswer = {
 		text: input.text,
 		correct: input.correct,
 		weight: input.weight,
 		index: input.index,
 		parentQuestion: input.parentQuestionID
-	}
+	};
 	const answer = await resolver.createAnswer(data);
 	if (answer) return answer;
 	else return new Error("Failed to create answer");
-}
-
-export const createContent = async (
-	resolver: ProgramResolver,
-	input: Content
-) => {
-	const data: CreateContentArgs = {
-		type: ContentType.PDF,
-		link: input.link,
-		parent: input.parent,
-		primary: input.primary
-	}
-	const answer = await resolver.createContent(data);
-	if (answer) return answer;
-	else return new Error("Failed to create answer");
-}
-
+};
