@@ -25,7 +25,6 @@ import {
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import { idText } from "typescript";
 
 @Injectable()
 export class ProgramService {
@@ -281,7 +280,7 @@ export class ProgramService {
 		if (feedback) {
 			payload["feedback"] = {
 				some: {
-					id: feedback!
+					id: feedback
 				}
 			} as Prisma.ModuleWhereInput["feedback"];
 		}
@@ -598,7 +597,8 @@ export class ProgramService {
 			description,
 			duration,
 			numSlides,
-			keywords
+			keywords,
+			objectives
 		} = data;
 
 		const args = Prisma.validator<Prisma.ModuleUpdateArgs>()({
@@ -611,7 +611,8 @@ export class ProgramService {
 				...(description && { description }),
 				...(duration && { duration }),
 				...(numSlides && { numSlides }),
-				...(keywords && { keywords })
+				...(keywords && { keywords }),
+				...(objectives && { objectives })
 			}
 		});
 
