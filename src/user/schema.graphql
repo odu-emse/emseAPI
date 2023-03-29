@@ -122,6 +122,14 @@ type User {
 	"""
 	isActive: Boolean
 	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
+	"""
 	user dob
 	"""
 	dob: Date
@@ -207,7 +215,14 @@ input NewUser {
 	middle name of new user
 	"""
 	middleName: String!
-	
+	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
 }
 
 input UserFields {
@@ -221,12 +236,13 @@ input UserFields {
 	middleName: String
 	isAdmin: Boolean
 	isActive: Boolean
+	biography: String
+	phoneNumber: String
 	dob: Date
 	social: String
 	plan: String
 	feedback: String
 	assignmentGraded: String
-	instructorProfile: String
 }
 
 input SocialFields {
@@ -243,11 +259,11 @@ input UpdateUser {
 	"""
 	The document's unique ID field
 	"""
-	id: String!
+	id: ID!
 	"""
 	Google's Open ID field that is unique to each Google Account
 	"""
-	openID: ID!
+	openID: String!
 	"""
 	The email of the update user
 	"""
@@ -268,6 +284,14 @@ input UpdateUser {
 	middle name of the update user
 	"""
 	middleName: String
+	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
 	"""
 	dob of the update user
 	"""

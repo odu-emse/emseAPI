@@ -14,17 +14,19 @@ generator dbml {
 }
 
 model User {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  openID     String    @unique
-  email      String
-  picURL     String?
-  createdAt  DateTime  @default(now())
-  firstName  String
-  lastName   String
-  middleName String?
-  dob        DateTime? @default(now())
-  isAdmin    Boolean   @default(false)
-  isActive   Boolean   @default(false)
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  openID      String    @unique
+  email       String
+  picURL      String?
+  createdAt   DateTime  @default(now())
+  firstName   String
+  lastName    String
+  middleName  String?
+  dob         DateTime? @default(now())
+  isAdmin     Boolean   @default(false)
+  isActive    Boolean   @default(false)
+  biography   String?
+  phoneNumber String?
 
   // Relation fields
   social             Social?            @relation(name: "social")

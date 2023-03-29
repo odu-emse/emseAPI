@@ -55,7 +55,8 @@ export class UserService {
 			plan,
 			feedback,
 			assignmentGraded,
-			instructorProfile
+			biography,
+			phoneNumber
 		} = input;
 
 		const where = Prisma.validator<Prisma.UserWhereInput>()({
@@ -110,11 +111,8 @@ export class UserService {
 					}
 				}
 			}),
-			...(instructorProfile && {
-				instructorProfile: {
-					id: instructorProfile
-				}
-			})
+			...(biography && { biography }),
+			...(phoneNumber && { phoneNumber })
 		});
 
 		let result:
@@ -229,7 +227,8 @@ export class UserService {
 			dob,
 			isAdmin,
 			isActive,
-			instructorProfile
+			biography,
+			phoneNumber
 		} = params;
 
 		const res = await this.prisma.user.count({
@@ -267,6 +266,8 @@ export class UserService {
 			...(firstName && { firstName }),
 			...(lastName && { lastName }),
 			...(middleName && { middleName }),
+			...(biography && { biography }),
+			...(phoneNumber && { phoneNumber }),
 			...(dob && {
 				dob: dob.toISOString()
 			}),
