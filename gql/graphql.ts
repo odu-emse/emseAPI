@@ -79,7 +79,7 @@ export interface ContentFields {
     type?: Nullable<ContentType>;
     link?: Nullable<string>;
     parent?: Nullable<string>;
-    primary: boolean;
+    primary?: Nullable<boolean>;
 }
 
 export interface CreateCollectionArgs {

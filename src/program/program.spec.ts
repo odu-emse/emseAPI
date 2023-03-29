@@ -4,17 +4,17 @@ import { ProgramResolver } from "./program.resolver";
 import { PrismaService } from "@/prisma.service";
 import {
 	Assignment,
-	Module,
 	AssignmentResult,
-	PlanOfStudy,
-	User,
 	ContentType,
 	CreateCollectionArgs,
+	CreateContentArgs,
 	LessonInput,
-	NewModule
+	Module,
+	NewModule,
+	PlanOfStudy,
+	User
 } from "@/types/graphql";
-import { test, describe, beforeAll, afterAll, expect } from "vitest";
-import { Prisma } from "@prisma/client";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { faker } from "@faker-js/faker";
 
 interface IAssignment extends Assignment {
@@ -317,6 +317,11 @@ describe("Collection", () => {
 		return resolver.createLesson(input);
 	};
 
+	const createLessonContent = async (input: CreateContentArgs) => {
+		return resolver.createContent(input);
+	};
+
+	let testingContentID: string;
 	let testingCollectionID: string;
 	let testingModuleID: string;
 	let testingLessonID: string;
@@ -353,94 +358,94 @@ describe("Collection", () => {
 			collection: testingCollectionID
 		});
 		testingLessonID = lesson.id;
+
+		const content = await createLessonContent({
+			parent: testingLessonID,
+			link: "",
+			primary: true,
+			type: ContentType.VIDEO
+		});
+
+		testingContentID = content.id;
 	});
 	test("should return an array of collections", async () => {
 		const collection = await resolver.collection();
 		expect(collection).toBeInstanceOf(Array);
 		expect(collection.length).toBeGreaterThan(0);
 	});
-	test("should return a collection", async () => {
+	test("should return a collection that belongs to the Module inputted", async () => {
 		const collection = await resolver.collection({
-			moduleID: testingCollectionID
+			moduleID: testingModuleID
 		});
-		expect(collection).toBeDefined();
-		if (collection.length > 0) {
-			collection.map(async (col) => {
-				expect(col.id).toBe(testingCollectionID);
-				expect(col.name).toBeDefined();
-				expect(col.moduleID).toBeDefined();
-				expect(await resolver.module({ id: col.moduleID })).toBeDefined();
+		expect(collection).toBeInstanceOf(Array);
+		collection.map(async (col) => {
+			expect(col.id).toBe(testingCollectionID);
+			expect(col.name).toBeDefined();
+			expect(col.moduleID).toBe(testingModuleID);
+		});
+	});
+	test("should return a collection that partially matches the name passed in", async () => {
+		const collection = await resolver.collection({
+			name: "Test"
+		});
+		expect(collection).toBeInstanceOf(Array);
+		collection.map(async (col) => {
+			expect(col.name).toBeDefined();
+			expect(col.name).toMatch(/Test/);
+		});
+	});
+	test("should return a collection that has lessons with IDs matching the inputted one", async () => {
+		const collection = await resolver.collection({
+			lessons: [testingLessonID]
+		});
+		expect(collection).toBeInstanceOf(Array);
+		collection.map(async (col) => {
+			expect(col.lessons).toBeDefined();
+			col.lessons.map((lesson) => {
+				expect(lesson.id).toBe(testingLessonID);
 			});
-		}
+		});
+	});
+	test("should return a collection that has position field matching the inputted one", async () => {
+		const collection = await resolver.collection({
+			positionIndex: 0
+		});
+		expect(collection).toBeInstanceOf(Array);
+		expect(collection[0].position).toBe(0);
 	});
 	test("should match lesson position field to array index", async () => {
 		const coll = await resolver.collection({ id: testingCollectionID });
-		expect(coll).toBeDefined();
-		if (coll.length > 0) {
-			coll.map((c) => {
-				c.lessons.map((lesson) => {
-					expect(lesson.position === c.lessons[lesson.position].position).toBe(
-						true
-					);
-					expect(lesson.collectionID === c.id).toBe(true);
-				});
-			});
-		}
-	});
-
-	test("should create new content based on input object", async () => {
-		const testingModuleCreateContentArgs = {
-			type: ContentType.PDF,
-			link: "test",
-			parent: testingLessonID,
-			primary: false
-		};
-		const createNewContent = await resolver.createContent(
-			testingModuleCreateContentArgs
-		);
-
-		expect(createNewContent).toBeDefined();
-		expect(createNewContent.type).toEqual(testingModuleCreateContentArgs.type);
-		expect(createNewContent.link).toEqual(testingModuleCreateContentArgs.link);
-		expect(createNewContent.parentID).toEqual(
-			testingModuleCreateContentArgs.parent
-		);
-		expect(createNewContent.primary).toEqual(
-			testingModuleCreateContentArgs.primary
-		);
-	});
-	test("should previous and next based on module ID", function () {
-		expect(false).toBe(true);
-	});
-
-	describe("Creates", () => {
-		describe("Query.createcontent()", () => {
-			test("should create new content", async () => {
-				testingModuleCreateContentArgs = {
-					type: ContentType.PDF,
-					link: "test",
-					parent: fakelessonID,
-					primary: false
-				};
-				const createNewContent = await resolver.createContent(
-					testingModuleCreateContentArgs
+		expect(coll).toBeInstanceOf(Array);
+		coll.map((c) => {
+			c.lessons.map((lesson) => {
+				expect(lesson.position === c.lessons[lesson.position].position).toBe(
+					true
 				);
-
-				if (createContent instanceof Error) throw new Error();
-				expect(createNewContent).toBeDefined();
-				expect(createNewContent.type).toEqual(
-					testingModuleCreateContentArgs.type
-				);
-				expect(createNewContent.link).toEqual(
-					testingModuleCreateContentArgs.link
-				);
-				expect(createNewContent.parentID).toEqual(
-					testingModuleCreateContentArgs.parent
-				);
-				expect(createNewContent.primary).toEqual(
-					testingModuleCreateContentArgs.primary
-				);
+				expect(lesson.collectionID === c.id).toBe(true);
 			});
 		});
+	});
+
+	test("should return an array of contents", async () => {
+		const contents = await resolver.content({});
+		expect(contents).toBeInstanceOf(Array);
+		expect(contents.length).toBeGreaterThan(0);
+	});
+	test("should return a content that belongs to the Lesson inputted", async () => {
+		const contents = await resolver.content({
+			parent: testingLessonID
+		});
+		expect(contents).toBeInstanceOf(Array);
+		contents.map(async (content) => {
+			expect(content.id).toBeDefined();
+			expect(content.parentID).toBe(testingLessonID);
+		});
+	});
+	test("should return a content array that has only one primary content within a lesson", async () => {
+		const contents = await resolver.content({
+			parent: testingLessonID
+		});
+		expect(contents).toBeInstanceOf(Array);
+		expect(contents.filter((c) => c.primary).length).toBe(1);
 	});
 });

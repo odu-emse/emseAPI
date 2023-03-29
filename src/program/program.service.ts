@@ -31,6 +31,10 @@ import { idText } from "typescript";
 export class ProgramService {
 	constructor(private prisma: PrismaService) {}
 
+	private contentInclude = Prisma.validator<Prisma.ContentInclude>()({
+		parent: true
+	});
+
 	private assignmentInclude = Prisma.validator<Prisma.AssignmentInclude>()({
 		module: true,
 		assignmentResults: {
@@ -443,7 +447,7 @@ export class ProgramService {
 
 	async collection(params: CollectionFields | null) {
 		if (!params) {
-			return await this.prisma.collection.findMany({
+			return this.prisma.collection.findMany({
 				include: this.collectionInclude
 			});
 		}
@@ -458,7 +462,11 @@ export class ProgramService {
 				}
 			}),
 			...(moduleID && { moduleID }),
-			...(positionIndex && { position: positionIndex })
+			...(positionIndex && {
+				position: {
+					equals: positionIndex
+				}
+			})
 		});
 
 		// loop out of lessons and check with and
@@ -514,7 +522,8 @@ export class ProgramService {
 		});
 
 		return this.prisma.content.findMany({
-			where
+			where,
+			include: this.contentInclude
 		});
 	}
 
@@ -1065,7 +1074,8 @@ export class ProgramService {
 		});
 
 		return this.prisma.content.create({
-			data
+			data,
+			include: this.contentInclude
 		});
 	}
 
@@ -1084,7 +1094,8 @@ export class ProgramService {
 				...(type && { type }),
 				...(link && { link }),
 				parent: parent ? { connect: { id: parent } } : undefined
-			}
+			},
+			include: this.contentInclude
 		});
 
 		return this.prisma.content.update(data);
