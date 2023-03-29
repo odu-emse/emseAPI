@@ -485,7 +485,7 @@ export interface IMutation {
     deleteQuiz(id: string): Quiz | Promise<Quiz>;
     createQuizInstance(quizID: string): QuizInstance | Promise<QuizInstance>;
     deleteQuizInstance(id: string): QuizInstance | Promise<QuizInstance>;
-    createQuestion(input?: Nullable<CreateQuestion>): Question[] | Promise<Question[]>;
+    createQuestion(input?: Nullable<CreateQuestion>): Question | Promise<Question>;
     updateQuestion(id: string, values: UpdateQuestion): Question[] | Promise<Question[]>;
     deleteQuestion(id: string): Question | Promise<Question>;
     createAnswer(input: CreateAnswer): Answer | Promise<Answer>;
