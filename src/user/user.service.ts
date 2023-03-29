@@ -24,7 +24,17 @@ export class UserService {
 			include: {
 				modules: {
 					include: {
-						module: true
+						module: {
+							include: {
+								parentModules: true,
+								members: true,
+								feedback: true,
+								subModules: true,
+								course: true,
+								assignments: true,
+								collections: true
+							}
+						}
 					}
 				}
 			}
