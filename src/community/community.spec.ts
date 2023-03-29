@@ -119,7 +119,6 @@ describe("Community", () => {
 			const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 			expect(thread instanceof Error).toBe(true);
 		});
-
 		test("should return the threads requested by ID", async () => {
 			const thread = await resolver.thread({ id: testingThreadID });
 			if (!thread || thread instanceof Error)
@@ -127,6 +126,32 @@ describe("Community", () => {
 			else {
 				thread.map((thread) => {
 					expect(thread.id).toBe(testingThreadID);
+				});
+			}
+		});
+		test("should return comments 3 levels deep", async () => {
+			const threads = await resolver.thread({ id: testingThreadID });
+			if (!threads || threads instanceof Error)
+				return new Error("Thread not found");
+			else {
+				threads.map((thread) => {
+					thread.comments.map((l1_comment) => {
+						expect(l1_comment).toHaveProperty("body");
+						expect(l1_comment).toHaveProperty("author");
+						if (Array.isArray(l1_comment.comments)) {
+							l1_comment.comments.map((l2_comment) => {
+								expect(l2_comment).toHaveProperty("body");
+								expect(l2_comment).toHaveProperty("author");
+
+								if (Array.isArray(l2_comment.comments)) {
+									l2_comment.comments.map((l3_comment) => {
+										expect(l3_comment).toHaveProperty("body");
+										expect(l3_comment).toHaveProperty("author");
+									});
+								}
+							});
+						}
+					});
 				});
 			}
 		});
@@ -188,11 +213,11 @@ describe("Community", () => {
 			if (voteNum instanceof Error)
 				throw new Error("Error in upvoteThread test case");
 
-			const upVoteNum = await resolver.upvoteThread(accountID, threadID);
+			const upVoteNum = await resolver.upvoteThread(threadID, accountID);
 
-			expect(
-				upVoteNum[0].upvotes.length === voteNum[0].upvotes.length + 1
-			).toBe(true);
+			expect(upVoteNum.upvotes.length === voteNum[0].upvotes.length + 1).toBe(
+				true
+			);
 		});
 		test("should update the thread with the given data", async () => {
 			const thread = await resolver.updateThread(threadID, {

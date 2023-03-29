@@ -8,6 +8,13 @@ enum EnrollmentStatus {
 	ACTIVE
 	INACTIVE
 }
+enum ContentType {
+PDF
+DOC
+DOCX
+VIDEO
+}
+
 
 enum FileType {
 	DOCX
@@ -370,7 +377,7 @@ type Content {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String!
+	type: ContentType!
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -381,6 +388,12 @@ type Content {
 	The lesson that this content belongs to.
 	"""
 	parent: Lesson!
+
+    """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
+
 }
 
 type Error {
@@ -447,7 +460,7 @@ input CreateContentArgs {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String!
+	type: ContentType!
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -458,6 +471,11 @@ input CreateContentArgs {
 	The lesson that this content belongs to.
 	"""
 	parent: ID!
+
+	 """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
 }
 
 input ContentFields {
@@ -469,7 +487,7 @@ input ContentFields {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String
+	type: ContentType
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -480,6 +498,10 @@ input ContentFields {
 	The lesson that this content belongs to.
 	"""
 	parent: ID
+	 """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
 }
 
 input CreateCollectionArgs {

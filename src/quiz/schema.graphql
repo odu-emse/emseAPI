@@ -28,13 +28,32 @@ type Quiz {
     """
     parentLesson: Lesson!
     """
-    The questions in this quiz
+    The possible questions and variants of for this quiz
+    """
+    questionPool: [Question!]!
+    """
+    The list of actual quiz instances students are taking
+    """
+    instances: [QuizInstance!]!
+}
+
+type QuizInstance {
+    """
+    The document ID for this QuizInstance
+    """
+    id: ID!
+    """
+    The quiz template this is an instance of
+    """
+    quiz: Quiz!
+    """
+    The list of questions in this instance of a quiz. One variant for each question number will be selected
     """
     questions: [Question!]!
     """
-    Submitted results to this quiz
+    The submission for this instance
     """
-    quizResults: [Quiz]
+    quizResult: QuizResult!
 }
 
 type Question {
@@ -66,6 +85,10 @@ type Question {
     The parent Quiz of this question
     """
     parent: Quiz!
+    """
+    The quiz instances that this question/variant is used in
+    """
+    instances: [QuizInstance!]!
 }
 
 type Answer {
@@ -111,13 +134,17 @@ type QuizResult {
     """
     answers: [String!]!
     """
+    The time and date that this result was submitted at.
+    """
+    submittedAt: Date
+    """
     The plan of study of the user who took the quiz
     """
     student: PlanOfStudy!
     """
     The quiz this result is for. This field relation is immutable to protect the grading algorithm
     """
-    quiz: Quiz!
+    quizInstance: QuizInstance!
 }
 
 input QuizFields {
@@ -151,6 +178,17 @@ input QuizFields {
     parentLesson: ID
 }
 
+input QuizInstanceFields {
+    """
+    The document id of a quiz instance
+    """
+    id: ID
+    """
+    The quiz that an instance is derived from
+    """
+    quiz: ID
+}
+
 input QuestionFields {
     """
     The document ID of the question
@@ -161,21 +199,21 @@ input QuestionFields {
     """
     number: Int
     """
-    The variant of the question number that this question is
+    The variant (unique to question number) of a question
     """
     variant: Int
     """
-    The text of the question (the readable question itself)
+    The text of a question (the readable question itself)
     """
     text: String
     """
-    The amount of points this question is worth
+    The amount of points a question is worth
     """
     points: Float
     """
-    The pool this question belongs to
+    The Quiz that a question belongs to
     """
-    parentPool: ID
+    parent: ID
 }
 
 input AnswerFields {
@@ -219,9 +257,9 @@ input QuizResultFields {
     """
     student: ID
     """
-    The quiz this result is for
+    The quiz instance that this is a submission for.
     """
-    quiz: ID
+    quizInstance: ID
 }
 
 type Query {
@@ -229,6 +267,11 @@ type Query {
     Fetch a Quiz by any of its parameters. an empty object will return all quizzes and a single id will return a single quiz
     """
     quiz(args: QuizFields!): [Quiz!]!
+    """
+    Fetch a single or multiple instances of a quiz by any of its paramters. An empty object will return all instances.
+    Giving only this parent quiz id will give all instances of a particular quiz.
+    """
+    quizInstance(args: QuizInstanceFields!): [QuizInstance!]!
     """
     Fetch a Question by any of its parameters. An empty object as the input parameter will return all Questions, an ID will retrieve an array with just a single Question.
     If a only a pool ID is provided than all questions in that pool will be returned.
@@ -404,13 +447,13 @@ input QuizSubmission {
     """
     student: ID!
     """
-    The quiz being submitted
+    The quiz Instance this is a submission for.
     """
-    quiz: ID!
+    quizInstance: ID!
     """
     The list of answers that were provided for this quiz
     """
-    answers: [String!]!
+    answers: [ID!]!
 }
 
 # TODO: Update documentation for update mutations
@@ -427,6 +470,16 @@ type Mutation {
     Delete a quiz record given its document ID
     """
     deleteQuiz(id: ID!): Quiz!
+    """
+    Create a new instance of a quiz. Give just the ID of the parent quiz.
+    This will randomly select the correct number of questions using random variants of each question
+    """
+    createQuizInstance(quizID: ID!): QuizInstance!
+    """
+    Delete an existing quiz instance given its document ID.
+    This will not delete the related quiz result.
+    """
+    deleteQuizInstance(id: ID!): QuizInstance!
     """
     Create a new question. This new question must be associated with a question pool to be created
     """

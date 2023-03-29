@@ -18,6 +18,13 @@ export enum EnrollmentStatus {
     INACTIVE = "INACTIVE"
 }
 
+export enum ContentType {
+    PDF = "PDF",
+    DOC = "DOC",
+    DOCX = "DOCX",
+    VIDEO = "VIDEO"
+}
+
 export enum FileType {
     DOCX = "DOCX",
     DOC = "DOC",
@@ -61,16 +68,18 @@ export interface PlanFields {
 }
 
 export interface CreateContentArgs {
-    type: string;
+    type: ContentType;
     link: string;
     parent: string;
+    primary: boolean;
 }
 
 export interface ContentFields {
     id?: Nullable<string>;
-    type?: Nullable<string>;
+    type?: Nullable<ContentType>;
     link?: Nullable<string>;
     parent?: Nullable<string>;
+    primary: boolean;
 }
 
 export interface CreateCollectionArgs {
@@ -262,13 +271,18 @@ export interface QuizFields {
     parentLesson?: Nullable<string>;
 }
 
+export interface QuizInstanceFields {
+    id?: Nullable<string>;
+    quiz?: Nullable<string>;
+}
+
 export interface QuestionFields {
     id?: Nullable<string>;
     number?: Nullable<number>;
     variant?: Nullable<number>;
     text?: Nullable<string>;
     points?: Nullable<number>;
-    parentPool?: Nullable<string>;
+    parent?: Nullable<string>;
 }
 
 export interface AnswerFields {
@@ -284,7 +298,7 @@ export interface QuizResultFields {
     id?: Nullable<string>;
     score?: Nullable<number>;
     student?: Nullable<string>;
-    quiz?: Nullable<string>;
+    quizInstance?: Nullable<string>;
 }
 
 export interface CreateQuiz {
@@ -339,7 +353,7 @@ export interface UpdateAnswer {
 
 export interface QuizSubmission {
     student: string;
-    quiz: string;
+    quizInstance: string;
     answers: string[];
 }
 
@@ -425,7 +439,7 @@ export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     addCommentToThread(parentThreadID: string, data: ICommentCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
-    upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    upvoteThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
@@ -468,6 +482,8 @@ export interface IMutation {
     createQuiz(input?: Nullable<CreateQuiz>): Quiz | Promise<Quiz>;
     updateQuiz(id: string, values: UpdateQuiz): Quiz[] | Promise<Quiz[]>;
     deleteQuiz(id: string): Quiz | Promise<Quiz>;
+    createQuizInstance(quizID: string): QuizInstance | Promise<QuizInstance>;
+    deleteQuizInstance(id: string): QuizInstance | Promise<QuizInstance>;
     createQuestion(input?: Nullable<CreateQuestion>): Question[] | Promise<Question[]>;
     updateQuestion(id: string, values: UpdateQuestion): Question[] | Promise<Question[]>;
     deleteQuestion(id: string): Question | Promise<Question>;
@@ -508,6 +524,7 @@ export interface IQuery {
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
+    quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
     question(args: QuestionFields): Question[] | Promise<Question[]>;
     answer(args: AnswerFields): Answer[] | Promise<Answer[]>;
     quizResult(args: QuizResultFields): QuizResult[] | Promise<QuizResult[]>;
@@ -666,9 +683,10 @@ export interface Lesson {
 
 export interface Content {
     id: string;
-    type: string;
+    type: ContentType;
     link: string;
     parent: Lesson;
+    primary: boolean;
 }
 
 export interface Error {
@@ -692,8 +710,15 @@ export interface Quiz {
     numQuestions: number;
     minScore: number;
     parentLesson: Lesson;
+    questionPool: Question[];
+    instances: QuizInstance[];
+}
+
+export interface QuizInstance {
+    id: string;
+    quiz: Quiz;
     questions: Question[];
-    quizResults?: Nullable<Nullable<Quiz>[]>;
+    quizResult: QuizResult;
 }
 
 export interface Question {
@@ -704,6 +729,7 @@ export interface Question {
     points: number;
     answers: Answer[];
     parent: Quiz;
+    instances: QuizInstance[];
 }
 
 export interface Answer {
@@ -719,8 +745,9 @@ export interface QuizResult {
     id: string;
     score: number;
     answers: string[];
+    submittedAt?: Nullable<Date>;
     student: PlanOfStudy;
-    quiz: Quiz;
+    quizInstance: QuizInstance;
 }
 
 export interface Social {
