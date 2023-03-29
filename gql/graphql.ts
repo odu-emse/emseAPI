@@ -423,7 +423,7 @@ export interface InstructorProfileInput {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string[]>;
+    selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }
@@ -502,6 +502,7 @@ export interface IMutation {
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
+    updateInstructorProfile(id: string, input: InstructorProfileInput): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
     addSocial(user: string, input?: Nullable<SocialInput>): Social | Promise<Social>;
     updateSocial(id: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
     updateUserSocial(userId: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
@@ -776,7 +777,7 @@ export interface InstructorProfile {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string[]>;
+    selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }

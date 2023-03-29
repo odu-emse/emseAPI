@@ -69,7 +69,7 @@ type InstructorProfile {
 	"""
 	The papers and publications selected
 	"""
-	selectedPapersAndPublications: [String!]
+	selectedPapersAndPublications: [String]
 	"""
 	Personal website of the user
 	"""
@@ -305,9 +305,9 @@ input UpdateUser {
 	"""
 	isActive: Boolean
 	"""
-	instructor of the Update user
+	The ID of the instructor profile that needs to be updated
 	"""
-	instructorProfile: InstructorProfileInput
+	instructorProfile: ID
 }
 
 input InstructorProfileInput {
@@ -342,7 +342,7 @@ input InstructorProfileInput {
 	"""
 	Selected Papers and Publications of the Instructor
 	"""
-	selectedPapersAndPublications: [String!]
+	selectedPapersAndPublications: [String]
 	"""
 	Personal Website of the Instructor
 	"""
@@ -410,7 +410,14 @@ type Mutation {
 	Updates user
 	"""
 	updateUser(input: UpdateUser): User
-
+	"""
+	Updates the instructor profile of the user given the user ID
+	"""
+	updateInstructorProfile(
+		"""
+		The unique ID of the user that relates to the instructor profile
+		"""
+		id: ID!, input: InstructorProfileInput!): InstructorProfile
 	"""
 	adds Social to the user
 	"""

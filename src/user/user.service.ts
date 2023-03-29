@@ -213,9 +213,7 @@ export class UserService {
 	}
 
 	// Update a user
-	async updateUser(
-		params: UpdateUser
-	): Promise<User & { instructorProfile: InstructorProfile | null }> {
+	async updateUser(params: UpdateUser): Promise<User> {
 		const {
 			id,
 			openID,
@@ -239,21 +237,6 @@ export class UserService {
 
 		if (res === 0) {
 			throw new Error(`The user with ${openID}, does not exist`);
-		}
-
-		if (instructorProfile !== null) {
-			try {
-				await this.prisma.instructorProfile.update({
-					where: {
-						accountID: id
-					},
-					data: {
-						...instructorProfile
-					}
-				});
-			} catch (error: any) {
-				throw new Error(error.message);
-			}
 		}
 
 		if (!moment(dob).isValid()) {
@@ -368,6 +351,23 @@ export class UserService {
 		return this.prisma.social.deleteMany({
 			where: {
 				accountID: userId
+			}
+		});
+	}
+
+	async updateInstructorProfile(
+		id: string,
+		input: Prisma.InstructorProfileUpdateInput
+	) {
+		return this.prisma.instructorProfile.update({
+			where: {
+				accountID: id
+			},
+			data: {
+				...input
+			},
+			include: {
+				account: true
 			}
 		});
 	}

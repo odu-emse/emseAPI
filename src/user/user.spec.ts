@@ -46,7 +46,7 @@ describe("Account services", () => {
 		phone: "757-555-5555",
 		background: "I am a professor",
 		researchInterest: "I am a professor",
-		selectedPapersAndPublications: "",
+		selectedPapersAndPublications: [""],
 		personalWebsite: "https://odu.edu/emse",
 		philosophy: "I  teach people"
 	};
@@ -164,7 +164,7 @@ describe("Account services", () => {
 				background:
 					"I'm a very experienced professor, and I only use books from 50 years ago.",
 				researchInterest: "Technology",
-				selectedPapersAndPublications: "",
+				selectedPapersAndPublications: [""],
 				personalWebsite: "https://odu.edu/emse",
 				philosophy: "I  teach people"
 			};
