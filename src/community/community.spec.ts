@@ -224,7 +224,7 @@ describe("Community", () => {
 			if (voteNum instanceof Error)
 				throw new Error("Error in upvoteThread test case");
 
-            const upVoteNum = await resolver.upvoteThread(threadID, accountID);
+			const upVoteNum = await resolver.upvoteThread(threadID, accountID);
 			// stuck at upvoted status, attempting to upvote a upvoted thread (self) for a second time will not increment the count
 			expect(upVoteNum.upvotes.length === voteNum[0].upvotes.length + 1).toBe(
 				false
