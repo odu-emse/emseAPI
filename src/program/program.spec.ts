@@ -409,4 +409,38 @@ describe("Collection", () => {
 			testingModuleCreateContentArgs.primary
 		);
 	});
+	test("should previous and next based on module ID", function () {
+		expect(false).toBe(true);
+	});
+
+	describe("Creates", () => {
+		describe("Query.createcontent()", () => {
+			test("should create new content", async () => {
+				testingModuleCreateContentArgs = {
+					type: ContentType.PDF,
+					link: "test",
+					parent: fakelessonID,
+					primary: false
+				};
+				const createNewContent = await resolver.createContent(
+					testingModuleCreateContentArgs
+				);
+
+				if (createContent instanceof Error) throw new Error();
+				expect(createNewContent).toBeDefined();
+				expect(createNewContent.type).toEqual(
+					testingModuleCreateContentArgs.type
+				);
+				expect(createNewContent.link).toEqual(
+					testingModuleCreateContentArgs.link
+				);
+				expect(createNewContent.parentID).toEqual(
+					testingModuleCreateContentArgs.parent
+				);
+				expect(createNewContent.primary).toEqual(
+					testingModuleCreateContentArgs.primary
+				);
+			});
+		});
+	});
 });
