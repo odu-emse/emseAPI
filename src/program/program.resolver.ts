@@ -25,6 +25,8 @@ import { ProgramService } from "./program.service";
 import { Prisma, UserRole } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
+import { isRequiredInputField } from "graphql";
+import { async } from "rxjs/internal/scheduler/async";
 
 @Resolver()
 // @UseGuards(AuthGuard)
@@ -266,9 +268,47 @@ export class ProgramResolver {
 
 	@Mutation("updateContent")
 	async updateContent(@Args("input") input: ContentFields) {
+		let id = input.id;
+		const original = await this.programService.content({
+			parent: input.parent
+		});
+		if (input.primary == true) {
+			await original.map(async (org) => {
+				if (org.primary == true) {
+					org.primary = false;
+					await this.programService.updateContent({
+						id: org.id,
+						primary: org.primary
+					});
+					await this.programService.updateContent({
+						primary: input.primary,
+						id: input.id
+					});
+				}
+			});
+		} else if (input.primary == false) {
+			//		if (original.filter(org => org.primary == true).length == 0) {
+
+			await original.map(async (org) => {
+				if (org.primary == true) {
+					org.primary = false;
+					await this.programService.updateContent({
+						id: org.id,
+						primary: org.primary
+					});
+				}
+			});
+			original[0].primary = true;
+			await this.programService.updateContent({
+				id: original[0].id,
+				primary: original[0].primary
+			});
+		}
+
+		//}
+
 		return await this.programService.updateContent(input);
 	}
-
 	@Mutation("deleteContent")
 	async deleteContent(@Args("contentID") contentID: string) {
 		return await this.programService.deleteContent(contentID);
