@@ -655,7 +655,7 @@ input UpdateModule {
 	"""
 	The objective to be added to the module
 	"""
-	objectives: String
+	objectives: [String!]
 }
 
 input NewAssignment {

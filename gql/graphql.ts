@@ -181,7 +181,7 @@ export interface UpdateModule {
     duration?: Nullable<number>;
     numSlides?: Nullable<number>;
     keywords?: Nullable<string[]>;
-    objectives?: Nullable<string>;
+    objectives?: Nullable<string[]>;
 }
 
 export interface NewAssignment {
