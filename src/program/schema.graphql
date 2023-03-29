@@ -862,6 +862,10 @@ type Mutation {
 	"""
 	addAssignment(input: NewAssignment): Assignment!
 	"""
+	Adds Objectives to a Module while retaining the old ones
+	"""
+	addObjectives(id: ID!, input: [String!]): Module
+	"""
 	Deletes assignments in Module
 	"""
 	deleteAssignment(module: ID!, id: ID!): Module

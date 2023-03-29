@@ -1109,4 +1109,29 @@ export class ProgramService {
 			}
 		});
 	}
+
+	async addObjectives(id: string, input: string[]) {
+		const module = await this.prisma.module.findUnique({
+			where: {
+				id
+			}
+		});
+
+		if (module === null) {
+			throw new Error("Module not found");
+		}
+
+		const objectives = [...module.objectives, input] as Array<string>;
+
+		return this.prisma.module.update({
+			where: {
+				id: id
+			},
+			data: {
+				objectives: {
+					set: objectives
+				}
+			}
+		});
+	}
 }

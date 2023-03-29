@@ -460,6 +460,7 @@ export interface IMutation {
     addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
     addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
+    addObjectives(id: string, input?: Nullable<string[]>): Nullable<Module> | Promise<Nullable<Module>>;
     deleteAssignment(module: string, id: string): Nullable<Module> | Promise<Nullable<Module>>;
     updateAssignment(id: string, input?: Nullable<AssignmentInput>): Nullable<Assignment> | Promise<Nullable<Assignment>>;
     addModuleFeedback(moduleId: string, userId: string, input?: Nullable<ModuleFeedbackInput>): Nullable<Module> | Promise<Nullable<Module>>;
