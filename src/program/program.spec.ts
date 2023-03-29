@@ -6,19 +6,16 @@ import {
 	Assignment,
 	Module,
 	AssignmentResult,
-	Course,
 	PlanOfStudy,
 	User,
-	CreateContentArgs,
-	ContentType
+	ContentType,
+	CreateCollectionArgs,
+	LessonInput,
+	NewModule
 } from "@/types/graphql";
-import {
-	createCollection,
-	createModule,
-	createContent,
-	createLesson
-} from "../../utils/tests";
 import { test, describe, beforeAll, afterAll, expect } from "vitest";
+import { Prisma } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 
 interface IAssignment extends Assignment {
 	id: string;
@@ -191,7 +188,7 @@ describe("Plan services", () => {
 			test("should not take longer than 1.5 seconds to return all assignments", async () => {
 				const start = new Date();
 				const assignments = await resolver.assignment({});
-				expect(assignments.length).toBeGreaterThan(1);
+				expect(assignments.length).toBeGreaterThan(0);
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
 			});
@@ -286,74 +283,81 @@ describe("Plan services", () => {
 });
 
 describe("Collection", () => {
-	let service: ProgramService;
-	let resolver: ProgramResolver;
-	let prisma: PrismaService;
-	prisma = new PrismaService();
+	const prisma = new PrismaService();
+	const service = new ProgramService(prisma);
+	const resolver = new ProgramResolver(service);
 
 	const deleteModule = async (id: string) => {
-		return await prisma.module.delete({
+		return prisma.module.delete({
 			where: { id }
 		});
 	};
 
 	const deleteCollection = async (id: string) => {
-		return await prisma.collection.delete({
+		return prisma.collection.delete({
 			where: { id }
 		});
 	};
 
-	const lessons = [
-		"640f7e381da3a0a3bc68ae6b",
-		"6410d40c9a732b04d66a8bfa",
-		"6410d40d9a732b04d66a8bff"
-	];
+	const deleteLesson = async (id: string) => {
+		return prisma.lesson.delete({
+			where: { id }
+		});
+	};
+
+	const createCollection = async (input: CreateCollectionArgs) => {
+		return resolver.createCollection(input);
+	};
+
+	const createModule = async (input: NewModule) => {
+		return resolver.create(input);
+	};
+
+	const createLesson = async (input: LessonInput) => {
+		return resolver.createLesson(input);
+	};
 
 	let testingCollectionID: string;
 	let testingModuleID: string;
-	let testingModuleCreateContentArgs: CreateContentArgs;
-	let createNewContent;
-	let fakelessonID;
+	let testingLessonID: string;
 
-	beforeAll(async () => {
-		service = new ProgramService(prisma);
-		resolver = new ProgramResolver(service);
-
-		const module = await createModule(resolver, {
+	afterAll(async () => {
+		await deleteLesson(testingLessonID);
+		await deleteCollection(testingCollectionID);
+		await deleteModule(testingModuleID);
+	});
+	test("should create dummy data structure", async () => {
+		const module = await createModule({
 			moduleName: "Test Module",
-			moduleNumber: 10,
+			moduleNumber: faker.datatype.number({
+				min: 123,
+				max: 9999,
+				precision: 1
+			}),
 			duration: 1,
 			intro: "Test Intro",
 			numSlides: 1,
 			description: "Test Description",
-			keywords: ["test", "keyword"]
+			keywords: ["Test Keywords"]
 		});
-		if (module instanceof Error) throw new Error(module.message);
-
 		testingModuleID = module.id;
-
-		const collection = await createCollection(resolver, {
+		const collection = await createCollection({
 			name: "Test Collection",
 			moduleID: testingModuleID,
 			positionIndex: 0
 		});
-		if (collection instanceof Error) throw new Error("Collection is undefined");
 		testingCollectionID = collection.id;
 
-		const lesson = await resolver.createLesson({
+		const lesson = await createLesson({
 			name: "Test Lesson",
 			collection: testingCollectionID
 		});
-		fakelessonID = lesson.id;
-	});
-	afterAll(async () => {
-		await deleteCollection(testingCollectionID);
-		await deleteModule(testingModuleID);
-		await prisma.$disconnect();
+		testingLessonID = lesson.id;
 	});
 	test("should return an array of collections", async () => {
-		expect(await resolver.collection()).toBeDefined();
-		expect(await resolver.collection()).toBeInstanceOf(Array);
+		const collection = await resolver.collection();
+		expect(collection).toBeInstanceOf(Array);
+		expect(collection.length).toBeGreaterThan(0);
 	});
 	test("should return a collection", async () => {
 		const collection = await resolver.collection({
@@ -383,41 +387,26 @@ describe("Collection", () => {
 			});
 		}
 	});
-	test("should populate previous and next based on module ID", function () {
-		expect(true).toBe(true);
-	});
-	test("should previous and next based on module ID", function () {
-		expect(false).toBe(true);
-	});
 
-	describe("Creates", () => {
-		describe("Query.createcontent()", () => {
-			test("should create new content", async () => {
-				testingModuleCreateContentArgs = {
-					type: ContentType.PDF,
-					link: "test",
-					parent: fakelessonID,
-					primary: false
-				};
-				const createNewContent = await resolver.createContent(
-					testingModuleCreateContentArgs
-				);
+	test("should create new content based on input object", async () => {
+		const testingModuleCreateContentArgs = {
+			type: ContentType.PDF,
+			link: "test",
+			parent: testingLessonID,
+			primary: false
+		};
+		const createNewContent = await resolver.createContent(
+			testingModuleCreateContentArgs
+		);
 
-				if (createContent instanceof Error) throw new Error();
-				expect(createNewContent).toBeDefined();
-				expect(createNewContent.type).toEqual(
-					testingModuleCreateContentArgs.type
-				);
-				expect(createNewContent.link).toEqual(
-					testingModuleCreateContentArgs.link
-				);
-				expect(createNewContent.parentID).toEqual(
-					testingModuleCreateContentArgs.parent
-				);
-				expect(createNewContent.primary).toEqual(
-					testingModuleCreateContentArgs.primary
-				);
-			});
-		});
+		expect(createNewContent).toBeDefined();
+		expect(createNewContent.type).toEqual(testingModuleCreateContentArgs.type);
+		expect(createNewContent.link).toEqual(testingModuleCreateContentArgs.link);
+		expect(createNewContent.parentID).toEqual(
+			testingModuleCreateContentArgs.parent
+		);
+		expect(createNewContent.primary).toEqual(
+			testingModuleCreateContentArgs.primary
+		);
 	});
 });

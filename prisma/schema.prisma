@@ -98,7 +98,7 @@ model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  moduleIDs String[] @db.ObjectId
+  moduleIDs String[] @default([]) @db.ObjectId
   module    Module[] @relation(fields: [moduleIDs], references: [id])
 }
 
