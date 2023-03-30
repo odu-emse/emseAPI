@@ -549,7 +549,7 @@ export class ProgramService {
 			...(id && { id }),
 			...(type && { type }),
 			...(link && { link }),
-			parent: { id: parent ? parent : undefined }
+			...(parent && { parent: { id: parent } })
 		});
 
 		return this.prisma.content.findMany({
@@ -1113,7 +1113,7 @@ export class ProgramService {
 	}
 
 	async updateContent(input: ContentFields) {
-		const { id, type, link, parent } = input;
+		const { id, type, link, parent, primary } = input;
 
 		if (!id) {
 			throw new Error("Id not provided to updateContent");
@@ -1126,7 +1126,8 @@ export class ProgramService {
 			data: {
 				...(type && { type }),
 				...(link && { link }),
-				parent: parent ? { connect: { id: parent } } : undefined
+				parent: parent ? { connect: { id: parent } } : undefined,
+				primary: primary !== null ? primary : undefined
 			},
 			include: this.contentInclude
 		});
