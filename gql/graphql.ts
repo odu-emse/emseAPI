@@ -79,7 +79,7 @@ export interface ContentFields {
     type?: Nullable<ContentType>;
     link?: Nullable<string>;
     parent?: Nullable<string>;
-    primary: boolean;
+    primary?: Nullable<boolean>;
 }
 
 export interface CreateCollectionArgs {
@@ -181,6 +181,7 @@ export interface UpdateModule {
     duration?: Nullable<number>;
     numSlides?: Nullable<number>;
     keywords?: Nullable<string[]>;
+    objectives?: Nullable<string[]>;
 }
 
 export interface NewAssignment {
@@ -364,6 +365,8 @@ export interface NewUser {
     firstName: string;
     lastName: string;
     middleName: string;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
 }
 
 export interface UserFields {
@@ -377,12 +380,13 @@ export interface UserFields {
     middleName?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
     dob?: Nullable<Date>;
     social?: Nullable<string>;
     plan?: Nullable<string>;
     feedback?: Nullable<string>;
     assignmentGraded?: Nullable<string>;
-    instructorProfile?: Nullable<string>;
 }
 
 export interface SocialFields {
@@ -403,10 +407,12 @@ export interface UpdateUser {
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
     dob?: Nullable<Date>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
-    instructorProfile?: Nullable<InstructorProfileInput>;
+    instructorProfile?: Nullable<string>;
 }
 
 export interface InstructorProfileInput {
@@ -417,7 +423,7 @@ export interface InstructorProfileInput {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }
@@ -455,6 +461,7 @@ export interface IMutation {
     addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
     addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
+    addObjectives(id: string, input?: Nullable<string[]>): Nullable<Module> | Promise<Nullable<Module>>;
     deleteAssignment(module: string, id: string): Nullable<Module> | Promise<Nullable<Module>>;
     updateAssignment(id: string, input?: Nullable<AssignmentInput>): Nullable<Assignment> | Promise<Nullable<Assignment>>;
     addModuleFeedback(moduleId: string, userId: string, input?: Nullable<ModuleFeedbackInput>): Nullable<Module> | Promise<Nullable<Module>>;
@@ -497,6 +504,7 @@ export interface IMutation {
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
+    updateInstructorProfile(id: string, input: InstructorProfileInput): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
     addSocial(user: string, input?: Nullable<SocialInput>): Social | Promise<Social>;
     updateSocial(id: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
     updateUserSocial(userId: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
@@ -771,7 +779,7 @@ export interface InstructorProfile {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }
@@ -787,6 +795,8 @@ export interface User {
     middleName?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
     dob?: Nullable<Date>;
     social?: Nullable<Social>;
     plan?: Nullable<PlanOfStudy>;
