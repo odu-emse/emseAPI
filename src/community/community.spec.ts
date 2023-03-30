@@ -119,7 +119,6 @@ describe("Community", () => {
 			const thread = await resolver.thread({ id: shuffle(testingThreadID) });
 			expect(thread instanceof Error).toBe(true);
 		});
-
 		test("should return the threads requested by ID", async () => {
 			const thread = await resolver.thread({ id: testingThreadID });
 			if (!thread || thread instanceof Error)
@@ -127,6 +126,32 @@ describe("Community", () => {
 			else {
 				thread.map((thread) => {
 					expect(thread.id).toBe(testingThreadID);
+				});
+			}
+		});
+		test("should return comments 3 levels deep", async () => {
+			const threads = await resolver.thread({ id: testingThreadID });
+			if (!threads || threads instanceof Error)
+				return new Error("Thread not found");
+			else {
+				threads.map((thread) => {
+					thread.comments.map((l1_comment) => {
+						expect(l1_comment).toHaveProperty("body");
+						expect(l1_comment).toHaveProperty("author");
+						if (Array.isArray(l1_comment.comments)) {
+							l1_comment.comments.map((l2_comment) => {
+								expect(l2_comment).toHaveProperty("body");
+								expect(l2_comment).toHaveProperty("author");
+
+								if (Array.isArray(l2_comment.comments)) {
+									l2_comment.comments.map((l3_comment) => {
+										expect(l3_comment).toHaveProperty("body");
+										expect(l3_comment).toHaveProperty("author");
+									});
+								}
+							});
+						}
+					});
 				});
 			}
 		});
@@ -188,11 +213,35 @@ describe("Community", () => {
 			if (voteNum instanceof Error)
 				throw new Error("Error in upvoteThread test case");
 
-			const upVoteNum = await resolver.upvoteThread(accountID, threadID);
+			const upVoteNum = await resolver.upvoteThread(threadID, accountID);
 
+			expect(upVoteNum.upvotes.length === voteNum[0].upvotes.length + 1).toBe(
+				true
+			);
+		});
+		test("should decrease vote count by 1", async () => {
+			const voteNum = await resolver.thread({ id: threadID });
+			if (voteNum instanceof Error)
+				throw new Error("Error in upvoteThread test case");
+			const upVoteNum = await resolver.upvoteThread(threadID, accountID);
+			// stuck at upvoted status, attempting to upvote a upvoted thread (self) for a second time will not increment the count
+			expect(upVoteNum.upvotes.length === voteNum[0].upvotes.length + 1).toBe(
+				false
+			);
+			// expect accountID inside of the upvotes Users array
+			expect(upVoteNum.upvotes.some((upvote) => upvote.id === accountID)).toBe(
+				true
+			);
+			// resolver on downvoteThread function
+			const downVoteNum = await resolver.downvoteThread(threadID, accountID);
+			// after downvote mutation, size of upvotes array should decrement by 1
+			expect(downVoteNum.upvotes.length === voteNum[0].upvotes.length - 1).toBe(
+				true
+			);
+			// accountID should no longer be found in the updated Array (after downvote)
 			expect(
-				upVoteNum[0].upvotes.length === voteNum[0].upvotes.length + 1
-			).toBe(true);
+				downVoteNum.upvotes.some((upvote) => upvote.id === accountID)
+			).toBe(false);
 		});
 		test("should update the thread with the given data", async () => {
 			const thread = await resolver.updateThread(threadID, {

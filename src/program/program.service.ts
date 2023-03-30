@@ -30,6 +30,10 @@ import { Prisma } from "@prisma/client";
 export class ProgramService {
 	constructor(private prisma: PrismaService) {}
 
+	private contentInclude = Prisma.validator<Prisma.ContentInclude>()({
+		parent: true
+	});
+
 	private assignmentInclude = Prisma.validator<Prisma.AssignmentInclude>()({
 		module: true,
 		assignmentResults: {
@@ -146,7 +150,35 @@ export class ProgramService {
 					student: true
 				}
 			},
-			module: true,
+			module: {
+				include: {
+					collections: {
+						include: {
+							lessons: {
+								include: {
+									threads: {
+										include: {
+											author: true,
+											comments: {
+												include: {
+													author: true,
+													comments: {
+														include: {
+															author: true,
+															comments: true
+														}
+													}
+												}
+											},
+											upvotes: true
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
 			progress: true
 		});
 
@@ -276,7 +308,7 @@ export class ProgramService {
 		if (feedback) {
 			payload["feedback"] = {
 				some: {
-					id: feedback!
+					id: feedback
 				}
 			} as Prisma.ModuleWhereInput["feedback"];
 		}
@@ -427,8 +459,12 @@ export class ProgramService {
 			...(role && { role })
 		};
 
-		payload["moduleId"] = module ? module : undefined;
-		payload["planId"] = plan ? plan : undefined;
+		payload["moduleId"] = module
+			? module
+			: (undefined as Prisma.ModuleEnrollmentWhereInput["moduleId"]);
+		payload["planID"] = plan
+			? plan
+			: (undefined as Prisma.ModuleEnrollmentWhereInput["planID"]);
 
 		const where = Prisma.validator<Prisma.ModuleEnrollmentWhereInput>()({
 			...payload
@@ -442,7 +478,7 @@ export class ProgramService {
 
 	async collection(params: CollectionFields | null) {
 		if (!params) {
-			return await this.prisma.collection.findMany({
+			return this.prisma.collection.findMany({
 				include: this.collectionInclude
 			});
 		}
@@ -457,7 +493,11 @@ export class ProgramService {
 				}
 			}),
 			...(moduleID && { moduleID }),
-			...(positionIndex && { position: positionIndex })
+			...(positionIndex && {
+				position: {
+					equals: positionIndex
+				}
+			})
 		});
 
 		// loop out of lessons and check with and
@@ -513,7 +553,8 @@ export class ProgramService {
 		});
 
 		return this.prisma.content.findMany({
-			where
+			where,
+			include: this.contentInclude
 		});
 	}
 
@@ -588,7 +629,8 @@ export class ProgramService {
 			description,
 			duration,
 			numSlides,
-			keywords
+			keywords,
+			objectives
 		} = data;
 
 		const args = Prisma.validator<Prisma.ModuleUpdateArgs>()({
@@ -601,7 +643,8 @@ export class ProgramService {
 				...(description && { description }),
 				...(duration && { duration }),
 				...(numSlides && { numSlides }),
-				...(keywords && { keywords })
+				...(keywords && { keywords }),
+				...(objectives && { objectives })
 			}
 		});
 
@@ -1064,7 +1107,8 @@ export class ProgramService {
 		});
 
 		return this.prisma.content.create({
-			data
+			data,
+			include: this.contentInclude
 		});
 	}
 
@@ -1084,7 +1128,8 @@ export class ProgramService {
 				...(link && { link }),
 				parent: parent ? { connect: { id: parent } } : undefined,
 				primary: primary !== null ? primary : undefined
-			}
+			},
+			include: this.contentInclude
 		});
 
 		return this.prisma.content.update(data);
@@ -1094,6 +1139,31 @@ export class ProgramService {
 		return this.prisma.content.delete({
 			where: {
 				id: contentID
+			}
+		});
+	}
+
+	async addObjectives(id: string, input: string[]) {
+		const module = await this.prisma.module.findUnique({
+			where: {
+				id
+			}
+		});
+
+		if (module === null) {
+			throw new Error("Module not found");
+		}
+
+		const objectives = [...module.objectives, input] as Array<string>;
+
+		return this.prisma.module.update({
+			where: {
+				id: id
+			},
+			data: {
+				objectives: {
+					set: objectives
+				}
 			}
 		});
 	}

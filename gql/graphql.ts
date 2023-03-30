@@ -181,6 +181,7 @@ export interface UpdateModule {
     duration?: Nullable<number>;
     numSlides?: Nullable<number>;
     keywords?: Nullable<string[]>;
+    objectives?: Nullable<string[]>;
 }
 
 export interface NewAssignment {
@@ -271,13 +272,18 @@ export interface QuizFields {
     parentLesson?: Nullable<string>;
 }
 
+export interface QuizInstanceFields {
+    id?: Nullable<string>;
+    quiz?: Nullable<string>;
+}
+
 export interface QuestionFields {
     id?: Nullable<string>;
     number?: Nullable<number>;
     variant?: Nullable<number>;
     text?: Nullable<string>;
     points?: Nullable<number>;
-    parentPool?: Nullable<string>;
+    parent?: Nullable<string>;
 }
 
 export interface AnswerFields {
@@ -293,7 +299,7 @@ export interface QuizResultFields {
     id?: Nullable<string>;
     score?: Nullable<number>;
     student?: Nullable<string>;
-    quiz?: Nullable<string>;
+    quizInstance?: Nullable<string>;
 }
 
 export interface CreateQuiz {
@@ -348,7 +354,7 @@ export interface UpdateAnswer {
 
 export interface QuizSubmission {
     student: string;
-    quiz: string;
+    quizInstance: string;
     answers: string[];
 }
 
@@ -359,6 +365,8 @@ export interface NewUser {
     firstName: string;
     lastName: string;
     middleName: string;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
 }
 
 export interface UserFields {
@@ -372,12 +380,13 @@ export interface UserFields {
     middleName?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
     dob?: Nullable<Date>;
     social?: Nullable<string>;
     plan?: Nullable<string>;
     feedback?: Nullable<string>;
     assignmentGraded?: Nullable<string>;
-    instructorProfile?: Nullable<string>;
 }
 
 export interface SocialFields {
@@ -398,10 +407,12 @@ export interface UpdateUser {
     firstName?: Nullable<string>;
     lastName?: Nullable<string>;
     middleName?: Nullable<string>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
     dob?: Nullable<Date>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
-    instructorProfile?: Nullable<InstructorProfileInput>;
+    instructorProfile?: Nullable<string>;
 }
 
 export interface InstructorProfileInput {
@@ -412,7 +423,7 @@ export interface InstructorProfileInput {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }
@@ -434,7 +445,8 @@ export interface IMutation {
     login(code?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     createThread(data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     addCommentToThread(parentThreadID: string, data: ICommentCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
-    upvoteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    upvoteThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    downvoteThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
@@ -449,6 +461,7 @@ export interface IMutation {
     addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
     addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
+    addObjectives(id: string, input?: Nullable<string[]>): Nullable<Module> | Promise<Nullable<Module>>;
     deleteAssignment(module: string, id: string): Nullable<Module> | Promise<Nullable<Module>>;
     updateAssignment(id: string, input?: Nullable<AssignmentInput>): Nullable<Assignment> | Promise<Nullable<Assignment>>;
     addModuleFeedback(moduleId: string, userId: string, input?: Nullable<ModuleFeedbackInput>): Nullable<Module> | Promise<Nullable<Module>>;
@@ -477,6 +490,8 @@ export interface IMutation {
     createQuiz(input?: Nullable<CreateQuiz>): Quiz | Promise<Quiz>;
     updateQuiz(id: string, values: UpdateQuiz): Quiz[] | Promise<Quiz[]>;
     deleteQuiz(id: string): Quiz | Promise<Quiz>;
+    createQuizInstance(quizID: string): QuizInstance | Promise<QuizInstance>;
+    deleteQuizInstance(id: string): QuizInstance | Promise<QuizInstance>;
     createQuestion(input?: Nullable<CreateQuestion>): Question[] | Promise<Question[]>;
     updateQuestion(id: string, values: UpdateQuestion): Question[] | Promise<Question[]>;
     deleteQuestion(id: string): Question | Promise<Question>;
@@ -489,6 +504,7 @@ export interface IMutation {
     deleteUser(openId: string): Nullable<User> | Promise<Nullable<User>>;
     createUser(input?: Nullable<NewUser>): User | Promise<User>;
     updateUser(input?: Nullable<UpdateUser>): Nullable<User> | Promise<Nullable<User>>;
+    updateInstructorProfile(id: string, input: InstructorProfileInput): Nullable<InstructorProfile> | Promise<Nullable<InstructorProfile>>;
     addSocial(user: string, input?: Nullable<SocialInput>): Social | Promise<Social>;
     updateSocial(id: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
     updateUserSocial(userId: string, input: SocialInput): Nullable<Social> | Promise<Nullable<Social>>;
@@ -517,6 +533,7 @@ export interface IQuery {
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
+    quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
     question(args: QuestionFields): Question[] | Promise<Question[]>;
     answer(args: AnswerFields): Answer[] | Promise<Answer[]>;
     quizResult(args: QuizResultFields): QuizResult[] | Promise<QuizResult[]>;
@@ -702,8 +719,15 @@ export interface Quiz {
     numQuestions: number;
     minScore: number;
     parentLesson: Lesson;
+    questionPool: Question[];
+    instances: QuizInstance[];
+}
+
+export interface QuizInstance {
+    id: string;
+    quiz: Quiz;
     questions: Question[];
-    quizResults?: Nullable<Nullable<Quiz>[]>;
+    quizResult: QuizResult;
 }
 
 export interface Question {
@@ -714,6 +738,7 @@ export interface Question {
     points: number;
     answers: Answer[];
     parent: Quiz;
+    instances: QuizInstance[];
 }
 
 export interface Answer {
@@ -729,8 +754,9 @@ export interface QuizResult {
     id: string;
     score: number;
     answers: string[];
+    submittedAt?: Nullable<Date>;
     student: PlanOfStudy;
-    quiz: Quiz;
+    quizInstance: QuizInstance;
 }
 
 export interface Social {
@@ -753,7 +779,7 @@ export interface InstructorProfile {
     phone?: Nullable<string>;
     background?: Nullable<string>;
     researchInterest?: Nullable<string>;
-    selectedPapersAndPublications?: Nullable<string>;
+    selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
 }
@@ -769,6 +795,8 @@ export interface User {
     middleName?: Nullable<string>;
     isAdmin?: Nullable<boolean>;
     isActive?: Nullable<boolean>;
+    biography?: Nullable<string>;
+    phoneNumber?: Nullable<string>;
     dob?: Nullable<Date>;
     social?: Nullable<Social>;
     plan?: Nullable<PlanOfStudy>;

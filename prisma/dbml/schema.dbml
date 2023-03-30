@@ -14,6 +14,8 @@ Table User {
   dob DateTime [default: `now()`]
   isAdmin Boolean [not null, default: false]
   isActive Boolean [not null, default: false]
+  biography String
+  phoneNumber String
   social Social
   plan PlanOfStudy
   tokens Token [not null]
@@ -42,7 +44,7 @@ Table InstructorProfile {
   phone String
   background String
   researchInterest String
-  selectedPapersAndPublications String
+  selectedPapersAndPublications String[] [not null]
   personalWebsite String
   philosophy String
 }
@@ -251,8 +253,18 @@ Table Quiz {
   minScore Float [not null, default: 0]
   parentLesson Lesson [not null]
   parentLessonID String [not null]
+  questionPool Question [not null]
+  instances QuizInstance [not null]
+}
+
+Table QuizInstance {
+  id String [pk]
+  quiz Quiz [not null]
+  quizID String [not null]
   questions Question [not null]
-  quizResults QuizResult [not null]
+  questionIDs String[] [not null]
+  quizResult QuizResult
+  quizResultID String [unique]
 }
 
 Table Question {
@@ -264,6 +276,8 @@ Table Question {
   answers Answer [not null]
   parent Quiz [not null]
   parentID String [not null]
+  instances QuizInstance [not null]
+  instanceIDs String[] [not null]
 }
 
 Table Answer {
@@ -279,12 +293,10 @@ Table Answer {
 Table QuizResult {
   id String [pk]
   score Float [not null]
-  answers String[] [not null]
   submittedAt DateTime [default: `now()`, not null]
   student PlanOfStudy [not null]
   studentID String [not null]
-  quiz Quiz
-  quizID String [not null, default: '']
+  quizInstance QuizInstance
 }
 
 Enum UserRole {
@@ -363,7 +375,7 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Thread.upvoteUserIDs > User.id
 
-Ref: Content.parentID > Lesson.id
+Ref: Content.parentID > Lesson.id [delete: Cascade]
 
 Ref: DirectMessage.authorID > User.id
 
@@ -377,10 +389,16 @@ Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
 
 Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
 
+Ref: QuizInstance.quizID > Quiz.id [delete: Cascade]
+
+Ref: QuizInstance.questionIDs > Question.id
+
+Ref: QuizInstance.quizResultID - QuizResult.id
+
 Ref: Question.parentID > Quiz.id [delete: Cascade]
+
+Ref: Question.instanceIDs > QuizInstance.id
 
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 
 Ref: QuizResult.studentID > PlanOfStudy.id
-
-Ref: QuizResult.quizID > Quiz.id

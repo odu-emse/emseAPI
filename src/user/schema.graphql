@@ -69,7 +69,7 @@ type InstructorProfile {
 	"""
 	The papers and publications selected
 	"""
-	selectedPapersAndPublications: String
+	selectedPapersAndPublications: [String]
 	"""
 	Personal website of the user
 	"""
@@ -121,6 +121,14 @@ type User {
 	to check if the user is active
 	"""
 	isActive: Boolean
+	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
 	"""
 	user dob
 	"""
@@ -207,7 +215,14 @@ input NewUser {
 	middle name of new user
 	"""
 	middleName: String!
-	
+	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
 }
 
 input UserFields {
@@ -221,12 +236,13 @@ input UserFields {
 	middleName: String
 	isAdmin: Boolean
 	isActive: Boolean
+	biography: String
+	phoneNumber: String
 	dob: Date
 	social: String
 	plan: String
 	feedback: String
 	assignmentGraded: String
-	instructorProfile: String
 }
 
 input SocialFields {
@@ -243,11 +259,11 @@ input UpdateUser {
 	"""
 	The document's unique ID field
 	"""
-	id: String!
+	id: ID!
 	"""
 	Google's Open ID field that is unique to each Google Account
 	"""
-	openID: ID!
+	openID: String!
 	"""
 	The email of the update user
 	"""
@@ -269,6 +285,14 @@ input UpdateUser {
 	"""
 	middleName: String
 	"""
+	user biography
+	"""
+	biography: String
+	"""
+	user phoneNumber
+	"""
+	phoneNumber: String
+	"""
 	dob of the update user
 	"""
 	dob: Date
@@ -281,9 +305,9 @@ input UpdateUser {
 	"""
 	isActive: Boolean
 	"""
-	instructor of the Update user
+	The ID of the instructor profile that needs to be updated
 	"""
-	instructorProfile: InstructorProfileInput
+	instructorProfile: ID
 }
 
 input InstructorProfileInput {
@@ -318,7 +342,7 @@ input InstructorProfileInput {
 	"""
 	Selected Papers and Publications of the Instructor
 	"""
-	selectedPapersAndPublications: String
+	selectedPapersAndPublications: [String]
 	"""
 	Personal Website of the Instructor
 	"""
@@ -386,7 +410,14 @@ type Mutation {
 	Updates user
 	"""
 	updateUser(input: UpdateUser): User
-
+	"""
+	Updates the instructor profile of the user given the user ID
+	"""
+	updateInstructorProfile(
+		"""
+		The unique ID of the user that relates to the instructor profile
+		"""
+		id: ID!, input: InstructorProfileInput!): InstructorProfile
 	"""
 	adds Social to the user
 	"""

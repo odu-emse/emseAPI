@@ -6,24 +6,43 @@ import {
 	IThreadCreateInput,
 	ICommentCreateInput
 } from "@/types/graphql";
-import { getRunningMode } from "vitest";
 
 @Injectable()
 export class CommunityService {
 	constructor(private prisma: PrismaService) {}
 
 	private threadInclude = Prisma.validator<Prisma.ThreadInclude>()({
+		// populating L1 comments
 		comments: {
 			include: {
+				// populating L2 comments
 				comments: {
 					include: {
-						comments: true
+						// populating L3 comments
+						comments: {
+							include: {
+								// populating L3 author
+								author: true
+							}
+						},
+						// populating L2 comment author
+						author: true
+					}
+				},
+				// populating L1 comment author
+				author: true
+			}
+		},
+		parentThread: true,
+		parentLesson: {
+			include: {
+				collection: {
+					include: {
+						module: true
 					}
 				}
 			}
 		},
-		parentThread: true,
-		parentLesson: true,
 		usersWatching: true,
 		author: true,
 		upvotes: true
@@ -152,6 +171,20 @@ export class CommunityService {
 	}
 
 	async upvoteThread(id: string, userID: string) {
+		// Fetch the thread first
+		const thread = await this.prisma.thread.findUnique({
+			where: {
+				id
+			},
+			include: {
+				upvotes: true
+			}
+		});
+
+		if (!thread) {
+			throw new Error("Thread not found");
+		}
+
 		return this.prisma.thread.update({
 			where: {
 				id
@@ -162,7 +195,45 @@ export class CommunityService {
 						id: userID
 					}
 				}
-			}
+			},
+			include: this.threadInclude
+		});
+	}
+
+	async downvoteThread(id: string, userID: string) {
+		// Fetch the thread first
+		const thread = await this.prisma.thread.findUnique({
+			where: {
+				id
+			},
+			include: this.threadInclude
+		});
+
+		if (!thread) {
+			throw new Error("Thread not found");
+		}
+
+		// Check if the userID is in the upvotes array
+		const userUpvoted = thread.upvotes.some((upvote) => upvote.id === userID);
+
+		// If the userID is not in the upvotes array, return an error
+		if (!userUpvoted) {
+			throw new Error("User has not upvoted this thread");
+		}
+
+		// Update the thread, removing the userID from the upvotes array
+		return this.prisma.thread.update({
+			where: {
+				id
+			},
+			data: {
+				upvotes: {
+					disconnect: {
+						id: userID
+					}
+				}
+			},
+			include: this.threadInclude
 		});
 	}
 

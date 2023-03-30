@@ -7,6 +7,7 @@ import {
 	User
 } from "@/types/graphql";
 import { UserService } from "./user.service";
+import { Prisma } from "@prisma/client";
 
 @Resolver("User")
 // @UseGuards(AuthGuard)
@@ -67,6 +68,14 @@ export class UserResolver {
 		@Args("input") input: SocialInput
 	) {
 		return await this.userService.updateSocial(id, input);
+	}
+
+	@Mutation("updateInstructorProfile")
+	async updateInstructorProfile(
+		@Args("id") id: string,
+		@Args("input") input: Prisma.InstructorProfileUpdateInput
+	) {
+		return await this.userService.updateInstructorProfile(id, input);
 	}
 
 	@Mutation("updateUserSocial")

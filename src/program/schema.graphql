@@ -652,6 +652,10 @@ input UpdateModule {
 	Keywords in UpdateModule
 	"""
 	keywords: [String!]
+	"""
+	The objective to be added to the module
+	"""
+	objectives: [String!]
 }
 
 input NewAssignment {
@@ -857,6 +861,10 @@ type Mutation {
 	adds assignement in module
 	"""
 	addAssignment(input: NewAssignment): Assignment!
+	"""
+	Adds Objectives to a Module while retaining the old ones
+	"""
+	addObjectives(id: ID!, input: [String!]): Module
 	"""
 	Deletes assignments in Module
 	"""

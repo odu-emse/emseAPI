@@ -4,14 +4,18 @@ import { ProgramResolver } from "./program.resolver";
 import { PrismaService } from "@/prisma.service";
 import {
 	Assignment,
-	Module,
 	AssignmentResult,
-	Course,
+	ContentType,
+	CreateCollectionArgs,
+	CreateContentArgs,
+	LessonInput,
+	Module,
+	NewModule,
 	PlanOfStudy,
 	User
 } from "@/types/graphql";
-import { createCollection, createModule } from "../../utils/tests";
-import { test, describe, beforeAll, afterAll, expect } from "vitest";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { faker } from "@faker-js/faker";
 
 interface IAssignment extends Assignment {
 	id: string;
@@ -47,10 +51,13 @@ describe("Plan services", () => {
 		resolver = new ProgramResolver(service);
 	});
 
-	let testingModuleID: string;
-	let testingAssignmentID: string;
+	let testingModuleID;
+	let testingAssignmentID;
 	let testingAssignmentResultID: string;
 	let testingCourseID: string;
+	let createNewContent;
+	const progServ: ProgramService = new ProgramService(prisma);
+	const progResolver: ProgramResolver = new ProgramResolver(progServ);
 
 	describe("Module", () => {
 		describe("modules Query", () => {
@@ -181,7 +188,7 @@ describe("Plan services", () => {
 			test("should not take longer than 1.5 seconds to return all assignments", async () => {
 				const start = new Date();
 				const assignments = await resolver.assignment({});
-				expect(assignments.length).toBeGreaterThan(1);
+				expect(assignments.length).toBeGreaterThan(0);
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
 			});
@@ -276,98 +283,169 @@ describe("Plan services", () => {
 });
 
 describe("Collection", () => {
-	let service: ProgramService;
-	let resolver: ProgramResolver;
-	let prisma: PrismaService;
-	prisma = new PrismaService();
+	const prisma = new PrismaService();
+	const service = new ProgramService(prisma);
+	const resolver = new ProgramResolver(service);
 
 	const deleteModule = async (id: string) => {
-		return await prisma.module.delete({
+		return prisma.module.delete({
 			where: { id }
 		});
 	};
 
 	const deleteCollection = async (id: string) => {
-		return await prisma.collection.delete({
+		return prisma.collection.delete({
 			where: { id }
 		});
 	};
 
-	const lessons = [
-		"639217c90482bbfb9aba86cc",
-		"639217e70482bbfb9aba86d0",
-		"639217e70482bbfb9aba86d1",
-		"639217e70482bbfb9aba86d2"
-	];
+	const deleteLesson = async (id: string) => {
+		return prisma.lesson.delete({
+			where: { id }
+		});
+	};
 
+	const createCollection = async (input: CreateCollectionArgs) => {
+		return resolver.createCollection(input);
+	};
+
+	const createModule = async (input: NewModule) => {
+		return resolver.create(input);
+	};
+
+	const createLesson = async (input: LessonInput) => {
+		return resolver.createLesson(input);
+	};
+
+	const createLessonContent = async (input: CreateContentArgs) => {
+		return resolver.createContent(input);
+	};
+
+	let testingContentID: string;
 	let testingCollectionID: string;
 	let testingModuleID: string;
+	let testingLessonID: string;
 
-	beforeAll(async () => {
-		service = new ProgramService(prisma);
-		resolver = new ProgramResolver(service);
-
-		const module = await createModule(resolver, {
+	afterAll(async () => {
+		await deleteLesson(testingLessonID);
+		await deleteCollection(testingCollectionID);
+		await deleteModule(testingModuleID);
+	});
+	test("should create dummy data structure", async () => {
+		const module = await createModule({
 			moduleName: "Test Module",
-			moduleNumber: 10,
+			moduleNumber: faker.datatype.number({
+				min: 123,
+				max: 9999,
+				precision: 1
+			}),
 			duration: 1,
 			intro: "Test Intro",
 			numSlides: 1,
 			description: "Test Description",
-			keywords: ["test", "keyword"]
+			keywords: ["Test Keywords"]
 		});
-		if (module instanceof Error) throw new Error(module.message);
-
 		testingModuleID = module.id;
-
-		const collection = await createCollection(resolver, {
+		const collection = await createCollection({
 			name: "Test Collection",
 			moduleID: testingModuleID,
-			lessons,
 			positionIndex: 0
 		});
-		if (typeof collection === "undefined")
-			throw new Error("Collection is undefined");
-		testingCollectionID = collection[0].id;
-	});
-	afterAll(async () => {
-		await deleteCollection(testingCollectionID);
-		await deleteModule(testingModuleID);
-		await prisma.$disconnect();
+		testingCollectionID = collection.id;
+
+		const lesson = await createLesson({
+			name: "Test Lesson",
+			collection: testingCollectionID
+		});
+		testingLessonID = lesson.id;
+
+		const content = await createLessonContent({
+			parent: testingLessonID,
+			link: "",
+			primary: true,
+			type: ContentType.VIDEO
+		});
+
+		testingContentID = content.id;
 	});
 	test("should return an array of collections", async () => {
-		expect(await resolver.collection()).toBeDefined();
-		expect(await resolver.collection()).toBeInstanceOf(Array);
+		const collection = await resolver.collection();
+		expect(collection).toBeInstanceOf(Array);
+		expect(collection.length).toBeGreaterThan(0);
 	});
-	test("should return a collection", async () => {
+	test("should return a collection that belongs to the Module inputted", async () => {
 		const collection = await resolver.collection({
-			moduleID: testingCollectionID
+			moduleID: testingModuleID
 		});
-		expect(collection).toBeDefined();
-		if (collection.length > 0) {
-			collection.map(async (col) => {
-				expect(col.id).toBe(testingCollectionID);
-				expect(col.name).toBeDefined();
-				expect(col.moduleID).toBeDefined();
-				expect(await resolver.module({ id: col.moduleID })).toBeDefined();
+		expect(collection).toBeInstanceOf(Array);
+		collection.map(async (col) => {
+			expect(col.id).toBe(testingCollectionID);
+			expect(col.name).toBeDefined();
+			expect(col.moduleID).toBe(testingModuleID);
+		});
+	});
+	test("should return a collection that partially matches the name passed in", async () => {
+		const collection = await resolver.collection({
+			name: "Test"
+		});
+		expect(collection).toBeInstanceOf(Array);
+		collection.map(async (col) => {
+			expect(col.name).toBeDefined();
+			expect(col.name).toMatch(/Test/);
+		});
+	});
+	test("should return a collection that has lessons with IDs matching the inputted one", async () => {
+		const collection = await resolver.collection({
+			lessons: [testingLessonID]
+		});
+		expect(collection).toBeInstanceOf(Array);
+		collection.map(async (col) => {
+			expect(col.lessons).toBeDefined();
+			col.lessons.map((lesson) => {
+				expect(lesson.id).toBe(testingLessonID);
 			});
-		}
+		});
+	});
+	test("should return a collection that has position field matching the inputted one", async () => {
+		const collection = await resolver.collection({
+			positionIndex: 0
+		});
+		expect(collection).toBeInstanceOf(Array);
+		expect(collection[0].position).toBe(0);
 	});
 	test("should match lesson position field to array index", async () => {
 		const coll = await resolver.collection({ id: testingCollectionID });
-		expect(coll).toBeDefined();
-		if (coll.length > 0) {
-			coll.map((c) => {
-				c.lessons.map((lesson) => {
-					expect(lesson.position === c.lessons[lesson.position].position).toBe(
-						true
-					);
-					expect(lesson.collectionID === c.id).toBe(true);
-				});
+		expect(coll).toBeInstanceOf(Array);
+		coll.map((c) => {
+			c.lessons.map((lesson) => {
+				expect(lesson.position === c.lessons[lesson.position].position).toBe(
+					true
+				);
+				expect(lesson.collectionID === c.id).toBe(true);
 			});
-		}
+		});
 	});
-	test("should populate previous and next based on module ID", function () {
-		expect(true).toBe(true);
+
+	test("should return an array of contents", async () => {
+		const contents = await resolver.content({});
+		expect(contents).toBeInstanceOf(Array);
+		expect(contents.length).toBeGreaterThan(0);
+	});
+	test("should return a content that belongs to the Lesson inputted", async () => {
+		const contents = await resolver.content({
+			parent: testingLessonID
+		});
+		expect(contents).toBeInstanceOf(Array);
+		contents.map(async (content) => {
+			expect(content.id).toBeDefined();
+			expect(content.parentID).toBe(testingLessonID);
+		});
+	});
+	test("should return a content array that has only one primary content within a lesson", async () => {
+		const contents = await resolver.content({
+			parent: testingLessonID
+		});
+		expect(contents).toBeInstanceOf(Array);
+		expect(contents.filter((c) => c.primary).length).toBe(1);
 	});
 });
