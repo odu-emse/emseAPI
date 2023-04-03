@@ -353,12 +353,16 @@ enum ContentType {
   DOC
   DOCX
   VIDEO
+  CAPTION
+  TRANSCRIPT
 }
 
 enum FileType {
   DOCX
   DOC
   PDF
+  TTT
+  TXT
 }
 
 // Dont need this anymore since we arent doing API Tokens

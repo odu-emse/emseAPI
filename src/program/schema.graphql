@@ -13,6 +13,8 @@ PDF
 DOC
 DOCX
 VIDEO
+CAPTION
+TRANSCRIPT
 }
 
 
@@ -20,6 +22,8 @@ enum FileType {
 	DOCX
 	DOC
 	PDF
+	TTT
+	TXT
 }
 
 type ModuleEnrollment {

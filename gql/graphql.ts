@@ -22,13 +22,17 @@ export enum ContentType {
     PDF = "PDF",
     DOC = "DOC",
     DOCX = "DOCX",
-    VIDEO = "VIDEO"
+    VIDEO = "VIDEO",
+    CAPTION = "CAPTION",
+    TRANSCRIPT = "TRANSCRIPT"
 }
 
 export enum FileType {
     DOCX = "DOCX",
     DOC = "DOC",
-    PDF = "PDF"
+    PDF = "PDF",
+    TTT = "TTT",
+    TXT = "TXT"
 }
 
 export interface IThreadCreateInput {

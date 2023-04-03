@@ -315,12 +315,16 @@ Enum ContentType {
   DOC
   DOCX
   VIDEO
+  CAPTION
+  TRANSCRIPT
 }
 
 Enum FileType {
   DOCX
   DOC
   PDF
+  TTT
+  TXT
 }
 
 Ref: User.watchedThreadIDs > Thread.id
