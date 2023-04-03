@@ -34,7 +34,6 @@ export enum FileType {
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
-    parentLesson?: Nullable<string>;
     parentThread?: Nullable<string>;
     author: string;
 }
@@ -49,7 +48,6 @@ export interface IThreadByParams {
     id?: Nullable<string>;
     title?: Nullable<string>;
     body?: Nullable<string>;
-    parentLesson?: Nullable<string>;
     parentThread?: Nullable<string>;
     comments?: Nullable<string>;
     author?: Nullable<string>;
@@ -552,7 +550,6 @@ export interface Thread {
     comments?: Nullable<Nullable<Thread>[]>;
     upvotes?: Nullable<User[]>;
     usersWatching?: Nullable<User[]>;
-    parentLesson?: Nullable<Lesson>;
     createdAt: Date;
     updatedAt: Date;
     parentThread?: Nullable<Thread>;

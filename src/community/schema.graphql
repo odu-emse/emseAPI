@@ -31,18 +31,20 @@ type Thread {
     """
     usersWatching: [User!]
     """
-    Add linkage between lesson and thread once lesson schema is defined
-    """
-    parentLesson: Lesson
-    """
+    The timestamp when the thread was created
     """
     createdAt: Date!
     """
+    The timestamp when the thread was last updated or interacted with
     """
     updatedAt: Date!
     """
+    The thread that this comment belongs to
     """
     parentThread: Thread
+    """
+    The ID of the thread that this comment belongs to
+    """
     parentThreadID: ID
 }
 
@@ -56,10 +58,6 @@ input IThreadCreateInput {
     """
     body: String!
     """
-    The ID of the lesson that this thread belongs to. If this parameter is not given, the thread will be created as a general social community post.
-    """
-    parentLesson: ID
-    """
     The ID of the parent thread that this comment belongs to. If this parameter is not given, the thread will be created as a new thread, and not as a comment. If this parameter is not given, the title parameter must be given.
     """
     parentThread: ID
@@ -71,7 +69,7 @@ input IThreadCreateInput {
 
 input ICommentCreateInput {
     id: ID
-     """
+    """
     The content body of the comment. Currently only supports text.
     """
     body: String!
@@ -95,10 +93,6 @@ input IThreadByParams {
     The content body of the thread to be partially matched to the given value. Upper and lower case characters are not treated equally.
     """
     body: String
-    """
-    The ID of the lesson to be exactly equal to the given value.
-    """
-    parentLesson: ID
     """
     The ID of the parent thread to be exactly equal to the given value.
     """

@@ -124,7 +124,6 @@ Table Lesson {
   id String [pk]
   name String [not null]
   transcript String
-  threads Thread [not null]
   collection Collection [not null]
   collectionID String [not null]
   position Int [not null, default: 0]
@@ -192,8 +191,7 @@ Table Thread {
   watcherID String[] [not null]
   author User [not null]
   authorID String [not null]
-  parentLesson Lesson
-  parentLessonID String
+  topics String[] [not null]
   parentThread Thread
   parentThreadID String
   comments Thread [not null]
@@ -368,8 +366,6 @@ Ref: AssignmentResult.assignmentId > Assignment.id
 Ref: Thread.watcherID > User.id
 
 Ref: Thread.authorID > User.id
-
-Ref: Thread.parentLessonID > Lesson.id
 
 Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 

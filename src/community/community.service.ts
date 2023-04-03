@@ -34,15 +34,6 @@ export class CommunityService {
 			}
 		},
 		parentThread: true,
-		parentLesson: {
-			include: {
-				collection: {
-					include: {
-						module: true
-					}
-				}
-			}
-		},
 		usersWatching: true,
 		author: true,
 		upvotes: true
@@ -54,8 +45,7 @@ export class CommunityService {
 				include: this.threadInclude
 			});
 		} else {
-			const { id, title, body, parentLesson, parentThread, author, comments } =
-				input;
+			const { id, title, body, parentThread, author, comments } = input;
 
 			const where = Prisma.validator<Prisma.ThreadWhereInput>()({
 				...(id && { id }),
@@ -67,11 +57,6 @@ export class CommunityService {
 				...(body && {
 					body: {
 						contains: body
-					}
-				}),
-				...(parentLesson && {
-					parentLesson: {
-						id: parentLesson
 					}
 				}),
 				...(parentThread && {
@@ -128,7 +113,7 @@ export class CommunityService {
 	}
 
 	async createThread(data: IThreadCreateInput) {
-		const { title, body, parentLesson, parentThread, author } = data;
+		const { title, body, parentThread, author } = data;
 
 		const create = Prisma.validator<Prisma.ThreadCreateInput>()({
 			...(title && {
@@ -144,13 +129,6 @@ export class CommunityService {
 				parentThread: {
 					connect: {
 						id: parentThread
-					}
-				}
-			}),
-			...(parentLesson && {
-				parentLesson: {
-					connect: {
-						id: parentLesson
 					}
 				}
 			}),
