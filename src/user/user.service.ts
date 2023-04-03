@@ -357,7 +357,7 @@ export class UserService {
 			}
 		});
 
-		return this.prisma.social.updateMany(update);
+		return this.prisma.social.update(update);
 	}
 
 	/// Delete a social record by document ID
