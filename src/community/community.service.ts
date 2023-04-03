@@ -45,7 +45,7 @@ export class CommunityService {
 				include: this.threadInclude
 			});
 		} else {
-			const { id, title, body, parentThread, author, comments } = input;
+			const { id, title, body, parentThread, author, comments, topics } = input;
 
 			const where = Prisma.validator<Prisma.ThreadWhereInput>()({
 				...(id && { id }),
@@ -80,6 +80,12 @@ export class CommunityService {
 				})
 			});
 
+			if (topics && topics.length > 0) {
+				where["topics"] = {
+					hasSome: topics as string[]
+				};
+			}
+
 			const include = this.threadInclude;
 
 			let res:
@@ -113,7 +119,7 @@ export class CommunityService {
 	}
 
 	async createThread(data: IThreadCreateInput) {
-		const { title, body, parentThread, author } = data;
+		const { title, body, parentThread, author, topics } = data;
 
 		const create = Prisma.validator<Prisma.ThreadCreateInput>()({
 			...(title && {
@@ -136,7 +142,10 @@ export class CommunityService {
 				connect: {
 					id: author
 				}
-			}
+			},
+			...(topics && {
+				topics: topics as string[]
+			})
 		});
 
 		if (!parentThread && !title)
@@ -216,7 +225,7 @@ export class CommunityService {
 	}
 
 	async updateThread(id: string, data: Prisma.ThreadUpdateInput) {
-		const { title, body, updatedAt } = data;
+		const { title, body, updatedAt, topics } = data;
 		try {
 			const update = Prisma.validator<Prisma.ThreadUpdateArgs>()({
 				where: {
@@ -224,9 +233,9 @@ export class CommunityService {
 				},
 				data: {
 					...(title && { title }),
-
 					...(body && { body }),
-					...(updatedAt && { updatedAt })
+					...(updatedAt && { updatedAt }),
+					...(topics && { topics })
 				},
 				include: this.threadInclude
 			});
