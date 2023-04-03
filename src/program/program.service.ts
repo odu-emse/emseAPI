@@ -106,14 +106,6 @@ export class ProgramService {
 			include: {
 				lessons: {
 					include: {
-						threads: {
-							include: {
-								author: true,
-								comments: true,
-								usersWatching: true,
-								parentThread: true
-							}
-						},
 						content: true
 					}
 				}
@@ -154,27 +146,7 @@ export class ProgramService {
 				include: {
 					collections: {
 						include: {
-							lessons: {
-								include: {
-									threads: {
-										include: {
-											author: true,
-											comments: {
-												include: {
-													author: true,
-													comments: {
-														include: {
-															author: true,
-															comments: true
-														}
-													}
-												}
-											},
-											upvotes: true
-										}
-									}
-								}
-							}
+							lessons: true
 						}
 					}
 				}
@@ -186,15 +158,7 @@ export class ProgramService {
 		module: true,
 		lessons: {
 			include: {
-				content: true,
-				threads: {
-					include: {
-						author: true,
-						usersWatching: true,
-						parentThread: true,
-						comments: true
-					}
-				}
+				content: true
 			}
 		}
 	});
@@ -212,14 +176,6 @@ export class ProgramService {
 						}
 					}
 				}
-			}
-		},
-		threads: {
-			include: {
-				author: true,
-				usersWatching: true,
-				parentThread: true,
-				comments: true
 			}
 		}
 	});
@@ -523,8 +479,7 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, transcript, thread, collection, position } =
-			input;
+		const { id, name, content, transcript, collection, position } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
@@ -532,7 +487,6 @@ export class ProgramService {
 			...(transcript && { transcript }),
 			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
-			threads: thread ? { some: { id: thread } } : undefined,
 			content: content ? { some: { id: content } } : undefined
 		});
 
@@ -1048,14 +1002,12 @@ export class ProgramService {
 			// The only thing i could think of is if these were a list of IDs in which case the threads
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
-			collection,
-			thread
+			collection
 		} = input;
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
 			...(transcript && { transcript }),
-			...(thread && { thread }),
 			...(collection && { collection })
 		};
 
@@ -1067,11 +1019,6 @@ export class ProgramService {
 				name: payload.name,
 				transcript: payload.transcript,
 				collectionID: payload.collection,
-				threads: {
-					connect: {
-						id: payload.thread
-					}
-				},
 				position: input.position ? input.position : undefined
 			}
 		});
