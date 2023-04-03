@@ -23,6 +23,10 @@ type Thread {
     """
     comments: [Thread]
     """
+    The topic tags associated with the thread
+    """
+    topics: [String]
+    """
     The number of upvotes for the thread
     """
     upvotes: [User!]
@@ -57,6 +61,10 @@ input IThreadCreateInput {
     The content body of the thread. Currently only supports text.
     """
     body: String!
+    """
+    The topic tags associated with the thread
+    """
+    topics: [String]
     """
     The ID of the parent thread that this comment belongs to. If this parameter is not given, the thread will be created as a new thread, and not as a comment. If this parameter is not given, the title parameter must be given.
     """
@@ -93,6 +101,10 @@ input IThreadByParams {
     The content body of the thread to be partially matched to the given value. Upper and lower case characters are not treated equally.
     """
     body: String
+    """
+    The topic tags associated with the thread
+    """
+    topics: [String]
     """
     The ID of the parent thread to be exactly equal to the given value.
     """
