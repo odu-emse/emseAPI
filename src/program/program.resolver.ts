@@ -269,7 +269,23 @@ export class ProgramResolver {
 
 	@Mutation("createContent")
 	async createContent(@Args("input") input: CreateContentArgs) {
-		return await this.programService.createContent(input);
+
+		// we get the lesson based on the parent ID of the content
+		const lesson = await this.programService.lesson({
+			id: input.parent
+		});
+
+		// we make a copy of the content array, so we can manipulate it
+		let updatedContentArray = [...lesson[0].content];
+
+		//checking the length of the array to see no two elements have same content type
+		let len = updatedContentArray.filter(newArr => newArr.type === input.type).length;
+		if(len == 0){
+			return await this.programService.createContent(input);
+		}
+		else{
+			throw new Error("Content type already exists, Please change the content type");
+		}
 	}
 
 	@Mutation("updateContent")
