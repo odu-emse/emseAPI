@@ -37,10 +37,13 @@ export class CommunityResolver {
 
 	@Mutation("addCommentToThread")
 	async addCommentToThread(
-		@Args("id") id: string,
+		@Args("parentThreadID") parentThreadID: string,
 		@Args("data") data: ICommentCreateInput
 	) {
-		const self = await this.thread({ id });
+		const self = await this.communityService.threadsByParam({
+			id: parentThreadID
+		});
+
 		if (self instanceof Error) return new Error(self.message);
 		else {
 			//creating new comment document
