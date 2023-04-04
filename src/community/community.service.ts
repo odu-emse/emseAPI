@@ -46,7 +46,6 @@ export class CommunityService {
 			input === null ||
 			Object.keys(input).length === 0
 		) {
-			console.log("returning all threads");
 			return this.prisma.thread.findMany({
 				include: this.threadInclude
 			});
@@ -68,7 +67,6 @@ export class CommunityService {
 			input.id !== null &&
 			input.id !== ""
 		) {
-			console.log("returning thread with id: " + input.id);
 			const response = await this.prisma.thread.findUnique({
 				where: {
 					id: input.id
@@ -80,7 +78,6 @@ export class CommunityService {
 		}
 		// if any other params are given, return threads by those params
 		else {
-			console.log("returning threads by params: " + JSON.stringify(input));
 			const { title, body, parentThread, author, comments, topics } = input;
 
 			const where = Prisma.validator<Prisma.ThreadWhereInput>()({
@@ -288,5 +285,45 @@ export class CommunityService {
 
 			include: this.threadInclude
 		});
+	}
+
+	async addUserAsWatcherToThread(id: string, userID: string) {
+		const self = await this.threadsByParam({ id });
+
+		if (!self || self instanceof Error) {
+			throw new Error("Thread not found");
+		}
+
+		const watchers = self[0].usersWatching;
+
+		if (watchers.some((watcher) => watcher.id === userID)) {
+			return this.prisma.thread.update({
+				where: {
+					id
+				},
+				data: {
+					usersWatching: {
+						disconnect: {
+							id: userID
+						}
+					}
+				},
+				include: this.threadInclude
+			});
+		} else {
+			return this.prisma.thread.update({
+				where: {
+					id
+				},
+				data: {
+					usersWatching: {
+						connect: {
+							id: userID
+						}
+					}
+				},
+				include: this.threadInclude
+			});
+		}
 	}
 }

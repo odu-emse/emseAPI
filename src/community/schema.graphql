@@ -141,4 +141,6 @@ type Mutation {
     updateThread(id: ID!, data: IThreadCreateInput!): Thread
 
     deleteThread(id: ID!): Thread
+
+    addUserAsWatcherToThread(id: ID!, userID: ID!): Thread
 }
