@@ -83,4 +83,12 @@ export class CommunityResolver {
 		if (res instanceof Error) return new Error(res.message);
 		return res;
 	}
+
+	@Mutation("addUserAsWatcherToThread")
+	async addUserAsWatcherToThread(
+		@Args("id") id: string,
+		@Args("userID") userID: string
+	) {
+		return await this.communityService.addUserAsWatcherToThread(id, userID);
+	}
 }

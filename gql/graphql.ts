@@ -449,6 +449,7 @@ export interface IMutation {
     downvoteThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    addUserAsWatcherToThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
     newGroupMessage(groupID: string, message: string, senderID: string): boolean | Promise<boolean>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
