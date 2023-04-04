@@ -40,15 +40,50 @@ export class CommunityService {
 	});
 
 	async threadsByParam(input?: IThreadByParams | null) {
-		if (!input) {
+		// if input is not given, return all threads
+		if (
+			typeof input === "undefined" ||
+			input === null ||
+			Object.keys(input).length === 0
+		) {
+			console.log("returning all threads");
 			return this.prisma.thread.findMany({
 				include: this.threadInclude
 			});
-		} else {
-			const { id, title, body, parentThread, author, comments, topics } = input;
+		}
+
+		const include = this.threadInclude;
+
+		let res:
+			| Array<
+					Prisma.ThreadGetPayload<{
+						include: typeof include;
+					}>
+			  >
+			| Error;
+
+		// if id is given, return thread with that id in an array with length 1
+		if (
+			typeof input.id !== "undefined" &&
+			input.id !== null &&
+			input.id !== ""
+		) {
+			console.log("returning thread with id: " + input.id);
+			const response = await this.prisma.thread.findUnique({
+				where: {
+					id: input.id
+				},
+				include: this.threadInclude
+			});
+			if (!response) return new Error("Thread not found");
+			return [response];
+		}
+		// if any other params are given, return threads by those params
+		else {
+			console.log("returning threads by params: " + JSON.stringify(input));
+			const { title, body, parentThread, author, comments, topics } = input;
 
 			const where = Prisma.validator<Prisma.ThreadWhereInput>()({
-				...(id && { id }),
 				...(title && {
 					title: {
 						contains: title
@@ -86,32 +121,10 @@ export class CommunityService {
 				};
 			}
 
-			const include = this.threadInclude;
-
-			let res:
-				| Array<
-						Prisma.ThreadGetPayload<{
-							include: typeof include;
-						}>
-				  >
-				| Error;
-
-			if (id) {
-				const response = await this.prisma.thread.findUnique({
-					where: {
-						id
-					},
-					include: this.threadInclude
-				});
-				if (!response || response instanceof Error)
-					return new Error("Thread not found");
-				res = [response];
-			} else {
-				res = await this.prisma.thread.findMany({
-					where,
-					include: this.threadInclude
-				});
-			}
+			res = await this.prisma.thread.findMany({
+				where,
+				include: this.threadInclude
+			});
 
 			if (!res) return new Error("Thread not found");
 			else return res;
