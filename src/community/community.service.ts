@@ -22,15 +22,18 @@ export class CommunityService {
 						comments: {
 							include: {
 								// populating L3 author
-								author: true
+								author: true,
+								upvotes: true
 							}
 						},
 						// populating L2 comment author
-						author: true
+						author: true,
+						upvotes: true
 					}
 				},
 				// populating L1 comment author
-				author: true
+				author: true,
+				upvotes: true
 			}
 		},
 		parentThread: true,
