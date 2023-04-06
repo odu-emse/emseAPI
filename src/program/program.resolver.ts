@@ -25,8 +25,6 @@ import { ProgramService } from "./program.service";
 import { Prisma, UserRole } from "@prisma/client";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@/auth.guard";
-import { isRequiredInputField } from "graphql";
-import { async } from "rxjs/internal/scheduler/async";
 
 @Resolver()
 // @UseGuards(AuthGuard)
@@ -80,6 +78,46 @@ export class ProgramResolver {
 	@Query("moduleEnrollment")
 	async moduleEnrollment(@Args("input") args: ModEnrollmentFields) {
 		return await this.programService.moduleEnrollment(args);
+	}
+
+	@Query("lessonsByModuleEnrollment")
+	async lessonsByModuleEnrollment(
+		@Args("planID") planID: string,
+		@Args("moduleID") moduleID: string
+	) {
+		const enrollment = await this.programService.moduleEnrollment({
+			plan: planID
+		});
+
+		const filteredEnrollment = enrollment.filter((enrollment) => {
+			return enrollment.module.id === moduleID;
+		});
+
+		const lessons = filteredEnrollment[0].module.collections.map((collection) =>
+			collection.lessons.map((lesson) => {
+				return lesson;
+			})
+		);
+
+		const filteredLessons = lessons.flat().map((lesson) => {
+			return lesson.lessonProgress.filter((progress) => {
+				return progress.enrollment.id === filteredEnrollment[0].id;
+			});
+		});
+
+		return [
+			...lessons
+				.flat()
+				.sort((a, b) => a.position - b.position)
+				.map((lesson) => {
+					return {
+						...lesson,
+						lessonProgress: filteredLessons
+							.flat()
+							.filter((progress) => progress.lessonID === lesson.id)
+					};
+				})
+		];
 	}
 
 	@Query("collection")
