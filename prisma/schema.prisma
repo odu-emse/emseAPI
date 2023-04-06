@@ -153,8 +153,9 @@ model Lesson {
   collectionID String     @db.ObjectId
   position     Int        @default(0)
 
-  content Content[]
-  quizzes Quiz[]
+  content        Content[]
+  quizzes        Quiz[]
+  lessonProgress LessonProgress[]
 }
 
 model ModuleFeedback {
@@ -175,11 +176,12 @@ model ModuleEnrollment {
   status     EnrollmentStatus @default(INACTIVE)
 
   // Relation Fields
-  module   Module       @relation(fields: [moduleId], references: [id])
-  moduleId String       @db.ObjectId
-  plan     PlanOfStudy? @relation(fields: [planID], references: [id])
-  planID   String?      @db.ObjectId
-  progress Progress?
+  module         Module           @relation(fields: [moduleId], references: [id])
+  moduleId       String           @db.ObjectId
+  plan           PlanOfStudy?     @relation(fields: [planID], references: [id])
+  planID         String?          @db.ObjectId
+  progress       Progress?
+  lessonProgress LessonProgress[]
 }
 
 model Assignment {
@@ -278,6 +280,19 @@ model Progress {
   enrollmentID String           @unique @db.ObjectId
 }
 
+model LessonProgress {
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @default(now()) @updatedAt
+  status       Float            @default(0)
+  completed    Boolean          @default(false)
+  lesson       Lesson           @relation(fields: [lessonID], references: [id], onDelete: Cascade)
+  lessonID     String           @db.ObjectId
+  // Relation Fields
+  enrollment   ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
+  enrollmentID String           @unique @db.ObjectId
+}
+
 model Quiz {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
   totalPoints    Float
@@ -353,6 +368,7 @@ enum ContentType {
   VIDEO
   CAPTION
   TRANSCRIPT
+  QUIZ
 }
 
 enum FileType {
