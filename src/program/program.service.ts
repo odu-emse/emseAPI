@@ -163,6 +163,11 @@ export class ProgramService {
 										include: {
 											enrollment: true
 										}
+									},
+									collection: {
+										include: {
+											module: true
+										}
 									}
 								}
 							}
