@@ -9,12 +9,13 @@ enum EnrollmentStatus {
 	INACTIVE
 }
 enum ContentType {
-PDF
-DOC
-DOCX
-VIDEO
-CAPTION
-TRANSCRIPT
+	PDF
+	DOC
+	DOCX
+	VIDEO
+	CAPTION
+	TRANSCRIPT
+	QUIZ
 }
 
 
@@ -65,6 +66,10 @@ type ModuleEnrollment {
 	The progress that this enrollment is associated with (one-to-one)
 	"""
 	progress: Progress!
+	"""
+	The progress model that is associated with this lesson
+	"""
+	lessonProgress: [LessonProgress]
 }
 
 type AssignmentResult {
@@ -370,6 +375,10 @@ type Lesson {
 	The quizzes that belong to this lesson
 	"""
 	quizzes: [Quiz!]
+	"""
+	The progress model that is associated with this lesson
+	"""
+	lessonProgress: [LessonProgress]
 }
 
 type Content {
@@ -444,7 +453,10 @@ type Query {
 	Parameters can be any of the fields that exist in a moduleEnrollment
 	"""
 	moduleEnrollment(input: ModEnrollmentFields!): [ModuleEnrollment!]
-
+	"""
+	Get a list of lessons given the plan ID and enrollment ID
+	"""
+	lessonsByModuleEnrollment(planID: ID!, moduleID: ID!) : [Lesson!]
 	"""
 	Retrieve a specific collection based on document ID
 	"""

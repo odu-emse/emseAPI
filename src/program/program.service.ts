@@ -144,9 +144,28 @@ export class ProgramService {
 			},
 			module: {
 				include: {
+					parentModules: true,
+					members: {
+						include: {
+							plan: {
+								include: {
+									student: true
+								}
+							}
+						}
+					},
 					collections: {
 						include: {
-							lessons: true
+							lessons: {
+								include: {
+									content: true,
+									lessonProgress: {
+										include: {
+											enrollment: true
+										}
+									}
+								}
+							}
 						}
 					}
 				}

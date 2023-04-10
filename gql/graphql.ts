@@ -24,7 +24,8 @@ export enum ContentType {
     DOCX = "DOCX",
     VIDEO = "VIDEO",
     CAPTION = "CAPTION",
-    TRANSCRIPT = "TRANSCRIPT"
+    TRANSCRIPT = "TRANSCRIPT",
+    QUIZ = "QUIZ"
 }
 
 export enum FileType {
@@ -533,6 +534,7 @@ export interface IQuery {
     moduleFeedback(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
     assignmentResult(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
     moduleEnrollment(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
+    lessonsByModuleEnrollment(planID: string, moduleID: string): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
@@ -612,6 +614,7 @@ export interface ModuleEnrollment {
     plan?: Nullable<PlanOfStudy>;
     inactivePlan?: Nullable<PlanOfStudy>;
     progress: Progress;
+    lessonProgress?: Nullable<Nullable<LessonProgress>[]>;
 }
 
 export interface AssignmentResult {
@@ -693,6 +696,7 @@ export interface Lesson {
     collection?: Nullable<Collection>;
     position?: Nullable<number>;
     quizzes?: Nullable<Quiz[]>;
+    lessonProgress?: Nullable<Nullable<LessonProgress>[]>;
 }
 
 export interface Content {
@@ -714,6 +718,16 @@ export interface Progress {
     createdAt: Date;
     updatedAt: Date;
     enrollment: ModuleEnrollment;
+}
+
+export interface LessonProgress {
+    id: string;
+    status: number;
+    completed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    enrollment: ModuleEnrollment;
+    lesson: Lesson;
 }
 
 export interface Quiz {
