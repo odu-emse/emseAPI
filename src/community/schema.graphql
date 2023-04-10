@@ -23,6 +23,10 @@ type Thread {
     """
     comments: [Thread]
     """
+    The topic tags associated with the thread
+    """
+    topics: [String]
+    """
     The number of upvotes for the thread
     """
     upvotes: [User!]
@@ -31,18 +35,20 @@ type Thread {
     """
     usersWatching: [User!]
     """
-    Add linkage between lesson and thread once lesson schema is defined
-    """
-    parentLesson: Lesson
-    """
+    The timestamp when the thread was created
     """
     createdAt: Date!
     """
+    The timestamp when the thread was last updated or interacted with
     """
     updatedAt: Date!
     """
+    The thread that this comment belongs to
     """
     parentThread: Thread
+    """
+    The ID of the thread that this comment belongs to
+    """
     parentThreadID: ID
 }
 
@@ -56,9 +62,9 @@ input IThreadCreateInput {
     """
     body: String!
     """
-    The ID of the lesson that this thread belongs to. If this parameter is not given, the thread will be created as a general social community post.
+    The topic tags associated with the thread
     """
-    parentLesson: ID
+    topics: [String]
     """
     The ID of the parent thread that this comment belongs to. If this parameter is not given, the thread will be created as a new thread, and not as a comment. If this parameter is not given, the title parameter must be given.
     """
@@ -71,7 +77,7 @@ input IThreadCreateInput {
 
 input ICommentCreateInput {
     id: ID
-     """
+    """
     The content body of the comment. Currently only supports text.
     """
     body: String!
@@ -96,9 +102,9 @@ input IThreadByParams {
     """
     body: String
     """
-    The ID of the lesson to be exactly equal to the given value.
+    The topic tags associated with the thread
     """
-    parentLesson: ID
+    topics: [String]
     """
     The ID of the parent thread to be exactly equal to the given value.
     """
@@ -135,4 +141,6 @@ type Mutation {
     updateThread(id: ID!, data: IThreadCreateInput!): Thread
 
     deleteThread(id: ID!): Thread
+
+    addUserAsWatcherToThread(id: ID!, userID: ID!): Thread
 }

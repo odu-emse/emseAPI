@@ -38,7 +38,7 @@ export enum FileType {
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
-    parentLesson?: Nullable<string>;
+    topics?: Nullable<Nullable<string>[]>;
     parentThread?: Nullable<string>;
     author: string;
 }
@@ -53,7 +53,7 @@ export interface IThreadByParams {
     id?: Nullable<string>;
     title?: Nullable<string>;
     body?: Nullable<string>;
-    parentLesson?: Nullable<string>;
+    topics?: Nullable<Nullable<string>[]>;
     parentThread?: Nullable<string>;
     comments?: Nullable<string>;
     author?: Nullable<string>;
@@ -453,6 +453,7 @@ export interface IMutation {
     downvoteThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     updateThread(id: string, data: IThreadCreateInput): Nullable<Thread> | Promise<Nullable<Thread>>;
     deleteThread(id: string): Nullable<Thread> | Promise<Nullable<Thread>>;
+    addUserAsWatcherToThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
     newGroupMessage(groupID: string, message: string, senderID: string): boolean | Promise<boolean>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
@@ -554,9 +555,9 @@ export interface Thread {
     author: User;
     body: string;
     comments?: Nullable<Nullable<Thread>[]>;
+    topics?: Nullable<Nullable<string>[]>;
     upvotes?: Nullable<User[]>;
     usersWatching?: Nullable<User[]>;
-    parentLesson?: Nullable<Lesson>;
     createdAt: Date;
     updatedAt: Date;
     parentThread?: Nullable<Thread>;

@@ -4,7 +4,7 @@ import { IThreadCreateInput } from "@/types/graphql";
 import { AuthService } from "@/auth/auth.service";
 import { UserService } from "@/user/user.service";
 import { PlanOfStudyResolver, PoSService } from "@/pos";
-import { pickRandomFromArray, shuffle } from "../../utils/tests";
+import { pickRandomFromArray, shuffle } from "../../utils";
 import { Prisma } from "@prisma/client";
 import { test, describe, afterAll, expect } from "vitest";
 
@@ -155,6 +155,16 @@ describe("Community", () => {
 				});
 			}
 		});
+		test("should return the threads with topics requested", async () => {
+			const thread = await resolver.thread({ topics: ["key"] });
+			if (!thread || thread instanceof Error)
+				return new Error("Thread not found");
+			else {
+				thread.map((thread) => {
+					expect(thread.topics).toContain("key");
+				});
+			}
+		});
 	});
 	describe("Create", function () {
 		test("should create a thread with author", async () => {
@@ -175,7 +185,6 @@ describe("Community", () => {
 				expect(thread.author.id === account.id).toBe(true);
 				expect(thread.watcherID.includes(account.id)).toBe(true);
 				expect(thread.parentThreadID).toBeNull();
-				expect(thread.parentLessonID).toBeNull();
 				expect(thread.author.watchedThreadIDs.includes(thread.id)).toBe(true);
 			}
 		});

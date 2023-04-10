@@ -42,19 +42,7 @@ export class UserService {
 		assignmentGraded: true,
 		instructorProfile: true,
 		social: true,
-		watchedThreads: {
-			include: {
-				parentLesson: {
-					include: {
-						collection: {
-							include: {
-								module: true
-							}
-						}
-					}
-				}
-			}
-		}
+		watchedThreads: true
 	});
 
 	/**
