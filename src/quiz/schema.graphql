@@ -10,6 +10,10 @@ type Quiz {
 	"""
 	The time the Quiz is due
 	"""
+	instructions: String
+	"""
+	The time the Quiz is due
+	"""
 	dueAt: Date
 	"""
 	The allotted time to take this quiz in ms
@@ -299,6 +303,10 @@ input CreateQuiz {
 	The total amount of points possible on this quiz
 	"""
 	totalPoints: Float!
+	"""
+	The instruction field for this quiz
+	"""
+	instructions: String
 	"""
 	The time the Quiz is due
 	"""

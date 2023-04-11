@@ -77,6 +77,7 @@ describe("Quiz Services", () => {
 				expect(fakeQuiz).toBeDefined();
 				expect(fakeQuiz.id).toBeDefined();
 				expect(fakeQuiz.totalPoints).toEqual(quizData.totalPoints);
+				expect(fakeQuiz.instructions).toEqual(quizData.instructions);
 				expect(fakeQuiz.numQuestions).toEqual(quizData.numQuestions);
 				expect(fakeQuiz.minScore).toEqual(quizData.minScore);
 				expect(fakeQuiz.dueAt).toEqual(quizData.dueAt);
@@ -154,6 +155,7 @@ describe("Quiz Services", () => {
 				const params = fakeQuiz;
 				const quizzes = await resolver.quiz({
 					totalPoints: fakeQuiz.totalPoints,
+					instructions: fakeQuiz.instructions,
 					dueAt: fakeQuiz.dueAt,
 					numQuestions: fakeQuiz.numQuestions,
 					minScore: fakeQuiz.minScore,

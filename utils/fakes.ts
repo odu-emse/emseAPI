@@ -204,6 +204,7 @@ export function createRandomQuiz(parentID?: string): Quiz {
 	return {
 		id: faker.database.mongodbObjectId(),
 		totalPoints: questions,
+		instructions: faker.lorem.sentence(),
 		dueAt: faker.date.future(),
 		timeLimit: faker.datatype.number(),
 		numQuestions: questions,

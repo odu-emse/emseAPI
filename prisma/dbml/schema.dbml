@@ -259,6 +259,7 @@ Table LessonProgress {
 Table Quiz {
   id String [pk]
   totalPoints Float [not null]
+  instructions String [not null]
   dueAt DateTime
   timeLimit Int
   numQuestions Int [not null]

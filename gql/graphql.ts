@@ -309,6 +309,7 @@ export interface QuizResultFields {
 
 export interface CreateQuiz {
     totalPoints: number;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions: number;
@@ -733,6 +734,7 @@ export interface LessonProgress {
 export interface Quiz {
     id: string;
     totalPoints: number;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions: number;
