@@ -296,7 +296,7 @@ model LessonProgress {
 model Quiz {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
   totalPoints    Float
-  instructions   String
+  instructions   String?
   dueAt          DateTime?
   timeLimit      Int?
   numQuestions   Int
