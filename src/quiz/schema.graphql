@@ -8,7 +8,7 @@ type Quiz {
 	"""
 	totalPoints: Float!
 	"""
-	The time the Quiz is due
+	The instruction field for this quiz
 	"""
 	instructions: String
 	"""
@@ -159,6 +159,10 @@ input QuizFields {
 	The total amount of points possible on this quiz
 	"""
 	totalPoints: Float
+	"""
+	The instruction field for this quiz
+	"""
+	instructions: String
 	"""
 	The time the Quiz is due
 	"""

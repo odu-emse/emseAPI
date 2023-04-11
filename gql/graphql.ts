@@ -270,6 +270,7 @@ export interface ProgressWaiveArgs {
 export interface QuizFields {
     id?: Nullable<string>;
     totalPoints?: Nullable<number>;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions?: Nullable<number>;
