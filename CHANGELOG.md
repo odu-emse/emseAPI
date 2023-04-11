@@ -1,4 +1,148 @@
 
+<a name="v0.3.0"></a>
+## [v0.3.0](https://github.com/odu-emse/emseAPI/compare/v0.2.4...v0.3.0) (2023-03-01)
+
+### Bug
+
+* **module:** Added default value to courseIDs array
+* **program:** Updated service includes and return values upon Error
+* **progress:** Worked on module waiver logic
+* **progress:** Added await to db calls in service
+* **progress:** Fixed import not being recognized by ts-jest This is a temporary fix, should be investigated further before merging
+* **progress:** Finished module waiver resolver logic
+* **progress:** Added cascading delete to enrollment field
+* **progress:** Added opposite relation to GraphQL schema Since most times we will pull progress through the module query, I added the include property to the module service.
+* **test:** Fixed create PoS util function fails
+
+### Build
+
+* **docker:** Added mongoDB as a service
+
+### Chore
+
+* **build:** Added Apollo as an optional playground provider
+* **progress:** Created a main export file for feature
+
+### Ci
+
+* **general:** Cut down on duplicate jobs
+* **general:** Updated formatter github user
+* **general:** Updated formatter cmd
+* **general:** Changed workflow trigger on ticket branches
+* **general:** Refactored jobs to run for each branch
+* **test:** Updated workflow triggers
+* **test:** Updated testing command to use
+* **test:** Changed command to use Jest instead of Vite
+
+### Feat
+
+* **community:** Timestamps update on comment addition
+* **dm:** Worked on group messaging sub-feature
+* **dm:** Messages can be sent to groups
+* **dm:** Created a reusable microservice initializer function
+* **dm:** Resolver responds with cached or fresh version
+* **dm:** Created module and service to handle Redis & ws The pub sub service will be used to publish and subscribe to web-socket events, while the Redis module is used for connecting to the Redis store
+* **dm:** Set-up redis communication through Docker
+* **dm:** Started adding Redis to the stack
+* **dm:** Added persistence to messages
+* **dm:** Filtered messages to go to receiver only
+* **dm:** Created sender and listener Both services and resolvers were created for each of these functionalities. `send` is a mutation that distributes the message and `listenForMessage` is the subscription that receives the messages on event trigger.
+* **dm:** Set-up subscriptions at entrypoint
+* **dm:** Installed required dependencies
+* **dm:** Debugged web socket Error on connection
+* **progress:** Added updated service & resolver
+
+### Fix
+
+* **build:** Addressed broken main.ts after rebase
+* **build:** Addressed broken files after rebase
+* **community:** Addressed broken test cases due to lack of import
+* **community:** Thread query now has null as default input
+* **docker:** Updated start command for studio service
+* **general:** Updated gitignore
+* **main:** Fixed & tested CORS issue
+* **program:** Added import statement for arg type
+* **test:** Changed cases to use vitest
+* **test:** Added vitest imports
+
+### Perf
+
+* **test:** Swapped out jest for vitest
+
+### Refactor
+
+* **graphql:** Added Apollo as the playground provider
+* **pos:** Added Error return to plans query
+* **program:** Reduced duplicate functions with reusable scripts
+* **program:** Changed includes to be public member
+* **progress:** Modified the arguments expected by the update service
+* **test:** Removed jest types and improved SWC config
+* **test:** Updated test cases to use vitest
+
+### Test
+
+* **community:** Created case to validate timestamp updating
+* **community:** Created cases to verify thread query bug fix
+* **general:** Removed unused imports
+* **general:** Moved class instantiation outside of beforeAll function to improve coverage
+* **program:** Updated test cases according to service refactor
+* **progress:** Cleaned up test cases
+* **progress:** Created fake data providers for all db models
+* **progress:** Created additional test cases
+* **progress:** Fixed failing test suite
+* **progress:** Extended code coverage of services & resolvers
+* **progress:** Created mock data initialization and cleanup logic
+* **progress:** Achieved full coverage for progress query
+* **utils:** Started testing utility functions
+
+### Pull Requests
+
+* Merge pull request [#436](https://github.com/odu-emse/emseAPI/issues/436) from odu-emse/dev
+* Merge pull request [#451](https://github.com/odu-emse/emseAPI/issues/451) from odu-emse/ALMP-589
+* Merge pull request [#452](https://github.com/odu-emse/emseAPI/issues/452) from odu-emse/ALMP-593
+* Merge pull request [#453](https://github.com/odu-emse/emseAPI/issues/453) from odu-emse/ALMP-541
+* Merge pull request [#446](https://github.com/odu-emse/emseAPI/issues/446) from odu-emse/ALMP-561
+* Merge pull request [#450](https://github.com/odu-emse/emseAPI/issues/450) from odu-emse/ALMP-585
+* Merge pull request [#449](https://github.com/odu-emse/emseAPI/issues/449) from odu-emse/ALMP-569
+* Merge pull request [#447](https://github.com/odu-emse/emseAPI/issues/447) from odu-emse/ALMP-514
+* Merge pull request [#448](https://github.com/odu-emse/emseAPI/issues/448) from odu-emse/ALMP-570
+* Merge pull request [#441](https://github.com/odu-emse/emseAPI/issues/441) from odu-emse/ALMP-523
+* Merge pull request [#438](https://github.com/odu-emse/emseAPI/issues/438) from odu-emse/ALMP-528
+* Merge pull request [#444](https://github.com/odu-emse/emseAPI/issues/444) from odu-emse/ALMP-560
+* Merge pull request [#443](https://github.com/odu-emse/emseAPI/issues/443) from odu-emse/ALMP-555
+* Merge pull request [#440](https://github.com/odu-emse/emseAPI/issues/440) from odu-emse/ALMP-532
+* Merge pull request [#439](https://github.com/odu-emse/emseAPI/issues/439) from odu-emse/ALMP-519
+* Merge pull request [#435](https://github.com/odu-emse/emseAPI/issues/435) from odu-emse/ALMP-476
+
+
+<a name="v0.2.4"></a>
+## [v0.2.4](https://github.com/odu-emse/emseAPI/compare/v0.2.3...v0.2.4) (2023-01-31)
+
+### Pull Requests
+
+* Merge pull request [#420](https://github.com/odu-emse/emseAPI/issues/420) from odu-emse/dev
+* Merge pull request [#431](https://github.com/odu-emse/emseAPI/issues/431) from odu-emse/ALMP-521
+* Merge pull request [#434](https://github.com/odu-emse/emseAPI/issues/434) from odu-emse/ALMP-489
+* Merge pull request [#433](https://github.com/odu-emse/emseAPI/issues/433) from odu-emse/ALMP-522
+* Merge pull request [#430](https://github.com/odu-emse/emseAPI/issues/430) from odu-emse/ALMP-520
+* Merge pull request [#432](https://github.com/odu-emse/emseAPI/issues/432) from odu-emse/ALMP-505
+* Merge pull request [#428](https://github.com/odu-emse/emseAPI/issues/428) from odu-emse/ALMP-512
+* Merge pull request [#429](https://github.com/odu-emse/emseAPI/issues/429) from odu-emse/ALMP-510
+* Merge pull request [#427](https://github.com/odu-emse/emseAPI/issues/427) from odu-emse/ALMP-500
+* Merge pull request [#426](https://github.com/odu-emse/emseAPI/issues/426) from odu-emse/ALMP-513
+* Merge pull request [#424](https://github.com/odu-emse/emseAPI/issues/424) from odu-emse/ALMP-501
+* Merge pull request [#425](https://github.com/odu-emse/emseAPI/issues/425) from odu-emse/ALMP-499
+* Merge pull request [#417](https://github.com/odu-emse/emseAPI/issues/417) from odu-emse/ALMP-494
+* Merge pull request [#421](https://github.com/odu-emse/emseAPI/issues/421) from odu-emse/ALMP-497
+* Merge pull request [#423](https://github.com/odu-emse/emseAPI/issues/423) from odu-emse/ALMP-502
+* Merge pull request [#422](https://github.com/odu-emse/emseAPI/issues/422) from odu-emse/ALMP-498
+* Merge pull request [#419](https://github.com/odu-emse/emseAPI/issues/419) from odu-emse/ALMP-410
+* Merge pull request [#418](https://github.com/odu-emse/emseAPI/issues/418) from odu-emse/ALMP-496
+* Merge pull request [#416](https://github.com/odu-emse/emseAPI/issues/416) from odu-emse/ALMP-483
+* Merge pull request [#415](https://github.com/odu-emse/emseAPI/issues/415) from odu-emse/ALMP-443
+* Merge pull request [#414](https://github.com/odu-emse/emseAPI/issues/414) from odu-emse/ALMP-485
+
+
 <a name="v0.2.3"></a>
 ## [v0.2.3](https://github.com/odu-emse/emseAPI/compare/v0.2.2...v0.2.3) (2023-01-13)
 
@@ -212,9 +356,8 @@
 
 
 Worked on ALMP-224
-  Worked on ALMP-225
+Worked on ALMP-225
 
 Worked on ALMP-225 Introduced ALMP-227
 
 Fixed ALMP-199
-
