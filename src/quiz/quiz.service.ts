@@ -175,7 +175,6 @@ export class QuizService {
 		const update = Prisma.validator<Prisma.QuizUpdateArgs>()({
 			data: {
 				totalPoints: values.totalPoints ? values.totalPoints : undefined,
-				instructions: values.instructions ? values.instructions : undefined,
 				dueAt: values.dueAt ? values.dueAt : undefined,
 				timeLimit: values.timeLimit ? values.timeLimit : undefined,
 				numQuestions: values.numQuestions ? values.numQuestions : undefined,
