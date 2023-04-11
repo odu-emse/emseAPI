@@ -150,6 +150,19 @@ describe("Progress", function () {
 			expect(res).toBeInstanceOf(Error);
 		});
 	});
+
+	describe("Waive module progress", function () {
+		test("should waive a user's module and set it to completed", async function () {
+			const result = await resolver.waiveModule({
+				enrollmentID: enrollment.id
+			});
+			if (result instanceof Error) throw new Error("Progress not waived.");
+			else {
+				expect(result?.completed).toBe(true);
+				expect(result?.status).toBe(100);
+			}
+		});
+	});
 });
 
 const initializeTest = () => {

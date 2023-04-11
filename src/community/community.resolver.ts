@@ -37,10 +37,13 @@ export class CommunityResolver {
 
 	@Mutation("addCommentToThread")
 	async addCommentToThread(
-		@Args("id") id: string,
+		@Args("parentThreadID") parentThreadID: string,
 		@Args("data") data: ICommentCreateInput
 	) {
-		const self = await this.thread({ id });
+		const self = await this.communityService.threadsByParam({
+			id: parentThreadID
+		});
+
 		if (self instanceof Error) return new Error(self.message);
 		else {
 			//creating new comment document
@@ -66,6 +69,11 @@ export class CommunityResolver {
 		return await this.communityService.upvoteThread(id, userID);
 	}
 
+	@Mutation("downvoteThread")
+	async downvoteThread(@Args("id") id: string, @Args("userID") userID: string) {
+		return await this.communityService.downvoteThread(id, userID);
+	}
+
 	@Mutation("updateThread")
 	async updateThread(
 		@Args("id") id: string,
@@ -74,5 +82,13 @@ export class CommunityResolver {
 		const res = await this.communityService.updateThread(id, data);
 		if (res instanceof Error) return new Error(res.message);
 		return res;
+	}
+
+	@Mutation("addUserAsWatcherToThread")
+	async addUserAsWatcherToThread(
+		@Args("id") id: string,
+		@Args("userID") userID: string
+	) {
+		return await this.communityService.addUserAsWatcherToThread(id, userID);
 	}
 }

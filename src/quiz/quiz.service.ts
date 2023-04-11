@@ -8,6 +8,7 @@ import {
 	CreateQuiz,
 	QuestionFields,
 	QuizFields,
+	QuizInstanceFields,
 	QuizResultFields,
 	QuizSubmission,
 	UpdateAnswer,
@@ -21,14 +22,29 @@ export class QuizService {
 
 	private quizInclude = Prisma.validator<Prisma.QuizInclude>()({
 		parentLesson: true,
-		questions: {
+		questionPool: {
 			include: {
 				answers: true
 			}
 		},
-		quizResults: {
+		instances: true
+	});
+
+	private quizInstanceInclude = Prisma.validator<Prisma.QuizInstanceInclude>()({
+		quiz: {
 			include: {
-				student: true
+				parentLesson: true,
+				questionPool: {
+					include: {
+						answers: true
+					}
+				}
+			}
+		},
+		questions: {
+			include: {
+				answers: true,
+				parent: true
 			}
 		}
 	});
@@ -37,8 +53,7 @@ export class QuizService {
 		answers: true,
 		parent: {
 			include: {
-				parentLesson: true,
-				quizResults: true
+				parentLesson: true
 			}
 		}
 	});
@@ -48,8 +63,7 @@ export class QuizService {
 			include: {
 				parent: {
 					include: {
-						parentLesson: true,
-						quizResults: true
+						parentLesson: true
 					}
 				}
 			}
@@ -62,9 +76,10 @@ export class QuizService {
 				student: true
 			}
 		},
-		quiz: {
+		quizInstance: {
 			include: {
-				parentLesson: true
+				quiz: true,
+				questions: {}
 			}
 		}
 	});
@@ -82,6 +97,17 @@ export class QuizService {
 		return this.prisma.quiz.findMany({
 			where,
 			include: this.quizInclude
+		});
+	}
+
+	async quizInstance(args: QuizInstanceFields) {
+		const where = Prisma.validator<Prisma.QuizInstanceWhereInput>()({
+			id: args.id ? args.id : undefined,
+			quizID: args.quiz ? args.quiz : undefined
+		});
+		return this.prisma.quizInstance.findMany({
+			where,
+			include: this.quizInstanceInclude
 		});
 	}
 
@@ -120,7 +146,7 @@ export class QuizService {
 			id: args.id ? args.id : undefined,
 			score: args.score ? args.score : undefined,
 			student: args.student ? { id: args.student } : undefined,
-			quiz: args.quiz ? { id: args.quiz } : undefined
+			quizInstance: args.quizInstance ? { id: args.quizInstance } : undefined
 		});
 		return this.prisma.quizResult.findMany({
 			where,
@@ -168,6 +194,58 @@ export class QuizService {
 
 	async deleteQuiz(id: string) {
 		return this.prisma.quiz.delete({
+			where: {
+				id
+			}
+		});
+	}
+
+	async createQuizInstance(quizID: string) {
+		// Get the quiz template
+		const quiz = await this.prisma.quiz.findFirst({
+			where: {
+				id: quizID
+			},
+			include: {
+				questionPool: {
+					include: {
+						answers: true
+					}
+				}
+			}
+		});
+		if (quiz === null) {
+			return new Error(
+				"Could not find a quiz with given document ID: " + quizID
+			);
+		}
+		//Start an array of question IDs
+		const questionIDs: Array<{ id: string }> = [];
+		//For each question that should be on the quiz
+		for (let i = 1; i <= quiz.numQuestions; i++) {
+			//Get all the variants of this question
+			const questions = quiz.questionPool.filter(
+				(question) => question.number === i
+			);
+			//Select a random question variant
+			questionIDs.push({
+				id: questions[Math.floor(Math.random() * questions.length)].id
+			});
+		}
+		return this.prisma.quizInstance.create({
+			data: {
+				quiz: {
+					connect: { id: quizID }
+				},
+				questions: {
+					connect: questionIDs
+				}
+			}
+		});
+	}
+
+	async deleteQuizInstance(id: string) {
+		return this.prisma.quizInstance.delete({
 			where: {
 				id
 			}
@@ -272,17 +350,38 @@ export class QuizService {
 		if (!student || !student.plan)
 			return new Error("Could not find user plan of study");
 		const plan = student.plan.id;
-
-		//TODO: Add quiz grading logic
-
-		return this.prisma.quizResult.create({
-			data: {
-				score: 100.0,
-				answers: input.answers,
-				student: { connect: { id: plan } },
-				quiz: { connect: { id: input.quiz } }
+		//Score counter;
+		let score = 0.0;
+		//Check all answers
+		const results = input.answers.map(async (answer) => {
+			const answerObj = await this.prisma.answer.findUnique({
+				where: {
+					id: answer
+				},
+				include: {
+					parentQuestion: true
+				}
+			});
+			if (!answerObj) {
+				return new Error("Could not find answer given ID");
+			}
+			if (answerObj.correct) {
+				score += answerObj.parentQuestion.points;
 			}
 		});
+
+		return Promise.all(results).then(() =>
+			this.prisma.quizResult.create({
+				data: {
+					score: score,
+					// answers: input.answers,
+					student: { connect: { id: plan } },
+					quizInstance: { connect: { id: input.quizInstance } }
+				}
+			})
+		);
+		//TODO: Add quiz grading logic
+		// const questions =
 	}
 
 	async updateQuizScore(id: string, newScore: number) {

@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = []
-  binaryTargets   = ["native", "debian-openssl-1.1.x"]
+  binaryTargets   = ["native", "debian-openssl-1.1.x", "linux-arm64-openssl-1.1.x"]
 }
 
 datasource db {
@@ -14,17 +14,19 @@ generator dbml {
 }
 
 model User {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  openID     String    @unique
-  email      String
-  picURL     String?
-  createdAt  DateTime  @default(now())
-  firstName  String
-  lastName   String
-  middleName String?
-  dob        DateTime? @default(now())
-  isAdmin    Boolean   @default(false)
-  isActive   Boolean   @default(false)
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  openID      String    @unique
+  email       String
+  picURL      String?
+  createdAt   DateTime  @default(now())
+  firstName   String
+  lastName    String
+  middleName  String?
+  dob         DateTime? @default(now())
+  isAdmin     Boolean   @default(false)
+  isActive    Boolean   @default(false)
+  biography   String?
+  phoneNumber String?
 
   // Relation fields
   social             Social?            @relation(name: "social")
@@ -40,14 +42,14 @@ model User {
   receivedMessages   DirectMessage[]    @relation(name: "receivedMessages")
   groupMemeberships  Group[]            @relation(name: "groupMemeberships", fields: [groupMembershipIDs], references: [id])
   groupMembershipIDs String[]           @default([]) @db.ObjectId
-  upvotedThreads   Thread[] @relation(name: "upvote", fields: [upvotedThreadIDs], references: [id])
-  upvotedThreadIDs String[] @default([]) @db.ObjectId
+  upvotedThreads     Thread[]           @relation(name: "upvote", fields: [upvotedThreadIDs], references: [id])
+  upvotedThreadIDs   String[]           @default([]) @db.ObjectId
 }
 
 model InstructorProfile {
-  id                            String  @id @default(auto()) @map("_id") @db.ObjectId
-  account                       User?   @relation(fields: [accountID], references: [id])
-  accountID                     String? @unique @db.ObjectId
+  id                            String   @id @default(auto()) @map("_id") @db.ObjectId
+  account                       User?    @relation(fields: [accountID], references: [id])
+  accountID                     String?  @unique @db.ObjectId
   title                         String?
   officeLocation                String?
   officeHours                   String?
@@ -55,7 +57,7 @@ model InstructorProfile {
   phone                         String?
   background                    String?
   researchInterest              String?
-  selectedPapersAndPublications String?
+  selectedPapersAndPublications String[] @default([])
   personalWebsite               String?
   philosophy                    String?
 }
@@ -98,7 +100,7 @@ model Course {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  moduleIDs String[] @db.ObjectId
+  moduleIDs String[] @default([]) @db.ObjectId
   module    Module[] @relation(fields: [moduleIDs], references: [id])
 }
 
@@ -147,13 +149,13 @@ model Lesson {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   transcript   String?
-  threads      Thread[]
   collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
   collectionID String     @db.ObjectId
   position     Int        @default(0)
 
-  content Content[]
-  quizzes Quiz[]
+  content        Content[]
+  quizzes        Quiz[]
+  lessonProgress LessonProgress[]
 }
 
 model ModuleFeedback {
@@ -174,11 +176,12 @@ model ModuleEnrollment {
   status     EnrollmentStatus @default(INACTIVE)
 
   // Relation Fields
-  module   Module       @relation(fields: [moduleId], references: [id])
-  moduleId String       @db.ObjectId
-  plan     PlanOfStudy? @relation(fields: [planID], references: [id])
-  planID   String?      @db.ObjectId
-  progress Progress?
+  module         Module           @relation(fields: [moduleId], references: [id])
+  moduleId       String           @db.ObjectId
+  plan           PlanOfStudy?     @relation(fields: [planID], references: [id])
+  planID         String?          @db.ObjectId
+  progress       Progress?
+  lessonProgress LessonProgress[]
 }
 
 model Assignment {
@@ -214,17 +217,16 @@ model AssignmentResult {
 }
 
 model Thread {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now()) @updatedAt
-  title          String?
-  body           String
-  usersWatching  User[]   @relation(fields: [watcherID], references: [id])
-  watcherID      String[] @default([]) @db.ObjectId
-  author         User     @relation(name: "createdThreads", fields: [authorID], references: [id])
-  authorID       String   @db.ObjectId
-  parentLesson   Lesson?  @relation(fields: [parentLessonID], references: [id])
-  parentLessonID String?  @db.ObjectId
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  title         String?
+  body          String
+  usersWatching User[]   @relation(fields: [watcherID], references: [id])
+  watcherID     String[] @default([]) @db.ObjectId
+  author        User     @relation(name: "createdThreads", fields: [authorID], references: [id])
+  authorID      String   @db.ObjectId
+  topics        String[] @default([])
 
   parentThread   Thread?  @relation("subComments", fields: [parentThreadID], references: [id], onDelete: NoAction, onUpdate: NoAction)
   parentThreadID String?  @db.ObjectId
@@ -235,11 +237,12 @@ model Thread {
 }
 
 model Content {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  type     String
+  id       String      @id @default(auto()) @map("_id") @db.ObjectId
+  type     ContentType
   link     String
-  parent   Lesson @relation(fields: [parentID], references: [id])
-  parentID String @db.ObjectId
+  parent   Lesson      @relation(fields: [parentID], references: [id], onDelete: Cascade)
+  parentID String      @db.ObjectId
+  primary  Boolean
 }
 
 model DirectMessage {
@@ -274,31 +277,56 @@ model Progress {
   completed    Boolean          @default(false)
   // Relation Fields
   enrollment   ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
-  enrollmentID String           @unique
+  enrollmentID String           @unique @db.ObjectId
+}
+
+model LessonProgress {
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @default(now()) @updatedAt
+  status       Float            @default(0)
+  completed    Boolean          @default(false)
+  lesson       Lesson           @relation(fields: [lessonID], references: [id], onDelete: Cascade)
+  lessonID     String           @db.ObjectId
+  // Relation Fields
+  enrollment   ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
+  enrollmentID String           @unique @db.ObjectId
 }
 
 model Quiz {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
   totalPoints    Float
   dueAt          DateTime?
   timeLimit      Int?
   numQuestions   Int
-  minScore       Float        @default(0.0)
-  parentLesson   Lesson       @relation(fields: [parentLessonID], references: [id], onDelete: Cascade)
-  parentLessonID String       @db.ObjectId
-  questions      Question[]
-  quizResults    QuizResult[]
+  minScore       Float          @default(0.0)
+  parentLesson   Lesson         @relation(fields: [parentLessonID], references: [id], onDelete: Cascade)
+  parentLessonID String         @db.ObjectId
+  questionPool   Question[]
+  instances      QuizInstance[]
+}
+
+model QuizInstance {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  quiz         Quiz        @relation(fields: [quizID], references: [id], onDelete: Cascade)
+  quizID       String      @db.ObjectId
+  questions    Question[]  @relation(fields: [questionIDs], references: [id])
+  questionIDs  String[]    @default([]) @db.ObjectId
+  quizResult   QuizResult? @relation(fields: [quizResultID], references: [id])
+  quizResultID String?     @unique @db.ObjectId
 }
 
 model Question {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  number   Int
-  variant  Int      @default(1)
-  text     String
-  points   Float    @default(1.0)
-  answers  Answer[]
-  parent   Quiz     @relation(fields: [parentID], references: [id], onDelete: Cascade)
-  parentID String   @db.ObjectId
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  number      Int
+  variant     Int            @default(1)
+  text        String
+  points      Float          @default(1.0)
+  answers     Answer[]
+  parent      Quiz           @relation(fields: [parentID], references: [id], onDelete: Cascade)
+  parentID    String         @db.ObjectId
+  instances   QuizInstance[] @relation(fields: [instanceIDs], references: [id])
+  instanceIDs String[]       @default([]) @db.ObjectId
 }
 
 model Answer {
@@ -314,13 +342,12 @@ model Answer {
 model QuizResult {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   score       Float
-  answers     String[]
+  // answers     String[]
   submittedAt DateTime @default(now())
 
-  student   PlanOfStudy @relation(fields: [studentID], references: [id])
-  studentID String      @db.ObjectId
-  quiz      Quiz?       @relation(fields: [quizID], references: [id])
-  quizID    String      @default("") @db.ObjectId
+  student      PlanOfStudy   @relation(fields: [studentID], references: [id])
+  studentID    String        @db.ObjectId
+  quizInstance QuizInstance?
 }
 
 enum UserRole {
@@ -334,10 +361,22 @@ enum EnrollmentStatus {
   INACTIVE
 }
 
+enum ContentType {
+  PDF
+  DOC
+  DOCX
+  VIDEO
+  CAPTION
+  TRANSCRIPT
+  QUIZ
+}
+
 enum FileType {
   DOCX
   DOC
   PDF
+  TTT
+  TXT
 }
 
 // Dont need this anymore since we arent doing API Tokens

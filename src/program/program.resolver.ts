@@ -80,6 +80,46 @@ export class ProgramResolver {
 		return await this.programService.moduleEnrollment(args);
 	}
 
+	@Query("lessonsByModuleEnrollment")
+	async lessonsByModuleEnrollment(
+		@Args("planID") planID: string,
+		@Args("moduleID") moduleID: string
+	) {
+		const enrollment = await this.programService.moduleEnrollment({
+			plan: planID
+		});
+
+		const filteredEnrollment = enrollment.filter((enrollment) => {
+			return enrollment.module.id === moduleID;
+		});
+
+		const lessons = filteredEnrollment[0].module.collections.map((collection) =>
+			collection.lessons.map((lesson) => {
+				return lesson;
+			})
+		);
+
+		const filteredLessons = lessons.flat().map((lesson) => {
+			return lesson.lessonProgress.filter((progress) => {
+				return progress.enrollment.id === filteredEnrollment[0].id;
+			});
+		});
+
+		return [
+			...lessons
+				.flat()
+				.sort((a, b) => a.position - b.position)
+				.map((lesson) => {
+					return {
+						...lesson,
+						lessonProgress: filteredLessons
+							.flat()
+							.filter((progress) => progress.lessonID === lesson.id)
+					};
+				})
+		];
+	}
+
 	@Query("collection")
 	async collection(@Args("input") args: CollectionFields | null = null) {
 		return await this.programService.collection(args);
@@ -152,6 +192,12 @@ export class ProgramResolver {
 		@Args("input") args: AssignmentInput
 	) {
 		return await this.programService.updateAssignment(id, args);
+	}
+
+	//Adds objective to the Module
+	@Mutation("addObjectives")
+	async addObjectives(@Args("id") id: string, @Args("input") input: string[]) {
+		return await this.programService.addObjectives(id, input);
 	}
 
 	/// Add module feedback
@@ -261,14 +307,95 @@ export class ProgramResolver {
 
 	@Mutation("createContent")
 	async createContent(@Args("input") input: CreateContentArgs) {
-		return await this.programService.createContent(input);
+		// we get the lesson based on the parent ID of the content
+		const lesson = await this.programService.lesson({
+			id: input.parent
+		});
+
+		// we make a copy of the content array, so we can manipulate it
+		let updatedContentArray = [...lesson[0].content];
+
+		//checking the length of the array to see no two elements have same content type
+		let len = updatedContentArray.filter(
+			(newArr) => newArr.type === input.type
+		).length;
+		if (len == 0) {
+			return await this.programService.createContent(input);
+		} else {
+			throw new Error(
+				"Content type already exists, Please change the content type"
+			);
+		}
 	}
 
 	@Mutation("updateContent")
-	async updateContent(@Args("input") input: ContentFields) {
-		return await this.programService.updateContent(input);
-	}
+	async updateContent(
+		@Args("input") input: Omit<ContentFields, "id"> & { id: string }
+	) {
+		// since we need the ID to update a content, we need to make sure it's there
+		if (!input.id) throw new Error("ID field is required");
+		// we get the content based on the ID passed in, in order to get the parent lesson ID
+		const original = await this.programService.content({
+			id: input.id
+		});
+		// we get the lesson based on the parent ID of the content
+		const lesson = await this.programService.lesson({
+			id: original[0].parentID
+		});
 
+		// we make a copy of the content array, so we can manipulate it
+		let updatedContentArray = [...lesson[0].content];
+
+		// if the change is to make the content primary, we need to make sure there's only one primary content
+		if (input.primary == true) {
+			// we map through the array and make all the content secondary
+			updatedContentArray = updatedContentArray.map((org) => {
+				if (org.primary == true) {
+					org.primary = false;
+				}
+				return org;
+			});
+
+			// we map through the array and make the content that was passed in primary
+			updatedContentArray = updatedContentArray.map((org) => {
+				if (org.id == input.id) {
+					org.primary = true;
+				}
+				return org;
+			});
+		}
+
+		// if the change is to make the content secondary, we need to make sure there's at least one primary content
+		// if there is no primary content, we make the first content in the array primary
+		if (input.primary == false) {
+			// we map through the array and make the content that was passed in secondary
+			updatedContentArray = updatedContentArray.map((org) => {
+				if (org.id == input.id) {
+					org.primary = false;
+				}
+				// we make all the content secondary
+				if (org.primary == true) {
+					org.primary = false;
+				}
+				return org;
+			});
+			// we make the first content in the array primary
+			updatedContentArray[0].primary = true;
+		}
+
+		// we map through the array and update the content using the service
+		const res = updatedContentArray.map(async (content) => {
+			return await this.programService.updateContent({
+				id: content.id,
+				primary: content.primary
+			});
+		});
+
+		// we resolve the promise and return the result
+		return Promise.all(res)
+			.then((res) => res)
+			.catch((err) => new Error(err));
+	}
 	@Mutation("deleteContent")
 	async deleteContent(@Args("contentID") contentID: string) {
 		return await this.programService.deleteContent(contentID);

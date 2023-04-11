@@ -46,7 +46,7 @@ describe("Account services", () => {
 		phone: "757-555-5555",
 		background: "I am a professor",
 		researchInterest: "I am a professor",
-		selectedPapersAndPublications: "",
+		selectedPapersAndPublications: [""],
 		personalWebsite: "https://odu.edu/emse",
 		philosophy: "I  teach people"
 	};
@@ -111,7 +111,9 @@ describe("Account services", () => {
 				firstName: "Testing",
 				lastName: "User",
 				middleName: "Jest",
-				dob: new Date()
+				dob: new Date(),
+				biography: "test-1234",
+				phoneNumber: "12345678"
 			};
 			const updateUser = await resolver.update(updatedUserObj);
 			expect(updateUser).toBeDefined();
@@ -125,6 +127,8 @@ describe("Account services", () => {
 			expect(updateUser.dob).toBeDefined();
 			expect(updateUser.dob).toStrictEqual(updatedUserObj.dob);
 			expect(updateUser.isAdmin).toBeDefined();
+			expect(updateUser.biography).toStrictEqual(updatedUserObj.biography);
+			expect(updateUser.phoneNumber).toStrictEqual(updatedUserObj.phoneNumber);
 		});
 		// TODO: test deletion of user after creation of user is supported
 		// test("should return deleteUser", async () => {});
@@ -160,7 +164,7 @@ describe("Account services", () => {
 				background:
 					"I'm a very experienced professor, and I only use books from 50 years ago.",
 				researchInterest: "Technology",
-				selectedPapersAndPublications: "",
+				selectedPapersAndPublications: [""],
 				personalWebsite: "https://odu.edu/emse",
 				philosophy: "I  teach people"
 			};

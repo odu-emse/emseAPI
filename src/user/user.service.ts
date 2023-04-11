@@ -24,14 +24,25 @@ export class UserService {
 			include: {
 				modules: {
 					include: {
-						module: true
+						module: {
+							include: {
+								parentModules: true,
+								members: true,
+								feedback: true,
+								subModules: true,
+								course: true,
+								assignments: true,
+								collections: true
+							}
+						}
 					}
 				}
 			}
 		},
 		assignmentGraded: true,
 		instructorProfile: true,
-		social: true
+		social: true,
+		watchedThreads: true
 	});
 
 	/**
@@ -55,7 +66,8 @@ export class UserService {
 			plan,
 			feedback,
 			assignmentGraded,
-			instructorProfile
+			biography,
+			phoneNumber
 		} = input;
 
 		const where = Prisma.validator<Prisma.UserWhereInput>()({
@@ -110,11 +122,8 @@ export class UserService {
 					}
 				}
 			}),
-			...(instructorProfile && {
-				instructorProfile: {
-					id: instructorProfile
-				}
-			})
+			...(biography && { biography }),
+			...(phoneNumber && { phoneNumber })
 		});
 
 		let result:
@@ -215,9 +224,7 @@ export class UserService {
 	}
 
 	// Update a user
-	async updateUser(
-		params: UpdateUser
-	): Promise<User & { instructorProfile: InstructorProfile | null }> {
+	async updateUser(params: UpdateUser): Promise<User> {
 		const {
 			id,
 			openID,
@@ -229,7 +236,8 @@ export class UserService {
 			dob,
 			isAdmin,
 			isActive,
-			instructorProfile
+			biography,
+			phoneNumber
 		} = params;
 
 		const res = await this.prisma.user.count({
@@ -242,21 +250,6 @@ export class UserService {
 			throw new Error(`The user with ${openID}, does not exist`);
 		}
 
-		if (instructorProfile !== null) {
-			try {
-				await this.prisma.instructorProfile.update({
-					where: {
-						accountID: id
-					},
-					data: {
-						...instructorProfile
-					}
-				});
-			} catch (error: any) {
-				throw new Error(error.message);
-			}
-		}
-
 		if (!moment(dob).isValid()) {
 			throw new Error("Invalid date of birth");
 		}
@@ -267,6 +260,8 @@ export class UserService {
 			...(firstName && { firstName }),
 			...(lastName && { lastName }),
 			...(middleName && { middleName }),
+			...(biography && { biography }),
+			...(phoneNumber && { phoneNumber }),
 			...(dob && {
 				dob: dob.toISOString()
 			}),
@@ -350,7 +345,7 @@ export class UserService {
 			}
 		});
 
-		return this.prisma.social.updateMany(update);
+		return this.prisma.social.update(update);
 	}
 
 	/// Delete a social record by document ID
@@ -367,6 +362,23 @@ export class UserService {
 		return this.prisma.social.deleteMany({
 			where: {
 				accountID: userId
+			}
+		});
+	}
+
+	async updateInstructorProfile(
+		id: string,
+		input: Prisma.InstructorProfileUpdateInput
+	) {
+		return this.prisma.instructorProfile.update({
+			where: {
+				accountID: id
+			},
+			data: {
+				...input
+			},
+			include: {
+				account: true
 			}
 		});
 	}

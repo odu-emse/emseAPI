@@ -25,11 +25,14 @@ import {
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
-import { idText } from "typescript";
 
 @Injectable()
 export class ProgramService {
 	constructor(private prisma: PrismaService) {}
+
+	private contentInclude = Prisma.validator<Prisma.ContentInclude>()({
+		parent: true
+	});
 
 	private assignmentInclude = Prisma.validator<Prisma.AssignmentInclude>()({
 		module: true,
@@ -103,14 +106,6 @@ export class ProgramService {
 			include: {
 				lessons: {
 					include: {
-						threads: {
-							include: {
-								author: true,
-								comments: true,
-								usersWatching: true,
-								parentThread: true
-							}
-						},
 						content: true
 					}
 				}
@@ -147,7 +142,39 @@ export class ProgramService {
 					student: true
 				}
 			},
-			module: true,
+			module: {
+				include: {
+					parentModules: true,
+					members: {
+						include: {
+							plan: {
+								include: {
+									student: true
+								}
+							}
+						}
+					},
+					collections: {
+						include: {
+							lessons: {
+								include: {
+									content: true,
+									lessonProgress: {
+										include: {
+											enrollment: true
+										}
+									},
+									collection: {
+										include: {
+											module: true
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
 			progress: true
 		});
 
@@ -155,15 +182,7 @@ export class ProgramService {
 		module: true,
 		lessons: {
 			include: {
-				content: true,
-				threads: {
-					include: {
-						author: true,
-						usersWatching: true,
-						parentThread: true,
-						comments: true
-					}
-				}
+				content: true
 			}
 		}
 	});
@@ -181,14 +200,6 @@ export class ProgramService {
 						}
 					}
 				}
-			}
-		},
-		threads: {
-			include: {
-				author: true,
-				usersWatching: true,
-				parentThread: true,
-				comments: true
 			}
 		}
 	});
@@ -277,7 +288,7 @@ export class ProgramService {
 		if (feedback) {
 			payload["feedback"] = {
 				some: {
-					id: feedback!
+					id: feedback
 				}
 			} as Prisma.ModuleWhereInput["feedback"];
 		}
@@ -428,8 +439,12 @@ export class ProgramService {
 			...(role && { role })
 		};
 
-		payload["moduleId"] = module ? module : undefined;
-		payload["planId"] = plan ? plan : undefined;
+		payload["moduleId"] = module
+			? module
+			: (undefined as Prisma.ModuleEnrollmentWhereInput["moduleId"]);
+		payload["planID"] = plan
+			? plan
+			: (undefined as Prisma.ModuleEnrollmentWhereInput["planID"]);
 
 		const where = Prisma.validator<Prisma.ModuleEnrollmentWhereInput>()({
 			...payload
@@ -443,7 +458,7 @@ export class ProgramService {
 
 	async collection(params: CollectionFields | null) {
 		if (!params) {
-			return await this.prisma.collection.findMany({
+			return this.prisma.collection.findMany({
 				include: this.collectionInclude
 			});
 		}
@@ -458,7 +473,11 @@ export class ProgramService {
 				}
 			}),
 			...(moduleID && { moduleID }),
-			...(positionIndex && { position: positionIndex })
+			...(positionIndex && {
+				position: {
+					equals: positionIndex
+				}
+			})
 		});
 
 		// loop out of lessons and check with and
@@ -484,8 +503,7 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, transcript, thread, collection, position } =
-			input;
+		const { id, name, content, transcript, collection, position } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
@@ -493,7 +511,6 @@ export class ProgramService {
 			...(transcript && { transcript }),
 			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
-			threads: thread ? { some: { id: thread } } : undefined,
 			content: content ? { some: { id: content } } : undefined
 		});
 
@@ -510,11 +527,12 @@ export class ProgramService {
 			...(id && { id }),
 			...(type && { type }),
 			...(link && { link }),
-			parent: { id: parent ? parent : undefined }
+			...(parent && { parent: { id: parent } })
 		});
 
 		return this.prisma.content.findMany({
-			where
+			where,
+			include: this.contentInclude
 		});
 	}
 
@@ -589,7 +607,8 @@ export class ProgramService {
 			description,
 			duration,
 			numSlides,
-			keywords
+			keywords,
+			objectives
 		} = data;
 
 		const args = Prisma.validator<Prisma.ModuleUpdateArgs>()({
@@ -602,7 +621,8 @@ export class ProgramService {
 				...(description && { description }),
 				...(duration && { duration }),
 				...(numSlides && { numSlides }),
-				...(keywords && { keywords })
+				...(keywords && { keywords }),
+				...(objectives && { objectives })
 			}
 		});
 
@@ -1006,14 +1026,12 @@ export class ProgramService {
 			// The only thing i could think of is if these were a list of IDs in which case the threads
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
-			collection,
-			thread
+			collection
 		} = input;
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
 			...(transcript && { transcript }),
-			...(thread && { thread }),
 			...(collection && { collection })
 		};
 
@@ -1025,11 +1043,6 @@ export class ProgramService {
 				name: payload.name,
 				transcript: payload.transcript,
 				collectionID: payload.collection,
-				threads: {
-					connect: {
-						id: payload.thread
-					}
-				},
 				position: input.position ? input.position : undefined
 			}
 		});
@@ -1051,7 +1064,7 @@ export class ProgramService {
 	}
 
 	async createContent(input: CreateContentArgs) {
-		const { type, link, parent } = input;
+		const { type, link, parent, primary } = input;
 
 		const data = Prisma.validator<Prisma.ContentCreateInput>()({
 			type,
@@ -1060,16 +1073,18 @@ export class ProgramService {
 				connect: {
 					id: parent
 				}
-			}
+			},
+			primary
 		});
 
 		return this.prisma.content.create({
-			data
+			data,
+			include: this.contentInclude
 		});
 	}
 
 	async updateContent(input: ContentFields) {
-		const { id, type, link, parent } = input;
+		const { id, type, link, parent, primary } = input;
 
 		if (!id) {
 			throw new Error("Id not provided to updateContent");
@@ -1082,8 +1097,10 @@ export class ProgramService {
 			data: {
 				...(type && { type }),
 				...(link && { link }),
-				parent: parent ? { connect: { id: parent } } : undefined
-			}
+				parent: parent ? { connect: { id: parent } } : undefined,
+				primary: primary !== null ? primary : undefined
+			},
+			include: this.contentInclude
 		});
 
 		return this.prisma.content.update(data);
@@ -1093,6 +1110,31 @@ export class ProgramService {
 		return this.prisma.content.delete({
 			where: {
 				id: contentID
+			}
+		});
+	}
+
+	async addObjectives(id: string, input: string[]) {
+		const module = await this.prisma.module.findUnique({
+			where: {
+				id
+			}
+		});
+
+		if (module === null) {
+			throw new Error("Module not found");
+		}
+
+		const objectives = [...module.objectives, input] as Array<string>;
+
+		return this.prisma.module.update({
+			where: {
+				id: id
+			},
+			data: {
+				objectives: {
+					set: objectives
+				}
 			}
 		});
 	}

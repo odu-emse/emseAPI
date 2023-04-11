@@ -8,11 +8,23 @@ enum EnrollmentStatus {
 	ACTIVE
 	INACTIVE
 }
+enum ContentType {
+	PDF
+	DOC
+	DOCX
+	VIDEO
+	CAPTION
+	TRANSCRIPT
+	QUIZ
+}
+
 
 enum FileType {
 	DOCX
 	DOC
 	PDF
+	TTT
+	TXT
 }
 
 type ModuleEnrollment {
@@ -54,6 +66,10 @@ type ModuleEnrollment {
 	The progress that this enrollment is associated with (one-to-one)
 	"""
 	progress: Progress!
+	"""
+	The progress model that is associated with this lesson
+	"""
+	lessonProgress: [LessonProgress]
 }
 
 type AssignmentResult {
@@ -359,6 +375,10 @@ type Lesson {
 	The quizzes that belong to this lesson
 	"""
 	quizzes: [Quiz!]
+	"""
+	The progress model that is associated with this lesson
+	"""
+	lessonProgress: [LessonProgress]
 }
 
 type Content {
@@ -370,7 +390,7 @@ type Content {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String!
+	type: ContentType!
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -381,6 +401,12 @@ type Content {
 	The lesson that this content belongs to.
 	"""
 	parent: Lesson!
+
+    """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
+
 }
 
 type Error {
@@ -427,7 +453,10 @@ type Query {
 	Parameters can be any of the fields that exist in a moduleEnrollment
 	"""
 	moduleEnrollment(input: ModEnrollmentFields!): [ModuleEnrollment!]
-
+	"""
+	Get a list of lessons given the plan ID and enrollment ID
+	"""
+	lessonsByModuleEnrollment(planID: ID!, moduleID: ID!) : [Lesson!]
 	"""
 	Retrieve a specific collection based on document ID
 	"""
@@ -447,7 +476,7 @@ input CreateContentArgs {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String!
+	type: ContentType!
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -458,6 +487,11 @@ input CreateContentArgs {
 	The lesson that this content belongs to.
 	"""
 	parent: ID!
+
+	 """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean!
 }
 
 input ContentFields {
@@ -469,7 +503,7 @@ input ContentFields {
 	"""
 	The type of content that this link/id references
 	"""
-	type: String
+	type: ContentType
 
 	"""
 	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
@@ -480,6 +514,10 @@ input ContentFields {
 	The lesson that this content belongs to.
 	"""
 	parent: ID
+	 """
+	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	"""
+	primary: Boolean
 }
 
 input CreateCollectionArgs {
@@ -630,6 +668,10 @@ input UpdateModule {
 	Keywords in UpdateModule
 	"""
 	keywords: [String!]
+	"""
+	The objective to be added to the module
+	"""
+	objectives: [String!]
 }
 
 input NewAssignment {
@@ -836,6 +878,10 @@ type Mutation {
 	"""
 	addAssignment(input: NewAssignment): Assignment!
 	"""
+	Adds Objectives to a Module while retaining the old ones
+	"""
+	addObjectives(id: ID!, input: [String!]): Module
+	"""
 	Deletes assignments in Module
 	"""
 	deleteAssignment(module: ID!, id: ID!): Module
@@ -934,7 +980,7 @@ type Mutation {
 	"""
 	Update a content Record
 	"""
-	updateContent(input: ContentFields!): Content
+	updateContent(input: ContentFields!): [Content!]
 
 	"""
 	Delete an existing content record
