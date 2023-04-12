@@ -153,6 +153,7 @@ model Lesson {
   collectionID String     @db.ObjectId
   position     Int        @default(0)
   objectives   String[]   @default([])
+  hours        Float      @default(0.0)
 
   content        Content[]
   quizzes        Quiz[]

@@ -129,6 +129,7 @@ Table Lesson {
   collectionID String [not null]
   position Int [not null, default: 0]
   objectives String[] [not null]
+  hours Float [not null, default: 0]
   content Content [not null]
   quizzes Quiz [not null]
   lessonProgress LessonProgress [not null]

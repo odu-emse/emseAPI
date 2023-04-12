@@ -1008,6 +1008,7 @@ export class ProgramService {
 				},
 				position: input.position ? input.position : undefined,
 				objectives: input.objectives ? input.objectives : undefined
+				hours: input.hours
 			},
 			include: this.lessonInclude
 		});
@@ -1030,6 +1031,8 @@ export class ProgramService {
 			// thread,
 			collection,
 			objectives
+			hours
+
 		} = input;
 
 		const newObjectives = objectives;
@@ -1053,7 +1056,8 @@ export class ProgramService {
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
-			...(collection && { collection })
+			...(collection && { collection }),
+			...(hours && { hours })
 		};
 
 		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
@@ -1065,6 +1069,7 @@ export class ProgramService {
 				collectionID: payload.collection,
 				position: input.position ? input.position : undefined,
 				objectives: newObjectives ? newObjectives : undefined
+				hours: payload.hours
 			}
 		});
 

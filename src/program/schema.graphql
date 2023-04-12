@@ -386,6 +386,10 @@ type Lesson {
 	A list of learning objectives being covered in this module
 	"""
 	objectives: 	[String!]!
+  """
+	The number of carnige hours granted for completion of this module
+	"""
+	hours: Float!
 }
 
 type Content {
@@ -834,6 +838,10 @@ input LessonInput {
 	The list of learning objectives for this module
 	"""
 	objectives: [String!]
+  """
+	The number of carnige hours granted for completing this module
+	"""
+	hours: Float!
 }
 
 input LessonFields {
@@ -865,6 +873,10 @@ input LessonFields {
 	Learning objectives that are taught in this module
 	"""
 	objectives: [String!]
+  """
+	The number of carnige hours granted for completing this module
+	"""
+	hours:	Float
 }
 
 type Mutation {

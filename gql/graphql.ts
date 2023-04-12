@@ -246,6 +246,7 @@ export interface LessonInput {
     collection: string;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
+    hours: number;
 }
 
 export interface LessonFields {
@@ -256,6 +257,7 @@ export interface LessonFields {
     collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
+    hours?: Nullable<number>;
 }
 
 export interface ProgressArgs {
@@ -705,6 +707,7 @@ export interface Lesson {
     quizzes?: Nullable<Quiz[]>;
     lessonProgress?: Nullable<Nullable<LessonProgress>[]>;
     objectives: string[];
+    hours: number;
 }
 
 export interface Content {
