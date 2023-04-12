@@ -1006,7 +1006,8 @@ export class ProgramService {
 						id: input.collection ? input.collection : undefined
 					}
 				},
-				position: input.position ? input.position : undefined
+				position: input.position ? input.position : undefined,
+				objectives: input.objectives ? input.objectives : undefined
 			},
 			include: this.lessonInclude
 		});
