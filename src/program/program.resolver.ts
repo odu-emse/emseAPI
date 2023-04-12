@@ -296,7 +296,10 @@ export class ProgramResolver {
 	}
 
 	@Mutation("updateLesson")
-	async updateLesson(@Args("input") input: LessonFields, @Args("replaceObj") replaceObj: boolean = false) {
+	async updateLesson(
+		@Args("input") input: LessonFields,
+		@Args("replaceObj") replaceObj: boolean = false
+	) {
 		return await this.programService.updateLesson(input, replaceObj);
 	}
 

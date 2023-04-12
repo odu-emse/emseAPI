@@ -1039,23 +1039,21 @@ export class ProgramService {
 				where: {
 					id
 				}
-			})
+			});
 			if (current) {
 				// Check if the value is already in the list if its not add it
 				current.objectives.map((value) => {
 					if (!newObjectives.includes(value)) {
 						newObjectives.push(value);
 					}
-				})
+				});
 			}
 		}
-
-
 
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
-			...(collection && { collection }),
+			...(collection && { collection })
 		};
 
 		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
