@@ -355,10 +355,6 @@ type Lesson {
 	"""
 	content: [Content]
 	"""
-	An optional transcript of the content data (primarily for videos)
-	"""
-	transcript: String
-	"""
 	The list of threads related to the lesson
 	"""
 	threads: [Thread]
@@ -801,10 +797,6 @@ input LessonInput {
 	"""
 	content: ID
 	"""
-	An optional transcript of the content data (primarily for videos)
-	"""
-	transcript: String
-	"""
 	The ID of the parent collection
 	"""
 	collection: ID!
@@ -828,10 +820,6 @@ input LessonFields {
 	The link/id of the actual content data itself
 	"""
 	content: ID
-	"""
-	An optional transcript of the content data (primarily for videos)
-	"""
-	transcript: String
 	"""
 	The list of ids to threads related to the lesson (Only a single value is supported)
 	"""

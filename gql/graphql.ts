@@ -237,7 +237,6 @@ export interface ModuleEnrollmentInput {
 export interface LessonInput {
     name: string;
     content?: Nullable<string>;
-    transcript?: Nullable<string>;
     collection: string;
     position?: Nullable<number>;
 }
@@ -246,7 +245,6 @@ export interface LessonFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
     content?: Nullable<string>;
-    transcript?: Nullable<string>;
     thread?: Nullable<string>;
     collection?: Nullable<string>;
     position?: Nullable<number>;
@@ -691,7 +689,6 @@ export interface Lesson {
     id: string;
     name: string;
     content?: Nullable<Nullable<Content>[]>;
-    transcript?: Nullable<string>;
     threads?: Nullable<Nullable<Thread>[]>;
     collection?: Nullable<Collection>;
     position?: Nullable<number>;
