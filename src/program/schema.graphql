@@ -988,8 +988,12 @@ type Mutation {
 	createLesson(input: LessonInput!): Lesson!
 	"""
 	Update a lesson given its ID
+	The input parameter is the data that will be updated in the Lesson as well as the ID of the lesson to be updated.
+	The replaceObj parameter specifies the mode in which lesson objectives should be updated. A true value will repalce
+	existing objectives with the new list passed in, whereas a false value (default) will add the strings in the list to
+	the existing data.
 	"""
-	updateLesson(input: LessonFields): Lesson
+	updateLesson(input: LessonFields, replaceObj: Boolean): Lesson
 
 	deleteLesson(id: String!): Lesson
 

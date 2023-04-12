@@ -490,7 +490,7 @@ export interface IMutation {
     createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
     updateCollection(id: string, data: CollectionFields): Collection | Promise<Collection>;
     createLesson(input: LessonInput): Lesson | Promise<Lesson>;
-    updateLesson(input?: Nullable<LessonFields>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
+    updateLesson(input?: Nullable<LessonFields>, replaceObj?: Nullable<boolean>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
     deleteLesson(id: string): Nullable<Lesson> | Promise<Nullable<Lesson>>;
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;

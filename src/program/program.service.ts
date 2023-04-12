@@ -1018,7 +1018,7 @@ export class ProgramService {
 		});
 	}
 
-	async updateLesson(input: LessonFields) {
+	async updateLesson(input: LessonFields, replaceObj: boolean) {
 		const {
 			id,
 			name,
@@ -1028,12 +1028,34 @@ export class ProgramService {
 			// The only thing i could think of is if these were a list of IDs in which case the threads
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
-			collection
+			collection,
+			objectives
 		} = input;
+
+		const newObjectives = objectives;
+		// Check that they passed in objectives, an ID and they are NOT replacing the list
+		if (newObjectives && id && !replaceObj) {
+			const current = await this.prisma.lesson.findUnique({
+				where: {
+					id
+				}
+			})
+			if (current) {
+				// Check if the value is already in the list if its not add it
+				current.objectives.map((value) => {
+					if (!newObjectives.includes(value)) {
+						newObjectives.push(value);
+					}
+				})
+			}
+		}
+
+
+
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
-			...(collection && { collection })
+			...(collection && { collection }),
 		};
 
 		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
@@ -1043,7 +1065,8 @@ export class ProgramService {
 			data: {
 				name: payload.name,
 				collectionID: payload.collection,
-				position: input.position ? input.position : undefined
+				position: input.position ? input.position : undefined,
+				objectives: newObjectives ? newObjectives : undefined
 			}
 		});
 
