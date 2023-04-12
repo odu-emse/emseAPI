@@ -123,7 +123,6 @@ Table Collection {
 Table Lesson {
   id String [pk]
   name String [not null]
-  transcript String
   collection Collection [not null]
   collectionID String [not null]
   position Int [not null, default: 0]

@@ -503,12 +503,11 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, transcript, collection, position } = input;
+		const { id, name, content, collection, position } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
-			...(transcript && { transcript }),
 			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
 			content: content ? { some: { id: content } } : undefined
@@ -998,7 +997,6 @@ export class ProgramService {
 							}
 						}
 					}),
-				transcript: input.transcript,
 				collection: {
 					connect: {
 						id: input.collection ? input.collection : undefined
@@ -1021,7 +1019,6 @@ export class ProgramService {
 			name,
 			// TODO: Allow for list fields to be updated
 			// content,
-			transcript,
 			// Threads are a list so how these are being updated is going to be a little strange.
 			// The only thing i could think of is if these were a list of IDs in which case the threads
 			// Being refererenced would all have to be modified in this update Lesson.
@@ -1031,7 +1028,6 @@ export class ProgramService {
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
-			...(transcript && { transcript }),
 			...(collection && { collection })
 		};
 
@@ -1041,7 +1037,6 @@ export class ProgramService {
 			},
 			data: {
 				name: payload.name,
-				transcript: payload.transcript,
 				collectionID: payload.collection,
 				position: input.position ? input.position : undefined
 			}
