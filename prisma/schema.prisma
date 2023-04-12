@@ -97,11 +97,12 @@ model Token {
 }
 
 model Course {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-
-  moduleIDs String[] @default([]) @db.ObjectId
-  module    Module[] @relation(fields: [moduleIDs], references: [id])
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  required      Boolean? @default(false)
+  carnegieHours Int?     @default(135)
+  moduleIDs     String[] @default([]) @db.ObjectId
+  module        Module[] @relation(fields: [moduleIDs], references: [id])
 }
 
 model Module {

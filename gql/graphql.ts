@@ -125,6 +125,8 @@ export interface CourseFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
     module?: Nullable<string>;
+    required?: Nullable<boolean>;
+    carnegieHours?: Nullable<number>;
 }
 
 export interface AssignmentFields {
@@ -206,6 +208,9 @@ export interface AssignmentInput {
 
 export interface CourseInput {
     name: string;
+    module: string;
+    required: boolean;
+    carnegieHours: number;
 }
 
 export interface ModuleFeedbackInput {
@@ -653,6 +658,8 @@ export interface Course {
     id: string;
     name: string;
     moduleIDs?: Nullable<Nullable<string>[]>;
+    required: boolean;
+    carnegieHours: number;
 }
 
 export interface Module {

@@ -198,16 +198,22 @@ type Course {
 	course id
 	"""
 	id: ID!
-
 	"""
 	Name of the course
 	"""
 	name: String!
-
 	"""
 	modules in the course
 	"""
 	moduleIDs: [ID]
+	"""
+	Boolean value to check if the course is required/core or an elective
+	"""
+	required: Boolean!
+	"""
+	Number of Carnegie Unit and Student Hours that the course is worth
+	"""
+	carnegieHours: Int!
 }
 
 type Module {
@@ -558,6 +564,8 @@ input CourseFields {
 	id: ID
 	name: String
 	module: ID
+	required: Boolean
+	carnegieHours: Int
 }
 
 input AssignmentFields {
@@ -718,9 +726,21 @@ input AssignmentInput {
 
 input CourseInput {
 	"""
-	New Name of the Course
+	The name of the given Course
 	"""
 	name: String!
+	"""
+	Additional module to be related to the course
+	"""
+	module: ID!
+	"""
+	The boolean attribute to decide weather the course is part of core courses or electives
+	"""
+	required: Boolean!
+	"""
+	The Carnegie Hours of the Course
+	"""
+	carnegieHours: Int!
 }
 
 input ModuleFeedbackInput {
