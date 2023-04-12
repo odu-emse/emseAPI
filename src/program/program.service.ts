@@ -1007,7 +1007,7 @@ export class ProgramService {
 					}
 				},
 				position: input.position ? input.position : undefined,
-				objectives: input.objectives ? input.objectives : undefined
+				objectives: input.objectives ? input.objectives : undefined,
 				hours: input.hours
 			},
 			include: this.lessonInclude
@@ -1030,7 +1030,7 @@ export class ProgramService {
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
 			collection,
-			objectives
+			objectives,
 			hours
 
 		} = input;
@@ -1068,7 +1068,7 @@ export class ProgramService {
 				name: payload.name,
 				collectionID: payload.collection,
 				position: input.position ? input.position : undefined,
-				objectives: newObjectives ? newObjectives : undefined
+				objectives: newObjectives ? newObjectives : undefined,
 				hours: payload.hours
 			}
 		});
