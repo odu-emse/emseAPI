@@ -16,6 +16,7 @@ enum ContentType {
 	CAPTION
 	TRANSCRIPT
 	QUIZ
+	TEXT
 }
 
 

@@ -25,7 +25,8 @@ export enum ContentType {
     VIDEO = "VIDEO",
     CAPTION = "CAPTION",
     TRANSCRIPT = "TRANSCRIPT",
-    QUIZ = "QUIZ"
+    QUIZ = "QUIZ",
+    TEXT = "TEXT"
 }
 
 export enum FileType {
