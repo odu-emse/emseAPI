@@ -382,6 +382,10 @@ type Lesson {
 	The progress model that is associated with this lesson
 	"""
 	lessonProgress: [LessonProgress]
+	"""
+	A list of learning objectives being covered in this module
+	"""
+	objectives: 	[String!]!
 }
 
 type Content {
@@ -826,6 +830,10 @@ input LessonInput {
 	The index of the lesson in the collection
 	"""
 	position: Int
+	"""
+	The list of learning objectives for this module
+	"""
+	objectives: [String!]
 }
 
 input LessonFields {
@@ -853,6 +861,10 @@ input LessonFields {
 	The index of the lesson in the collection
 	"""
 	position: Int
+	"""
+	Learning objectives that are taught in this module
+	"""
+	objectives: [String!]
 }
 
 type Mutation {

@@ -152,6 +152,7 @@ model Lesson {
   collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
   collectionID String     @db.ObjectId
   position     Int        @default(0)
+  objectives   String[]   @default([])
 
   content        Content[]
   quizzes        Quiz[]
