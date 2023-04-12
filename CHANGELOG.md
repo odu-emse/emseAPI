@@ -1,4 +1,67 @@
 
+<a name="v0.3.1"></a>
+## [v0.3.1](https://github.com/odu-emse/emseAPI/compare/v0.3.0...v0.3.1) (2023-04-11)
+
+### Feat
+
+* **community:** Created add user to watchers list mutation
+* **community:** Added topics property and CRUD operation logic
+* **community:** Created add user to watchers list mutation
+* **community:** Added topics property and CRUD operation logic
+* **instructor:** Changed publications data type and create update mutation
+* **lesson:** Created query for getting lessons by planID and enrollmentID
+* **lesson:** Create model to track lesson progress
+* **module:** Created add objectives mutation and service
+* **user:** Added biography and phone number fields
+
+### Fix
+
+* **community:** Add upvoted user includes on comments
+* **community:** Fixed schema issues that broke comment addition Because of mismatching argument names, comments got added to the first thread in the DB since it never got any appropriate parameters to search by.
+* **community:** Removed all references to lessons from threads
+* **community:** Fixed schema issues that broke comment addition Because of mismatching argument names, comments got added to the first thread in the DB since it never got any appropriate parameters to search by.
+* **community:** Removed all references to lessons from threads
+* **content:** Rolled back schema change Making the primary argument required will force us to change the value every time we update the content, regardless of what field we initially wanted to update.
+* **content:** Updated resolver logic to handle validation Completely overhauled the resolver logic as it wasn't working properly.
+* **enrollment:** Added includes to match FE requirements
+* **includes:** Updated includes required by the client-side
+* **includes:** Updated relation population as requested
+* **module:** Objectives are now updatable
+* **module:** Changed objectives data structure
+* **social:** Resolved issue with updating service
+* **test:** Reverted updated made to file
+* **threads:** Fixed author relation not populating in comments Alongside the fix, I created a test case to make sure the includes was created successfully. Made some modifications to the upvote thread test case as well but that needs to be addressed in ALMP-633
+* **user:** Fixed selected papers field update
+
+### Test
+
+* **community:** Created test case for topic based param search
+* **community:** Created test case for topic based param search
+* **content:** Modified test cases to pass
+* **content:** Fixed broken test cases
+
+### Pull Requests
+
+* Merge pull request [#457](https://github.com/odu-emse/emseAPI/issues/457) from odu-emse/dev
+* Merge pull request [#479](https://github.com/odu-emse/emseAPI/issues/479) from odu-emse/ALMP-756
+* Merge pull request [#478](https://github.com/odu-emse/emseAPI/issues/478) from odu-emse/ALMP-674
+* Merge pull request [#477](https://github.com/odu-emse/emseAPI/issues/477) from odu-emse/ALMP-658
+* Merge pull request [#476](https://github.com/odu-emse/emseAPI/issues/476) from odu-emse/ALMP-668
+* Merge pull request [#474](https://github.com/odu-emse/emseAPI/issues/474) from odu-emse/ALMP-631
+* Merge pull request [#459](https://github.com/odu-emse/emseAPI/issues/459) from odu-emse/ALMP-588
+* Merge pull request [#475](https://github.com/odu-emse/emseAPI/issues/475) from odu-emse/ALMP-666
+* Merge pull request [#472](https://github.com/odu-emse/emseAPI/issues/472) from odu-emse/ALMP-640
+* Merge pull request [#473](https://github.com/odu-emse/emseAPI/issues/473) from odu-emse/ALMP-656
+* Merge pull request [#471](https://github.com/odu-emse/emseAPI/issues/471) from odu-emse/ALMP-639
+* Merge pull request [#470](https://github.com/odu-emse/emseAPI/issues/470) from odu-emse/ALMP-612
+* Merge pull request [#465](https://github.com/odu-emse/emseAPI/issues/465) from odu-emse/ALMP-594
+* Merge pull request [#462](https://github.com/odu-emse/emseAPI/issues/462) from odu-emse/ALMP-632
+* Merge pull request [#463](https://github.com/odu-emse/emseAPI/issues/463) from odu-emse/ALMP-633
+* Merge pull request [#458](https://github.com/odu-emse/emseAPI/issues/458) from odu-emse/ALMP-602
+* Merge pull request [#456](https://github.com/odu-emse/emseAPI/issues/456) from odu-emse/ALMP-586
+* Merge pull request [#454](https://github.com/odu-emse/emseAPI/issues/454) from odu-emse/ALMP-600
+
+
 <a name="v0.3.0"></a>
 ## [v0.3.0](https://github.com/odu-emse/emseAPI/compare/v0.2.4...v0.3.0) (2023-03-01)
 
