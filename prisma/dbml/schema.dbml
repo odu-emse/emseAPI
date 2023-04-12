@@ -330,6 +330,7 @@ Enum ContentType {
   CAPTION
   TRANSCRIPT
   QUIZ
+  TEXT
 }
 
 Enum FileType {
