@@ -649,29 +649,33 @@ export class ProgramService {
 	}
 
 	/// Create a course and assign an initial module to that course
-	async addCourse(data: Prisma.CourseCreateInput): Promise<Course | Error> {
-		return await this.prisma.course.create({
+	async addCourse(data: CourseInput) {
+		return this.prisma.course.create({
 			data: {
-				name: data.name
+				name: data.name,
+				carnegieHours: data.carnegieHours,
+				required: data.required
 			},
 			include: this.courseInclude
 		});
 	}
 
-	async updateCourse(id: string, data: CourseInput): Promise<Course> {
-		const { name } = data;
+	async updateCourse(id: string, data: CourseInput) {
+		const { name, required, carnegieHours } = data;
 		return this.prisma.course.update({
 			where: {
 				id: id
 			},
 			data: {
-				...(name && { name })
+				...(name && { name }),
+				...(required && { required }),
+				...(carnegieHours && { carnegieHours })
 			},
 			include: this.courseInclude
 		});
 	}
 
-	async deleteCourse(id: string): Promise<Course> {
+	async deleteCourse(id: string) {
 		await this.prisma.course.update({
 			where: {
 				id
@@ -684,7 +688,7 @@ export class ProgramService {
 			include: this.courseInclude
 		});
 
-		return await this.prisma.course.delete({
+		return this.prisma.course.delete({
 			where: {
 				id
 			}
