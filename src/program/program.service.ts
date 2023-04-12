@@ -1032,7 +1032,6 @@ export class ProgramService {
 			collection,
 			objectives,
 			hours
-
 		} = input;
 
 		const newObjectives = objectives;
