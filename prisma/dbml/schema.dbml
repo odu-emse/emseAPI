@@ -81,6 +81,8 @@ Table Token {
 Table Course {
   id String [pk]
   name String [not null]
+  required Boolean [default: false]
+  carnegieHours Int [default: 135]
   moduleIDs String[] [not null]
   module Module [not null]
 }
