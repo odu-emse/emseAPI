@@ -1006,7 +1006,8 @@ export class ProgramService {
 						id: input.collection ? input.collection : undefined
 					}
 				},
-				position: input.position ? input.position : undefined
+				position: input.position ? input.position : undefined,
+				hours: input.hours
 			},
 			include: this.lessonInclude
 		});
@@ -1027,12 +1028,14 @@ export class ProgramService {
 			// The only thing i could think of is if these were a list of IDs in which case the threads
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
-			collection
+			collection,
+			hours
 		} = input;
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
-			...(collection && { collection })
+			...(collection && { collection }),
+			...(hours && { hours })
 		};
 
 		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
@@ -1042,7 +1045,8 @@ export class ProgramService {
 			data: {
 				name: payload.name,
 				collectionID: payload.collection,
-				position: input.position ? input.position : undefined
+				position: input.position ? input.position : undefined,
+				hours: payload.hours
 			}
 		});
 

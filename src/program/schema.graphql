@@ -382,6 +382,10 @@ type Lesson {
 	The progress model that is associated with this lesson
 	"""
 	lessonProgress: [LessonProgress]
+	"""
+	The number of carnige hours granted for completion of this module
+	"""
+	hours: Float!
 }
 
 type Content {
@@ -826,6 +830,10 @@ input LessonInput {
 	The index of the lesson in the collection
 	"""
 	position: Int
+	"""
+	The number of carnige hours granted for completing this module
+	"""
+	hours: Float!
 }
 
 input LessonFields {
@@ -853,6 +861,10 @@ input LessonFields {
 	The index of the lesson in the collection
 	"""
 	position: Int
+	"""
+	The number of carnige hours granted for completing this module
+	"""
+	hours:	Float
 }
 
 type Mutation {
