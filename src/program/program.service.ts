@@ -503,14 +503,15 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, collection, position } = input;
+		const { id, name, content, collection, position, objectives} = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
 			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
-			content: content ? { some: { id: content } } : undefined
+			content: content ? { some: { id: content } } : undefined,
+			objectives: objectives ? { hasEvery: objectives} : undefined
 		});
 
 		return this.prisma.lesson.findMany({
