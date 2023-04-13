@@ -503,14 +503,15 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, collection, position } = input;
+		const { id, name, content, collection, position, objectives } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
 			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
-			content: content ? { some: { id: content } } : undefined
+			content: content ? { some: { id: content } } : undefined,
+			objectives: objectives ? { hasEvery: objectives } : undefined
 		});
 
 		return this.prisma.lesson.findMany({
@@ -1007,6 +1008,7 @@ export class ProgramService {
 					}
 				},
 				position: input.position ? input.position : undefined,
+				objectives: input.objectives ? input.objectives : undefined,
 				hours: input.hours
 			},
 			include: this.lessonInclude
@@ -1018,7 +1020,7 @@ export class ProgramService {
 		});
 	}
 
-	async updateLesson(input: LessonFields) {
+	async updateLesson(input: LessonFields, replaceObj: boolean) {
 		const {
 			id,
 			name,
@@ -1029,8 +1031,28 @@ export class ProgramService {
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
 			collection,
+			objectives,
 			hours
 		} = input;
+
+		const newObjectives = objectives;
+		// Check that they passed in objectives, an ID and they are NOT replacing the list
+		if (newObjectives && id && !replaceObj) {
+			const current = await this.prisma.lesson.findUnique({
+				where: {
+					id
+				}
+			});
+			if (current) {
+				// Check if the value is already in the list if its not add it
+				current.objectives.map((value) => {
+					if (!newObjectives.includes(value)) {
+						newObjectives.push(value);
+					}
+				});
+			}
+		}
+
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
@@ -1046,6 +1068,7 @@ export class ProgramService {
 				name: payload.name,
 				collectionID: payload.collection,
 				position: input.position ? input.position : undefined,
+				objectives: newObjectives ? newObjectives : undefined,
 				hours: payload.hours
 			}
 		});

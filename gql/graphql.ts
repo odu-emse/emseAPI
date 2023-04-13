@@ -245,6 +245,7 @@ export interface LessonInput {
     content?: Nullable<string>;
     collection: string;
     position?: Nullable<number>;
+    objectives?: Nullable<string[]>;
     hours: number;
 }
 
@@ -255,6 +256,7 @@ export interface LessonFields {
     thread?: Nullable<string>;
     collection?: Nullable<string>;
     position?: Nullable<number>;
+    objectives?: Nullable<string[]>;
     hours?: Nullable<number>;
 }
 
@@ -493,7 +495,7 @@ export interface IMutation {
     createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
     updateCollection(id: string, data: CollectionFields): Collection | Promise<Collection>;
     createLesson(input: LessonInput): Lesson | Promise<Lesson>;
-    updateLesson(input?: Nullable<LessonFields>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
+    updateLesson(input?: Nullable<LessonFields>, replaceObj?: Nullable<boolean>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
     deleteLesson(id: string): Nullable<Lesson> | Promise<Nullable<Lesson>>;
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
@@ -707,6 +709,7 @@ export interface Lesson {
     position?: Nullable<number>;
     quizzes?: Nullable<Quiz[]>;
     lessonProgress?: Nullable<Nullable<LessonProgress>[]>;
+    objectives: string[];
     hours: number;
 }
 

@@ -383,6 +383,10 @@ type Lesson {
 	"""
 	lessonProgress: [LessonProgress]
 	"""
+	A list of learning objectives being covered in this module
+	"""
+	objectives: 	[String!]!
+  """
 	The number of carnige hours granted for completion of this module
 	"""
 	hours: Float!
@@ -831,6 +835,10 @@ input LessonInput {
 	"""
 	position: Int
 	"""
+	The list of learning objectives for this module
+	"""
+	objectives: [String!]
+  """
 	The number of carnige hours granted for completing this module
 	"""
 	hours: Float!
@@ -862,6 +870,10 @@ input LessonFields {
 	"""
 	position: Int
 	"""
+	Learning objectives that are taught in this module
+	"""
+	objectives: [String!]
+  """
 	The number of carnige hours granted for completing this module
 	"""
 	hours:	Float
@@ -988,8 +1000,12 @@ type Mutation {
 	createLesson(input: LessonInput!): Lesson!
 	"""
 	Update a lesson given its ID
+	The input parameter is the data that will be updated in the Lesson as well as the ID of the lesson to be updated.
+	The replaceObj parameter specifies the mode in which lesson objectives should be updated. A true value will repalce
+	existing objectives with the new list passed in, whereas a false value (default) will add the strings in the list to
+	the existing data.
 	"""
-	updateLesson(input: LessonFields): Lesson
+	updateLesson(input: LessonFields, replaceObj: Boolean): Lesson
 
 	deleteLesson(id: String!): Lesson
 
