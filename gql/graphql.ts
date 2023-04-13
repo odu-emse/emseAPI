@@ -276,6 +276,7 @@ export interface ProgressWaiveArgs {
 export interface QuizFields {
     id?: Nullable<string>;
     totalPoints?: Nullable<number>;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions?: Nullable<number>;
@@ -315,6 +316,7 @@ export interface QuizResultFields {
 
 export interface CreateQuiz {
     totalPoints: number;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions: number;
@@ -324,6 +326,7 @@ export interface CreateQuiz {
 
 export interface UpdateQuiz {
     totalPoints?: Nullable<number>;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions?: Nullable<number>;
@@ -741,6 +744,7 @@ export interface LessonProgress {
 export interface Quiz {
     id: string;
     totalPoints: number;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions: number;

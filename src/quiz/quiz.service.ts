@@ -88,6 +88,7 @@ export class QuizService {
 		const where = Prisma.validator<Prisma.QuizWhereInput>()({
 			id: args.id ? args.id : undefined,
 			totalPoints: args.totalPoints ? args.totalPoints : undefined,
+			instructions: args.instructions ? args.instructions : undefined,
 			dueAt: args.dueAt ? args.dueAt : undefined,
 			timeLimit: args.timeLimit ? args.timeLimit : undefined,
 			numQuestions: args.numQuestions ? args.numQuestions : undefined,
@@ -157,6 +158,7 @@ export class QuizService {
 	async createQuiz(input: CreateQuiz) {
 		const create = Prisma.validator<Prisma.QuizCreateInput>()({
 			totalPoints: input.totalPoints,
+			instructions: input.instructions ? input.instructions : undefined,
 			dueAt: input.dueAt ? input.dueAt : undefined,
 			timeLimit: input.timeLimit ? input.timeLimit : undefined,
 			numQuestions: input.numQuestions,
@@ -173,6 +175,7 @@ export class QuizService {
 		const update = Prisma.validator<Prisma.QuizUpdateArgs>()({
 			data: {
 				totalPoints: values.totalPoints ? values.totalPoints : undefined,
+				instructions: values.instructions ? values.instructions : undefined,
 				dueAt: values.dueAt ? values.dueAt : undefined,
 				timeLimit: values.timeLimit ? values.timeLimit : undefined,
 				numQuestions: values.numQuestions ? values.numQuestions : undefined,

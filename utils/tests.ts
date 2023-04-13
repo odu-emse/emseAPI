@@ -91,6 +91,7 @@ export const createCollection = async (
 export const createQuiz = async (resolver: QuizResolver, input: Quiz) => {
 	const data: CreateQuiz = {
 		totalPoints: input.totalPoints,
+		instructions: input.instructions,
 		dueAt: input.dueAt,
 		timeLimit: input.timeLimit,
 		numQuestions: input.numQuestions,
