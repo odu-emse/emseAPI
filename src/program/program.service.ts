@@ -163,6 +163,11 @@ export class ProgramService {
 										include: {
 											enrollment: true
 										}
+									},
+									collection: {
+										include: {
+											module: true
+										}
 									}
 								}
 							}
@@ -498,12 +503,11 @@ export class ProgramService {
 
 	//Fetch Lessons
 	async lesson(input: LessonFields) {
-		const { id, name, content, transcript, collection, position } = input;
+		const { id, name, content, collection, position } = input;
 
 		const where = Prisma.validator<Prisma.LessonWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
-			...(transcript && { transcript }),
 			...(position && { position }),
 			collection: { id: collection ? collection : undefined },
 			content: content ? { some: { id: content } } : undefined
@@ -644,29 +648,33 @@ export class ProgramService {
 	}
 
 	/// Create a course and assign an initial module to that course
-	async addCourse(data: Prisma.CourseCreateInput): Promise<Course | Error> {
-		return await this.prisma.course.create({
+	async addCourse(data: CourseInput) {
+		return this.prisma.course.create({
 			data: {
-				name: data.name
+				name: data.name,
+				carnegieHours: data.carnegieHours,
+				required: data.required
 			},
 			include: this.courseInclude
 		});
 	}
 
-	async updateCourse(id: string, data: CourseInput): Promise<Course> {
-		const { name } = data;
+	async updateCourse(id: string, data: CourseInput) {
+		const { name, required, carnegieHours } = data;
 		return this.prisma.course.update({
 			where: {
 				id: id
 			},
 			data: {
-				...(name && { name })
+				...(name && { name }),
+				...(required && { required }),
+				...(carnegieHours && { carnegieHours })
 			},
 			include: this.courseInclude
 		});
 	}
 
-	async deleteCourse(id: string): Promise<Course> {
+	async deleteCourse(id: string) {
 		await this.prisma.course.update({
 			where: {
 				id
@@ -679,7 +687,7 @@ export class ProgramService {
 			include: this.courseInclude
 		});
 
-		return await this.prisma.course.delete({
+		return this.prisma.course.delete({
 			where: {
 				id
 			}
@@ -993,13 +1001,13 @@ export class ProgramService {
 							}
 						}
 					}),
-				transcript: input.transcript,
 				collection: {
 					connect: {
 						id: input.collection ? input.collection : undefined
 					}
 				},
-				position: input.position ? input.position : undefined
+				position: input.position ? input.position : undefined,
+				hours: input.hours
 			},
 			include: this.lessonInclude
 		});
@@ -1016,18 +1024,18 @@ export class ProgramService {
 			name,
 			// TODO: Allow for list fields to be updated
 			// content,
-			transcript,
 			// Threads are a list so how these are being updated is going to be a little strange.
 			// The only thing i could think of is if these were a list of IDs in which case the threads
 			// Being refererenced would all have to be modified in this update Lesson.
 			// thread,
-			collection
+			collection,
+			hours
 		} = input;
 		const payload = {
 			...(id && { id }),
 			...(name && { name }),
-			...(transcript && { transcript }),
-			...(collection && { collection })
+			...(collection && { collection }),
+			...(hours && { hours })
 		};
 
 		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
@@ -1036,9 +1044,9 @@ export class ProgramService {
 			},
 			data: {
 				name: payload.name,
-				transcript: payload.transcript,
 				collectionID: payload.collection,
-				position: input.position ? input.position : undefined
+				position: input.position ? input.position : undefined,
+				hours: payload.hours
 			}
 		});
 

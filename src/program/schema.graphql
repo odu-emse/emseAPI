@@ -16,6 +16,7 @@ enum ContentType {
 	CAPTION
 	TRANSCRIPT
 	QUIZ
+	TEXT
 }
 
 
@@ -198,16 +199,22 @@ type Course {
 	course id
 	"""
 	id: ID!
-
 	"""
 	Name of the course
 	"""
 	name: String!
-
 	"""
 	modules in the course
 	"""
 	moduleIDs: [ID]
+	"""
+	Boolean value to check if the course is required/core or an elective
+	"""
+	required: Boolean!
+	"""
+	Number of Carnegie Unit and Student Hours that the course is worth
+	"""
+	carnegieHours: Int!
 }
 
 type Module {
@@ -355,10 +362,6 @@ type Lesson {
 	"""
 	content: [Content]
 	"""
-	An optional transcript of the content data (primarily for videos)
-	"""
-	transcript: String
-	"""
 	The list of threads related to the lesson
 	"""
 	threads: [Thread]
@@ -379,6 +382,10 @@ type Lesson {
 	The progress model that is associated with this lesson
 	"""
 	lessonProgress: [LessonProgress]
+	"""
+	The number of carnige hours granted for completion of this module
+	"""
+	hours: Float!
 }
 
 type Content {
@@ -558,6 +565,8 @@ input CourseFields {
 	id: ID
 	name: String
 	module: ID
+	required: Boolean
+	carnegieHours: Int
 }
 
 input AssignmentFields {
@@ -718,9 +727,21 @@ input AssignmentInput {
 
 input CourseInput {
 	"""
-	New Name of the Course
+	The name of the given Course
 	"""
 	name: String!
+	"""
+	Additional module to be related to the course
+	"""
+	module: ID!
+	"""
+	The boolean attribute to decide weather the course is part of core courses or electives
+	"""
+	required: Boolean!
+	"""
+	The Carnegie Hours of the Course
+	"""
+	carnegieHours: Int!
 }
 
 input ModuleFeedbackInput {
@@ -801,10 +822,6 @@ input LessonInput {
 	"""
 	content: ID
 	"""
-	An optional transcript of the content data (primarily for videos)
-	"""
-	transcript: String
-	"""
 	The ID of the parent collection
 	"""
 	collection: ID!
@@ -813,6 +830,10 @@ input LessonInput {
 	The index of the lesson in the collection
 	"""
 	position: Int
+	"""
+	The number of carnige hours granted for completing this module
+	"""
+	hours: Float!
 }
 
 input LessonFields {
@@ -829,10 +850,6 @@ input LessonFields {
 	"""
 	content: ID
 	"""
-	An optional transcript of the content data (primarily for videos)
-	"""
-	transcript: String
-	"""
 	The list of ids to threads related to the lesson (Only a single value is supported)
 	"""
 	thread: ID
@@ -844,6 +861,10 @@ input LessonFields {
 	The index of the lesson in the collection
 	"""
 	position: Int
+	"""
+	The number of carnige hours granted for completing this module
+	"""
+	hours:	Float
 }
 
 type Mutation {

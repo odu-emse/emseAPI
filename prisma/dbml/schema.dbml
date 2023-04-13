@@ -81,6 +81,8 @@ Table Token {
 Table Course {
   id String [pk]
   name String [not null]
+  required Boolean [default: false]
+  carnegieHours Int [default: 135]
   moduleIDs String[] [not null]
   module Module [not null]
 }
@@ -123,10 +125,10 @@ Table Collection {
 Table Lesson {
   id String [pk]
   name String [not null]
-  transcript String
   collection Collection [not null]
   collectionID String [not null]
   position Int [not null, default: 0]
+  hours Float [not null, default: 0]
   content Content [not null]
   quizzes Quiz [not null]
   lessonProgress LessonProgress [not null]
@@ -331,6 +333,7 @@ Enum ContentType {
   CAPTION
   TRANSCRIPT
   QUIZ
+  TEXT
 }
 
 Enum FileType {

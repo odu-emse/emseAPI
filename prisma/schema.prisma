@@ -97,11 +97,12 @@ model Token {
 }
 
 model Course {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-
-  moduleIDs String[] @default([]) @db.ObjectId
-  module    Module[] @relation(fields: [moduleIDs], references: [id])
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  required      Boolean? @default(false)
+  carnegieHours Int?     @default(135)
+  moduleIDs     String[] @default([]) @db.ObjectId
+  module        Module[] @relation(fields: [moduleIDs], references: [id])
 }
 
 model Module {
@@ -148,10 +149,10 @@ model Collection {
 model Lesson {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  transcript   String?
   collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
   collectionID String     @db.ObjectId
   position     Int        @default(0)
+  hours        Float      @default(0.0)
 
   content        Content[]
   quizzes        Quiz[]
@@ -370,6 +371,7 @@ enum ContentType {
   CAPTION
   TRANSCRIPT
   QUIZ
+  TEXT
 }
 
 enum FileType {

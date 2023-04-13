@@ -25,7 +25,8 @@ export enum ContentType {
     VIDEO = "VIDEO",
     CAPTION = "CAPTION",
     TRANSCRIPT = "TRANSCRIPT",
-    QUIZ = "QUIZ"
+    QUIZ = "QUIZ",
+    TEXT = "TEXT"
 }
 
 export enum FileType {
@@ -125,6 +126,8 @@ export interface CourseFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
     module?: Nullable<string>;
+    required?: Nullable<boolean>;
+    carnegieHours?: Nullable<number>;
 }
 
 export interface AssignmentFields {
@@ -206,6 +209,9 @@ export interface AssignmentInput {
 
 export interface CourseInput {
     name: string;
+    module: string;
+    required: boolean;
+    carnegieHours: number;
 }
 
 export interface ModuleFeedbackInput {
@@ -237,19 +243,19 @@ export interface ModuleEnrollmentInput {
 export interface LessonInput {
     name: string;
     content?: Nullable<string>;
-    transcript?: Nullable<string>;
     collection: string;
     position?: Nullable<number>;
+    hours: number;
 }
 
 export interface LessonFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
     content?: Nullable<string>;
-    transcript?: Nullable<string>;
     thread?: Nullable<string>;
     collection?: Nullable<string>;
     position?: Nullable<number>;
+    hours?: Nullable<number>;
 }
 
 export interface ProgressArgs {
@@ -656,6 +662,8 @@ export interface Course {
     id: string;
     name: string;
     moduleIDs?: Nullable<Nullable<string>[]>;
+    required: boolean;
+    carnegieHours: number;
 }
 
 export interface Module {
@@ -694,12 +702,12 @@ export interface Lesson {
     id: string;
     name: string;
     content?: Nullable<Nullable<Content>[]>;
-    transcript?: Nullable<string>;
     threads?: Nullable<Nullable<Thread>[]>;
     collection?: Nullable<Collection>;
     position?: Nullable<number>;
     quizzes?: Nullable<Quiz[]>;
     lessonProgress?: Nullable<Nullable<LessonProgress>[]>;
+    hours: number;
 }
 
 export interface Content {

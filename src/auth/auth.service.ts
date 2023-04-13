@@ -54,7 +54,7 @@ export class AuthService {
 		}: TokenType = JSON.parse(decoded);
 
 		if (!sub) {
-			throw new Error("Invalid token");
+			return new Error("Invalid token");
 		}
 
 		//Check to see if a user exists already
@@ -79,11 +79,31 @@ export class AuthService {
 			const account = await this.registerUser(payload);
 
 			if (account instanceof Error) {
-				throw "Error adding plan to user.";
+				return Error("Error while creating user account.");
 			} else {
-				await this.pos.addPlan({
+				const plan = await this.pos.addPlan({
 					student: account.id
 				});
+
+				if (!plan) {
+					return Error("Error while creating plan of study.");
+				} else {
+					const social = await this.prisma.social.create({
+						data: {
+							account: {
+								connect: {
+									id: account.id
+								}
+							}
+						}
+					});
+
+					if (!social) {
+						return Error("Error while creating social profile.");
+					} else {
+						return account;
+					}
+				}
 			}
 		} else {
 			const update = Prisma.validator<Prisma.UserUpdateInput>()({

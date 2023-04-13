@@ -13,7 +13,8 @@ import { CommunityModule } from "./community/community.module";
 import { DirectMessageModule } from "@/direct-message/direct-message.module";
 import { ProgressModule } from "@/progress";
 import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
-import {QuizModule} from "@/quiz/quiz.module";
+import { QuizModule } from "@/quiz/quiz.module";
+import { AppResolver } from "@/app.resolver";
 
 @Scalar("Date")
 export class DateScalar implements CustomScalar<string, Moment> {
@@ -68,7 +69,7 @@ const playgroundConfig =
 				"graphql-ws": true,
 				"subscriptions-transport-ws": false
 			},
-			context: ({req, res}) => ({req, res})
+			context: ({ req, res }) => ({ req, res })
 		}),
 		UserModule,
 		PoSModule,
@@ -80,6 +81,6 @@ const playgroundConfig =
 		QuizModule
 	],
 	controllers: [],
-	providers: [DateScalar]
+	providers: [DateScalar, AppResolver]
 })
 export class AppModule {}
