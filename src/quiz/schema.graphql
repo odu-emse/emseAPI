@@ -339,6 +339,10 @@ input UpdateQuiz {
 	"""
 	totalPoints: Float
 	"""
+	The instruction field for this quiz
+	"""
+	instructions: String
+	"""
 	The time the Quiz is due
 	"""
 	dueAt: Date

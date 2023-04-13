@@ -305,6 +305,7 @@ describe("Quiz Services", () => {
 				const quizData = createRandomQuiz();
 				const updatedQuiz = await resolver.updateQuiz(fakeQuiz.id, {
 					totalPoints: quizData.totalPoints,
+					instructions: quizData.instructions,
 					numQuestions: quizData.numQuestions,
 					minScore: quizData.minScore,
 					parentLesson: otherLesson.id,
@@ -312,6 +313,7 @@ describe("Quiz Services", () => {
 				});
 				expect(updatedQuiz).toBeDefined();
 				expect(updatedQuiz.totalPoints).toEqual(quizData.totalPoints);
+				expect(updatedQuiz.instructions).toEqual(quizData.instructions);
 				expect(updatedQuiz.numQuestions).toEqual(quizData.numQuestions);
 				expect(updatedQuiz.minScore).toEqual(quizData.minScore);
 				expect(updatedQuiz.parentLesson.id).toEqual(otherLesson.id);

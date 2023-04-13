@@ -320,6 +320,7 @@ export interface CreateQuiz {
 
 export interface UpdateQuiz {
     totalPoints?: Nullable<number>;
+    instructions?: Nullable<string>;
     dueAt?: Nullable<Date>;
     timeLimit?: Nullable<number>;
     numQuestions?: Nullable<number>;
