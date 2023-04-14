@@ -1,12 +1,12 @@
 import {
 	AssignmentInput,
 	CourseInput,
-	ModuleEnrollmentInput,
-	ModuleFeedbackUpdate,
+	SectionEnrollmentInput,
+	SectionFeedbackUpdate,
 	NewAssignment,
 	NewAssignmentResult,
-	UpdateModule,
-	ModuleFields,
+	UpdateSection,
+	SectionFields,
 	CourseFields,
 	AssignmentFields,
 	ModFeedbackFields,
@@ -17,7 +17,7 @@ import {
 	CreateCollectionArgs,
 	CreateContentArgs,
 	ModEnrollmentFields,
-	NewModule,
+	NewSection,
 	CollectionFields
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
@@ -31,25 +31,25 @@ import { AuthGuard } from "@/auth.guard";
 export class ProgramResolver {
 	constructor(private readonly programService: ProgramService) {}
 
-	// Get Module(s)
-	@Query("module")
-	async module(
-		@Args("input") args: ModuleFields,
+	// Get Section(s)
+	@Query("section")
+	async section(
+		@Args("input") args: SectionFields,
 		@Args("memberRole") role?: UserRole
 	) {
-		const result = await this.programService.module(args);
+		const result = await this.programService.section(args);
 		if (!result) {
-			return new Error("Module not found");
+			return new Error("Section not found");
 		}
 		if (!role) {
 			return result;
 		} else {
-			return result.map((module) => {
-				const thisModule = module;
-				thisModule.members = module.members.filter(
+			return result.map((section) => {
+				const thisSection = section;
+				thisSection.members = section.members.filter(
 					(value) => value.role === role
 				);
-				return thisModule;
+				return thisSection;
 			});
 		}
 	}
@@ -65,9 +65,9 @@ export class ProgramResolver {
 		return await this.programService.assignment(args);
 	}
 
-	@Query("moduleFeedback")
-	async moduleFeedback(@Args("input") args: ModFeedbackFields) {
-		return await this.programService.moduleFeedback(args);
+	@Query("sectionFeedback")
+	async sectionFeedback(@Args("input") args: ModFeedbackFields) {
+		return await this.programService.sectionFeedback(args);
 	}
 
 	@Query("assignmentResult")
@@ -75,25 +75,25 @@ export class ProgramResolver {
 		return await this.programService.assignmentResult(args);
 	}
 
-	@Query("moduleEnrollment")
-	async moduleEnrollment(@Args("input") args: ModEnrollmentFields) {
-		return await this.programService.moduleEnrollment(args);
+	@Query("sectionEnrollment")
+	async sectionEnrollment(@Args("input") args: ModEnrollmentFields) {
+		return await this.programService.sectionEnrollment(args);
 	}
 
-	@Query("lessonsByModuleEnrollment")
-	async lessonsByModuleEnrollment(
+	@Query("lessonsBySectionEnrollment")
+	async lessonsBySectionEnrollment(
 		@Args("planID") planID: string,
-		@Args("moduleID") moduleID: string
+		@Args("sectionID") sectionID: string
 	) {
-		const enrollment = await this.programService.moduleEnrollment({
+		const enrollment = await this.programService.sectionEnrollment({
 			plan: planID
 		});
 
 		const filteredEnrollment = enrollment.filter((enrollment) => {
-			return enrollment.module.id === moduleID;
+			return enrollment.section.id === sectionID;
 		});
 
-		const lessons = filteredEnrollment[0].module.collections.map((collection) =>
+		const lessons = filteredEnrollment[0].section.collections.map((collection) =>
 			collection.lessons.map((lesson) => {
 				return lesson;
 			})
@@ -137,22 +137,22 @@ export class ProgramResolver {
 
 	// Mutations
 
-	// Add a module to the db with all required initial fields
-	@Mutation("addModule")
-	async create(@Args("input") args: NewModule) {
-		return await this.programService.addModule(args);
+	// Add a section to the db with all required initial fields
+	@Mutation("addSection")
+	async create(@Args("input") args: NewSection) {
+		return await this.programService.addSection(args);
 	}
 
-	// Update a single module's data in the db
-	@Mutation("updateModule")
-	async update(@Args("input") args: UpdateModule) {
-		return await this.programService.updateModule(args);
+	// Update a single Section's data in the db
+	@Mutation("updateSection")
+	async update(@Args("input") args: UpdateSection) {
+		return await this.programService.updateSection(args);
 	}
 
-	// Delete a module from db
-	@Mutation("deleteModule")
+	// Delete a Section from db
+	@Mutation("deleteSection")
 	async delete(@Args("id") args: string) {
-		return await this.programService.deleteModule(args);
+		return await this.programService.deleteSection(args);
 	}
 
 	// // Add a Course to the db with a course name
@@ -181,7 +181,7 @@ export class ProgramResolver {
 
 	// // Delete an assignment from DB
 	@Mutation("deleteAssignment")
-	async deleteAssignment(@Args("module") args: string, @Args("id") id: string) {
+	async deleteAssignment(@Args("section") args: string, @Args("id") id: string) {
 		return await this.programService.deleteAssignment(args, id);
 	}
 
@@ -194,35 +194,35 @@ export class ProgramResolver {
 		return await this.programService.updateAssignment(id, args);
 	}
 
-	//Adds objective to the Module
+	//Adds objective to the section
 	@Mutation("addObjectives")
 	async addObjectives(@Args("id") id: string, @Args("input") input: string[]) {
 		return await this.programService.addObjectives(id, input);
 	}
 
-	/// Add module feedback
-	@Mutation("addModuleFeedback")
-	async addModuleFeedback(
-		@Args("moduleId") moduleId: string,
+	/// Add section feedback
+	@Mutation("addSectionFeedback")
+	async addSectionFeedback(
+		@Args("sectionId") sectionId: string,
 		@Args("userId") userId: string,
-		@Args("input") data: Prisma.ModuleFeedbackCreateInput
+		@Args("input") data: Prisma.SectionFeedbackCreateInput
 	) {
-		return await this.programService.addModuleFeedback(moduleId, userId, data);
+		return await this.programService.addSectionFeedback(sectionId, userId, data);
 	}
 
-	/// Update a modulefeedback
-	@Mutation("updateModuleFeedback")
-	async updateModuleFeedback(
+	/// Update a sectionfeedback
+	@Mutation("updateSectionFeedback")
+	async updateSectionFeedback(
 		@Args("id") id: string,
-		@Args("input") data: ModuleFeedbackUpdate
+		@Args("input") data: SectionFeedbackUpdate
 	) {
-		return await this.programService.updateModuleFeedback(id, data);
+		return await this.programService.updateSectionFeedback(id, data);
 	}
 
-	/// Delete a ModuleFeedback
-	@Mutation("deleteModuleFeedback")
-	async deleteModuleFeedback(@Args("id") id: string) {
-		return await this.programService.deleteModuleFeedback(id);
+	/// Delete a SectionFeedback
+	@Mutation("deleteSectionFeedback")
+	async deleteSectionFeedback(@Args("id") id: string) {
+		return await this.programService.deleteSectionFeedback(id);
 	}
 
 	@Mutation("addAssignmentResult")
@@ -243,38 +243,38 @@ export class ProgramResolver {
 		return await this.programService.deleteAssignmentResult(id);
 	}
 
-	@Mutation("addModuleEnrollment")
-	async addModuleEnrollment(@Args("input") input: ModuleEnrollmentInput) {
-		return await this.programService.addModuleEnrollment(input);
+	@Mutation("addSectionEnrollment")
+	async addSectionEnrollment(@Args("input") input: SectionEnrollmentInput) {
+		return await this.programService.addSectionEnrollment(input);
 	}
 
-	@Mutation("updateModuleEnrollment")
-	async updateModuleEnrollment(
+	@Mutation("updateSectionEnrollment")
+	async updateSectionEnrollment(
 		@Args("id") id: string,
-		@Args("input") input: ModuleEnrollmentInput
+		@Args("input") input: SectionEnrollmentInput
 	) {
-		return await this.programService.updateModuleEnrollment(id, input);
+		return await this.programService.updateSectionEnrollment(id, input);
 	}
 
-	@Mutation("deleteModuleEnrollment")
-	async deleteModuleEnrollment(@Args("id") id: string) {
-		return await this.programService.deleteModuleEnrollment(id);
+	@Mutation("deleteSectionEnrollment")
+	async deleteSectionEnrollment(@Args("id") id: string) {
+		return await this.programService.deleteSectionEnrollment(id);
 	}
 
-	@Mutation("pairCourseModule")
-	async pairCourseModule(
+	@Mutation("pairCourseSection")
+	async pairCourseSection(
 		@Args("courseId") courseId: string,
-		@Args("moduleId") moduleId: string
+		@Args("sectionId") sectionId: string
 	) {
-		return await this.programService.pairCourseModule(courseId, moduleId);
+		return await this.programService.pairCourseSection(courseId, sectionId);
 	}
 
-	@Mutation("unpairCourseModule")
-	async unpairCourseModule(
+	@Mutation("unpairCourseSection")
+	async unpairCourseSection(
 		@Args("courseId") courseId: string,
-		@Args("moduleId") moduleId: string
+		@Args("sectionId") sectionId: string
 	) {
-		return await this.programService.unpairCourseModule(courseId, moduleId);
+		return await this.programService.unpairCourseSection(courseId, sectionId);
 	}
 
 	@Mutation("createCollection")
