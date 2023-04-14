@@ -32,7 +32,7 @@ model User {
   social             Social?            @relation(name: "social")
   plan               PlanOfStudy?       @relation(name: "plan")
   tokens             Token[]
-  feedback           ModuleFeedback[]
+  feedback           SectionFeedback[]
   assignmentGraded   AssignmentResult[] @relation(name: "graded")
   instructorProfile  InstructorProfile?
   watchedThreads     Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
@@ -63,13 +63,13 @@ model InstructorProfile {
 }
 
 model PlanOfStudy {
-  id                String             @id @default(auto()) @map("_id") @db.ObjectId
-  student           User?              @relation(name: "plan", fields: [studentID], references: [id])
-  studentID         String?            @unique @db.ObjectId
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  student           User?               @relation(name: "plan", fields: [studentID], references: [id])
+  studentID         String?             @unique @db.ObjectId
   // ill figure advisors out later, my brain needs a rest
   // advisor           User?              @relation(fields: [advisorId], references:[id])
   // advisorId         String?            @db.ObjectId
-  modules           ModuleEnrollment[]
+  sections          SectionEnrollment[]
   assignmentResults AssignmentResult[]
   quizResults       QuizResult[]
 }
@@ -97,37 +97,37 @@ model Token {
 }
 
 model Course {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String
-  required      Boolean? @default(false)
-  carnegieHours Int?     @default(135)
-  moduleIDs     String[] @default([]) @db.ObjectId
-  module        Module[] @relation(fields: [moduleIDs], references: [id])
+  required      Boolean?  @default(false)
+  carnegieHours Int?      @default(135)
+  sectionIDs    String[]  @default([]) @db.ObjectId
+  sections      Section[] @relation(fields: [sectionIDs], references: [id])
 }
 
-model Module {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  moduleNumber Int      @unique
-  moduleName   String   @unique
-  description  String
-  duration     Float
-  intro        String
-  numSlides    Int
-  keywords     String[]
-  objectives   String[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now()) @updatedAt
+model Section {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  sectionNumber Int      @unique
+  sectionName   String   @unique
+  description   String
+  duration      Float
+  intro         String
+  numSlides     Int
+  keywords      String[]
+  objectives    String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
 
   // Relation fields
-  members     ModuleEnrollment[]
+  members     SectionEnrollment[]
   assignments Assignment[]
-  feedback    ModuleFeedback[]
+  feedback    SectionFeedback[]
 
-  parentModules   Module[]     @relation("parentModules", fields: [parentModuleIDs], references: [id])
-  parentModuleIDs String[]     @default([]) @db.ObjectId
-  subModules      Module[]     @relation("parentModules", fields: [subModuleIDs], references: [id])
-  subModuleIDs    String[]     @default([]) @db.ObjectId
-  collections     Collection[] @relation(name: "collections")
+  parentSections   Section[]    @relation("parentModules", fields: [parentSectionIDs], references: [id])
+  parentSectionIDs String[]     @default([]) @db.ObjectId
+  subSections      Section[]    @relation("parentModules", fields: [subSectionIDs], references: [id])
+  subSectionIDs    String[]     @default([]) @db.ObjectId
+  collections      Collection[] @relation(name: "collections")
 
   courseIDs String[] @default([]) @db.ObjectId
   course    Course[] @relation(fields: [courseIDs], references: [id])
@@ -141,9 +141,9 @@ model Collection {
   position  Int      @default(0)
 
   // Relation fields
-  lessons  Lesson[]
-  module   Module   @relation(name: "collections", fields: [moduleID], references: [id], onDelete: Cascade)
-  moduleID String   @db.ObjectId
+  lessons   Lesson[]
+  section   Section  @relation(name: "collections", fields: [sectionID], references: [id], onDelete: Cascade)
+  sectionID String   @db.ObjectId
 }
 
 model Lesson {
@@ -160,26 +160,26 @@ model Lesson {
   lessonProgress LessonProgress[]
 }
 
-model ModuleFeedback {
+model SectionFeedback {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   feedback String
   rating   Int
 
-  studentId String @db.ObjectId
-  moduleId  String @db.ObjectId
-  student   User   @relation(fields: [studentId], references: [id])
-  module    Module @relation(fields: [moduleId], references: [id])
+  studentId String  @db.ObjectId
+  sectionId String  @db.ObjectId
+  student   User    @relation(fields: [studentId], references: [id])
+  section   Section @relation(fields: [sectionId], references: [id])
 }
 
-model ModuleEnrollment {
+model SectionEnrollment {
   id         String           @id @default(auto()) @map("_id") @db.ObjectId
   enrolledAt DateTime         @default(now())
   role       UserRole // Allow for instructors, graders and students to take part in the module.
   status     EnrollmentStatus @default(INACTIVE)
 
   // Relation Fields
-  module         Module           @relation(fields: [moduleId], references: [id])
-  moduleId       String           @db.ObjectId
+  section        Section          @relation(fields: [sectionId], references: [id])
+  sectionId      String           @db.ObjectId
   plan           PlanOfStudy?     @relation(fields: [planID], references: [id])
   planID         String?          @db.ObjectId
   progress       Progress?
@@ -196,8 +196,8 @@ model Assignment {
   acceptedTypes FileType @default(DOC)
 
   // Relation Fields
-  moduleId          String             @db.ObjectId
-  module            Module             @relation(fields: [moduleId], references: [id])
+  sectionId         String             @db.ObjectId
+  section           Section            @relation(fields: [sectionId], references: [id])
   assignmentResults AssignmentResult[]
 }
 
@@ -272,27 +272,27 @@ model Group {
 }
 
 model Progress {
-  id           String           @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @default(now()) @updatedAt
-  status       Float            @default(0)
-  completed    Boolean          @default(false)
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @default(now()) @updatedAt
+  status       Float             @default(0)
+  completed    Boolean           @default(false)
   // Relation Fields
-  enrollment   ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
-  enrollmentID String           @unique @db.ObjectId
+  enrollment   SectionEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
+  enrollmentID String            @unique @db.ObjectId
 }
 
 model LessonProgress {
-  id           String           @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @default(now()) @updatedAt
-  status       Float            @default(0)
-  completed    Boolean          @default(false)
-  lesson       Lesson           @relation(fields: [lessonID], references: [id], onDelete: Cascade)
-  lessonID     String           @db.ObjectId
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @default(now()) @updatedAt
+  status       Float             @default(0)
+  completed    Boolean           @default(false)
+  lesson       Lesson            @relation(fields: [lessonID], references: [id], onDelete: Cascade)
+  lessonID     String            @db.ObjectId
   // Relation Fields
-  enrollment   ModuleEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
-  enrollmentID String           @unique @db.ObjectId
+  enrollment   SectionEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
+  enrollmentID String            @unique @db.ObjectId
 }
 
 model Quiz {
