@@ -8,9 +8,9 @@ export class PoSService {
 	constructor(private prisma: PrismaService) {}
 
 	private PlanOfStudyInclude = Prisma.validator<Prisma.PlanOfStudyInclude>()({
-		modules: {
+		sections: {
 			include: {
-				module: {
+				section: {
 					include: {
 						feedback: true,
 						assignments: true,
@@ -62,7 +62,7 @@ export class PoSService {
 	}
 
 	async planByParams(params: PlanFields) {
-		const { id, student, module, assignmentResult, modulesLeft } = params;
+		const { id, student, section, assignmentResult, sectionsLeft } = params;
 
 		const payload = {
 			...(id && { id })
@@ -71,10 +71,10 @@ export class PoSService {
 			payload["studentId"] = student;
 		}
 
-		if (module) {
-			payload["modules"] = {
+		if (section) {
+			payload["sections"] = {
 				some: {
-					id: module
+					id: section
 				}
 			};
 		}
@@ -85,10 +85,10 @@ export class PoSService {
 				}
 			};
 		}
-		if (modulesLeft) {
-			payload["modulesLeft"] = {
+		if (sectionsLeft) {
+			payload["sectionsLeft"] = {
 				some: {
-					id: modulesLeft
+					id: sectionsLeft
 				}
 			};
 		}
@@ -105,7 +105,7 @@ export class PoSService {
 		else return res;
 	}
 
-	// TODO: Allow for starting modules and courses
+	// TODO: Allow for starting sections and courses
 	async addPlan(input: PlanInput) {
 		return this.prisma.planOfStudy.create({
 			data: {
@@ -117,7 +117,7 @@ export class PoSService {
 		});
 	}
 
-	// TODO: Handle connections to modules, courses and assignment results
+	// TODO: Handle connections to sections, courses and assignment results
 	async updatePlan(id: string, input: PlanInput) {
 		return this.prisma.planOfStudy.update({
 			where: {

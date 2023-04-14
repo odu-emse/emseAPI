@@ -1,12 +1,12 @@
 import {
 	AssignmentInput,
 	CourseInput,
-	ModuleFeedbackUpdate,
+	SectionFeedbackUpdate,
 	NewAssignment,
-	UpdateModule,
+	UpdateSection,
 	NewAssignmentResult,
-	ModuleEnrollmentInput,
-	ModuleFields,
+	SectionEnrollmentInput,
+	SectionFields,
 	CourseFields,
 	AssignmentFields,
 	ModFeedbackFields,
@@ -14,12 +14,12 @@ import {
 	ModEnrollmentFields,
 	LessonFields,
 	Course,
-	ModuleFeedback,
+	SectionFeedback,
 	CreateCollectionArgs,
 	LessonInput,
 	CreateContentArgs,
 	ContentFields,
-	NewModule,
+	NewSection,
 	CollectionFields
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
@@ -35,7 +35,7 @@ export class ProgramService {
 	});
 
 	private assignmentInclude = Prisma.validator<Prisma.AssignmentInclude>()({
-		module: true,
+		section: true,
 		assignmentResults: {
 			include: {
 				student: true,
@@ -46,18 +46,18 @@ export class ProgramService {
 	});
 
 	private courseInclude = Prisma.validator<Prisma.CourseInclude>()({
-		module: {
+		sections: {
 			include: {
 				assignments: true,
 				feedback: {
 					include: {
 						student: true,
-						module: false
+						section: false
 					}
 				},
 				members: {
 					include: {
-						module: false,
+						section: false,
 						plan: true
 					}
 				}
@@ -65,7 +65,7 @@ export class ProgramService {
 		}
 	});
 
-	public moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
+	public sectionInclude = Prisma.validator<Prisma.SectionInclude>()({
 		members: {
 			include: {
 				plan: {
@@ -100,8 +100,8 @@ export class ProgramService {
 				student: true
 			}
 		},
-		parentModules: true,
-		subModules: true,
+		parentSections: true,
+		subSections: true,
 		collections: {
 			include: {
 				lessons: {
@@ -114,10 +114,10 @@ export class ProgramService {
 		course: true
 	});
 
-	private moduleFeedbackInclude =
-		Prisma.validator<Prisma.ModuleFeedbackInclude>()({
+	private sectionFeedbackInclude =
+		Prisma.validator<Prisma.SectionFeedbackInclude>()({
 			student: true,
-			module: true
+			section: true
 		});
 
 	private assignmentResultInclude =
@@ -130,21 +130,21 @@ export class ProgramService {
 			gradedBy: true,
 			assignment: {
 				include: {
-					module: true
+					section: true
 				}
 			}
 		});
 
-	public moduleEnrollmentInclude =
-		Prisma.validator<Prisma.ModuleEnrollmentInclude>()({
+	public sectionEnrollmentInclude =
+		Prisma.validator<Prisma.SectionEnrollmentInclude>()({
 			plan: {
 				include: {
 					student: true
 				}
 			},
-			module: {
+			section: {
 				include: {
-					parentModules: true,
+					parentSections: true,
 					members: {
 						include: {
 							plan: {
@@ -166,7 +166,7 @@ export class ProgramService {
 									},
 									collection: {
 										include: {
-											module: true
+											section: true
 										}
 									}
 								}
@@ -179,7 +179,7 @@ export class ProgramService {
 		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
-		module: true,
+		section: true,
 		lessons: {
 			include: {
 				content: true
@@ -191,7 +191,7 @@ export class ProgramService {
 		content: true,
 		collection: {
 			include: {
-				module: {
+				section: {
 					include: {
 						collections: {
 							include: {
@@ -204,11 +204,11 @@ export class ProgramService {
 		}
 	});
 
-	async module(params: ModuleFields) {
+	async section(params: SectionFields) {
 		const {
 			id,
-			moduleNumber,
-			moduleName,
+			sectionNumber,
+			sectionName,
 			description,
 			intro,
 			numSlides,
@@ -218,15 +218,15 @@ export class ProgramService {
 			assignments,
 			members,
 			feedback,
-			parentModules,
+			parentSections,
 			objectives,
-			subModules
+			subSections
 		} = params;
 
 		const payload = {
 			...(id && { id }),
-			...(moduleNumber && { moduleNumber }),
-			...(moduleName && { moduleName }),
+			...(sectionNumber && { sectionNumber }),
+			...(sectionName && { sectionName }),
 			...(description && { description }),
 			...(intro && { intro }),
 			...(numSlides && { numSlides }),
@@ -234,25 +234,25 @@ export class ProgramService {
 			...(updatedAt && { updatedAt })
 		};
 
-		// use the Prisma.ModuleWhereInput type and remove the AND field. Then create a union type with the AND field added back in as an array of Prisma.ModuleWhereInput
-		const where: Omit<Prisma.ModuleWhereInput, "AND"> & {
-			AND: Array<Prisma.ModuleWhereInput>;
+		// use the Prisma.sectionWhereInput type and remove the AND field. Then create a union type with the AND field added back in as an array of Prisma.sectionWhereInput
+		const where: Omit<Prisma.SectionWhereInput, "AND"> & {
+			AND: Array<Prisma.SectionWhereInput>;
 		} = {
 			AND: []
 		};
 
-		if (parentModules) {
+		if (parentSections) {
 			where.AND.push({
-				parentModuleIDs: {
-					hasEvery: parentModules
+				parentSectionIDs: {
+					hasEvery: parentSections
 				}
 			});
 		}
 
-		if (subModules) {
+		if (subSections) {
 			where.AND.push({
-				subModuleIDs: {
-					hasEvery: subModules
+				subSectionIDs: {
+					hasEvery: subSections
 				}
 			});
 		}
@@ -276,13 +276,13 @@ export class ProgramService {
 				some: {
 					id: assignments
 				}
-			} as Prisma.ModuleWhereInput["assignments"];
+			} as Prisma.SectionWhereInput["assignments"];
 		}
 
 		if (keywords) {
 			payload["keywords"] = {
 				hasEvery: keywords
-			} as Prisma.ModuleWhereInput["keywords"];
+			} as Prisma.SectionWhereInput["keywords"];
 		}
 
 		if (feedback) {
@@ -290,36 +290,36 @@ export class ProgramService {
 				some: {
 					id: feedback
 				}
-			} as Prisma.ModuleWhereInput["feedback"];
+			} as Prisma.SectionWhereInput["feedback"];
 		}
 
 		if (objectives) {
 			payload["objectives"] = {
 				hasSome: objectives
-			} as Prisma.ModuleWhereInput["objectives"];
+			} as Prisma.SectionWhereInput["objectives"];
 		}
 
-		return await this.prisma.module.findMany({
+		return await this.prisma.section.findMany({
 			where: {
 				...where,
 				...payload
 			},
-			include: this.moduleInclude
+			include: this.sectionInclude
 		});
 	}
 
 	async course(params: CourseFields) {
-		const { id, name, module } = params;
+		const { id, name, section } = params;
 
 		const payload = {
 			...(id && { id }),
 			...(name && { name })
 		};
 
-		if (module) {
-			payload["module"] = {
+		if (section) {
+			payload["section"] = {
 				some: {
-					id: module
+					id: section
 				}
 			};
 		}
@@ -343,7 +343,7 @@ export class ProgramService {
 			contentURL,
 			contentType,
 			acceptedTypes,
-			module,
+			section,
 			assignmentResult
 		} = params;
 
@@ -357,7 +357,7 @@ export class ProgramService {
 			...(acceptedTypes && { acceptedTypes })
 		};
 
-		payload["moduleId"] = module ? module : undefined;
+		payload["sectionId"] = section ? section : undefined;
 		payload["assignmentResults"] = assignmentResult
 			? { some: { id: assignmentResult } }
 			: undefined;
@@ -372,8 +372,8 @@ export class ProgramService {
 		});
 	}
 
-	async moduleFeedback(params: ModFeedbackFields) {
-		const { id, feedback, rating, student, module } = params;
+	async sectionFeedback(params: ModFeedbackFields) {
+		const { id, feedback, rating, student, section } = params;
 
 		const payload = {
 			...(id && { id }),
@@ -382,15 +382,15 @@ export class ProgramService {
 		};
 
 		payload["studentId"] = student ? student : undefined;
-		payload["moduleId"] = module ? module : undefined;
+		payload["sectionId"] = section ? section : undefined;
 
-		const where = Prisma.validator<Prisma.ModuleFeedbackWhereInput>()({
+		const where = Prisma.validator<Prisma.SectionFeedbackWhereInput>()({
 			...payload
 		});
 
-		return this.prisma.moduleFeedback.findMany({
+		return this.prisma.sectionFeedback.findMany({
 			where,
-			include: this.moduleFeedbackInclude
+			include: this.sectionFeedbackInclude
 		});
 	}
 
@@ -430,8 +430,8 @@ export class ProgramService {
 		});
 	}
 
-	async moduleEnrollment(params: ModEnrollmentFields) {
-		const { id, enrolledAt, role, module, plan } = params;
+	async sectionEnrollment(params: ModEnrollmentFields) {
+		const { id, enrolledAt, role, section, plan } = params;
 
 		const payload = {
 			...(id && { id }),
@@ -439,20 +439,20 @@ export class ProgramService {
 			...(role && { role })
 		};
 
-		payload["moduleId"] = module
-			? module
-			: (undefined as Prisma.ModuleEnrollmentWhereInput["moduleId"]);
+		payload["sectionId"] = section
+			? section
+			: (undefined as Prisma.SectionEnrollmentWhereInput["sectionId"]);
 		payload["planID"] = plan
 			? plan
-			: (undefined as Prisma.ModuleEnrollmentWhereInput["planID"]);
+			: (undefined as Prisma.SectionEnrollmentWhereInput["planID"]);
 
-		const where = Prisma.validator<Prisma.ModuleEnrollmentWhereInput>()({
+		const where = Prisma.validator<Prisma.SectionEnrollmentWhereInput>()({
 			...payload
 		});
 
-		return this.prisma.moduleEnrollment.findMany({
+		return this.prisma.sectionEnrollment.findMany({
 			where,
-			include: this.moduleEnrollmentInclude
+			include: this.sectionEnrollmentInclude
 		});
 	}
 
@@ -463,7 +463,7 @@ export class ProgramService {
 			});
 		}
 
-		const { id, name, lessons, moduleID, positionIndex } = params;
+		const { id, name, lessons, sectionID, positionIndex } = params;
 
 		const where = Prisma.validator<Prisma.CollectionWhereInput>()({
 			...(id && { id }),
@@ -472,7 +472,7 @@ export class ProgramService {
 					contains: name
 				}
 			}),
-			...(moduleID && { moduleID }),
+			...(sectionID && { sectionID }),
 			...(positionIndex && {
 				position: {
 					equals: positionIndex
@@ -540,14 +540,14 @@ export class ProgramService {
 		name,
 		lessons,
 		positionIndex,
-		moduleID
+		sectionID
 	}: CreateCollectionArgs) {
 		const create = Prisma.validator<Prisma.CollectionCreateInput>()({
 			name,
 			position: positionIndex,
-			module: {
+			section: {
 				connect: {
-					id: moduleID
+					id: sectionID
 				}
 			},
 			lessons: {
@@ -576,34 +576,34 @@ export class ProgramService {
 
 	//Mutations
 
-	/// Create a new module
-	async addModule(data: NewModule) {
-		const countArgs = Prisma.validator<Prisma.ModuleFindManyArgs>()({
+	/// Create a new section
+	async addSection(data: NewSection) {
+		const countArgs = Prisma.validator<Prisma.SectionFindManyArgs>()({
 			where: {
-				moduleNumber: data.moduleNumber
+				sectionNumber: data.sectionNumber
 			}
 		});
 		//find out if there is a duplicate user
-		const count = await this.prisma.module.count(countArgs);
+		const count = await this.prisma.section.count(countArgs);
 
 		if (count !== 0) {
-			throw new Error("Module already exists.");
+			throw new Error("Section already exists.");
 		} else {
-			const create = Prisma.validator<Prisma.ModuleCreateInput>()({
+			const create = Prisma.validator<Prisma.SectionCreateInput>()({
 				...data
 			});
-			return this.prisma.module.create({
+			return this.prisma.section.create({
 				data: create,
-				include: this.moduleInclude
+				include: this.sectionInclude
 			});
 		}
 	}
 
-	/// Modify a modules data or add an assignment here
-	async updateModule(data: UpdateModule) {
+	/// Modify a sections data or add an assignment here
+	async updateSection(data: UpdateSection) {
 		const {
-			moduleNumber,
-			moduleName,
+			sectionNumber,
+			sectionName,
 			description,
 			duration,
 			numSlides,
@@ -611,13 +611,13 @@ export class ProgramService {
 			objectives
 		} = data;
 
-		const args = Prisma.validator<Prisma.ModuleUpdateArgs>()({
+		const args = Prisma.validator<Prisma.SectionUpdateArgs>()({
 			where: {
 				id: data.id
 			},
 			data: {
-				...(moduleNumber && { moduleNumber }),
-				...(moduleName && { moduleName }),
+				...(sectionNumber && { sectionNumber }),
+				...(sectionName && { sectionName }),
 				...(description && { description }),
 				...(duration && { duration }),
 				...(numSlides && { numSlides }),
@@ -626,29 +626,29 @@ export class ProgramService {
 			}
 		});
 
-		return this.prisma.module.update({
+		return this.prisma.section.update({
 			where: args.where,
 			data: args.data,
-			include: this.moduleInclude
+			include: this.sectionInclude
 		});
 	}
 
-	/// Remove a module and all of its assignments
-	async deleteModule(id: string) {
+	/// Remove a section and all of its assignments
+	async deleteSection(id: string) {
 		await this.prisma.assignment.deleteMany({
 			where: {
-				moduleId: id
+				sectionId: id
 			}
 		});
 
-		return this.prisma.module.delete({
+		return this.prisma.section.delete({
 			where: {
 				id: id
 			}
 		});
 	}
 
-	/// Create a course and assign an initial module to that course
+	/// Create a course and assign an initial section to that course
 	async addCourse(data: CourseInput) {
 		return this.prisma.course.create({
 			data: {
@@ -681,7 +681,7 @@ export class ProgramService {
 				id
 			},
 			data: {
-				module: {
+				sections: {
 					deleteMany: {}
 				}
 			},
@@ -695,12 +695,12 @@ export class ProgramService {
 		});
 	}
 
-	/// Remove an assignment from a module
-	async deleteAssignment(module: string, id: string) {
-		// Do something here to disconnect an assignment from a module
-		return this.prisma.module.update({
+	/// Remove an assignment from a section
+	async deleteAssignment(section: string, id: string) {
+		// Do something here to disconnect an assignment from a section
+		return this.prisma.section.update({
 			where: {
-				id: module
+				id: section
 			},
 			data: {
 				assignments: {
@@ -715,9 +715,9 @@ export class ProgramService {
 		return this.prisma.assignment.create({
 			data: {
 				name: input.name,
-				module: {
+				section: {
 					connect: {
-						id: input.module
+						id: input.section
 					}
 				},
 				dueAt: input.dueAt,
@@ -750,15 +750,15 @@ export class ProgramService {
 		});
 	}
 
-	/// Create a module feedback and link it to the user and module
-	async addModuleFeedback(
-		moduleId: string,
+	/// Create a section feedback and link it to the user and section
+	async addSectionFeedback(
+		sectionId: string,
 		userId: string,
-		input: Prisma.ModuleFeedbackCreateInput
+		input: Prisma.SectionFeedbackCreateInput
 	) {
-		return this.prisma.module.update({
+		return this.prisma.section.update({
 			where: {
-				id: moduleId
+				id: sectionId
 			},
 			data: {
 				feedback: {
@@ -773,15 +773,15 @@ export class ProgramService {
 					}
 				}
 			},
-			include: this.moduleInclude
+			include: this.sectionInclude
 		});
 	}
 
-	/// Update a module feedback
-	async updateModuleFeedback(id: string, input: ModuleFeedbackUpdate) {
+	/// Update a section feedback
+	async updateSectionFeedback(id: string, input: SectionFeedbackUpdate) {
 		const { feedback, rating } = input;
 
-		const update = Prisma.validator<Prisma.ModuleFeedbackUpdateArgs>()({
+		const update = Prisma.validator<Prisma.SectionFeedbackUpdateArgs>()({
 			where: {
 				id
 			},
@@ -791,15 +791,15 @@ export class ProgramService {
 			}
 		});
 
-		return this.prisma.moduleFeedback.update({
+		return this.prisma.sectionFeedback.update({
 			...update,
-			include: this.moduleFeedbackInclude
+			include: this.sectionFeedbackInclude
 		});
 	}
 
-	/// Delete a ModuleFeedback
-	async deleteModuleFeedback(id: string): Promise<ModuleFeedback> {
-		return this.prisma.moduleFeedback.delete({
+	/// Delete a sectionFeedback
+	async deleteSectionFeedback(id: string): Promise<SectionFeedback> {
+		return this.prisma.sectionFeedback.delete({
 			where: {
 				id
 			}
@@ -843,24 +843,24 @@ export class ProgramService {
 		});
 	}
 
-	/// Create a ModuleEnrollment Document
-	async addModuleEnrollment(input: ModuleEnrollmentInput) {
-		const { plan, module, role, status } = input;
+	/// Create a SectionEnrollment Document
+	async addSectionEnrollment(input: SectionEnrollmentInput) {
+		const { plan, section, role, status } = input;
 
-		const count = await this.prisma.moduleEnrollment.count({
+		const count = await this.prisma.sectionEnrollment.count({
 			where: {
 				planID: plan,
-				moduleId: module
+				sectionId: section
 			}
 		});
 
 		if (count !== 0) {
-			throw new Error("This Module Enrollment already exists");
+			throw new Error("This Section Enrollment already exists");
 		} else {
-			const create = Prisma.validator<Prisma.ModuleEnrollmentCreateInput>()({
-				module: {
+			const create = Prisma.validator<Prisma.SectionEnrollmentCreateInput>()({
+				section: {
 					connect: {
-						id: module
+						id: section
 					}
 				},
 				plan: {
@@ -872,46 +872,46 @@ export class ProgramService {
 				status
 			});
 
-			return this.prisma.moduleEnrollment.create({
+			return this.prisma.sectionEnrollment.create({
 				data: create,
-				include: this.moduleEnrollmentInclude
+				include: this.sectionEnrollmentInclude
 			});
 		}
 	}
 
-	/// Update a ModuleEnrollment
-	async updateModuleEnrollment(id: string, input: ModuleEnrollmentInput) {
-		const args = Prisma.validator<Prisma.ModuleEnrollmentUpdateArgs>()({
+	/// Update a SectionEnrollment
+	async updateSectionEnrollment(id: string, input: SectionEnrollmentInput) {
+		const args = Prisma.validator<Prisma.SectionEnrollmentUpdateArgs>()({
 			where: {
 				id
 			},
 			data: {
-				moduleId: input.module,
+				sectionId: input.section,
 				planID: input.plan,
 				role: input.role
 			}
 		});
 
-		return this.prisma.moduleEnrollment.update({
+		return this.prisma.sectionEnrollment.update({
 			where: args.where,
 			data: args.data,
-			include: this.moduleEnrollmentInclude
+			include: this.sectionEnrollmentInclude
 		});
 	}
 
-	async deleteModuleEnrollment(id: string) {
-		return this.prisma.moduleEnrollment.delete({
+	async deleteSectionEnrollment(id: string) {
+		return this.prisma.sectionEnrollment.delete({
 			where: {
 				id
 			}
 		});
 	}
 
-	// Link a course and a module
-	async pairCourseModule(courseId: string, moduleId: string) {
-		const count = await this.prisma.module.count({
+	// Link a course and a section
+	async pairCourseSection(courseId: string, sectionId: string) {
+		const count = await this.prisma.section.count({
 			where: {
-				id: moduleId,
+				id: sectionId,
 				course: {
 					some: {
 						id: courseId
@@ -921,7 +921,7 @@ export class ProgramService {
 		});
 
 		if (count != 0) {
-			throw new Error("Module and Course are already Linked.");
+			throw new Error("Section and Course are already Linked.");
 		}
 
 		await this.prisma.course.update({
@@ -929,46 +929,46 @@ export class ProgramService {
 				id: courseId
 			},
 			data: {
-				moduleIDs: {
-					push: moduleId
+				sectionIDs: {
+					push: sectionId
 				}
 			}
 		});
 
-		return this.prisma.module.update({
+		return this.prisma.section.update({
 			where: {
-				id: moduleId
+				id: sectionId
 			},
 			data: {
 				courseIDs: {
 					push: courseId
 				}
 			},
-			include: this.moduleInclude
+			include: this.sectionInclude
 		});
 	}
 
-	async unpairCourseModule(courseId: string, moduleId: string) {
+	async unpairCourseSection(courseId: string, sectionId: string) {
 		const courseIdToRemove = await this.prisma.course.findUnique({
 			where: {
 				id: courseId
 			}
 		});
 
-		const newModuleSet =
+		const newSectionSet =
 			courseIdToRemove !== null
-				? courseIdToRemove.moduleIDs.filter((module) => module !== moduleId)
+				? courseIdToRemove.sectionIDs.filter((section) => section !== sectionId)
 				: null;
 
-		const moduleIdToRemove = await this.prisma.module.findUnique({
+		const sectionIdToRemove = await this.prisma.section.findUnique({
 			where: {
-				id: moduleId
+				id: sectionId
 			}
 		});
 
 		const newCourseSet =
-			moduleIdToRemove !== null
-				? moduleIdToRemove.courseIDs.filter((course) => course !== courseId)
+			sectionIdToRemove !== null
+				? sectionIdToRemove.courseIDs.filter((course) => course !== courseId)
 				: null;
 
 		await this.prisma.course.update({
@@ -976,13 +976,13 @@ export class ProgramService {
 				id: courseId
 			},
 			data: {
-				moduleIDs: newModuleSet !== null ? newModuleSet : undefined
+				sectionIDs: newSectionSet !== null ? newSectionSet : undefined
 			}
 		});
 
-		return this.prisma.module.update({
+		return this.prisma.section.update({
 			where: {
-				id: moduleId
+				id: sectionId
 			},
 			data: {
 				courseIDs: newCourseSet !== null ? newCourseSet : undefined
@@ -1141,19 +1141,19 @@ export class ProgramService {
 	}
 
 	async addObjectives(id: string, input: string[]) {
-		const module = await this.prisma.module.findUnique({
+		const section = await this.prisma.section.findUnique({
 			where: {
 				id
 			}
 		});
 
-		if (module === null) {
-			throw new Error("Module not found");
+		if (section === null) {
+			throw new Error("Section not found");
 		}
 
-		const objectives = [...module.objectives, input] as Array<string>;
+		const objectives = [...section.objectives, input] as Array<string>;
 
-		return this.prisma.module.update({
+		return this.prisma.section.update({
 			where: {
 				id: id
 			},

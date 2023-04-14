@@ -67,7 +67,7 @@ export class ProgressService {
 		return true;
 	}
 
-	async waiveModule(enrollmentID: string) {
+	async waiveSection(enrollmentID: string) {
 		const res = await this.prisma.progress.update({
 			where: { enrollmentID },
 			data: {
