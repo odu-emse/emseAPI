@@ -93,10 +93,11 @@ export class ProgramResolver {
 			return enrollment.section.id === sectionID;
 		});
 
-		const lessons = filteredEnrollment[0].section.collections.map((collection) =>
-			collection.lessons.map((lesson) => {
-				return lesson;
-			})
+		const lessons = filteredEnrollment[0].section.collections.map(
+			(collection) =>
+				collection.lessons.map((lesson) => {
+					return lesson;
+				})
 		);
 
 		const filteredLessons = lessons.flat().map((lesson) => {
@@ -181,7 +182,10 @@ export class ProgramResolver {
 
 	// // Delete an assignment from DB
 	@Mutation("deleteAssignment")
-	async deleteAssignment(@Args("section") args: string, @Args("id") id: string) {
+	async deleteAssignment(
+		@Args("section") args: string,
+		@Args("id") id: string
+	) {
 		return await this.programService.deleteAssignment(args, id);
 	}
 
@@ -207,7 +211,11 @@ export class ProgramResolver {
 		@Args("userId") userId: string,
 		@Args("input") data: Prisma.SectionFeedbackCreateInput
 	) {
-		return await this.programService.addSectionFeedback(sectionId, userId, data);
+		return await this.programService.addSectionFeedback(
+			sectionId,
+			userId,
+			data
+		);
 	}
 
 	/// Update a sectionfeedback
