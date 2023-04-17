@@ -49,7 +49,7 @@ type InstructorProfile {
 	"""
 	office hours of the user
 	"""
-	officeHours: String
+	officeHours: [String]
 	"""
 	contract policy needed
 	"""
@@ -65,7 +65,7 @@ type InstructorProfile {
 	"""
 	Research interest of the User
 	"""
-	researchInterest: String
+	researchInterest: [String]
 	"""
 	The papers and publications selected
 	"""
@@ -322,7 +322,7 @@ input InstructorProfileInput {
 	"""
 	Office hours of Instructor Profile
 	"""
-	officeHours: String
+	officeHours: [String]
 	"""
 	Contact Policy of Instructor Profile
 	"""
@@ -338,7 +338,7 @@ input InstructorProfileInput {
 	"""
 	Research Interest of the Instructor
 	"""
-	researchInterest: String
+	researchInterest: [String]
 	"""
 	Selected Papers and Publications of the Instructor
 	"""

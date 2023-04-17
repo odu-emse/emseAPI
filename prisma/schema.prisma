@@ -52,14 +52,13 @@ model InstructorProfile {
   accountID                     String?  @unique @db.ObjectId
   title                         String?
   officeLocation                String?
-  officeHours                   String?
+  officeHours                   String[] @default([])
   contactPolicy                 String?
   phone                         String?
   background                    String?
-  researchInterest              String?
+  researchInterest              String[] @default([])
   selectedPapersAndPublications String[] @default([])
   personalWebsite               String?
-  philosophy                    String?
 }
 
 model PlanOfStudy {
