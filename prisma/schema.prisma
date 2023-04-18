@@ -54,12 +54,9 @@ model InstructorProfile {
   officeLocation                String?
   officeHours                   String?
   contactPolicy                 String?
-  phone                         String?
   background                    String?
   researchInterest              String?
   selectedPapersAndPublications String[] @default([])
-  personalWebsite               String?
-  philosophy                    String?
 }
 
 model PlanOfStudy {
