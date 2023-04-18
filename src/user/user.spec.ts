@@ -41,10 +41,10 @@ describe("Account services", () => {
 	const updatedInstructorProfileReset: InstructorProfileInput = {
 		title: "Department Chair",
 		officeLocation: "Online",
-		officeHours: "Anytime",
+		officeHours: ["Anytime"],
 		contactPolicy: "Email",
 		background: "I am a professor",
-		researchInterest: "I am a professor",
+		researchInterest: ["I am a professor"],
 		selectedPapersAndPublications: [""]
 	};
 
@@ -154,11 +154,11 @@ describe("Account services", () => {
 			const updatedInstructorProfile: InstructorProfileInput = {
 				title: "Adjunct Professor",
 				officeLocation: "ESB 2101",
-				officeHours: "9AM - 5PM - MWF",
+				officeHours: ["9AM - 5PM - MWF"],
 				contactPolicy: "Email",
 				background:
 					"I'm a very experienced professor, and I only use books from 50 years ago.",
-				researchInterest: "Technology",
+				researchInterest: ["Technology"],
 				selectedPapersAndPublications: [""]
 			};
 			const input: UpdateUser = {
