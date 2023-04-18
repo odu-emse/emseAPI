@@ -2,14 +2,14 @@ import { UserService } from "./user.service";
 import { UserResolver } from "./user.resolver";
 import { PrismaService } from "@/prisma.service";
 import {
-	Social,
-	UpdateUser,
-	User,
 	InstructorProfileInput,
-	SocialInput
+	Social,
+	SocialInput,
+	UpdateUser,
+	User
 } from "@/types/graphql";
 import { shuffle } from "../../utils/tests";
-import { test, describe, afterAll, expect } from "vitest";
+import { afterAll, describe, expect, test } from "vitest";
 
 describe("Account services", () => {
 	let service: UserService;
@@ -43,12 +43,9 @@ describe("Account services", () => {
 		officeLocation: "Online",
 		officeHours: "Anytime",
 		contactPolicy: "Email",
-		phone: "757-555-5555",
 		background: "I am a professor",
 		researchInterest: "I am a professor",
-		selectedPapersAndPublications: [""],
-		personalWebsite: "https://odu.edu/emse",
-		philosophy: "I  teach people"
+		selectedPapersAndPublications: [""]
 	};
 
 	prisma = new PrismaService();
@@ -152,7 +149,6 @@ describe("Account services", () => {
 			expect(instructorProfile.researchInterest).toBeDefined();
 			expect(instructorProfile.selectedPapersAndPublications).toBeDefined();
 			expect(instructorProfile.personalWebsite).toBeDefined();
-			expect(instructorProfile.philosophy).toBeDefined();
 		});
 		test("should update instructor profile given input argument", async () => {
 			const updatedInstructorProfile: InstructorProfileInput = {
@@ -160,13 +156,10 @@ describe("Account services", () => {
 				officeLocation: "ESB 2101",
 				officeHours: "9AM - 5PM - MWF",
 				contactPolicy: "Email",
-				phone: "111-222-3333",
 				background:
 					"I'm a very experienced professor, and I only use books from 50 years ago.",
 				researchInterest: "Technology",
-				selectedPapersAndPublications: [""],
-				personalWebsite: "https://odu.edu/emse",
-				philosophy: "I  teach people"
+				selectedPapersAndPublications: [""]
 			};
 			const input: UpdateUser = {
 				id: userDocumentID,
@@ -191,9 +184,6 @@ describe("Account services", () => {
 			expect(updateUser.instructorProfile.contactPolicy).toEqual(
 				updatedInstructorProfile.contactPolicy
 			);
-			expect(updateUser.instructorProfile.phone).toEqual(
-				updatedInstructorProfile.phone
-			);
 			expect(updateUser.instructorProfile.background).toEqual(
 				updatedInstructorProfile.background
 			);
@@ -203,12 +193,6 @@ describe("Account services", () => {
 			expect(
 				updateUser.instructorProfile.selectedPapersAndPublications
 			).toEqual(updatedInstructorProfile.selectedPapersAndPublications);
-			expect(updateUser.instructorProfile.personalWebsite).toEqual(
-				updatedInstructorProfile.personalWebsite
-			);
-			expect(updateUser.instructorProfile.philosophy).toEqual(
-				updatedInstructorProfile.philosophy
-			);
 		});
 	});
 	describe("Social", () => {
