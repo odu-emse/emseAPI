@@ -434,11 +434,11 @@ export interface UpdateUser {
 export interface InstructorProfileInput {
     title?: Nullable<string>;
     officeLocation?: Nullable<string>;
-    officeHours?: Nullable<string>;
+    officeHours?: Nullable<Nullable<string>[]>;
     contactPolicy?: Nullable<string>;
     phone?: Nullable<string>;
     background?: Nullable<string>;
-    researchInterest?: Nullable<string>;
+    researchInterest?: Nullable<Nullable<string>[]>;
     selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;
@@ -808,11 +808,11 @@ export interface InstructorProfile {
     account?: Nullable<User>;
     title?: Nullable<string>;
     officeLocation?: Nullable<string>;
-    officeHours?: Nullable<string>;
+    officeHours?: Nullable<Nullable<string>[]>;
     contactPolicy?: Nullable<string>;
     phone?: Nullable<string>;
     background?: Nullable<string>;
-    researchInterest?: Nullable<string>;
+    researchInterest?: Nullable<Nullable<string>[]>;
     selectedPapersAndPublications?: Nullable<Nullable<string>[]>;
     personalWebsite?: Nullable<string>;
     philosophy?: Nullable<string>;

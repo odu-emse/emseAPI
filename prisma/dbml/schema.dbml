@@ -39,14 +39,13 @@ Table InstructorProfile {
   accountID String [unique]
   title String
   officeLocation String
-  officeHours String
+  officeHours String[] [not null]
   contactPolicy String
   phone String
   background String
-  researchInterest String
+  researchInterest String[] [not null]
   selectedPapersAndPublications String[] [not null]
   personalWebsite String
-  philosophy String
 }
 
 Table PlanOfStudy {
