@@ -500,6 +500,8 @@ type Path {
     updatedAt: Date!
     course:    CoursePath!
     status:    PathStatus!
+    hoursSatisfies: Float!
+    learningOutcomes: [String!]!
 }
 
 enum PathStatus {
@@ -534,6 +536,9 @@ input CreateLearningPathInput {
 
 input PathInput {
     course: CoursePathInput!
+    status: PathStatus
+    hoursSatisfies: Float
+    learningOutcomes: [String!]
 }
 
 input CoursePathInput {

@@ -362,10 +362,12 @@ model LearningPath {
 }
 
 type Path {
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
-  course    CoursePath
-  status    PathStatus @default(DRAFT)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @default(now())
+  course           CoursePath
+  status           PathStatus? @default(DRAFT)
+  hoursSatisfies   Float?      @default(0.0)
+  learningOutcomes String[]    @default([])
 }
 
 type CoursePath {
