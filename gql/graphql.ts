@@ -85,6 +85,9 @@ export interface CreateLearningPathInput {
 
 export interface PathInput {
     course: CoursePathInput;
+    status?: Nullable<PathStatus>;
+    hoursSatisfies?: Nullable<number>;
+    learningOutcomes?: Nullable<string[]>;
 }
 
 export interface CoursePathInput {
@@ -771,6 +774,8 @@ export interface Path {
     updatedAt: Date;
     course: CoursePath;
     status: PathStatus;
+    hoursSatisfies: number;
+    learningOutcomes: string[];
 }
 
 export interface CoursePath {
