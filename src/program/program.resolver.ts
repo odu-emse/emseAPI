@@ -18,7 +18,8 @@ import {
 	CreateContentArgs,
 	ModEnrollmentFields,
 	NewModule,
-	CollectionFields
+	CollectionFields,
+	CreateLearningPathInput
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -133,6 +134,11 @@ export class ProgramResolver {
 	@Query("lesson")
 	async lesson(@Args("input") input: LessonFields) {
 		return await this.programService.lesson(input);
+	}
+
+	@Query("learningPath")
+	async learningPath(@Args("planID") planID: string) {
+		return await this.programService.learningPath(planID);
 	}
 
 	// Mutations
@@ -402,5 +408,13 @@ export class ProgramResolver {
 	@Mutation("deleteContent")
 	async deleteContent(@Args("contentID") contentID: string) {
 		return await this.programService.deleteContent(contentID);
+	}
+
+	@Mutation("createLearningPath")
+	async createLearningPath(
+		@Args("planID") planID: string,
+		@Args("input") input: CreateLearningPathInput
+	) {
+		return await this.programService.createLearningPath(planID, input);
 	}
 }
