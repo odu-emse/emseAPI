@@ -484,26 +484,25 @@ type Query {
     """
     Retrieve a sepcific learning path based on the user's plan of study ID
     """
-    learningPath(planID: ID!): LearningPath!
+    learningPath(planID: ID!): [LearningPath!]!
 }
 
 type LearningPath {
     id:        ID!
     createdAt: Date!
-    updatedAt:    Date!
     plan:      PlanOfStudy!
     planID:    ID!
-    path :     Path!
+    paths:     [Path!]!
 }
 
 type Path {
     createdAt: Date!
+    updatedAt: Date!
     course:    CoursePath!
 }
 
 type CoursePath {
     id:       ID!
-    course:   Course!
     sections: [SectionPath!]!
 }
 
@@ -514,18 +513,17 @@ type SectionPath {
 
 type CollectionPath {
     id:      ID!
-    collection: Collection!
     modules: [ModulePath!]!
 }
 
 type ModulePath {
     id: ID!
-    module: Module!
-    enrollmentID: ID!
+    enrollmentID: ID
 }
 
 input CreateLearningPathInput {
-    path: PathInput!
+    path: PathInput
+    paths: [PathInput!]
 }
 
 input PathInput {

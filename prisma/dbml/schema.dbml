@@ -316,10 +316,9 @@ Table QuizResult {
 Table LearningPath {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [default: `now()`, not null]
   plan PlanOfStudy [not null]
-  planID String [not null]
-  path Path [not null]
+  planID String [unique, not null]
+  paths Path[] [not null]
 }
 
 Enum UserRole {
