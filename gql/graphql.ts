@@ -73,6 +73,34 @@ export interface PlanFields {
     modulesLeft?: Nullable<string>;
 }
 
+export interface CreateLearningPathInput {
+    path: PathInput;
+}
+
+export interface PathInput {
+    course: CoursePathInput;
+}
+
+export interface CoursePathInput {
+    id: string;
+    sections: SectionPathInput[];
+}
+
+export interface SectionPathInput {
+    id: string;
+    collections: CollectionPathInput[];
+}
+
+export interface CollectionPathInput {
+    id: string;
+    modules: ModulePathInput[];
+}
+
+export interface ModulePathInput {
+    id: string;
+    enrollmentID?: Nullable<string>;
+}
+
 export interface CreateContentArgs {
     type: ContentType;
     link: string;
@@ -497,6 +525,7 @@ export interface IMutation {
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
+    createLearningPath(planID: string, input: CreateLearningPathInput): LearningPath | Promise<LearningPath>;
     createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
     waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
     deleteProgress(id: string): boolean | Promise<boolean>;
@@ -546,6 +575,7 @@ export interface IQuery {
     collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
+    learningPath(planID: string): LearningPath | Promise<LearningPath>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
     quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
@@ -720,6 +750,43 @@ export interface Content {
 
 export interface Error {
     message?: Nullable<string>;
+}
+
+export interface LearningPath {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    plan: PlanOfStudy;
+    planID: string;
+    path: Path;
+}
+
+export interface Path {
+    createdAt: Date;
+    course: CoursePath;
+}
+
+export interface CoursePath {
+    id: string;
+    course: Course;
+    sections: SectionPath[];
+}
+
+export interface SectionPath {
+    id: string;
+    collections: CollectionPath[];
+}
+
+export interface CollectionPath {
+    id: string;
+    collection: Collection;
+    modules: ModulePath[];
+}
+
+export interface ModulePath {
+    id: string;
+    module: Module;
+    enrollmentID: string;
 }
 
 export interface Progress {

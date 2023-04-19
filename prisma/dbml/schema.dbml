@@ -41,11 +41,9 @@ Table InstructorProfile {
   officeLocation String
   officeHours String[] [not null]
   contactPolicy String
-  phone String
   background String
   researchInterest String[] [not null]
   selectedPapersAndPublications String[] [not null]
-  personalWebsite String
 }
 
 Table PlanOfStudy {
@@ -55,6 +53,7 @@ Table PlanOfStudy {
   modules ModuleEnrollment [not null]
   assignmentResults AssignmentResult [not null]
   quizResults QuizResult [not null]
+  learningPaths LearningPath [not null]
 }
 
 Table Social {
@@ -314,6 +313,15 @@ Table QuizResult {
   quizInstance QuizInstance
 }
 
+Table LearningPath {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  plan PlanOfStudy [not null]
+  planID String [not null]
+  path Path [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -425,3 +433,5 @@ Ref: Question.instanceIDs > QuizInstance.id
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 
 Ref: QuizResult.studentID > PlanOfStudy.id
+
+Ref: LearningPath.planID > PlanOfStudy.id [delete: Cascade]
