@@ -354,14 +354,16 @@ model QuizResult {
 model LearningPath {
   id        String      @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime    @default(now())
-  updatedAt DateTime    @default(now()) @updatedAt
   plan      PlanOfStudy @relation(fields: [planID], references: [id], onDelete: Cascade)
   planID    String      @db.ObjectId
-  path      Path
+  paths     Path[]
+
+  @@unique([planID])
 }
 
 type Path {
   createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
   course    CoursePath
 }
 

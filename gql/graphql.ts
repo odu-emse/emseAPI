@@ -74,7 +74,8 @@ export interface PlanFields {
 }
 
 export interface CreateLearningPathInput {
-    path: PathInput;
+    path?: Nullable<PathInput>;
+    paths?: Nullable<PathInput[]>;
 }
 
 export interface PathInput {
@@ -575,7 +576,7 @@ export interface IQuery {
     collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
     module(input?: Nullable<ModuleFields>): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
-    learningPath(planID: string): LearningPath | Promise<LearningPath>;
+    learningPath(planID: string): LearningPath[] | Promise<LearningPath[]>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
     quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
@@ -755,20 +756,19 @@ export interface Error {
 export interface LearningPath {
     id: string;
     createdAt: Date;
-    updatedAt: Date;
     plan: PlanOfStudy;
     planID: string;
-    path: Path;
+    paths: Path[];
 }
 
 export interface Path {
     createdAt: Date;
+    updatedAt: Date;
     course: CoursePath;
 }
 
 export interface CoursePath {
     id: string;
-    course: Course;
     sections: SectionPath[];
 }
 
@@ -779,14 +779,12 @@ export interface SectionPath {
 
 export interface CollectionPath {
     id: string;
-    collection: Collection;
     modules: ModulePath[];
 }
 
 export interface ModulePath {
     id: string;
-    module: Module;
-    enrollmentID: string;
+    enrollmentID?: Nullable<string>;
 }
 
 export interface Progress {
