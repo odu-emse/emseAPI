@@ -20,11 +20,12 @@ import {
 	CreateContentArgs,
 	ContentFields,
 	NewModule,
-	CollectionFields
+	CollectionFields,
+	CreateLearningPathInput
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { Prisma } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 
 @Injectable()
 export class ProgramService {
@@ -200,6 +201,14 @@ export class ProgramService {
 						}
 					}
 				}
+			}
+		}
+	});
+
+	private learningPathInclude = Prisma.validator<Prisma.LearningPathInclude>()({
+		plan: {
+			include: {
+				student: true
 			}
 		}
 	});
@@ -1162,6 +1171,92 @@ export class ProgramService {
 					set: objectives
 				}
 			}
+		});
+	}
+
+	async learningPath(planID: string) {
+		return this.prisma.learningPath.findFirst({
+			where: {
+				planID
+			},
+			include: this.learningPathInclude
+		});
+	}
+
+	async createLearningPath(planID: string, input: CreateLearningPathInput) {
+		// validate course ID passed in
+		// validate section IDs passed in
+		// validate collection IDs passed in
+		// validate module IDs passed in
+		// if all validations pass
+		// create module enrollment for each module in the learning path
+		// store the enrollment ID in the module composite type
+		// create learning path
+		// else return a validation error
+
+		const { path } = input;
+
+		const course = await this.prisma.course.findUnique({
+			where: {
+				id: path.course.id
+			}
+		});
+
+		if (!course) {
+			return new Error("Course not found");
+		}
+
+		//create an enrollment for each module in the learning path
+		const moduleCount = path.course.sections
+			.map((section) => {
+				return section.collections
+					.map((collection) => {
+						return collection.modules.length;
+					})
+					.reduce((a, b) => a + b, 0);
+			})
+			.reduce((a, b) => a + b, 0);
+
+		const enrollment = await this.prisma.moduleEnrollment.createMany({
+			data: path.course.sections
+				.map((section) => {
+					return section.collections
+						.map((collection) => {
+							return collection.modules
+								.map((module) => {
+									return {
+										moduleId: module.id,
+										planID: planID,
+										role: UserRole.STUDENT
+									};
+								})
+								.flat(2);
+						})
+						.flat(2);
+				})
+				.flat(2)
+		});
+
+		if (enrollment.count !== moduleCount) {
+			return new Error("Failed to create module enrollments");
+		}
+
+		const pathData = Prisma.validator<Prisma.LearningPathCreateInput>()({
+			plan: {
+				connect: {
+					id: planID
+				}
+			},
+			path: {
+				course: {
+					id: path.course.id
+				}
+			}
+		});
+
+		return this.prisma.learningPath.create({
+			data: pathData,
+			include: this.learningPathInclude
 		});
 	}
 }
