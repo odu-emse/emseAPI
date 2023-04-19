@@ -1175,7 +1175,7 @@ export class ProgramService {
 	}
 
 	async learningPath(planID: string) {
-		return this.prisma.learningPath.findFirst({
+		return this.prisma.learningPath.findMany({
 			where: {
 				planID
 			},
@@ -1194,69 +1194,103 @@ export class ProgramService {
 		// create learning path
 		// else return a validation error
 
-		const { path } = input;
+		const { path, paths } = input;
 
-		const course = await this.prisma.course.findUnique({
-			where: {
-				id: path.course.id
+		// handle multiple path creation
+		if (paths && !path) {
+			const courses = await this.prisma.course.findMany({
+				where: {
+					id: {
+						in: paths.map((path) => path.course.id)
+					}
+				}
+			});
+
+			if (courses.length !== paths.length) {
+				return new Error("Not all courses could be found");
 			}
-		});
-
-		if (!course) {
-			return new Error("Course not found");
 		}
 
-		//create an enrollment for each module in the learning path
-		const moduleCount = path.course.sections
-			.map((section) => {
-				return section.collections
-					.map((collection) => {
-						return collection.modules.length;
-					})
-					.reduce((a, b) => a + b, 0);
-			})
-			.reduce((a, b) => a + b, 0);
+		// handle single path creation
+		if (path && !paths) {
+			const course = await this.prisma.course.findUnique({
+				where: {
+					id: path.course.id
+				}
+			});
 
-		const enrollment = await this.prisma.moduleEnrollment.createMany({
-			data: path.course.sections
+			if (!course) {
+				return new Error("Course not found");
+			}
+
+			//create an enrollment for each module in the learning path
+			const moduleCount = path.course.sections
 				.map((section) => {
 					return section.collections
 						.map((collection) => {
-							return collection.modules
-								.map((module) => {
+							return collection.modules.length;
+						})
+						.reduce((a, b) => a + b, 0);
+				})
+				.reduce((a, b) => a + b, 0);
+
+			const enrollment = await this.prisma.moduleEnrollment.createMany({
+				data: path.course.sections
+					.map((section) => {
+						return section.collections
+							.map((collection) => {
+								return collection.modules
+									.map((module) => {
+										return {
+											moduleId: module.id,
+											planID: planID,
+											role: UserRole.STUDENT
+										};
+									})
+									.flat(2);
+							})
+							.flat(2);
+					})
+					.flat(2)
+			});
+
+			if (enrollment.count !== moduleCount) {
+				return new Error("Failed to create module enrollments");
+			}
+
+			const pathData = Prisma.validator<Prisma.LearningPathCreateInput>()({
+				plan: {
+					connect: {
+						id: planID
+					}
+				},
+				paths: {
+					course: {
+						id: path.course.id,
+						sections: path.course.sections.map((section) => {
+							return {
+								id: section.id,
+								collections: section.collections.map((collection) => {
 									return {
-										moduleId: module.id,
-										planID: planID,
-										role: UserRole.STUDENT
+										id: collection.id,
+										modules: collection.modules.map((module) => {
+											return {
+												id: module.id,
+												enrollmentID: ""
+											};
+										})
 									};
 								})
-								.flat(2);
+							};
 						})
-						.flat(2);
-				})
-				.flat(2)
-		});
+					}
+				}
+			});
 
-		if (enrollment.count !== moduleCount) {
-			return new Error("Failed to create module enrollments");
+			return this.prisma.learningPath.create({
+				data: pathData,
+				include: this.learningPathInclude
+			});
 		}
-
-		const pathData = Prisma.validator<Prisma.LearningPathCreateInput>()({
-			plan: {
-				connect: {
-					id: planID
-				}
-			},
-			path: {
-				course: {
-					id: path.course.id
-				}
-			}
-		});
-
-		return this.prisma.learningPath.create({
-			data: pathData,
-			include: this.learningPathInclude
-		});
 	}
 }
