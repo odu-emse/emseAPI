@@ -138,7 +138,9 @@ export class ProgramResolver {
 
 	@Query("learningPath")
 	async learningPath(@Args("planID") planID: string) {
-		return await this.programService.learningPath(planID);
+		const lps = await this.programService.learningPath(planID);
+		if (!lps) throw new Error("No learning paths found for inputted user");
+		return lps;
 	}
 
 	// Mutations
@@ -415,6 +417,14 @@ export class ProgramResolver {
 		@Args("planID") planID: string,
 		@Args("input") input: CreateLearningPathInput
 	) {
-		return await this.programService.createLearningPath(planID, input);
+		if (!input.path && !input.paths)
+			throw new Error(
+				"Either a single path object or a list of path objects is required"
+			);
+		const data = await this.programService.createLearningPath(planID, input);
+
+		if (!data)
+			return new Error("An error occurred while creating your learning path");
+		return data;
 	}
 }
