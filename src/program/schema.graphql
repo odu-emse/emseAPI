@@ -499,6 +499,12 @@ type Path {
     createdAt: Date!
     updatedAt: Date!
     course:    CoursePath!
+    status:    PathStatus!
+}
+
+enum PathStatus {
+    DRAFT
+    LIVE
 }
 
 type CoursePath {

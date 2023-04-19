@@ -351,6 +351,11 @@ Enum FileType {
   TXT
 }
 
+Enum PathStatus {
+  DRAFT
+  LIVE
+}
+
 Ref: User.watchedThreadIDs > Thread.id
 
 Ref: User.groupMembershipIDs > Group.id

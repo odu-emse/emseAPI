@@ -37,6 +37,11 @@ export enum FileType {
     TXT = "TXT"
 }
 
+export enum PathStatus {
+    DRAFT = "DRAFT",
+    LIVE = "LIVE"
+}
+
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
@@ -765,6 +770,7 @@ export interface Path {
     createdAt: Date;
     updatedAt: Date;
     course: CoursePath;
+    status: PathStatus;
 }
 
 export interface CoursePath {
