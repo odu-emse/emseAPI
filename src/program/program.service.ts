@@ -24,7 +24,7 @@ import {
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { Prisma, UserRole } from "@prisma/client";
+import { ModuleEnrollment, Prisma, UserRole } from "@prisma/client";
 
 @Injectable()
 export class ProgramService {
@@ -1220,41 +1220,6 @@ export class ProgramService {
 
 			if (!course) {
 				return new Error("Course not found");
-			}
-
-			//create an enrollment for each module in the learning path
-			const moduleCount = path.course.sections
-				.map((section) => {
-					return section.collections
-						.map((collection) => {
-							return collection.modules.length;
-						})
-						.reduce((a, b) => a + b, 0);
-				})
-				.reduce((a, b) => a + b, 0);
-
-			const enrollment = await this.prisma.moduleEnrollment.createMany({
-				data: path.course.sections
-					.map((section) => {
-						return section.collections
-							.map((collection) => {
-								return collection.modules
-									.map((module) => {
-										return {
-											moduleId: module.id,
-											planID: planID,
-											role: UserRole.STUDENT
-										};
-									})
-									.flat(2);
-							})
-							.flat(2);
-					})
-					.flat(2)
-			});
-
-			if (enrollment.count !== moduleCount) {
-				return new Error("Failed to create module enrollments");
 			}
 
 			const pathData = Prisma.validator<Prisma.LearningPathCreateInput>()({
