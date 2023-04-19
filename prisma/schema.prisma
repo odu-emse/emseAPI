@@ -365,6 +365,7 @@ type Path {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
   course    CoursePath
+  status    PathStatus @default(DRAFT)
 }
 
 type CoursePath {
@@ -415,6 +416,11 @@ enum FileType {
   PDF
   TTT
   TXT
+}
+
+enum PathStatus {
+  DRAFT
+  LIVE
 }
 
 // Dont need this anymore since we arent doing API Tokens
