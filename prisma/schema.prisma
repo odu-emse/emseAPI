@@ -69,6 +69,7 @@ model PlanOfStudy {
   sections          SectionEnrollment[]
   assignmentResults AssignmentResult[]
   quizResults       QuizResult[]
+  learningPaths     LearningPath[]
 }
 
 model Social {
@@ -348,6 +349,40 @@ model QuizResult {
   student      PlanOfStudy   @relation(fields: [studentID], references: [id])
   studentID    String        @db.ObjectId
   quizInstance QuizInstance?
+}
+
+model LearningPath {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now()) @updatedAt
+  plan      PlanOfStudy @relation(fields: [planID], references: [id], onDelete: Cascade)
+  planID    String      @db.ObjectId
+  path      Path
+}
+
+type Path {
+  createdAt DateTime   @default(now())
+  course    CoursePath
+}
+
+type CoursePath {
+  id       String
+  sections SectionPath[]
+}
+
+type SectionPath {
+  id          String
+  collections CollectionPath[]
+}
+
+type CollectionPath {
+  id      String
+  modules ModulePath[]
+}
+
+type ModulePath {
+  id           String
+  enrollmentID String
 }
 
 enum UserRole {
