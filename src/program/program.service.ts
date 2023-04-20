@@ -25,7 +25,8 @@ import {
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { ModuleEnrollment, Prisma, UserRole } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 
 @Injectable()
 export class ProgramService {
@@ -1175,12 +1176,93 @@ export class ProgramService {
 	}
 
 	async learningPath(planID: string) {
-		return this.prisma.learningPath.findMany({
+		const lps = await this.prisma.learningPath.findMany({
 			where: {
 				planID
 			},
 			include: this.learningPathInclude
 		});
+
+		const courses: Array<string> = [];
+		const modules: Array<string> = [];
+
+		lps.map((lp) => {
+			lp.paths.map((path) => {
+				courses.push(path.course.id);
+				path.course.sections.map((section) => {
+					section.collections.map((collection) => {
+						collection.modules.map((module) => {
+							modules.push(module.id);
+						});
+					});
+				});
+			});
+		});
+
+		const courseIDs = [...new Set(courses)];
+		const moduleIDs = [...new Set(modules)];
+
+		const coursesData = await this.prisma.course.findMany({
+			where: {
+				id: {
+					in: courseIDs
+				}
+			},
+			include: this.courseInclude
+		});
+
+		const modulesData = await this.prisma.module.findMany({
+			where: {
+				id: {
+					in: moduleIDs
+				}
+			},
+			include: this.moduleInclude
+		});
+
+		const courseMap = new Map();
+		const moduleMap = new Map();
+
+		coursesData.map((course) => {
+			courseMap.set(course.id, course);
+		});
+
+		modulesData.map((module) => {
+			moduleMap.set(module.id, module);
+		});
+
+		const paths = lps.map((lp) => {
+			const paths = lp.paths.map((path) => {
+				const course = courseMap.get(path.course.id) as Course;
+				return {
+					...path,
+					course: {
+						...course,
+						sections: path.course.sections.map((section) => {
+							return {
+								...section,
+								collections: section.collections.map((collection) => {
+									return {
+										...collection,
+										modules: collection.modules.map((module) => {
+											return {
+												...moduleMap.get(module.id)
+											};
+										})
+									};
+								})
+							};
+						})
+					}
+				};
+			});
+			return {
+				...lp,
+				paths
+			};
+		});
+
+		return paths;
 	}
 
 	async createLearningPath(planID: string, input: CreateLearningPathInput) {
