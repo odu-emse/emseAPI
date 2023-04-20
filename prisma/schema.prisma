@@ -362,6 +362,7 @@ model LearningPath {
 }
 
 type Path {
+  id               String
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @default(now())
   course           CoursePath
@@ -377,11 +378,13 @@ type CoursePath {
 
 type SectionPath {
   id          String
+  name        String
   collections CollectionPath[]
 }
 
 type CollectionPath {
   id      String
+  name    String
   modules ModulePath[]
 }
 
