@@ -496,6 +496,7 @@ type LearningPath {
 }
 
 type Path {
+    id:        ID!
     createdAt: Date!
     updatedAt: Date!
     course:    CoursePath!
@@ -510,22 +511,115 @@ enum PathStatus {
 }
 
 type CoursePath {
+    """
+    course id
+    """
     id:       ID!
+    """
+    Name of the course
+    """
+    name: String!
+    """
+    modules in the course
+    """
+    moduleIDs: [ID]
+    """
+    Boolean value to check if the course is required/core or an elective
+    """
+    required: Boolean!
+    """
+    Number of Carnegie Unit and Student Hours that the course is worth
+    """
+    carnegieHours: Int!
     sections: [SectionPath!]!
 }
 
 type SectionPath {
     id:          ID!
+    name: String!
     collections: [CollectionPath!]!
 }
 
 type CollectionPath {
     id:      ID!
+    name: String!
     modules: [ModulePath!]!
 }
 
 type ModulePath {
+    """
+    Module Id
+    """
     id: ID!
+
+    """
+    Number of the Module
+    """
+    moduleNumber: Int!
+
+    """
+    Name of hte Module
+    """
+    moduleName: String!
+
+    """
+    Description of the Module
+    """
+    description: String!
+
+    """
+    Duration of the Module
+    """
+    duration: Float!
+
+    """
+    Introduction of the Module
+    """
+    intro: String!
+
+    """
+    Keywords in the Modules
+    """
+    keywords: [String!]!
+
+    """
+    objectives in the Modules
+    """
+    objectives: [String!]!
+
+    """
+    Date and Time of the Module Created at
+    """
+    createdAt: Date!
+
+    """
+    Date and Time of the Module Updated at
+    """
+    updatedAt: Date!
+
+    """
+    Memebers enrolled in the Module
+    """
+    members: [ModuleEnrollment!]!
+
+    """
+    Feedback of the Module
+    """
+    feedback: [ModuleFeedback!]!
+
+    """
+    Parent Modules of the Module
+    """
+    parentModules: [Module!]!
+
+    """
+    Child modules in the Module
+    """
+    subModules: [Module!]!
+    """
+    courseIDs set
+    """
+    courseIDs: [ID!]!
     enrollmentID: ID
 }
 
@@ -548,11 +642,13 @@ input CoursePathInput {
 
 input SectionPathInput {
     id: ID!
+    name: String!
     collections: [CollectionPathInput!]!
 }
 
 input CollectionPathInput {
     id: ID!
+    name: String!
     modules: [ModulePathInput!]!
 }
 
