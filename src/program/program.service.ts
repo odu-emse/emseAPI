@@ -1312,14 +1312,19 @@ export class ProgramService {
 					}
 				},
 				paths: {
+					id: faker.database.mongodbObjectId(),
+					learningOutcomes: path.learningOutcomes || [],
+					hoursSatisfies: path.hoursSatisfies || 1,
 					course: {
 						id: path.course.id,
 						sections: path.course.sections.map((section) => {
 							return {
 								id: section.id,
+								name: section.name,
 								collections: section.collections.map((collection) => {
 									return {
 										id: collection.id,
+										name: collection.name,
 										modules: collection.modules.map((module) => {
 											return {
 												id: module.id,
