@@ -90,7 +90,7 @@ export interface ContentFields {
 
 export interface CreateCollectionArgs {
     name: string;
-    moduleID: string;
+    moduleID?: Nullable<string[]>;
     lessons?: Nullable<string[]>;
     positionIndex: number;
 }
@@ -98,7 +98,7 @@ export interface CreateCollectionArgs {
 export interface CollectionFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
-    moduleID?: Nullable<string>;
+    moduleID?: Nullable<Nullable<string>[]>;
     lessons?: Nullable<Nullable<string>[]>;
     positionIndex?: Nullable<number>;
 }
@@ -692,8 +692,8 @@ export interface Collection {
     createdAt: Date;
     updatedAt: Date;
     lessons?: Nullable<Nullable<Lesson>[]>;
-    module: Module;
-    moduleID: string;
+    module?: Nullable<Module[]>;
+    moduleID?: Nullable<string[]>;
     position?: Nullable<number>;
 }
 

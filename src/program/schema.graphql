@@ -277,7 +277,7 @@ type Module {
 	Assignement in the module
 	"""
 	assignments: [Assignment!]!
-
+	
 	"""
 	Memebers enrolled in the Module
 	"""
@@ -337,11 +337,11 @@ type Collection {
 	"""
 	The module that this collection belongs to
 	"""
-	module: Module!
+	module: [Module!]
 	"""
 	The module's unique ID that this collection belongs to
 	"""
-	moduleID: ID!
+	moduleID: [ID!]
 	"""
 	The position index of the collection in a module
 	"""
@@ -533,7 +533,7 @@ input ContentFields {
 
 input CreateCollectionArgs {
 	name: String!
-	moduleID: ID!
+	moduleID: [ID!]
 	lessons: [ID!]
 	positionIndex: Int!
 }
@@ -541,7 +541,7 @@ input CreateCollectionArgs {
 input CollectionFields {
 	id: ID
 	name: String
-	moduleID: ID
+	moduleID: [ID]
 	lessons: [ID]
 	positionIndex: Int
 }

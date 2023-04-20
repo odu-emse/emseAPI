@@ -124,7 +124,8 @@ model Module {
   parentModuleIDs String[]     @default([]) @db.ObjectId
   subModules      Module[]     @relation("parentModules", fields: [subModuleIDs], references: [id])
   subModuleIDs    String[]     @default([]) @db.ObjectId
-  collections     Collection[] @relation(name: "collections")
+  collections     Collection[] @relation(name: "collections", fields: [collectionsID], references: [id])
+  collectionsID   String[]     @db.ObjectId
 
   courseIDs String[] @default([]) @db.ObjectId
   course    Course[] @relation(fields: [courseIDs], references: [id])
@@ -139,8 +140,8 @@ model Collection {
 
   // Relation fields
   lessons  Lesson[]
-  module   Module   @relation(name: "collections", fields: [moduleID], references: [id], onDelete: Cascade)
-  moduleID String   @db.ObjectId
+  module   Module[]   @relation(name: "collections", fields: [moduleID], references: [id])
+  moduleID String[]   @db.ObjectId
 }
 
 model Lesson {

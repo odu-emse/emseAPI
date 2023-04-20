@@ -41,11 +41,9 @@ Table InstructorProfile {
   officeLocation String
   officeHours String[] [not null]
   contactPolicy String
-  phone String
   background String
   researchInterest String[] [not null]
   selectedPapersAndPublications String[] [not null]
-  personalWebsite String
 }
 
 Table PlanOfStudy {
@@ -106,6 +104,7 @@ Table Module {
   subModules Module [not null]
   subModuleIDs String[] [not null]
   collections Collection [not null]
+  collectionsID String[] [not null]
   courseIDs String[] [not null]
   course Course [not null]
 }
@@ -118,7 +117,7 @@ Table Collection {
   position Int [not null, default: 0]
   lessons Lesson [not null]
   module Module [not null]
-  moduleID String [not null]
+  moduleID String[] [not null]
 }
 
 Table Lesson {
@@ -364,9 +363,11 @@ Ref: Module.parentModuleIDs > Module.id
 
 Ref: Module.subModuleIDs > Module.id
 
+Ref: Module.collectionsID > Collection.id
+
 Ref: Module.courseIDs > Course.id
 
-Ref: Collection.moduleID > Module.id [delete: Cascade]
+Ref: Collection.moduleID > Module.id
 
 Ref: Lesson.collectionID > Collection.id [delete: Cascade]
 
