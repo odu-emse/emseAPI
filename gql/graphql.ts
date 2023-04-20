@@ -97,11 +97,13 @@ export interface CoursePathInput {
 
 export interface SectionPathInput {
     id: string;
+    name: string;
     collections: CollectionPathInput[];
 }
 
 export interface CollectionPathInput {
     id: string;
+    name: string;
     modules: ModulePathInput[];
 }
 
@@ -770,6 +772,7 @@ export interface LearningPath {
 }
 
 export interface Path {
+    id: string;
     createdAt: Date;
     updatedAt: Date;
     course: CoursePath;
@@ -780,21 +783,41 @@ export interface Path {
 
 export interface CoursePath {
     id: string;
+    name: string;
+    moduleIDs?: Nullable<Nullable<string>[]>;
+    required: boolean;
+    carnegieHours: number;
     sections: SectionPath[];
 }
 
 export interface SectionPath {
     id: string;
+    name: string;
     collections: CollectionPath[];
 }
 
 export interface CollectionPath {
     id: string;
+    name: string;
     modules: ModulePath[];
 }
 
 export interface ModulePath {
     id: string;
+    moduleNumber: number;
+    moduleName: string;
+    description: string;
+    duration: number;
+    intro: string;
+    keywords: string[];
+    objectives: string[];
+    createdAt: Date;
+    updatedAt: Date;
+    members: ModuleEnrollment[];
+    feedback: ModuleFeedback[];
+    parentModules: Module[];
+    subModules: Module[];
+    courseIDs: string[];
     enrollmentID?: Nullable<string>;
 }
 
