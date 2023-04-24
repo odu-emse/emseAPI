@@ -537,6 +537,7 @@ export interface IMutation {
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
     createLearningPath(planID: string, input: CreateLearningPathInput): LearningPath | Promise<LearningPath>;
+    updateLearningPath(planID: string, pathID: string, input: PathInput): LearningPath | Promise<LearningPath>;
     createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
     waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
     deleteProgress(id: string): boolean | Promise<boolean>;
