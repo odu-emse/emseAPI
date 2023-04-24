@@ -1475,4 +1475,32 @@ export class ProgramService {
 			data: lpPayload
 		});
 	}
+
+	async deleteLearningPath(planID: string, pathID: string) {
+		const lpData = await this.prisma.learningPath.findMany({
+			where: {
+				planID
+			},
+			select: {
+				createdAt: true,
+				paths: true
+			}
+		});
+
+		if (lpData.length !== 1) {
+			return new Error("The learning path you choose could not be found");
+		}
+
+		const lpPayload = {
+			...lpData[0],
+			paths: lpData[0].paths.filter((path) => path.id !== pathID)
+		} as Prisma.LearningPathUpdateInput;
+
+		return this.prisma.learningPath.update({
+			where: {
+				planID
+			},
+			data: lpPayload
+		});
+	}
 }

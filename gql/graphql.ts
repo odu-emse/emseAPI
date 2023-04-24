@@ -537,7 +537,9 @@ export interface IMutation {
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
     createLearningPath(planID: string, input: CreateLearningPathInput): LearningPath | Promise<LearningPath>;
+    createPath(planID: string, input: PathInput): SimpleLearningPath | Promise<SimpleLearningPath>;
     updateLearningPath(planID: string, pathID: string, input: PathInput): LearningPath | Promise<LearningPath>;
+    deleteLearningPath(planID: string, pathID: string): LearningPath | Promise<LearningPath>;
     createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
     waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
     deleteProgress(id: string): boolean | Promise<boolean>;
@@ -762,6 +764,47 @@ export interface Content {
 
 export interface Error {
     message?: Nullable<string>;
+}
+
+export interface SimpleLearningPath {
+    id: string;
+    createdAt: Date;
+    plan: PlanOfStudy;
+    planID: string;
+    paths: SimplePath[];
+}
+
+export interface SimplePath {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    course: SimpleCoursePath;
+    status: PathStatus;
+    hoursSatisfies: number;
+    learningOutcomes: string[];
+}
+
+export interface SimpleCoursePath {
+    id: string;
+    sections: SimpleSection[];
+}
+
+export interface SimpleSection {
+    id: string;
+    name: string;
+    collections: SimpleCollection[];
+}
+
+export interface SimpleCollection {
+    id: string;
+    name: string;
+    modules: SimpleModule[];
+}
+
+export interface SimpleModule {
+    id: string;
+    name: string;
+    collections: SimpleCollection[];
 }
 
 export interface LearningPath {

@@ -487,6 +487,47 @@ type Query {
     learningPath(planID: ID!, pathID: ID): [LearningPath!]!
 }
 
+type SimpleLearningPath {
+    id:        ID!
+    createdAt: Date!
+    plan:      PlanOfStudy!
+    planID:    ID!
+    paths:     [SimplePath!]!
+}
+
+type SimplePath {
+    id:        ID!
+    createdAt: Date!
+    updatedAt: Date!
+    course:    SimpleCoursePath!
+    status:    PathStatus!
+    hoursSatisfies: Float!
+    learningOutcomes: [String!]!
+}
+
+type SimpleCoursePath {
+    id: ID!
+    sections: [SimpleSection!]!
+}
+
+type SimpleSection {
+    id: ID!
+    name: String!
+    collections: [SimpleCollection!]!
+}
+
+type SimpleCollection {
+    id: ID!
+    name: String!
+    modules: [SimpleModule!]!
+}
+
+type SimpleModule {
+    id: ID!
+    name: String!
+    collections: [SimpleCollection!]!
+}
+
 type LearningPath {
     id:        ID!
     createdAt: Date!
@@ -1198,11 +1239,15 @@ type Mutation {
     """
     deleteContent(contentID: ID!): Content
     """
-    Create a new learning path with the given program structure
+    Create a new learning path model with the given program structure
     """
     createLearningPath(planID: ID!, input: CreateLearningPathInput!): LearningPath!
     """
     Update an existing learning path with the given program structure
     """
     updateLearningPath(planID: ID!, pathID: ID!, input: PathInput!): LearningPath!
+    """
+    Delete an existing learning path
+    """
+    deleteLearningPath(planID: ID!, pathID: ID!): LearningPath!
 }
