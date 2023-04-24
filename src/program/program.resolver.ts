@@ -19,8 +19,8 @@ import {
 	ModEnrollmentFields,
 	NewSection,
 	CollectionFields
-	CreateLearningPathInput
-} from "@/types/graphql";
+	CreateLearningPathInput, PathInput,
+} from '@/types/graphql';
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma, UserRole } from "@prisma/client";
@@ -445,6 +445,22 @@ export class ProgramResolver {
 
 		if (!data)
 			return new Error("An error occurred while creating your learning path");
+		return data;
+	}
+
+	@Mutation("updateLearningPath")
+	async updateLearningPath(
+		@Args("planID") planID: string,
+		@Args("pathID") pathID: string,
+		@Args("input") input: PathInput
+	) {
+		const data = await this.programService.updateLearningPath(
+			planID,
+			pathID,
+			input
+		);
+		if (!input)
+			return new Error("An error occurred while updating your learning path");
 		return data;
 	}
 }
