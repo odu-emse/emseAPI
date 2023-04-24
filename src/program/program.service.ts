@@ -21,8 +21,9 @@ import {
 	ContentFields,
 	NewModule,
 	CollectionFields,
-	CreateLearningPathInput, PathInput,
-} from '@/types/graphql';
+	CreateLearningPathInput,
+	PathInput
+} from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -1350,113 +1351,128 @@ export class ProgramService {
 		const { status, course, learningOutcomes, hoursSatisfies } = input;
 
 		const courseData = await this.prisma.course.findMany({
-				where: {
-					id: course.id
-				}
-			});
-
-			if (courseData.length !== 1) {
-				return new Error("The course you choose could not be found");
+			where: {
+				id: course.id
 			}
+		});
 
-			// needed to include the select statement here since we only want to update those two fields
-			const lpData = await this.prisma.learningPath.findMany({
-				where: {
-					planID,
-				},
-				select: {
-					createdAt: true,
-					paths: true,
-				}
-			})
+		if (courseData.length !== 1) {
+			return new Error("The course you choose could not be found");
+		}
 
-			if (lpData.length !== 1) {
-				return new Error("The learning path you choose could not be found");
+		// needed to include the select statement here since we only want to update those two fields
+		const lpData = await this.prisma.learningPath.findMany({
+			where: {
+				planID
+			},
+			select: {
+				createdAt: true,
+				paths: true
 			}
+		});
 
-			const pathData = lpData[0].paths.filter((path) => path.id === pathID)[0];
+		if (lpData.length !== 1) {
+			return new Error("The learning path you choose could not be found");
+		}
 
-			// by referencing the pathData here, we are able to save the old data that was present in the path
+		const pathData = lpData[0].paths.filter((path) => path.id === pathID)[0];
+
+		// by referencing the pathData here, we are able to save the old data that was present in the path
 		let pathPayload = {
 			...pathData,
 			...(hoursSatisfies && { hoursSatisfies }),
 			...(learningOutcomes && { learningOutcomes }),
-			...(status && { status }),
+			...(status && { status })
 		} as Prisma.PathCreateInput;
 
-			const updatedSectionsArray = course.sections.map((section, sectionIndex) => {
-				if(section.id !== pathData.course.sections[sectionIndex].id){
+		const updatedSectionsArray = course.sections.map(
+			(section, sectionIndex) => {
+				if (section.id !== pathData.course.sections[sectionIndex].id) {
 					return {
 						id: section.id,
 						name: section.name,
 						collections: []
-					}
-				}
-				else{
-					const updatedCollectionsArray = section.collections.map((collection, collectionIndex) => {
-						if(collection.id !== pathData.course.sections[sectionIndex].collections[collectionIndex].id){
-							return {
-								id: collection.id,
-								name: collection.name,
-								modules: []
+					};
+				} else {
+					const updatedCollectionsArray = section.collections.map(
+						(collection, collectionIndex) => {
+							if (
+								collection.id !==
+								pathData.course.sections[sectionIndex].collections[
+									collectionIndex
+								].id
+							) {
+								return {
+									id: collection.id,
+									name: collection.name,
+									modules: []
+								};
+							} else {
+								const updatedModulesArray = collection.modules.map(
+									(module, moduleIndex) => {
+										if (
+											module.id !==
+											pathData.course.sections[sectionIndex].collections[
+												collectionIndex
+											].modules[moduleIndex].id
+										) {
+											return {
+												id: module.id,
+												enrollmentID: ""
+											};
+										} else {
+											return {
+												id: module.id,
+												enrollmentID:
+													pathData.course.sections[sectionIndex].collections[
+														collectionIndex
+													].modules[moduleIndex].enrollmentID
+											};
+										}
+									}
+								);
+								return {
+									id: collection.id,
+									name: collection.name,
+									modules: updatedModulesArray
+								};
 							}
 						}
-						else{
-							const updatedModulesArray = collection.modules.map((module, moduleIndex) => {
-								if(module.id !== pathData.course.sections[sectionIndex].collections[collectionIndex].modules[moduleIndex].id){
-									return {
-										id: module.id,
-										enrollmentID: ""
-									}
-								}
-								else{
-									return {
-										id: module.id,
-										enrollmentID: pathData.course.sections[sectionIndex].collections[collectionIndex].modules[moduleIndex].enrollmentID
-									}
-								}
-							})
-							return {
-								id: collection.id,
-								name: collection.name,
-								modules: updatedModulesArray
-							}
-						}
-					})
+					);
 					return {
 						id: section.id,
 						name: section.name,
 						collections: updatedCollectionsArray
-					}
-				}
-			})
-
-			pathPayload = {
-				...pathPayload,
-				course: {
-					id: courseData[0].id,
-					sections: updatedSectionsArray
+					};
 				}
 			}
+		);
 
-			// we map over the existing learning paths and replace the one we are updating with the new data but keeping the old ones
-			const lpPayload = {
-				...lpData[0],
-				paths: lpData[0].paths.map((path) => {
-					if(path.id !== pathID){
-						return path
-					}
-					else{
-						return pathPayload
-					}
-				})
-			} as Prisma.LearningPathUpdateInput
+		pathPayload = {
+			...pathPayload,
+			course: {
+				id: courseData[0].id,
+				sections: updatedSectionsArray
+			}
+		};
 
-			return this.prisma.learningPath.update({
-				where: {
-					planID
-				},
-				data: lpPayload,
+		// we map over the existing learning paths and replace the one we are updating with the new data but keeping the old ones
+		const lpPayload = {
+			...lpData[0],
+			paths: lpData[0].paths.map((path) => {
+				if (path.id !== pathID) {
+					return path;
+				} else {
+					return pathPayload;
+				}
 			})
+		} as Prisma.LearningPathUpdateInput;
+
+		return this.prisma.learningPath.update({
+			where: {
+				planID
+			},
+			data: lpPayload
+		});
 	}
 }

@@ -19,8 +19,9 @@ import {
 	ModEnrollmentFields,
 	NewModule,
 	CollectionFields,
-	CreateLearningPathInput, PathInput,
-} from '@/types/graphql';
+	CreateLearningPathInput,
+	PathInput
+} from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
 import { Prisma, UserRole } from "@prisma/client";
