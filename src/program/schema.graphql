@@ -1243,6 +1243,10 @@ type Mutation {
     """
     createLearningPath(planID: ID!, input: CreateLearningPathInput!): LearningPath!
     """
+    Add a new path to an existing learning path model
+    """
+    createPath(planID: ID!, input: PathInput!): SimpleLearningPath!
+    """
     Update an existing learning path with the given program structure
     """
     updateLearningPath(planID: ID!, pathID: ID!, input: PathInput!): LearningPath!
