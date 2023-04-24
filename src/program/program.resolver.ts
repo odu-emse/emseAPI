@@ -459,8 +459,19 @@ export class ProgramResolver {
 			pathID,
 			input
 		);
-		if (!input)
+		if (data instanceof Error)
 			return new Error("An error occurred while updating your learning path");
+		return data;
+	}
+
+	@Mutation("deleteLearningPath")
+	async deleteLearningPath(
+		@Args("planID") planID: string,
+		@Args("pathID") pathID: string
+	) {
+		const data = await this.programService.deleteLearningPath(planID, pathID);
+		if (data instanceof Error)
+			return new Error("An error occurred while deleting your learning path");
 		return data;
 	}
 }
