@@ -484,7 +484,7 @@ type Query {
     """
     Retrieve a sepcific learning path based on the user's plan of study ID
     """
-    learningPath(planID: ID!): [LearningPath!]!
+    learningPath(planID: ID!, pathID: ID): [LearningPath!]!
 }
 
 type LearningPath {
