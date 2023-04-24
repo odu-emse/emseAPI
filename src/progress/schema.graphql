@@ -52,7 +52,7 @@ input ProgressWaiveArgs {
     planID: ID
 }
 
-type LessonProgress {
+type ModuleProgress {
     """
     The database defined ID of the progress document
     """
@@ -78,9 +78,9 @@ type LessonProgress {
     """
     enrollment: SectionEnrollment!
     """
-    The lesson that this progress is associated with (one-to-one)
+    The module that this progress is associated with (one-to-one)
     """
-    lesson: Lesson!
+    module: Module!
 }
 
 type Query {

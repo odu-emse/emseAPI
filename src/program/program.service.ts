@@ -12,11 +12,10 @@ import {
 	ModFeedbackFields,
 	AssignmentResFields,
 	ModEnrollmentFields,
-	LessonFields,
-	Course,
+	ModuleFields,
 	SectionFeedback,
 	CreateCollectionArgs,
-	LessonInput,
+	ModuleInput,
 	CreateContentArgs,
 	ContentFields,
 	NewSection,
@@ -104,7 +103,7 @@ export class ProgramService {
 		subSections: true,
 		collections: {
 			include: {
-				lessons: {
+				modules: {
 					include: {
 						content: true
 					}
@@ -156,10 +155,10 @@ export class ProgramService {
 					},
 					collections: {
 						include: {
-							lessons: {
+							modules: {
 								include: {
 									content: true,
-									lessonProgress: {
+									moduleProgress: {
 										include: {
 											enrollment: true
 										}
@@ -180,14 +179,14 @@ export class ProgramService {
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
 		section: true,
-		lessons: {
+		modules: {
 			include: {
 				content: true
 			}
 		}
 	});
 
-	private lessonInclude = Prisma.validator<Prisma.LessonInclude>()({
+	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
 		content: true,
 		collection: {
 			include: {
@@ -195,7 +194,7 @@ export class ProgramService {
 					include: {
 						collections: {
 							include: {
-								lessons: true
+								modules: true
 							}
 						}
 					}
@@ -463,7 +462,7 @@ export class ProgramService {
 			});
 		}
 
-		const { id, name, lessons, sectionID, positionIndex } = params;
+		const { id, name, modules, sectionID, positionIndex } = params;
 
 		const where = Prisma.validator<Prisma.CollectionWhereInput>()({
 			...(id && { id }),
@@ -480,14 +479,14 @@ export class ProgramService {
 			})
 		});
 
-		// loop out of lessons and check with and
-		if (lessons) {
-			lessons.map((lesson) => {
+		// loop out of modules and check with and
+		if (modules) {
+			modules.map((module) => {
 				where["AND"] = [
 					{
-						lessons: {
+						modules: {
 							some: {
-								id: lesson
+								id: module
 							}
 						}
 					}
@@ -501,11 +500,11 @@ export class ProgramService {
 		});
 	}
 
-	//Fetch Lessons
-	async lesson(input: LessonFields) {
+	//Fetch modules
+	async module(input: ModuleFields) {
 		const { id, name, content, collection, position, objectives } = input;
 
-		const where = Prisma.validator<Prisma.LessonWhereInput>()({
+		const where = Prisma.validator<Prisma.ModuleWhereInput>()({
 			...(id && { id }),
 			...(name && { name }),
 			...(position && { position }),
@@ -514,9 +513,9 @@ export class ProgramService {
 			objectives: objectives ? { hasEvery: objectives } : undefined
 		});
 
-		return this.prisma.lesson.findMany({
+		return this.prisma.module.findMany({
 			where,
-			include: this.lessonInclude
+			include: this.moduleInclude
 		});
 	}
 
@@ -538,7 +537,7 @@ export class ProgramService {
 
 	async createCollection({
 		name,
-		lessons,
+		modules,
 		positionIndex,
 		sectionID
 	}: CreateCollectionArgs) {
@@ -550,16 +549,16 @@ export class ProgramService {
 					id: sectionID
 				}
 			},
-			lessons: {
-				connect: lessons?.map((lesson) => {
-					return { id: lesson };
+			modules: {
+				connect: modules?.map((module) => {
+					return { id: module };
 				})
 			}
 		});
 		return this.prisma.collection.create({
 			data: create,
 			include: {
-				lessons: true
+				modules: true
 			}
 		});
 	}
@@ -989,9 +988,9 @@ export class ProgramService {
 			}
 		});
 	}
-	async createLesson(input: LessonInput) {
-		//TODO: Support Lessons being added in the middle of an existing collection (i.e new lesson at index 4 needs to shift right starting from original index 4)
-		const args = Prisma.validator<Prisma.LessonCreateArgs>()({
+	async createModule(input: ModuleInput) {
+		//TODO: Support Modules being added in the middle of an existing collection (i.e new module at index 4 needs to shift right starting from original index 4)
+		const args = Prisma.validator<Prisma.ModuleCreateArgs>()({
 			data: {
 				name: input.name,
 				...(input.content !== null &&
@@ -1011,16 +1010,16 @@ export class ProgramService {
 				objectives: input.objectives ? input.objectives : undefined,
 				hours: input.hours
 			},
-			include: this.lessonInclude
+			include: this.moduleInclude
 		});
 
-		return this.prisma.lesson.create({
+		return this.prisma.module.create({
 			data: args.data,
 			include: args.include
 		});
 	}
 
-	async updateLesson(input: LessonFields, replaceObj: boolean) {
+	async updateModule(input: ModuleFields, replaceObj: boolean) {
 		const {
 			id,
 			name,
@@ -1028,7 +1027,7 @@ export class ProgramService {
 			// content,
 			// Threads are a list so how these are being updated is going to be a little strange.
 			// The only thing i could think of is if these were a list of IDs in which case the threads
-			// Being refererenced would all have to be modified in this update Lesson.
+			// Being refererenced would all have to be modified in this update Module.
 			// thread,
 			collection,
 			objectives,
@@ -1038,7 +1037,7 @@ export class ProgramService {
 		const newObjectives = objectives;
 		// Check that they passed in objectives, an ID and they are NOT replacing the list
 		if (newObjectives && id && !replaceObj) {
-			const current = await this.prisma.lesson.findUnique({
+			const current = await this.prisma.module.findUnique({
 				where: {
 					id
 				}
@@ -1060,7 +1059,7 @@ export class ProgramService {
 			...(hours && { hours })
 		};
 
-		const args = Prisma.validator<Prisma.LessonUpdateArgs>()({
+		const args = Prisma.validator<Prisma.ModuleUpdateArgs>()({
 			where: {
 				id: payload.id
 			},
@@ -1073,16 +1072,16 @@ export class ProgramService {
 			}
 		});
 
-		return this.prisma.lesson.update({
+		return this.prisma.module.update({
 			where: args.where,
 			data: args.data,
-			include: this.lessonInclude
+			include: this.moduleInclude
 		});
 	}
 
-	async deleteLesson(id: string) {
-		// TODO: Shift left remaining lessons in the parent collection after deletion.
-		return this.prisma.lesson.delete({
+	async deleteModule(id: string) {
+		// TODO: Shift left remaining modules in the parent collection after deletion.
+		return this.prisma.module.delete({
 			where: {
 				id
 			}

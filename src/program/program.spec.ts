@@ -8,7 +8,7 @@ import {
 	ContentType,
 	CreateCollectionArgs,
 	CreateContentArgs,
-	LessonInput,
+	ModuleInput,
 	Module,
 	NewModule,
 	PlanOfStudy,
@@ -299,8 +299,8 @@ describe("Collection", () => {
 		});
 	};
 
-	const deleteLesson = async (id: string) => {
-		return prisma.lesson.delete({
+	const deleteModule = async (id: string) => {
+		return prisma.module.delete({
 			where: { id }
 		});
 	};
@@ -313,21 +313,21 @@ describe("Collection", () => {
 		return resolver.create(input);
 	};
 
-	const createLesson = async (input: LessonInput) => {
-		return resolver.createLesson(input);
+	const createModule = async (input: ModuleInput) => {
+		return resolver.createModule(input);
 	};
 
-	const createLessonContent = async (input: CreateContentArgs) => {
+	const createModuleContent = async (input: CreateContentArgs) => {
 		return resolver.createContent(input);
 	};
 
 	let testingContentID: string;
 	let testingCollectionID: string;
 	let testingModuleID: string;
-	let testingLessonID: string;
+	let testingModuleID: string;
 
 	afterAll(async () => {
-		await deleteLesson(testingLessonID);
+		await deleteModule(testingModuleID);
 		await deleteCollection(testingCollectionID);
 		await deleteModule(testingModuleID);
 	});
@@ -353,14 +353,14 @@ describe("Collection", () => {
 		});
 		testingCollectionID = collection.id;
 
-		const lesson = await createLesson({
-			name: "Test Lesson",
+		const module = await createModule({
+			name: "Test Module",
 			collection: testingCollectionID
 		});
-		testingLessonID = lesson.id;
+		testingModuleID = module.id;
 
-		const content = await createLessonContent({
-			parent: testingLessonID,
+		const content = await createModuleContent({
+			parent: testingModuleID,
 			link: "",
 			primary: true,
 			type: ContentType.VIDEO
@@ -394,15 +394,15 @@ describe("Collection", () => {
 			expect(col.name).toMatch(/Test/);
 		});
 	});
-	test("should return a collection that has lessons with IDs matching the inputted one", async () => {
+	test("should return a collection that has modules with IDs matching the inputted one", async () => {
 		const collection = await resolver.collection({
-			lessons: [testingLessonID]
+			modules: [testingModuleID]
 		});
 		expect(collection).toBeInstanceOf(Array);
 		collection.map(async (col) => {
-			expect(col.lessons).toBeDefined();
-			col.lessons.map((lesson) => {
-				expect(lesson.id).toBe(testingLessonID);
+			expect(col.modules).toBeDefined();
+			col.modules.map((module) => {
+				expect(module.id).toBe(testingModuleID);
 			});
 		});
 	});
@@ -413,15 +413,15 @@ describe("Collection", () => {
 		expect(collection).toBeInstanceOf(Array);
 		expect(collection[0].position).toBe(0);
 	});
-	test("should match lesson position field to array index", async () => {
+	test("should match module position field to array index", async () => {
 		const coll = await resolver.collection({ id: testingCollectionID });
 		expect(coll).toBeInstanceOf(Array);
 		coll.map((c) => {
-			c.lessons.map((lesson) => {
-				expect(lesson.position === c.lessons[lesson.position].position).toBe(
+			c.modules.map((module) => {
+				expect(module.position === c.modules[module.position].position).toBe(
 					true
 				);
-				expect(lesson.collectionID === c.id).toBe(true);
+				expect(module.collectionID === c.id).toBe(true);
 			});
 		});
 	});
@@ -431,19 +431,19 @@ describe("Collection", () => {
 		expect(contents).toBeInstanceOf(Array);
 		expect(contents.length).toBeGreaterThan(0);
 	});
-	test("should return a content that belongs to the Lesson inputted", async () => {
+	test("should return a content that belongs to the Module inputted", async () => {
 		const contents = await resolver.content({
-			parent: testingLessonID
+			parent: testingModuleID
 		});
 		expect(contents).toBeInstanceOf(Array);
 		contents.map(async (content) => {
 			expect(content.id).toBeDefined();
-			expect(content.parentID).toBe(testingLessonID);
+			expect(content.parentID).toBe(testingModuleID);
 		});
 	});
-	test("should return a content array that has only one primary content within a lesson", async () => {
+	test("should return a content array that has only one primary content within a module", async () => {
 		const contents = await resolver.content({
-			parent: testingLessonID
+			parent: testingModuleID
 		});
 		expect(contents).toBeInstanceOf(Array);
 		expect(contents.filter((c) => c.primary).length).toBe(1);

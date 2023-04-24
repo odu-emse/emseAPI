@@ -28,9 +28,9 @@ type Quiz {
 	"""
 	minScore: Float!
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: Lesson!
+	parentModule: Module!
 	"""
 	The possible questions and variants of for this quiz
 	"""
@@ -180,9 +180,9 @@ input QuizFields {
 	"""
 	minScore: Float
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: ID
+	parentModule: ID
 }
 
 input QuizInstanceFields {
@@ -328,9 +328,9 @@ input CreateQuiz {
 	"""
 	minScore: Float
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: ID!
+	parentModule: ID!
 }
 
 input UpdateQuiz {
@@ -359,9 +359,9 @@ input UpdateQuiz {
 	"""
 	minScore: Float
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: ID
+	parentModule: ID
 }
 
 input CreateQuestion {
@@ -474,7 +474,7 @@ input QuizSubmission {
 # TODO: Update documentation for update mutations
 type Mutation {
 	"""
-	Create a new quiz record and associate it with its parent Lesson
+	Create a new quiz record and associate it with its parent Module
 	"""
 	createQuiz(input: CreateQuiz): Quiz!
 	"""
