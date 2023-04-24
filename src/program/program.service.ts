@@ -1352,7 +1352,7 @@ export class ProgramService {
 			where: {
 				planID
 			}
-		})
+		});
 
 		if (LP.length !== 1) {
 			return new Error("The learning path you choose could not be found");
@@ -1365,7 +1365,7 @@ export class ProgramService {
 			where: {
 				id: course.id
 			}
-		})
+		});
 
 		if (courseData.length !== 1) {
 			return new Error("The course you choose could not be found");
@@ -1392,18 +1392,14 @@ export class ProgramService {
 										enrollmentID: ""
 									};
 								})
-							}
+							};
 						})
-					}
+					};
 				})
 			}
-		})
+		});
 
-
-		const paths = [
-			...LP[0].paths,
-			pathData
-		]
+		const paths = [...LP[0].paths, pathData];
 
 		return this.prisma.learningPath.update({
 			where: {
@@ -1413,7 +1409,7 @@ export class ProgramService {
 				paths: paths
 			},
 			include: this.learningPathInclude
-		})
+		});
 	}
 
 	async updateLearningPath(planID: string, pathID: string, input: PathInput) {
