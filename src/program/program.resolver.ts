@@ -138,21 +138,20 @@ export class ProgramResolver {
 	}
 
 	@Query("learningPath")
-	async learningPath(@Args("planID") planID: string, @Args("pathID") pathID: string | null = null) {
+	async learningPath(
+		@Args("planID") planID: string,
+		@Args("pathID") pathID: string | null = null
+	) {
 		const lps = await this.programService.learningPath(planID);
 		if (!lps) throw new Error("No learning paths found for inputted user");
-		if (pathID !== null && typeof pathID !== 'undefined') {
+		if (pathID !== null && typeof pathID !== "undefined") {
 			const lp = lps[0].paths.find((path) => path.id === pathID);
 			if (!lp) throw new Error("No learning path found with inputted ID");
 			const payload = {
 				...lps[0],
-				paths: [
-					{ ...lp },
-				]
-			}
-			return [
-				payload
-			]
+				paths: [{ ...lp }]
+			};
+			return [payload];
 		}
 		return lps;
 	}
