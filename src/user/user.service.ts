@@ -22,14 +22,14 @@ export class UserService {
 		feedback: true,
 		plan: {
 			include: {
-				modules: {
+				sections: {
 					include: {
-						module: {
+						section: {
 							include: {
-								parentModules: true,
+								parentSections: true,
 								members: true,
 								feedback: true,
-								subModules: true,
+								subSections: true,
 								course: true,
 								assignments: true,
 								collections: true

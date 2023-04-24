@@ -68,9 +68,9 @@ export interface PlanInput {
 export interface PlanFields {
     id?: Nullable<string>;
     student?: Nullable<string>;
-    module?: Nullable<string>;
+    section?: Nullable<string>;
     assignmentResult?: Nullable<string>;
-    modulesLeft?: Nullable<string>;
+    sectionsLeft?: Nullable<string>;
 }
 
 export interface CreateContentArgs {
@@ -90,7 +90,7 @@ export interface ContentFields {
 
 export interface CreateCollectionArgs {
     name: string;
-    moduleID: string;
+    sectionID: string;
     lessons?: Nullable<string[]>;
     positionIndex: number;
 }
@@ -98,15 +98,15 @@ export interface CreateCollectionArgs {
 export interface CollectionFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
-    moduleID?: Nullable<string>;
+    sectionID?: Nullable<string>;
     lessons?: Nullable<Nullable<string>[]>;
     positionIndex?: Nullable<number>;
 }
 
-export interface ModuleFields {
+export interface SectionFields {
     id?: Nullable<string>;
-    moduleNumber?: Nullable<number>;
-    moduleName?: Nullable<string>;
+    sectionNumber?: Nullable<number>;
+    sectionName?: Nullable<string>;
     description?: Nullable<string>;
     duration?: Nullable<number>;
     intro?: Nullable<string>;
@@ -118,14 +118,14 @@ export interface ModuleFields {
     assignments?: Nullable<string>;
     members?: Nullable<string[]>;
     feedback?: Nullable<string>;
-    parentModules?: Nullable<string[]>;
-    subModules?: Nullable<string[]>;
+    parentSections?: Nullable<string[]>;
+    subSections?: Nullable<string[]>;
 }
 
 export interface CourseFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
-    module?: Nullable<string>;
+    section?: Nullable<string>;
     required?: Nullable<boolean>;
     carnegieHours?: Nullable<number>;
 }
@@ -138,7 +138,7 @@ export interface AssignmentFields {
     contentURL?: Nullable<string>;
     contentType?: Nullable<string>;
     acceptedTypes?: Nullable<FileType>;
-    module?: Nullable<string>;
+    section?: Nullable<string>;
     assignmentResult?: Nullable<string>;
 }
 
@@ -147,7 +147,7 @@ export interface ModFeedbackFields {
     feedback?: Nullable<string>;
     rating?: Nullable<number>;
     student?: Nullable<string>;
-    module?: Nullable<string>;
+    section?: Nullable<string>;
 }
 
 export interface AssignmentResFields {
@@ -166,13 +166,13 @@ export interface ModEnrollmentFields {
     id?: Nullable<string>;
     enrolledAt?: Nullable<Date>;
     role?: Nullable<UserRole>;
-    module?: Nullable<string>;
+    section?: Nullable<string>;
     plan?: Nullable<string>;
 }
 
-export interface NewModule {
-    moduleNumber: number;
-    moduleName: string;
+export interface NewSection {
+    sectionNumber: number;
+    sectionName: string;
     description: string;
     duration: number;
     intro: string;
@@ -180,10 +180,10 @@ export interface NewModule {
     keywords: string[];
 }
 
-export interface UpdateModule {
+export interface UpdateSection {
     id: string;
-    moduleName?: Nullable<string>;
-    moduleNumber?: Nullable<number>;
+    sectionName?: Nullable<string>;
+    sectionNumber?: Nullable<number>;
     intro?: Nullable<string>;
     description?: Nullable<string>;
     duration?: Nullable<number>;
@@ -195,7 +195,7 @@ export interface UpdateModule {
 export interface NewAssignment {
     name: string;
     dueAt: Date;
-    module: string;
+    section: string;
     contentType: string;
     contentURL: string;
     acceptedTypes: FileType;
@@ -204,22 +204,22 @@ export interface NewAssignment {
 export interface AssignmentInput {
     name?: Nullable<string>;
     dueAt?: Nullable<Date>;
-    module?: Nullable<string>;
+    section?: Nullable<string>;
 }
 
 export interface CourseInput {
     name: string;
-    module: string;
+    section: string;
     required: boolean;
     carnegieHours: number;
 }
 
-export interface ModuleFeedbackInput {
+export interface SectionFeedbackInput {
     feedback: string;
     rating: number;
 }
 
-export interface ModuleFeedbackUpdate {
+export interface SectionFeedbackUpdate {
     feedback?: Nullable<string>;
     rating?: Nullable<number>;
 }
@@ -233,8 +233,8 @@ export interface NewAssignmentResult {
     fileType: string;
 }
 
-export interface ModuleEnrollmentInput {
-    module: string;
+export interface SectionEnrollmentInput {
+    section: string;
     plan: string;
     role: UserRole;
     status: EnrollmentStatus;
@@ -271,7 +271,7 @@ export interface ProgressArgs {
 
 export interface ProgressWaiveArgs {
     enrollmentID?: Nullable<string>;
-    moduleID?: Nullable<string>;
+    sectionID?: Nullable<string>;
     planID?: Nullable<string>;
 }
 
@@ -468,27 +468,27 @@ export interface IMutation {
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
-    deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
-    addModule(input?: Nullable<NewModule>): Module | Promise<Module>;
-    updateModule(input?: Nullable<UpdateModule>): Nullable<Module> | Promise<Nullable<Module>>;
+    deleteSection(id: string): Nullable<Section> | Promise<Nullable<Section>>;
+    addSection(input?: Nullable<NewSection>): Section | Promise<Section>;
+    updateSection(input?: Nullable<UpdateSection>): Nullable<Section> | Promise<Nullable<Section>>;
     deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
     addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
     addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
-    addObjectives(id: string, input?: Nullable<string[]>): Nullable<Module> | Promise<Nullable<Module>>;
-    deleteAssignment(module: string, id: string): Nullable<Module> | Promise<Nullable<Module>>;
+    addObjectives(id: string, input?: Nullable<string[]>): Nullable<Section> | Promise<Nullable<Section>>;
+    deleteAssignment(section: string, id: string): Nullable<Section> | Promise<Nullable<Section>>;
     updateAssignment(id: string, input?: Nullable<AssignmentInput>): Nullable<Assignment> | Promise<Nullable<Assignment>>;
-    addModuleFeedback(moduleId: string, userId: string, input?: Nullable<ModuleFeedbackInput>): Nullable<Module> | Promise<Nullable<Module>>;
-    updateModuleFeedback(id: string, input?: Nullable<ModuleFeedbackUpdate>): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
-    deleteModuleFeedback(id: string): Nullable<ModuleFeedback> | Promise<Nullable<ModuleFeedback>>;
+    addSectionFeedback(sectionId: string, userId: string, input?: Nullable<SectionFeedbackInput>): Nullable<Section> | Promise<Nullable<Section>>;
+    updateSectionFeedback(id: string, input?: Nullable<SectionFeedbackUpdate>): Nullable<SectionFeedback> | Promise<Nullable<SectionFeedback>>;
+    deleteSectionFeedback(id: string): Nullable<SectionFeedback> | Promise<Nullable<SectionFeedback>>;
     addAssignmentResult(input?: Nullable<NewAssignmentResult>): AssignmentResult | Promise<AssignmentResult>;
     updateAssignmentResult(id: string, result: number): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
     deleteAssignmentResult(id: string): Nullable<AssignmentResult> | Promise<Nullable<AssignmentResult>>;
-    addModuleEnrollment(input?: Nullable<ModuleEnrollmentInput>): ModuleEnrollment | Promise<ModuleEnrollment>;
-    updateModuleEnrollment(id: string, input?: Nullable<ModuleEnrollmentInput>): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
-    deleteModuleEnrollment(id: string): Nullable<ModuleEnrollment> | Promise<Nullable<ModuleEnrollment>>;
-    pairCourseModule(courseId: string, moduleId: string): Module | Promise<Module>;
-    unpairCourseModule(courseId: string, moduleId: string): Nullable<Module> | Promise<Nullable<Module>>;
+    addSectionEnrollment(input?: Nullable<SectionEnrollmentInput>): SectionEnrollment | Promise<SectionEnrollment>;
+    updateSectionEnrollment(id: string, input?: Nullable<SectionEnrollmentInput>): Nullable<SectionEnrollment> | Promise<Nullable<SectionEnrollment>>;
+    deleteSectionEnrollment(id: string): Nullable<SectionEnrollment> | Promise<Nullable<SectionEnrollment>>;
+    pairCourseSection(courseId: string, sectionId: string): Section | Promise<Section>;
+    unpairCourseSection(courseId: string, sectionId: string): Nullable<Section> | Promise<Nullable<Section>>;
     createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
     updateCollection(id: string, data: CollectionFields): Collection | Promise<Collection>;
     createLesson(input: LessonInput): Lesson | Promise<Lesson>;
@@ -498,7 +498,7 @@ export interface IMutation {
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
     createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
-    waiveModule(args: ProgressWaiveArgs): Progress | Promise<Progress>;
+    waiveSection(args: ProgressWaiveArgs): Progress | Promise<Progress>;
     deleteProgress(id: string): boolean | Promise<boolean>;
     updateProgress(status: number, id?: Nullable<string>, enrollmentID?: Nullable<string>): Progress | Promise<Progress>;
     createQuiz(input?: Nullable<CreateQuiz>): Quiz | Promise<Quiz>;
@@ -536,13 +536,13 @@ export interface IQuery {
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     planByParams(input?: Nullable<PlanFields>): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
-    module(input: ModuleFields, memberRole?: Nullable<UserRole>): Nullable<Module[]> | Promise<Nullable<Module[]>>;
+    section(input: SectionFields, memberRole?: Nullable<UserRole>): Nullable<Section[]> | Promise<Nullable<Section[]>>;
     course(input: CourseFields): Nullable<Course[]> | Promise<Nullable<Course[]>>;
     assignment(input: AssignmentFields): Nullable<Assignment[]> | Promise<Nullable<Assignment[]>>;
-    moduleFeedback(input: ModFeedbackFields): Nullable<ModuleFeedback[]> | Promise<Nullable<ModuleFeedback[]>>;
+    sectionFeedback(input: ModFeedbackFields): Nullable<SectionFeedback[]> | Promise<Nullable<SectionFeedback[]>>;
     assignmentResult(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
-    moduleEnrollment(input: ModEnrollmentFields): Nullable<ModuleEnrollment[]> | Promise<Nullable<ModuleEnrollment[]>>;
-    lessonsByModuleEnrollment(planID: string, moduleID: string): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
+    sectionEnrollment(input: ModEnrollmentFields): Nullable<SectionEnrollment[]> | Promise<Nullable<SectionEnrollment[]>>;
+    lessonsBySectionEnrollment(planID: string, SectionID: string): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
     lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
@@ -607,18 +607,18 @@ export interface Group {
 export interface PlanOfStudy {
     id: string;
     student?: Nullable<User>;
-    modules?: Nullable<Nullable<ModuleEnrollment>[]>;
+    sections?: Nullable<Nullable<SectionEnrollment>[]>;
     assignmentResults?: Nullable<AssignmentResult[]>;
-    modulesLeft?: Nullable<Nullable<ModuleEnrollment>[]>;
+    sectionsLeft?: Nullable<Nullable<SectionEnrollment>[]>;
     quizResults?: Nullable<QuizResult[]>;
 }
 
-export interface ModuleEnrollment {
+export interface SectionEnrollment {
     id: string;
     enrolledAt: Date;
     role: UserRole;
     status: EnrollmentStatus;
-    module: Module;
+    section: Section;
     plan?: Nullable<PlanOfStudy>;
     inactivePlan?: Nullable<PlanOfStudy>;
     progress: Progress;
@@ -645,30 +645,30 @@ export interface Assignment {
     contentURL?: Nullable<string>;
     contentType?: Nullable<string>;
     acceptedTypes?: Nullable<FileType>;
-    module: Module;
+    section: Section;
     assignmentResults?: Nullable<Nullable<AssignmentResult>[]>;
 }
 
-export interface ModuleFeedback {
+export interface SectionFeedback {
     id: string;
     feedback: string;
     rating: number;
     student?: Nullable<User>;
-    module?: Nullable<Module>;
+    section?: Nullable<Section>;
 }
 
 export interface Course {
     id: string;
     name: string;
-    moduleIDs?: Nullable<Nullable<string>[]>;
+    sectionIDs?: Nullable<Nullable<string>[]>;
     required: boolean;
     carnegieHours: number;
 }
 
-export interface Module {
+export interface Section {
     id: string;
-    moduleNumber: number;
-    moduleName: string;
+    sectionNumber: number;
+    sectionName: string;
     description: string;
     duration: number;
     intro: string;
@@ -678,10 +678,10 @@ export interface Module {
     createdAt: Date;
     updatedAt: Date;
     assignments: Assignment[];
-    members: ModuleEnrollment[];
-    feedback: ModuleFeedback[];
-    parentModules: Module[];
-    subModules: Module[];
+    members: SectionEnrollment[];
+    feedback: SectionFeedback[];
+    parentSections: Section[];
+    subSections: Section[];
     collections: Collection[];
     courseIDs: string[];
 }
@@ -692,8 +692,8 @@ export interface Collection {
     createdAt: Date;
     updatedAt: Date;
     lessons?: Nullable<Nullable<Lesson>[]>;
-    module: Module;
-    moduleID: string;
+    section: Section;
+    sectionID: string;
     position?: Nullable<number>;
 }
 
@@ -728,7 +728,7 @@ export interface Progress {
     completed: boolean;
     createdAt: Date;
     updatedAt: Date;
-    enrollment: ModuleEnrollment;
+    enrollment: SectionEnrollment;
 }
 
 export interface LessonProgress {
@@ -737,7 +737,7 @@ export interface LessonProgress {
     completed: boolean;
     createdAt: Date;
     updatedAt: Date;
-    enrollment: ModuleEnrollment;
+    enrollment: SectionEnrollment;
     lesson: Lesson;
 }
 
@@ -829,7 +829,7 @@ export interface User {
     social?: Nullable<Social>;
     plan?: Nullable<PlanOfStudy>;
     tokens?: Nullable<string[]>;
-    feedback?: Nullable<ModuleFeedback[]>;
+    feedback?: Nullable<SectionFeedback[]>;
     assignmentGraded?: Nullable<AssignmentResult[]>;
     instructorProfile?: Nullable<InstructorProfile>;
     watchedThreads?: Nullable<Thread[]>;

@@ -33,7 +33,7 @@ export class ProgressResolver {
 		@Args("input") input: Prisma.ProgressUncheckedCreateInput,
 		@Args("enrollmentID") enrollmentID: string
 	) {
-		const enrollment = await this.program.moduleEnrollment({
+		const enrollment = await this.program.sectionEnrollment({
 			id: enrollmentID
 		});
 		if (!enrollment || enrollment.length === 0)
@@ -46,25 +46,25 @@ export class ProgressResolver {
 		else return response;
 	}
 
-	@Mutation("waiveModule")
-	async waiveModule(@Args("args") args: ProgressWaiveArgs) {
-		// if moduleID and planID are provided, we can use them to find the enrollment or create a new one
-		if (args.moduleID && args.planID) {
-			const { moduleID, planID } = args;
+	@Mutation("waiveSection")
+	async waiveSection(@Args("args") args: ProgressWaiveArgs) {
+		// if SectionID and planID are provided, we can use them to find the enrollment or create a new one
+		if (args.sectionID && args.planID) {
+			const { sectionID, planID } = args;
 			// check if plan exists
 			const plan = await this.plan.planByParams({ id: planID });
 			if (plan instanceof Error) return new Error(plan.message);
 
-			// check if module exists
-			const module = await this.program.module(
-				{ id: moduleID },
+			// check if section exists
+			const section = await this.program.section(
+				{ id: sectionID },
 				UserRole.STUDENT
 			);
-			if (module instanceof Error) return new Error(module.message);
+			if (section instanceof Error) return new Error(section.message);
 			else {
-				// both module and plan exist, so we can create a new enrollment
-				const enrollment = await this.program.addModuleEnrollment({
-					module: moduleID,
+				// both section and plan exist, so we can create a new enrollment
+				const enrollment = await this.program.addSectionEnrollment({
+					section: sectionID,
 					plan: planID,
 					role: UserRole.STUDENT,
 					status: EnrollmentStatus.ACTIVE
@@ -86,15 +86,15 @@ export class ProgressResolver {
 		// if enrollmentID is provided, we can use it to find the enrollment and create a new progress document or find the existing one
 		else if (args.enrollmentID) {
 			const { enrollmentID } = args;
-			const enrollment = await this.program.moduleEnrollment({
+			const enrollment = await this.program.sectionEnrollment({
 				id: enrollmentID
 			});
 			if (!enrollment) return new Error("Enrollment not found");
 
-			// since moduleEnrollment returns an array, we need to get the first element as it returns a unique enrollment if id is provided
+			// since sectionEnrollment returns an array, we need to get the first element as it returns a unique enrollment if id is provided
 			const progress = enrollment[0].progress ? enrollment[0].progress : null;
 			// in case there is a population error we return an error
-			if (!enrollment[0].plan || !enrollment[0].module)
+			if (!enrollment[0].plan || !enrollment[0].section)
 				return new Error("Enrollment not found");
 			if (!progress) {
 				// progress doesn't exist, so we can create a new one
@@ -106,28 +106,28 @@ export class ProgressResolver {
 					},
 					enrollmentID
 				);
-				await this.program.updateModuleEnrollment(enrollmentID, {
+				await this.program.updateSectionEnrollment(enrollmentID, {
 					status: EnrollmentStatus.ACTIVE,
 					role: UserRole.STUDENT,
 					plan: enrollment[0].plan.id,
-					module: enrollment[0].module.id
+					section: enrollment[0].section.id
 				});
 				if (res instanceof Error) return new Error(res.message);
 				else return res;
 			} else if (progress) {
 				// progress exists, so we can update it
-				const res = await this.progressService.waiveModule(enrollmentID);
-				await this.program.updateModuleEnrollment(enrollmentID, {
+				const res = await this.progressService.waiveSection(enrollmentID);
+				await this.program.updateSectionEnrollment(enrollmentID, {
 					status: EnrollmentStatus.ACTIVE,
 					role: UserRole.STUDENT,
 					plan: enrollment[0].plan.id,
-					module: enrollment[0].module.id
+					section: enrollment[0].section.id
 				});
 				if (res instanceof Error) return new Error(res.message);
 				else return res;
 			}
 		} else
-			return new Error("No enrollment or module to be waived was specified");
+			return new Error("No enrollment or section to be waived was specified");
 	}
 
 	@Mutation("deleteProgress")

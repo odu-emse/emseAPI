@@ -28,14 +28,14 @@ enum FileType {
 	TXT
 }
 
-type ModuleEnrollment {
+type SectionEnrollment {
 	"""
-	id of the ModuleEnrollment
+	id of the SectionEnrollment
 	"""
 	id: ID!
 
 	"""
-	TimeStamp at which the module is enrolledAt
+	TimeStamp at which the Section is enrolledAt
 	"""
 	enrolledAt: Date!
 
@@ -50,9 +50,9 @@ type ModuleEnrollment {
 	status: EnrollmentStatus!
 
 	"""
-	Current Module
+	Current Section
 	"""
-	module: Module!
+	section: Section!
 
 	"""
 	Plan of study Chosen
@@ -157,9 +157,9 @@ type Assignment {
 	acceptedTypes: FileType
 
 	"""
-	Assignment belonging to the module
+	Assignment belonging to the Section
 	"""
-	module: Module!
+	section: Section!
 
 	"""
 	Assignment Result
@@ -167,14 +167,14 @@ type Assignment {
 	assignmentResults: [AssignmentResult]
 }
 
-type ModuleFeedback {
+type SectionFeedback {
 	"""
-	id of ModuleFeedback
+	id of SectionFeedback
 	"""
 	id: ID!
 
 	"""
-	Feedback fo the Module
+	Feedback fo the Section
 	"""
 	feedback: String!
 
@@ -184,14 +184,14 @@ type ModuleFeedback {
 	rating: Int!
 
 	"""
-	Module feedback given by the student
+	Section feedback given by the student
 	"""
 	student: User
 
 	"""
-	Module in which module feedback is given
+	Section in which Section feedback is given
 	"""
-	module: Module
+	section: Section
 }
 
 type Course {
@@ -204,9 +204,9 @@ type Course {
 	"""
 	name: String!
 	"""
-	modules in the course
+	Sections in the course
 	"""
-	moduleIDs: [ID]
+	sectionIDs: [ID]
 	"""
 	Boolean value to check if the course is required/core or an elective
 	"""
@@ -217,88 +217,88 @@ type Course {
 	carnegieHours: Int!
 }
 
-type Module {
+type Section {
 	"""
-	Module Id
+	Section Id
 	"""
 	id: ID!
 
 	"""
-	Number of the Module
+	Number of the Section
 	"""
-	moduleNumber: Int!
+	sectionNumber: Int!
 
 	"""
-	Name of hte Module
+	Name of hte Section
 	"""
-	moduleName: String!
+	sectionName: String!
 
 	"""
-	Description of the Module
+	Description of the Section
 	"""
 	description: String!
 
 	"""
-	Duration of the Module
+	Duration of the Section
 	"""
 	duration: Float!
 
 	"""
-	Introduction of the Module
+	Introduction of the Section
 	"""
 	intro: String!
 
 	"""
-	No of slides in the Module
+	No of slides in the Section
 	"""
 	numSlides: Int!
 
 	"""
-	Keywords in the Modules
+	Keywords in the Sections
 	"""
 	keywords: [String!]!
 
 	"""
-	objectives in the Modules
+	objectives in the Sections
 	"""
 	objectives: [String!]!
 
 	"""
-	Date and Time of the Module Created at
+	Date and Time of the Section Created at
 	"""
 	createdAt: Date!
 
 	"""
-	Date and Time of the Module Updated at
+	Date and Time of the Section Updated at
 	"""
 	updatedAt: Date!
 
 	"""
-	Assignement in the module
+	Assignement in the Section
 	"""
 	assignments: [Assignment!]!
 
 	"""
-	Memebers enrolled in the Module
+	Memebers enrolled in the Section
 	"""
-	members: [ModuleEnrollment!]!
+	members: [SectionEnrollment!]!
 
 	"""
-	Feedback of the Module
+	Feedback of the Section
 	"""
-	feedback: [ModuleFeedback!]!
+	feedback: [SectionFeedback!]!
 
 	"""
-	Parent Modules of the Module
+	Parent Sections of the Section
 	"""
-	parentModules: [Module!]!
+	parentSections: [Section!]!
 
 	"""
-	Child modules in the Module
+	Child Sections in the Section
 	"""
-	subModules: [Module!]!
+	subSections: [Section!]!
 	"""
-	A list of collections that have this module's materials
+	A list of collections that have this Section's materials
 	"""
 	collections: [Collection!]!
 
@@ -335,15 +335,15 @@ type Collection {
 	lessons: [Lesson]
 
 	"""
-	The module that this collection belongs to
+	The Section that this collection belongs to
 	"""
-	module: Module!
+	section: Section!
 	"""
-	The module's unique ID that this collection belongs to
+	The Section's unique ID that this collection belongs to
 	"""
-	moduleID: ID!
+	sectionID: ID!
 	"""
-	The position index of the collection in a module
+	The position index of the collection in a Section
 	"""
 	position: Int
 }
@@ -383,11 +383,11 @@ type Lesson {
 	"""
 	lessonProgress: [LessonProgress]
 	"""
-	A list of learning objectives being covered in this module
+	A list of learning objectives being covered in this Section
 	"""
 	objectives: 	[String!]!
   """
-	The number of carnige hours granted for completion of this module
+	The number of carnige hours granted for completion of this Section
 	"""
 	hours: Float!
 }
@@ -429,11 +429,11 @@ type Error {
 
 type Query {
 	"""
-	Get a list of modules given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
-	Parameters can be any of the fields that exist in a module
-	An additional parameter: memberRole, can be provided to specify that module members should only be selected if they have said role.
+	Get a list of Sections given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a Section
+	An additional parameter: memberRole, can be provided to specify that Section members should only be selected if they have said role.
 	"""
-	module(input: ModuleFields!, memberRole: UserRole): [Module!]
+	section(input: SectionFields!, memberRole: UserRole): [Section!]
 
 	"""
 	Get a list of courses given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -448,10 +448,10 @@ type Query {
 	assignment(input: AssignmentFields!): [Assignment!]
 
 	"""
-	Get a list of moduleFeedbacks given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
-	Parameters can be any of the fields that exist in a moduleFeedback
+	Get a list of SectionFeedbacks given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a SectionFeedback
 	"""
-	moduleFeedback(input: ModFeedbackFields!): [ModuleFeedback!]
+	sectionFeedback(input: ModFeedbackFields!): [SectionFeedback!]
 
 	"""
 	Get a list of assignmentResults given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -460,14 +460,14 @@ type Query {
 	assignmentResult(input: AssignmentResFields!): [AssignmentResult!]
 
 	"""
-	Get a list of moduleEnrollments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
-	Parameters can be any of the fields that exist in a moduleEnrollment
+	Get a list of SectionEnrollments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+	Parameters can be any of the fields that exist in a SectionEnrollment
 	"""
-	moduleEnrollment(input: ModEnrollmentFields!): [ModuleEnrollment!]
+	sectionEnrollment(input: ModEnrollmentFields!): [SectionEnrollment!]
 	"""
 	Get a list of lessons given the plan ID and enrollment ID
 	"""
-	lessonsByModuleEnrollment(planID: ID!, moduleID: ID!) : [Lesson!]
+	lessonsBySectionEnrollment(planID: ID!, SectionID: ID!) : [Lesson!]
 	"""
 	Retrieve a specific collection based on document ID
 	"""
@@ -533,7 +533,7 @@ input ContentFields {
 
 input CreateCollectionArgs {
 	name: String!
-	moduleID: ID!
+	sectionID: ID!
 	lessons: [ID!]
 	positionIndex: Int!
 }
@@ -541,15 +541,15 @@ input CreateCollectionArgs {
 input CollectionFields {
 	id: ID
 	name: String
-	moduleID: ID
+	sectionID: ID
 	lessons: [ID]
 	positionIndex: Int
 }
 
-input ModuleFields {
+input SectionFields {
 	id: ID
-	moduleNumber: Int
-	moduleName: String
+	sectionNumber: Int
+	sectionName: String
 	description: String
 	duration: Float
 	intro: String
@@ -561,14 +561,14 @@ input ModuleFields {
 	assignments: ID
 	members: [ID!]
 	feedback: ID
-	parentModules: [ID!]
-	subModules: [ID!]
+	parentSections: [ID!]
+	subSections: [ID!]
 }
 
 input CourseFields {
 	id: ID
 	name: String
-	module: ID
+	section: ID
 	required: Boolean
 	carnegieHours: Int
 }
@@ -582,7 +582,7 @@ input AssignmentFields {
 	contentType: String
 	acceptedTypes: FileType
 
-	module: ID
+	section: ID
 	assignmentResult: ID
 }
 
@@ -592,7 +592,7 @@ input ModFeedbackFields {
 	rating: Int
 
 	student: ID
-	module: ID
+	section: ID
 }
 
 input AssignmentResFields {
@@ -613,76 +613,76 @@ input ModEnrollmentFields {
 	enrolledAt: Date
 
 	role: UserRole
-	module: ID
+	section: ID
 	plan: ID
 }
 
-input NewModule {
+input NewSection {
 	"""
-	Number of the Module
+	Number of the Section
 	"""
-	moduleNumber: Int!
+	sectionNumber: Int!
 	"""
-	Name of the Module
+	Name of the Section
 	"""
-	moduleName: String!
+	sectionName: String!
 	"""
-	description of the Module
+	description of the section
 	"""
 	description: String!
 	"""
-	Duration of the NewModule
+	Duration of the NewSection
 	"""
 	duration: Float!
 	"""
-	Introduction of the NewModule
+	Introduction of the NewSection
 	"""
 	intro: String!
 	"""
-	Number of Slides in NewModule
+	Number of Slides in NewSection
 	"""
 	numSlides: Int!
 	"""
-	keywords of the NewModule
+	keywords of the NewSection
 	"""
 	keywords: [String!]!
 }
 
-input UpdateModule {
+input UpdateSection {
 	"""
-	UpdateModule id
+	UpdateSection id
 	"""
 	id: ID!
 	"""
-	Module Name of the UpdateModule
+	Section Name of the UpdateSection
 	"""
-	moduleName: String
+	sectionName: String
 	"""
-	Module NUmber of the UpdateModule
+	Section NUmber of the UpdateSection
 	"""
-	moduleNumber: Int
+	sectionNumber: Int
 	"""
-	Introduction of the UpdateModule
+	Introduction of the UpdateSection
 	"""
 	intro: String
 	"""
-	Decription of the UpdateModule
+	Decription of the UpdateSection
 	"""
 	description: String
 	"""
-	Duration of the UpdateModule
+	Duration of the UpdateSection
 	"""
 	duration: Float
 	"""
-	Number of slides in Updatemodule
+	Number of slides in UpdateSection
 	"""
 	numSlides: Int
 	"""
-	Keywords in UpdateModule
+	Keywords in UpdateSection
 	"""
 	keywords: [String!]
 	"""
-	The objective to be added to the module
+	The objective to be added to the Section
 	"""
 	objectives: [String!]
 }
@@ -697,9 +697,9 @@ input NewAssignment {
 	"""
 	dueAt: Date!
 	"""
-	Module to which the NewAssignement Belongs to
+	Section to which the NewAssignement Belongs to
 	"""
-	module: ID!
+	section: ID!
 	"""
 	File type that the assignment is submitted in
 	"""
@@ -724,9 +724,9 @@ input AssignmentInput {
 	"""
 	dueAt: Date
 	"""
-	Updated module linkage
+	Updated section linkage
 	"""
-	module: ID
+	section: ID
 }
 
 input CourseInput {
@@ -735,9 +735,9 @@ input CourseInput {
 	"""
 	name: String!
 	"""
-	Additional module to be related to the course
+	Additional section to be related to the course
 	"""
-	module: ID!
+	section: ID!
 	"""
 	The boolean attribute to decide weather the course is part of core courses or electives
 	"""
@@ -748,24 +748,24 @@ input CourseInput {
 	carnegieHours: Int!
 }
 
-input ModuleFeedbackInput {
+input SectionFeedbackInput {
 	"""
-	New Feedback of the Module
+	New Feedback of the Section
 	"""
 	feedback: String!
 	"""
-	New Rating of the Module
+	New Rating of the Section
 	"""
 	rating: Int!
 }
 
-input ModuleFeedbackUpdate {
+input SectionFeedbackUpdate {
 	"""
-	Updated feedback of Module
+	Updated feedback of Section
 	"""
 	feedback: String
 	"""
-	Updated feedback of Module
+	Updated feedback of Section
 	"""
 	rating: Int
 }
@@ -797,17 +797,17 @@ input NewAssignmentResult {
 	fileType: String!
 }
 
-input ModuleEnrollmentInput {
+input SectionEnrollmentInput {
 	"""
-	Relating Module to ModuleEnrollment
+	Relating Section to SectionEnrollment
 	"""
-	module: ID!
+	section: ID!
 	"""
-	Relating Plan to Module enrollment
+	Relating Plan to Section enrollment
 	"""
 	plan: ID!
 	"""
-	Relating role to ModuleEnrollment
+	Relating role to SectionEnrollment
 	"""
 	role: UserRole!
 	"""
@@ -835,11 +835,11 @@ input LessonInput {
 	"""
 	position: Int
 	"""
-	The list of learning objectives for this module
+	The list of learning objectives for this Section
 	"""
 	objectives: [String!]
   """
-	The number of carnige hours granted for completing this module
+	The number of carnige hours granted for completing this Section
 	"""
 	hours: Float!
 }
@@ -870,28 +870,28 @@ input LessonFields {
 	"""
 	position: Int
 	"""
-	Learning objectives that are taught in this module
+	Learning objectives that are taught in this Section
 	"""
 	objectives: [String!]
   """
-	The number of carnige hours granted for completing this module
+	The number of carnige hours granted for completing this Section
 	"""
 	hours:	Float
 }
 
 type Mutation {
 	"""
-	Deletes the entire Module
+	Deletes the entire Section
 	"""
-	deleteModule(id: ID!): Module
+	deleteSection(id: ID!): Section
 	"""
-	Adds an entire module
+	Adds an entire Section
 	"""
-	addModule(input: NewModule): Module!
+	addSection(input: NewSection): Section!
 	"""
-	updates a Module
+	updates a Section
 	"""
-	updateModule(input: UpdateModule): Module
+	updateSection(input: UpdateSection): Section
 
 	"""
 	deletes all Courses referring id
@@ -907,44 +907,44 @@ type Mutation {
 	updateCourse(id: ID!, input: CourseInput): Course
 
 	"""
-	adds assignement in module
+	adds assignement in Section
 	"""
 	addAssignment(input: NewAssignment): Assignment!
 	"""
-	Adds Objectives to a Module while retaining the old ones
+	Adds Objectives to a Section while retaining the old ones
 	"""
-	addObjectives(id: ID!, input: [String!]): Module
+	addObjectives(id: ID!, input: [String!]): Section
 	"""
-	Deletes assignments in Module
+	Deletes assignments in Section
 	"""
-	deleteAssignment(module: ID!, id: ID!): Module
+	deleteAssignment(section: ID!, id: ID!): Section
 	"""
 	Updates Assignements
 	"""
 	updateAssignment(id: ID!, input: AssignmentInput): Assignment
 
-	addModuleFeedback(
+	addSectionFeedback(
 		"""
-		Module Feedback is given relating to Moduleid
+		Section Feedback is given relating to Sectionid
 		"""
-		moduleId: ID!
+		sectionId: ID!
 		"""
-		Module Feedback is given relating to Userid
+		section Feedback is given relating to Userid
 		"""
 		userId: ID!
 		"""
-		Module Feedback is given relating to Modulefeedbackinput
+		section Feedback is given relating to Sectionfeedbackinput
 		"""
-		input: ModuleFeedbackInput
-	): Module
+		input: SectionFeedbackInput
+	): Section
 	"""
-	Module feedback is updated
+	Section feedback is updated
 	"""
-	updateModuleFeedback(id: ID!, input: ModuleFeedbackUpdate): ModuleFeedback
+	updateSectionFeedback(id: ID!, input: SectionFeedbackUpdate): SectionFeedback
 	"""
-	Module feedback is deleted
+	Section feedback is deleted
 	"""
-	deleteModuleFeedback(id: ID!): ModuleFeedback
+	deleteSectionFeedback(id: ID!): SectionFeedback
 	"""
 	Assignment Result is added
 	"""
@@ -958,31 +958,31 @@ type Mutation {
 	"""
 	deleteAssignmentResult(id: ID!): AssignmentResult
 	"""
-	Course Module is paired Relating Course ID and module Id
+	Course Section is paired Relating Course ID and Section Id
 	"""
-	addModuleEnrollment(input: ModuleEnrollmentInput): ModuleEnrollment!
-	updateModuleEnrollment(
+	addSectionEnrollment(input: SectionEnrollmentInput): SectionEnrollment!
+	updateSectionEnrollment(
 		"""
-		Module enrollment is updated relating to id
+		Section enrollment is updated relating to id
 		"""
 		id: ID!
 		"""
-		Module enrollment input
+		Section enrollment input
 		"""
-		input: ModuleEnrollmentInput
-	): ModuleEnrollment
+		input: SectionEnrollmentInput
+	): SectionEnrollment
 
 	"""
-	Delete ModuleEnrollment
+	Delete SectionEnrollment
 	"""
-	deleteModuleEnrollment(id: ID!): ModuleEnrollment
+	deleteSectionEnrollment(id: ID!): SectionEnrollment
 
-	pairCourseModule(courseId: ID!, moduleId: ID!): Module!
+	pairCourseSection(courseId: ID!, sectionId: ID!): Section!
 
 	"""
-	Course Module is Unpaired Relating to Course Id and mobile Id
+	Course Section is Unpaired Relating to Course Id and mobile Id
 	"""
-	unpairCourseModule(courseId: ID!, moduleId: ID!): Module
+	unpairCourseSection(courseId: ID!, sectionId: ID!): Section
 
 	"""
 	Create a new collection

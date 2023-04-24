@@ -134,9 +134,9 @@ type User {
 	"""
 	tokens: [ID!]
 	"""
-	feedback of the user pointing to module feedback
+	feedback of the user pointing to section feedback
 	"""
-	feedback: [ModuleFeedback!]
+	feedback: [SectionFeedback!]
 	"""
 	assignment graded pointing to assignment result of the user
 	"""
