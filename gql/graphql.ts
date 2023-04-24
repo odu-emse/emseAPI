@@ -91,7 +91,7 @@ export interface ContentFields {
 export interface CreateCollectionArgs {
     name: string;
     sectionID: string;
-    lessons?: Nullable<string[]>;
+    modules?: Nullable<string[]>;
     positionIndex: number;
 }
 
@@ -99,7 +99,7 @@ export interface CollectionFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
     sectionID?: Nullable<string>;
-    lessons?: Nullable<Nullable<string>[]>;
+    modules?: Nullable<Nullable<string>[]>;
     positionIndex?: Nullable<number>;
 }
 
@@ -240,7 +240,7 @@ export interface SectionEnrollmentInput {
     status: EnrollmentStatus;
 }
 
-export interface LessonInput {
+export interface ModuleInput {
     name: string;
     content?: Nullable<string>;
     collection: string;
@@ -249,7 +249,7 @@ export interface LessonInput {
     hours: number;
 }
 
-export interface LessonFields {
+export interface ModuleFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
     content?: Nullable<string>;
@@ -283,7 +283,7 @@ export interface QuizFields {
     timeLimit?: Nullable<number>;
     numQuestions?: Nullable<number>;
     minScore?: Nullable<number>;
-    parentLesson?: Nullable<string>;
+    parentModule?: Nullable<string>;
 }
 
 export interface QuizInstanceFields {
@@ -323,7 +323,7 @@ export interface CreateQuiz {
     timeLimit?: Nullable<number>;
     numQuestions: number;
     minScore?: Nullable<number>;
-    parentLesson: string;
+    parentModule: string;
 }
 
 export interface UpdateQuiz {
@@ -333,7 +333,7 @@ export interface UpdateQuiz {
     timeLimit?: Nullable<number>;
     numQuestions?: Nullable<number>;
     minScore?: Nullable<number>;
-    parentLesson?: Nullable<string>;
+    parentModule?: Nullable<string>;
 }
 
 export interface CreateQuestion {
@@ -491,9 +491,9 @@ export interface IMutation {
     unpairCourseSection(courseId: string, sectionId: string): Nullable<Section> | Promise<Nullable<Section>>;
     createCollection(data: CreateCollectionArgs): Collection | Promise<Collection>;
     updateCollection(id: string, data: CollectionFields): Collection | Promise<Collection>;
-    createLesson(input: LessonInput): Lesson | Promise<Lesson>;
-    updateLesson(input?: Nullable<LessonFields>, replaceObj?: Nullable<boolean>): Nullable<Lesson> | Promise<Nullable<Lesson>>;
-    deleteLesson(id: string): Nullable<Lesson> | Promise<Nullable<Lesson>>;
+    createModule(input: ModuleInput): Module | Promise<Module>;
+    updateModule(input?: Nullable<ModuleFields>, replaceObj?: Nullable<boolean>): Nullable<Module> | Promise<Nullable<Module>>;
+    deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
@@ -542,9 +542,9 @@ export interface IQuery {
     sectionFeedback(input: ModFeedbackFields): Nullable<SectionFeedback[]> | Promise<Nullable<SectionFeedback[]>>;
     assignmentResult(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
     sectionEnrollment(input: ModEnrollmentFields): Nullable<SectionEnrollment[]> | Promise<Nullable<SectionEnrollment[]>>;
-    lessonsBySectionEnrollment(planID: string, SectionID: string): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
+    modulesBySectionEnrollment(planID: string, SectionID: string): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
-    lesson(input?: Nullable<LessonFields>): Nullable<Lesson[]> | Promise<Nullable<Lesson[]>>;
+    module(input?: Nullable<ModuleFields>): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
@@ -622,7 +622,7 @@ export interface SectionEnrollment {
     plan?: Nullable<PlanOfStudy>;
     inactivePlan?: Nullable<PlanOfStudy>;
     progress: Progress;
-    lessonProgress?: Nullable<Nullable<LessonProgress>[]>;
+    moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
 }
 
 export interface AssignmentResult {
@@ -691,13 +691,13 @@ export interface Collection {
     name: string;
     createdAt: Date;
     updatedAt: Date;
-    lessons?: Nullable<Nullable<Lesson>[]>;
+    modules?: Nullable<Nullable<Module>[]>;
     section: Section;
     sectionID: string;
     position?: Nullable<number>;
 }
 
-export interface Lesson {
+export interface Module {
     id: string;
     name: string;
     content?: Nullable<Nullable<Content>[]>;
@@ -705,7 +705,7 @@ export interface Lesson {
     collection?: Nullable<Collection>;
     position?: Nullable<number>;
     quizzes?: Nullable<Quiz[]>;
-    lessonProgress?: Nullable<Nullable<LessonProgress>[]>;
+    moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
     hours: number;
 }
@@ -714,7 +714,7 @@ export interface Content {
     id: string;
     type: ContentType;
     link: string;
-    parent: Lesson;
+    parent: Module;
     primary: boolean;
 }
 
@@ -731,14 +731,14 @@ export interface Progress {
     enrollment: SectionEnrollment;
 }
 
-export interface LessonProgress {
+export interface ModuleProgress {
     id: string;
     status: number;
     completed: boolean;
     createdAt: Date;
     updatedAt: Date;
     enrollment: SectionEnrollment;
-    lesson: Lesson;
+    module: Module;
 }
 
 export interface Quiz {
@@ -749,7 +749,7 @@ export interface Quiz {
     timeLimit?: Nullable<number>;
     numQuestions: number;
     minScore: number;
-    parentLesson: Lesson;
+    parentModule: Module;
     questionPool: Question[];
     instances: QuizInstance[];
 }

@@ -21,7 +21,7 @@ export class QuizService {
 	constructor(private prisma: PrismaService) {}
 
 	private quizInclude = Prisma.validator<Prisma.QuizInclude>()({
-		parentLesson: true,
+		parentModule: true,
 		questionPool: {
 			include: {
 				answers: true
@@ -33,7 +33,7 @@ export class QuizService {
 	private quizInstanceInclude = Prisma.validator<Prisma.QuizInstanceInclude>()({
 		quiz: {
 			include: {
-				parentLesson: true,
+				parentModule: true,
 				questionPool: {
 					include: {
 						answers: true
@@ -53,7 +53,7 @@ export class QuizService {
 		answers: true,
 		parent: {
 			include: {
-				parentLesson: true
+				parentModule: true
 			}
 		}
 	});
@@ -63,7 +63,7 @@ export class QuizService {
 			include: {
 				parent: {
 					include: {
-						parentLesson: true
+						parentModule: true
 					}
 				}
 			}
@@ -93,7 +93,7 @@ export class QuizService {
 			timeLimit: args.timeLimit ? args.timeLimit : undefined,
 			numQuestions: args.numQuestions ? args.numQuestions : undefined,
 			minScore: args.minScore ? args.minScore : undefined,
-			parentLessonID: args.parentLesson ? args.parentLesson : undefined
+			parentModuleID: args.parentModule ? args.parentModule : undefined
 		});
 		return this.prisma.quiz.findMany({
 			where,
@@ -163,7 +163,7 @@ export class QuizService {
 			timeLimit: input.timeLimit ? input.timeLimit : undefined,
 			numQuestions: input.numQuestions,
 			minScore: input.minScore ? input.minScore : undefined,
-			parentLesson: { connect: { id: input.parentLesson } }
+			parentModule: { connect: { id: input.parentModule } }
 		});
 		return this.prisma.quiz.create({
 			data: create,
@@ -180,8 +180,8 @@ export class QuizService {
 				timeLimit: values.timeLimit ? values.timeLimit : undefined,
 				numQuestions: values.numQuestions ? values.numQuestions : undefined,
 				minScore: values.minScore ? values.minScore : undefined,
-				parentLesson: values.parentLesson
-					? { connect: { id: values.parentLesson } }
+				parentModule: values.parentModule
+					? { connect: { id: values.parentModule } }
 					: undefined
 			},
 			where: {

@@ -5,9 +5,9 @@ import {
 	Content,
 	Course,
 	InstructorProfile,
-	Lesson,
 	Module,
-	ModuleEnrollment,
+	Section,
+	SectionEnrollment,
 	PlanOfStudy,
 	Progress,
 	Social,
@@ -77,12 +77,12 @@ export function createRandomPlanOfStudy(userAccountID?: string): PlanOfStudy {
 export function createRandomCourse(): Course {
 	return {
 		id: faker.database.mongodbObjectId(),
-		moduleIDs: [faker.database.mongodbObjectId()],
+		sectionIDs: [faker.database.mongodbObjectId()],
 		name: faker.lorem.words(3)
 	};
 }
 
-export function createRandomModule(): Module {
+export function createRandomSection(): Section {
 	return {
 		id: faker.database.mongodbObjectId(),
 		courseIDs: [faker.database.mongodbObjectId()],
@@ -91,17 +91,17 @@ export function createRandomModule(): Module {
 		duration: faker.datatype.number(),
 		intro: faker.lorem.lines(1),
 		keywords: [faker.lorem.words(3)],
-		moduleName: faker.lorem.words(3),
-		moduleNumber: faker.datatype.number(),
+		sectionName: faker.lorem.words(3),
+		sectionNumber: faker.datatype.number(),
 		numSlides: faker.datatype.number(),
 		objectives: [faker.lorem.words(3)],
-		parentModuleIDs: [faker.database.mongodbObjectId()],
-		subModuleIDs: [faker.database.mongodbObjectId()],
+		parentSectionIDs: [faker.database.mongodbObjectId()],
+		subSectionIDs: [faker.database.mongodbObjectId()],
 		updatedAt: faker.date.past()
 	};
 }
 
-export function createRandomLesson(collectionID?: string): Lesson {
+export function createRandomModule(collectionID?: string): Module {
 	return {
 		id: faker.database.mongodbObjectId(),
 		collectionID: collectionID
@@ -113,36 +113,36 @@ export function createRandomLesson(collectionID?: string): Lesson {
 	};
 }
 
-export function createRandomCollection(moduleID?: string): Collection {
+export function createRandomCollection(sectionID?: string): Collection {
 	return {
 		createdAt: faker.date.past(),
 		id: faker.database.mongodbObjectId(),
-		moduleID: moduleID ? moduleID : faker.database.mongodbObjectId(),
+		sectionID: sectionID ? sectionID : faker.database.mongodbObjectId(),
 		name: faker.lorem.words(3),
 		position: faker.datatype.number(),
 		updatedAt: faker.date.past()
 	};
 }
 
-export function createRandomModuleEnrollment(
-	moduleID?: string,
+export function createRandomSectionEnrollment(
+	sectionID?: string,
 	planID?: string
-): ModuleEnrollment {
+): SectionEnrollment {
 	return {
 		enrolledAt: faker.date.past(),
 		id: faker.database.mongodbObjectId(),
-		moduleId: moduleID ? moduleID : faker.database.mongodbObjectId(),
+		sectionId: sectionID ? sectionID : faker.database.mongodbObjectId(),
 		planID: planID ? planID : faker.database.mongodbObjectId(),
 		role: faker.helpers.arrayElement(["STUDENT", "TEACHER", "GRADER"]),
 		status: faker.helpers.arrayElement(["ACTIVE", "INACTIVE"])
 	};
 }
 
-export function createRandomAssignment(moduleID?: string): Assignment {
+export function createRandomAssignment(sectionID?: string): Assignment {
 	return {
 		dueAt: faker.date.future(),
 		id: faker.database.mongodbObjectId(),
-		moduleId: moduleID ? moduleID : faker.database.mongodbObjectId(),
+		sectionId: sectionID ? sectionID : faker.database.mongodbObjectId(),
 		name: faker.lorem.words(3),
 		updatedAt: faker.date.past()
 	};
@@ -168,15 +168,15 @@ export function createRandomAssignmentResult(
 
 export function createRandomThread(
 	authorID?: string,
-	parentLessonID?: string,
+	parentModuleID?: string,
 	parentThreadID?: string,
 	watcherID?: string
 ): Thread {
 	return {
 		id: faker.database.mongodbObjectId(),
 		authorID: authorID ? authorID : faker.database.mongodbObjectId(),
-		parentLessonID: parentLessonID
-			? parentLessonID
+		parentModuleID: parentModuleID
+			? parentModuleID
 			: faker.database.mongodbObjectId(),
 		parentThreadID: parentThreadID
 			? parentThreadID
@@ -209,7 +209,7 @@ export function createRandomQuiz(parentID?: string): Quiz {
 		timeLimit: faker.datatype.number(),
 		numQuestions: questions,
 		minScore: faker.datatype.number(),
-		parentLessonID: parentID ? parentID : faker.database.mongodbObjectId()
+		parentModuleID: parentID ? parentID : faker.database.mongodbObjectId()
 	}
 }
 
@@ -258,10 +258,10 @@ export const social = createRandomSocial();
 export const plan = createRandomPlanOfStudy();
 
 export const course = createRandomCourse();
+export const section = createRandomSection();
 export const module = createRandomModule();
-export const lesson = createRandomLesson();
 export const collection = createRandomCollection();
-export const moduleEnrollment = createRandomModuleEnrollment();
+export const sectionEnrollment = createRandomSectionEnrollment();
 export const assignment = createRandomAssignment();
 export const assignmentResult = createRandomAssignmentResult();
 export const thread = createRandomThread();

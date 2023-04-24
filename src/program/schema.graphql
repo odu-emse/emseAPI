@@ -68,9 +68,9 @@ type SectionEnrollment {
 	"""
 	progress: Progress!
 	"""
-	The progress model that is associated with this lesson
+	The progress model that is associated with this module
 	"""
-	lessonProgress: [LessonProgress]
+	moduleProgress: [ModuleProgress]
 }
 
 type AssignmentResult {
@@ -330,9 +330,9 @@ type Collection {
 	updatedAt: Date!
 
 	"""
-	List of lessons in the collection
+	List of modules in the collection
 	"""
-	lessons: [Lesson]
+	modules: [Module]
 
 	"""
 	The Section that this collection belongs to
@@ -348,13 +348,13 @@ type Collection {
 	position: Int
 }
 
-type Lesson {
+type Module {
 	"""
 	document ID
 	"""
 	id: ID!
 	"""
-	Lesson Name
+	Module Name
 	"""
 	name: String!
 	"""
@@ -362,26 +362,26 @@ type Lesson {
 	"""
 	content: [Content]
 	"""
-	The list of threads related to the lesson
+	The list of threads related to the module
 	"""
 	threads: [Thread]
 	"""
-	The collection that the lesson belongs to
+	The collection that the module belongs to
 	"""
 	collection: Collection
 
 	"""
-	The position index of the lesson in the collection it belongs to.
+	The position index of the module in the collection it belongs to.
 	"""
 	position: Int
 	"""
-	The quizzes that belong to this lesson
+	The quizzes that belong to this module
 	"""
 	quizzes: [Quiz!]
 	"""
-	The progress model that is associated with this lesson
+	The progress model that is associated with this module
 	"""
-	lessonProgress: [LessonProgress]
+	moduleProgress: [ModuleProgress]
 	"""
 	A list of learning objectives being covered in this Section
 	"""
@@ -409,12 +409,12 @@ type Content {
 	link: String!
 
 	"""
-	The lesson that this content belongs to.
+	The module that this content belongs to.
 	"""
-	parent: Lesson!
+	parent: Module!
 
     """
-	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	Boolean property that marks each element in the content array of a module as either the primary content type or secondary resources
 	"""
 	primary: Boolean!
 
@@ -465,17 +465,17 @@ type Query {
 	"""
 	sectionEnrollment(input: ModEnrollmentFields!): [SectionEnrollment!]
 	"""
-	Get a list of lessons given the plan ID and enrollment ID
+	Get a list of modules given the plan ID and enrollment ID
 	"""
-	lessonsBySectionEnrollment(planID: ID!, SectionID: ID!) : [Lesson!]
+	modulesBySectionEnrollment(planID: ID!, SectionID: ID!) : [Module!]
 	"""
 	Retrieve a specific collection based on document ID
 	"""
 	collection(input: CollectionFields): [Collection]
 	"""
-	Retrieve lessons given a set of parameters
+	Retrieve modules given a set of parameters
 	"""
-	lesson(input: LessonFields): [Lesson!]
+	module(input: ModuleFields): [Module!]
 
 	"""
 	Retrieve Content Given a set of parameters
@@ -495,12 +495,12 @@ input CreateContentArgs {
 	link: String!
 
 	"""
-	The lesson that this content belongs to.
+	The module that this content belongs to.
 	"""
 	parent: ID!
 
 	 """
-	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	Boolean property that marks each element in the content array of a module as either the primary content type or secondary resources
 	"""
 	primary: Boolean!
 }
@@ -522,11 +522,11 @@ input ContentFields {
 	link: String
 
 	"""
-	The lesson that this content belongs to.
+	The module that this content belongs to.
 	"""
 	parent: ID
 	 """
-	Boolean property that marks each element in the content array of a lesson as either the primary content type or secondary resources
+	Boolean property that marks each element in the content array of a module as either the primary content type or secondary resources
 	"""
 	primary: Boolean
 }
@@ -534,7 +534,7 @@ input ContentFields {
 input CreateCollectionArgs {
 	name: String!
 	sectionID: ID!
-	lessons: [ID!]
+	modules: [ID!]
 	positionIndex: Int!
 }
 
@@ -542,7 +542,7 @@ input CollectionFields {
 	id: ID
 	name: String
 	sectionID: ID
-	lessons: [ID]
+	modules: [ID]
 	positionIndex: Int
 }
 
@@ -816,9 +816,9 @@ input SectionEnrollmentInput {
 	status: EnrollmentStatus!
 }
 
-input LessonInput {
+input ModuleInput {
 	"""
-	Lesson Name
+	Module Name
 	"""
 	name: String!
 	"""
@@ -831,7 +831,7 @@ input LessonInput {
 	collection: ID!
 
 	"""
-	The index of the lesson in the collection
+	The index of the Module in the collection
 	"""
 	position: Int
 	"""
@@ -844,13 +844,13 @@ input LessonInput {
 	hours: Float!
 }
 
-input LessonFields {
+input ModuleFields {
 	"""
 	document ID
 	"""
 	id: ID
 	"""
-	Lesson Name
+	Module Name
 	"""
 	name: String
 	"""
@@ -858,7 +858,7 @@ input LessonFields {
 	"""
 	content: ID
 	"""
-	The list of ids to threads related to the lesson (Only a single value is supported)
+	The list of ids to threads related to the module (Only a single value is supported)
 	"""
 	thread: ID
 	"""
@@ -866,7 +866,7 @@ input LessonFields {
 	"""
 	collection: ID
 	"""
-	The index of the lesson in the collection
+	The index of the module in the collection
 	"""
 	position: Int
 	"""
@@ -995,19 +995,19 @@ type Mutation {
 	updateCollection(id: ID!, data: CollectionFields!): Collection!
 
 	"""
-	Create a Lesson for an individual collection
+	Create a Module for an individual collection
 	"""
-	createLesson(input: LessonInput!): Lesson!
+	createModule(input: ModuleInput!): Module!
 	"""
-	Update a lesson given its ID
-	The input parameter is the data that will be updated in the Lesson as well as the ID of the lesson to be updated.
-	The replaceObj parameter specifies the mode in which lesson objectives should be updated. A true value will repalce
+	Update a module given its ID
+	The input parameter is the data that will be updated in the module as well as the ID of the module to be updated.
+	The replaceObj parameter specifies the mode in which module objectives should be updated. A true value will repalce
 	existing objectives with the new list passed in, whereas a false value (default) will add the strings in the list to
 	the existing data.
 	"""
-	updateLesson(input: LessonFields, replaceObj: Boolean): Lesson
+	updateModule(input: ModuleFields, replaceObj: Boolean): Module
 
-	deleteLesson(id: String!): Lesson
+	deleteModule(id: String!): Module
 
 	"""
 	Create a Content Record

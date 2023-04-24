@@ -41,11 +41,9 @@ Table InstructorProfile {
   officeLocation String
   officeHours String[] [not null]
   contactPolicy String
-  phone String
   background String
   researchInterest String[] [not null]
   selectedPapersAndPublications String[] [not null]
-  personalWebsite String
 }
 
 Table PlanOfStudy {
@@ -116,12 +114,12 @@ Table Collection {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
   position Int [not null, default: 0]
-  lessons Lesson [not null]
+  modules Module [not null]
   section Section [not null]
   sectionID String [not null]
 }
 
-Table Lesson {
+Table Module {
   id String [pk]
   name String [not null]
   collection Collection [not null]
@@ -131,7 +129,7 @@ Table Lesson {
   hours Float [not null, default: 0]
   content Content [not null]
   quizzes Quiz [not null]
-  lessonProgress LessonProgress [not null]
+  moduleProgress ModuleProgress [not null]
 }
 
 Table SectionFeedback {
@@ -154,7 +152,7 @@ Table SectionEnrollment {
   plan PlanOfStudy
   planID String
   progress Progress
-  lessonProgress LessonProgress [not null]
+  moduleProgress ModuleProgress [not null]
 }
 
 Table Assignment {
@@ -207,7 +205,7 @@ Table Content {
   id String [pk]
   type ContentType [not null]
   link String [not null]
-  parent Lesson [not null]
+  parent Module [not null]
   parentID String [not null]
   primary Boolean [not null]
 }
@@ -246,14 +244,14 @@ Table Progress {
   enrollmentID String [unique, not null]
 }
 
-Table LessonProgress {
+Table ModuleProgress {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
   status Float [not null, default: 0]
   completed Boolean [not null, default: false]
-  lesson Lesson [not null]
-  lessonID String [not null]
+  module Module [not null]
+  moduleID String [not null]
   enrollment SectionEnrollment [not null]
   enrollmentID String [unique, not null]
 }
@@ -266,8 +264,8 @@ Table Quiz {
   timeLimit Int
   numQuestions Int [not null]
   minScore Float [not null, default: 0]
-  parentLesson Lesson [not null]
-  parentLessonID String [not null]
+  parentModule Module [not null]
+  parentModuleID String [not null]
   questionPool Question [not null]
   instances QuizInstance [not null]
 }
@@ -368,7 +366,7 @@ Ref: Section.courseIDs > Course.id
 
 Ref: Collection.sectionID > Section.id [delete: Cascade]
 
-Ref: Lesson.collectionID > Collection.id [delete: Cascade]
+Ref: Module.collectionID > Collection.id [delete: Cascade]
 
 Ref: SectionFeedback.studentId > User.id
 
@@ -394,7 +392,7 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Thread.upvoteUserIDs > User.id
 
-Ref: Content.parentID > Lesson.id [delete: Cascade]
+Ref: Content.parentID > Module.id [delete: Cascade]
 
 Ref: DirectMessage.authorID > User.id
 
@@ -406,11 +404,11 @@ Ref: Group.memberIDs > User.id
 
 Ref: Progress.enrollmentID - SectionEnrollment.id [delete: Cascade]
 
-Ref: LessonProgress.lessonID > Lesson.id [delete: Cascade]
+Ref: ModuleProgress.moduleID > Module.id [delete: Cascade]
 
-Ref: LessonProgress.enrollmentID > SectionEnrollment.id [delete: Cascade]
+Ref: ModuleProgress.enrollmentID > SectionEnrollment.id [delete: Cascade]
 
-Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
+Ref: Quiz.parentModuleID > Module.id [delete: Cascade]
 
 Ref: QuizInstance.quizID > Quiz.id [delete: Cascade]
 

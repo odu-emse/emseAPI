@@ -12,8 +12,8 @@ import {
 	ModFeedbackFields,
 	AssignmentResFields,
 	ContentFields,
-	LessonFields,
-	LessonInput,
+	ModuleFields,
+	ModuleInput,
 	CreateCollectionArgs,
 	CreateContentArgs,
 	ModEnrollmentFields,
@@ -80,8 +80,8 @@ export class ProgramResolver {
 		return await this.programService.sectionEnrollment(args);
 	}
 
-	@Query("lessonsBySectionEnrollment")
-	async lessonsBySectionEnrollment(
+	@Query("modulesBySectionEnrollment")
+	async modulesBySectionEnrollment(
 		@Args("planID") planID: string,
 		@Args("sectionID") sectionID: string
 	) {
@@ -93,29 +93,29 @@ export class ProgramResolver {
 			return enrollment.section.id === sectionID;
 		});
 
-		const lessons = filteredEnrollment[0].section.collections.map(
+		const modules = filteredEnrollment[0].section.collections.map(
 			(collection) =>
-				collection.lessons.map((lesson) => {
-					return lesson;
+				collection.modules.map((module) => {
+					return module;
 				})
 		);
 
-		const filteredLessons = lessons.flat().map((lesson) => {
-			return lesson.lessonProgress.filter((progress) => {
+		const filteredModules = modules.flat().map((module) => {
+			return module.moduleProgress.filter((progress) => {
 				return progress.enrollment.id === filteredEnrollment[0].id;
 			});
 		});
 
 		return [
-			...lessons
+			...modules
 				.flat()
 				.sort((a, b) => a.position - b.position)
-				.map((lesson) => {
+				.map((module) => {
 					return {
-						...lesson,
-						lessonProgress: filteredLessons
+						...module,
+						moduleProgress: filteredModules
 							.flat()
-							.filter((progress) => progress.lessonID === lesson.id)
+							.filter((progress) => progress.moduleID === module.id)
 					};
 				})
 		];
@@ -131,9 +131,9 @@ export class ProgramResolver {
 		return await this.programService.content(input);
 	}
 
-	@Query("lesson")
-	async lesson(@Args("input") input: LessonFields) {
-		return await this.programService.lesson(input);
+	@Query("module")
+	async module(@Args("input") input: ModuleFields) {
+		return await this.programService.module(input);
 	}
 
 	// Mutations
@@ -298,33 +298,33 @@ export class ProgramResolver {
 		return await this.programService.updateCollection(id, data);
 	}
 
-	@Mutation("createLesson")
-	async createLesson(@Args("input") input: LessonInput) {
-		return await this.programService.createLesson(input);
+	@Mutation("createModule")
+	async createModule(@Args("input") input: ModuleInput) {
+		return await this.programService.createModule(input);
 	}
 
-	@Mutation("updateLesson")
-	async updateLesson(
-		@Args("input") input: LessonFields,
+	@Mutation("updateModule")
+	async updateModule(
+		@Args("input") input: ModuleFields,
 		@Args("replaceObj") replaceObj: boolean = false
 	) {
-		return await this.programService.updateLesson(input, replaceObj);
+		return await this.programService.updateModule(input, replaceObj);
 	}
 
-	@Mutation("deleteLesson")
-	async deleteLesson(@Args("id") id: string) {
-		return await this.programService.deleteLesson(id);
+	@Mutation("deleteModule")
+	async deleteModule(@Args("id") id: string) {
+		return await this.programService.deleteModule(id);
 	}
 
 	@Mutation("createContent")
 	async createContent(@Args("input") input: CreateContentArgs) {
-		// we get the lesson based on the parent ID of the content
-		const lesson = await this.programService.lesson({
+		// we get the module based on the parent ID of the content
+		const module = await this.programService.module({
 			id: input.parent
 		});
 
 		// we make a copy of the content array, so we can manipulate it
-		let updatedContentArray = [...lesson[0].content];
+		let updatedContentArray = [...module[0].content];
 
 		//checking the length of the array to see no two elements have same content type
 		let len = updatedContentArray.filter(
@@ -345,17 +345,17 @@ export class ProgramResolver {
 	) {
 		// since we need the ID to update a content, we need to make sure it's there
 		if (!input.id) throw new Error("ID field is required");
-		// we get the content based on the ID passed in, in order to get the parent lesson ID
+		// we get the content based on the ID passed in, in order to get the parent module ID
 		const original = await this.programService.content({
 			id: input.id
 		});
-		// we get the lesson based on the parent ID of the content
-		const lesson = await this.programService.lesson({
+		// we get the module based on the parent ID of the content
+		const module = await this.programService.module({
 			id: original[0].parentID
 		});
 
 		// we make a copy of the content array, so we can manipulate it
-		let updatedContentArray = [...lesson[0].content];
+		let updatedContentArray = [...module[0].content];
 
 		// if the change is to make the content primary, we need to make sure there's only one primary content
 		if (input.primary == true) {

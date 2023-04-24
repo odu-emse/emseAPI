@@ -5,12 +5,12 @@ import { test, describe, expect, afterAll } from "vitest";
 import {
 	createAnswer,
 	createCollection,
-	createLesson,
+	createModule,
 	createModule,
 	createQuestion,
 	createQuiz,
 	createRandomAnswer,
-	createRandomLesson,
+	createRandomModule,
 	createRandomQuestion,
 	createRandomQuiz
 } from "../../utils";
@@ -30,7 +30,7 @@ describe("Quiz Services", () => {
 	const testingAccountPlanID = "63e51cbd14406c6ad63f73a8";
 	let fakeModule;
 	let fakeCollection;
-	let fakeLesson;
+	let fakeModule;
 	let fakeQuiz;
 	let fakeQuestion;
 	let fakeAnswer;
@@ -62,16 +62,16 @@ describe("Quiz Services", () => {
 			positionIndex: 1
 		});
 
-		fakeLesson = await createLesson(
+		fakeModule = await createModule(
 			progResolver,
-			createRandomLesson(fakeCollection.id)
+			createRandomModule(fakeCollection.id)
 		);
 	});
 
 	describe("Creates", () => {
 		describe("Mutation.createQuiz()", () => {
 			test("should create a new quiz", async () => {
-				const quizData = createRandomQuiz(fakeLesson.id);
+				const quizData = createRandomQuiz(fakeModule.id);
 				fakeQuiz = await createQuiz(resolver, quizData);
 				if (fakeQuiz instanceof Error) throw new Error(fakeQuiz.message);
 				expect(fakeQuiz).toBeDefined();
@@ -81,7 +81,7 @@ describe("Quiz Services", () => {
 				expect(fakeQuiz.numQuestions).toEqual(quizData.numQuestions);
 				expect(fakeQuiz.minScore).toEqual(quizData.minScore);
 				expect(fakeQuiz.dueAt).toEqual(quizData.dueAt);
-				expect(fakeQuiz.parentLessonID).toEqual(fakeLesson.id);
+				expect(fakeQuiz.parentModuleID).toEqual(fakeModule.id);
 			});
 		});
 		describe("Mutation.createQuestion", () => {
@@ -159,7 +159,7 @@ describe("Quiz Services", () => {
 					dueAt: fakeQuiz.dueAt,
 					numQuestions: fakeQuiz.numQuestions,
 					minScore: fakeQuiz.minScore,
-					parentLesson: fakeQuiz.parentLessonID
+					parentModule: fakeQuiz.parentModuleID
 				});
 
 				expect(quizzes).toBeDefined();
@@ -168,7 +168,7 @@ describe("Quiz Services", () => {
 					expect(quiz.dueAt).toEqual(params.dueAt);
 					expect(quiz.numQuestions).toEqual(params.numQuestions);
 					expect(quiz.minScore).toEqual(params.minScore);
-					expect(quiz.parentLesson.id).toEqual(params.parentLessonID);
+					expect(quiz.parentModule.id).toEqual(params.parentModuleID);
 				});
 			});
 			test("should take less than 1.5 seconds to get all quizzes", async () => {
@@ -297,18 +297,18 @@ describe("Quiz Services", () => {
 	describe("Updates", () => {
 		describe("Mutation.updateQuiz()", () => {
 			test("should update all specified fields", async () => {
-				const otherLesson = await createLesson(
+				const otherModule = await createModule(
 					progResolver,
-					createRandomLesson(fakeCollection.id)
+					createRandomModule(fakeCollection.id)
 				);
-				if (otherLesson instanceof Error) throw new Error(otherLesson.message);
+				if (otherModule instanceof Error) throw new Error(otherModule.message);
 				const quizData = createRandomQuiz();
 				const updatedQuiz = await resolver.updateQuiz(fakeQuiz.id, {
 					totalPoints: quizData.totalPoints,
 					instructions: quizData.instructions,
 					numQuestions: quizData.numQuestions,
 					minScore: quizData.minScore,
-					parentLesson: otherLesson.id,
+					parentModule: otherModule.id,
 					dueAt: quizData.dueAt
 				});
 				expect(updatedQuiz).toBeDefined();
@@ -316,7 +316,7 @@ describe("Quiz Services", () => {
 				expect(updatedQuiz.instructions).toEqual(quizData.instructions);
 				expect(updatedQuiz.numQuestions).toEqual(quizData.numQuestions);
 				expect(updatedQuiz.minScore).toEqual(quizData.minScore);
-				expect(updatedQuiz.parentLesson.id).toEqual(otherLesson.id);
+				expect(updatedQuiz.parentModule.id).toEqual(otherModule.id);
 				expect(updatedQuiz.dueAt).toEqual(quizData.dueAt);
 			});
 		});

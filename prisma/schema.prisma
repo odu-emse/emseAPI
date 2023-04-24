@@ -138,12 +138,12 @@ model Collection {
   position  Int      @default(0)
 
   // Relation fields
-  lessons   Lesson[]
+  modules   Module[]
   section   Section  @relation(name: "collections", fields: [sectionID], references: [id], onDelete: Cascade)
   sectionID String   @db.ObjectId
 }
 
-model Lesson {
+model Module {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
@@ -154,7 +154,7 @@ model Lesson {
 
   content        Content[]
   quizzes        Quiz[]
-  lessonProgress LessonProgress[]
+  moduleProgress ModuleProgress[]
 }
 
 model SectionFeedback {
@@ -180,7 +180,7 @@ model SectionEnrollment {
   plan           PlanOfStudy?     @relation(fields: [planID], references: [id])
   planID         String?          @db.ObjectId
   progress       Progress?
-  lessonProgress LessonProgress[]
+  moduleProgress ModuleProgress[]
 }
 
 model Assignment {
@@ -239,7 +239,7 @@ model Content {
   id       String      @id @default(auto()) @map("_id") @db.ObjectId
   type     ContentType
   link     String
-  parent   Lesson      @relation(fields: [parentID], references: [id], onDelete: Cascade)
+  parent   Module      @relation(fields: [parentID], references: [id], onDelete: Cascade)
   parentID String      @db.ObjectId
   primary  Boolean
 }
@@ -279,14 +279,14 @@ model Progress {
   enrollmentID String            @unique @db.ObjectId
 }
 
-model LessonProgress {
+model ModuleProgress {
   id           String            @id @default(auto()) @map("_id") @db.ObjectId
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @default(now()) @updatedAt
   status       Float             @default(0)
   completed    Boolean           @default(false)
-  lesson       Lesson            @relation(fields: [lessonID], references: [id], onDelete: Cascade)
-  lessonID     String            @db.ObjectId
+  module       Module            @relation(fields: [moduleID], references: [id], onDelete: Cascade)
+  moduleID     String            @db.ObjectId
   // Relation Fields
   enrollment   SectionEnrollment @relation(fields: [enrollmentID], references: [id], onDelete: Cascade)
   enrollmentID String            @unique @db.ObjectId
@@ -300,8 +300,8 @@ model Quiz {
   timeLimit      Int?
   numQuestions   Int
   minScore       Float          @default(0.0)
-  parentLesson   Lesson         @relation(fields: [parentLessonID], references: [id], onDelete: Cascade)
-  parentLessonID String         @db.ObjectId
+  parentModule   Module         @relation(fields: [parentModuleID], references: [id], onDelete: Cascade)
+  parentModuleID String         @db.ObjectId
   questionPool   Question[]
   instances      QuizInstance[]
 }
