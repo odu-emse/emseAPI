@@ -441,6 +441,17 @@ export class ProgramResolver {
 		return data;
 	}
 
+	@Mutation("createPath")
+	async createPath(
+		@Args("planID") planID: string,
+		@Args("input") input: PathInput
+	) {
+		const data = await this.programService.createPath(planID, input);
+		if (data instanceof Error)
+			return new Error("An error occurred while creating your path");
+		return data;
+	}
+
 	@Mutation("updateLearningPath")
 	async updateLearningPath(
 		@Args("planID") planID: string,

@@ -1347,6 +1347,76 @@ export class ProgramService {
 		}
 	}
 
+	async createPath(planID: string, input: PathInput) {
+		// get base LP data so we can persist the old paths and add the new one
+		const LP = await this.prisma.learningPath.findMany({
+			where: {
+				planID
+			}
+		})
+
+		if (LP.length !== 1) {
+			return new Error("The learning path you choose could not be found");
+		}
+
+		const { status, course, learningOutcomes, hoursSatisfies } = input;
+
+		// getting the course data so we can validate and populate in the path
+		const courseData = await this.prisma.course.findMany({
+			where: {
+				id: course.id
+			}
+		})
+
+		if (courseData.length !== 1) {
+			return new Error("The course you choose could not be found");
+		}
+
+		const pathData = Prisma.validator<Prisma.PathCreateInput>()({
+			id: faker.database.mongodbObjectId(),
+			learningOutcomes: learningOutcomes || [],
+			hoursSatisfies: hoursSatisfies || 1,
+			status: status || "DRAFT",
+			course: {
+				id: course.id,
+				sections: course.sections.map((section) => {
+					return {
+						id: section.id,
+						name: section.name,
+						collections: section.collections.map((collection) => {
+							return {
+								id: collection.id,
+								name: collection.name,
+								modules: collection.modules.map((module) => {
+									return {
+										id: module.id,
+										enrollmentID: ""
+									};
+								})
+							}
+						})
+					}
+				})
+			}
+		})
+
+
+		const paths = [
+			...LP[0].paths,
+			pathData
+		]
+
+		return this.prisma.learningPath.update({
+			where: {
+				planID
+			},
+			data: {
+				paths: paths
+			},
+			include: this.learningPathInclude
+		})
+	}
+
 	async updateLearningPath(planID: string, pathID: string, input: PathInput) {
 		const { status, course, learningOutcomes, hoursSatisfies } = input;
 
