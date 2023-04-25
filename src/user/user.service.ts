@@ -7,7 +7,8 @@ import type {
 	InstructorProfile,
 	Error,
 	UserFields,
-	SocialFields
+	SocialFields,
+	NewUser
 } from "@/types/graphql";
 import moment from "moment";
 import { Prisma } from "@prisma/client";
@@ -379,6 +380,14 @@ export class UserService {
 			},
 			include: {
 				account: true
+			}
+		});
+	}
+
+	async createUser(args: NewUser) {
+		return this.prisma.user.create({
+			data: {
+				...args
 			}
 		});
 	}
