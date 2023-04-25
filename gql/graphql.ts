@@ -857,8 +857,8 @@ export interface ModulePath {
     objectives: string[];
     createdAt: Date;
     updatedAt: Date;
-    members: ModuleEnrollment[];
-    feedback: ModuleFeedback[];
+    members: SectionEnrollment[];
+    feedback: SectionFeedback[];
     parentModules: Module[];
     subModules: Module[];
     courseIDs: string[];

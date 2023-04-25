@@ -639,14 +639,14 @@ type ModulePath {
     updatedAt: Date!
 
     """
-    Memebers enrolled in the Module
+    Members enrolled in the Module
     """
-    members: [ModuleEnrollment!]!
+    members: [SectionEnrollment!]!
 
     """
     Feedback of the Module
     """
-    feedback: [ModuleFeedback!]!
+    feedback: [SectionFeedback!]!
 
     """
     Parent Modules of the Module

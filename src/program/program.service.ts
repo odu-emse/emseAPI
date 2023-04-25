@@ -19,9 +19,10 @@ import {
 	CreateContentArgs,
 	ContentFields,
 	NewSection,
-	CollectionFields
+	CollectionFields,
 	CreateLearningPathInput,
-	PathInput
+	PathInput,
+	Course
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
