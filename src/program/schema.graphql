@@ -467,7 +467,7 @@ type Query {
 	"""
 	Get a list of modules given the plan ID and enrollment ID
 	"""
-	modulesBySectionEnrollment(planID: ID!, SectionID: ID!) : [Module!]
+	modulesBySectionEnrollment(planID: ID!, sectionID: ID!) : [Module!]
 	"""
 	Retrieve a specific collection based on document ID
 	"""
