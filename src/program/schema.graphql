@@ -565,10 +565,6 @@ type CoursePath {
     """
     name: String!
     """
-    modules in the course
-    """
-    moduleIDs: [ID]
-    """
     Boolean value to check if the course is required/core or an elective
     """
     required: Boolean!
@@ -593,78 +589,48 @@ type CollectionPath {
 
 type ModulePath {
     """
-    Module Id
+    document ID
     """
     id: ID!
+    """
+    Module Name
+    """
+    name: String!
+    """
+    The link/id of the actual content data itself
+    """
+    content: [Content]
+    """
+    The list of threads related to the module
+    """
+    threads: [Thread]
+    """
+    The collection that the module belongs to
+    """
+    collections: [Collection]
+
+    collectionIDs: [ID!]
 
     """
-    Number of the Module
+    The position index of the module in the collection it belongs to.
     """
-    moduleNumber: Int!
-
+    position: Int
     """
-    Name of hte Module
+    The quizzes that belong to this module
     """
-    moduleName: String!
-
+    quizzes: [Quiz!]
     """
-    Description of the Module
+    The progress model that is associated with this module
     """
-    description: String!
-
+    moduleProgress: [ModuleProgress]
     """
-    Duration of the Module
+    A list of learning objectives being covered in this Section
     """
-    duration: Float!
-
+    objectives: 	[String!]!
     """
-    Introduction of the Module
+    The number of carnige hours granted for completion of this Section
     """
-    intro: String!
-
-    """
-    Keywords in the Modules
-    """
-    keywords: [String!]!
-
-    """
-    objectives in the Modules
-    """
-    objectives: [String!]!
-
-    """
-    Date and Time of the Module Created at
-    """
-    createdAt: Date!
-
-    """
-    Date and Time of the Module Updated at
-    """
-    updatedAt: Date!
-
-    """
-    Members enrolled in the Module
-    """
-    members: [SectionEnrollment!]!
-
-    """
-    Feedback of the Module
-    """
-    feedback: [SectionFeedback!]!
-
-    """
-    Parent Modules of the Module
-    """
-    parentModules: [Module!]!
-
-    """
-    Child modules in the Module
-    """
-    subModules: [Module!]!
-    """
-    courseIDs set
-    """
-    courseIDs: [ID!]!
+    hours: Float!
     enrollmentID: ID
 }
 
