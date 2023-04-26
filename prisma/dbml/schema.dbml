@@ -116,6 +116,7 @@ Table Collection {
   updatedAt DateTime [default: `now()`, not null]
   position Int [not null, default: 0]
   modules Module [not null]
+  moduleIDs String[] [not null]
   section Section [not null]
   sectionID String [not null]
 }
@@ -123,8 +124,8 @@ Table Collection {
 Table Module {
   id String [pk]
   name String [not null]
-  collection Collection [not null]
-  collectionID String [not null]
+  collections Collection [not null]
+  collectionIDs String[] [not null]
   position Int [not null, default: 0]
   objectives String[] [not null]
   hours Float [not null, default: 0]
@@ -378,9 +379,11 @@ Ref: Section.subSectionIDs > Section.id
 
 Ref: Section.courseIDs > Course.id
 
+Ref: Collection.moduleIDs > Module.id
+
 Ref: Collection.sectionID > Section.id [delete: Cascade]
 
-Ref: Module.collectionID > Collection.id [delete: Cascade]
+Ref: Module.collectionIDs > Collection.id
 
 Ref: SectionFeedback.studentId > User.id
 

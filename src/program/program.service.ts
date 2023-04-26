@@ -167,7 +167,7 @@ export class ProgramService {
 											enrollment: true
 										}
 									},
-									collection: {
+									collections: {
 										include: {
 											section: true
 										}
@@ -192,7 +192,7 @@ export class ProgramService {
 
 	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
 		content: true,
-		collection: {
+		collections: {
 			include: {
 				section: {
 					include: {
@@ -520,7 +520,7 @@ export class ProgramService {
 			...(id && { id }),
 			...(name && { name }),
 			...(position && { position }),
-			collection: { id: collection ? collection : undefined },
+			collections: { some: { id: collection ? collection : undefined } },
 			content: content ? { some: { id: content } } : undefined,
 			objectives: objectives ? { hasEvery: objectives } : undefined
 		});
@@ -1013,7 +1013,7 @@ export class ProgramService {
 							}
 						}
 					}),
-				collection: {
+				collections: {
 					connect: {
 						id: input.collection ? input.collection : undefined
 					}
@@ -1077,7 +1077,9 @@ export class ProgramService {
 			},
 			data: {
 				name: payload.name,
-				collectionID: payload.collection,
+				collectionIDs: {
+					push: payload.collection
+				},
 				position: input.position ? input.position : undefined,
 				objectives: newObjectives ? newObjectives : undefined,
 				hours: payload.hours

@@ -139,19 +139,20 @@ model Collection {
   position  Int      @default(0)
 
   // Relation fields
-  modules   Module[]
+  modules   Module[] @relation(fields: [moduleIDs], references: [id])
+  moduleIDs String[] @default([]) @db.ObjectId
   section   Section  @relation(name: "collections", fields: [sectionID], references: [id], onDelete: Cascade)
   sectionID String   @db.ObjectId
 }
 
 model Module {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
-  collectionID String     @db.ObjectId
-  position     Int        @default(0)
-  objectives   String[]   @default([])
-  hours        Float      @default(0.0)
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  collections   Collection[] @relation(fields: [collectionIDs], references: [id])
+  collectionIDs String[]     @default([]) @db.ObjectId
+  position      Int          @default(0)
+  objectives    String[]     @default([])
+  hours         Float        @default(0.0)
 
   content        Content[]
   quizzes        Quiz[]
