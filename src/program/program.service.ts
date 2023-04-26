@@ -652,6 +652,7 @@ export class ProgramService {
 		return this.prisma.course.create({
 			data: {
 				name: data.name,
+				sectionIDs: data.section,
 				carnegieHours: data.carnegieHours,
 				required: data.required
 			},
