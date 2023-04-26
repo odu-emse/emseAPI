@@ -736,6 +736,7 @@ export interface Collection {
     createdAt: Date;
     updatedAt: Date;
     modules?: Nullable<Nullable<Module>[]>;
+    moduleIDs?: Nullable<string[]>;
     section: Section;
     sectionID: string;
     position?: Nullable<number>;
@@ -746,7 +747,8 @@ export interface Module {
     name: string;
     content?: Nullable<Nullable<Content>[]>;
     threads?: Nullable<Nullable<Thread>[]>;
-    collection?: Nullable<Collection>;
+    collections?: Nullable<Nullable<Collection>[]>;
+    collectionIDs?: Nullable<string[]>;
     position?: Nullable<number>;
     quizzes?: Nullable<Quiz[]>;
     moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;

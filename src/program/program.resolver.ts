@@ -87,6 +87,8 @@ export class ProgramResolver {
 		@Args("planID") planID: string,
 		@Args("sectionID") sectionID: string
 	) {
+		// using the combination of the student's plan of study and the section they are looking at
+		// we can find the exact enrollment they are looking for as only one enrollment can exist for a student for a given section
 		const enrollment = await this.programService.sectionEnrollment({
 			plan: planID
 		});

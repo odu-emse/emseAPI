@@ -145,6 +145,12 @@ export class ProgramService {
 					student: true
 				}
 			},
+			moduleProgress: {
+				include: {
+					enrollment: true,
+					module: true
+				}
+			},
 			section: {
 				include: {
 					parentSections: true,

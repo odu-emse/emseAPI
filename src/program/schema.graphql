@@ -334,6 +334,8 @@ type Collection {
 	"""
 	modules: [Module]
 
+    moduleIDs: [ID!]
+
 	"""
 	The Section that this collection belongs to
 	"""
@@ -368,7 +370,9 @@ type Module {
 	"""
 	The collection that the module belongs to
 	"""
-	collection: Collection
+	collections: [Collection]
+
+    collectionIDs: [ID!]
 
 	"""
 	The position index of the module in the collection it belongs to.
