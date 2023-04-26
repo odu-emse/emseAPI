@@ -830,7 +830,6 @@ export interface Path {
 export interface CoursePath {
     id: string;
     name: string;
-    moduleIDs?: Nullable<Nullable<string>[]>;
     required: boolean;
     carnegieHours: number;
     sections: SectionPath[];
@@ -850,20 +849,16 @@ export interface CollectionPath {
 
 export interface ModulePath {
     id: string;
-    moduleNumber: number;
-    moduleName: string;
-    description: string;
-    duration: number;
-    intro: string;
-    keywords: string[];
+    name: string;
+    content?: Nullable<Nullable<Content>[]>;
+    threads?: Nullable<Nullable<Thread>[]>;
+    collections?: Nullable<Nullable<Collection>[]>;
+    collectionIDs?: Nullable<string[]>;
+    position?: Nullable<number>;
+    quizzes?: Nullable<Quiz[]>;
+    moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
-    createdAt: Date;
-    updatedAt: Date;
-    members: SectionEnrollment[];
-    feedback: SectionFeedback[];
-    parentModules: Module[];
-    subModules: Module[];
-    courseIDs: string[];
+    hours: number;
     enrollmentID?: Nullable<string>;
 }
 
