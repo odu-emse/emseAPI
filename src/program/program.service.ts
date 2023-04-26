@@ -147,7 +147,11 @@ export class ProgramService {
 			},
 			moduleProgress: {
 				include: {
-					enrollment: true,
+					enrollment: {
+						include: {
+							section: true
+						}
+					},
 					module: true
 				}
 			},
@@ -209,6 +213,11 @@ export class ProgramService {
 						}
 					}
 				}
+			}
+		},
+		moduleProgress: {
+			include: {
+				enrollment: true
 			}
 		}
 	});
