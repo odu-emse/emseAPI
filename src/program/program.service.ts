@@ -113,72 +113,69 @@ export class ProgramService {
 		course: true
 	});
 
-	private sectionFeedbackInclude = Prisma.validator<
-		Prisma.SectionFeedbackInclude
-	>()({
-		student: true,
-		section: true
-	});
+	private sectionFeedbackInclude =
+		Prisma.validator<Prisma.SectionFeedbackInclude>()({
+			student: true,
+			section: true
+		});
 
-	private assignmentResultInclude = Prisma.validator<
-		Prisma.AssignmentResultInclude
-	>()({
-		student: {
-			include: {
-				student: true
+	private assignmentResultInclude =
+		Prisma.validator<Prisma.AssignmentResultInclude>()({
+			student: {
+				include: {
+					student: true
+				}
+			},
+			gradedBy: true,
+			assignment: {
+				include: {
+					section: true
+				}
 			}
-		},
-		gradedBy: true,
-		assignment: {
-			include: {
-				section: true
-			}
-		}
-	});
+		});
 
-	public sectionEnrollmentInclude = Prisma.validator<
-		Prisma.SectionEnrollmentInclude
-	>()({
-		plan: {
-			include: {
-				student: true
-			}
-		},
-		section: {
-			include: {
-				parentSections: true,
-				members: {
-					include: {
-						plan: {
-							include: {
-								student: true
+	public sectionEnrollmentInclude =
+		Prisma.validator<Prisma.SectionEnrollmentInclude>()({
+			plan: {
+				include: {
+					student: true
+				}
+			},
+			section: {
+				include: {
+					parentSections: true,
+					members: {
+						include: {
+							plan: {
+								include: {
+									student: true
+								}
 							}
 						}
-					}
-				},
-				collections: {
-					include: {
-						modules: {
-							include: {
-								content: true,
-								moduleProgress: {
-									include: {
-										enrollment: true
-									}
-								},
-								collection: {
-									include: {
-										section: true
+					},
+					collections: {
+						include: {
+							modules: {
+								include: {
+									content: true,
+									moduleProgress: {
+										include: {
+											enrollment: true
+										}
+									},
+									collection: {
+										include: {
+											section: true
+										}
 									}
 								}
 							}
 						}
 					}
 				}
-			}
-		},
-		progress: true
-	});
+			},
+			progress: true
+		});
 
 	private collectionInclude = Prisma.validator<Prisma.CollectionInclude>()({
 		section: true,
@@ -260,7 +257,7 @@ export class ProgramService {
 		}
 
 		if (members) {
-			members.forEach(member => {
+			members.forEach((member) => {
 				if (where.AND) {
 					where.AND.push({
 						members: {
@@ -484,7 +481,7 @@ export class ProgramService {
 
 		// loop out of modules and check with and
 		if (modules) {
-			modules.map(module => {
+			modules.map((module) => {
 				where["AND"] = [
 					{
 						modules: {
@@ -553,7 +550,7 @@ export class ProgramService {
 				}
 			},
 			modules: {
-				connect: modules?.map(module => {
+				connect: modules?.map((module) => {
 					return { id: module };
 				})
 			}
@@ -961,7 +958,7 @@ export class ProgramService {
 
 		const newSectionSet =
 			courseIdToRemove !== null
-				? courseIdToRemove.sectionIDs.filter(section => section !== sectionId)
+				? courseIdToRemove.sectionIDs.filter((section) => section !== sectionId)
 				: null;
 
 		const sectionIdToRemove = await this.prisma.section.findUnique({
@@ -972,7 +969,7 @@ export class ProgramService {
 
 		const newCourseSet =
 			sectionIdToRemove !== null
-				? sectionIdToRemove.courseIDs.filter(course => course !== courseId)
+				? sectionIdToRemove.courseIDs.filter((course) => course !== courseId)
 				: null;
 
 		await this.prisma.course.update({
@@ -1049,7 +1046,7 @@ export class ProgramService {
 			});
 			if (current) {
 				// Check if the value is already in the list if its not add it
-				current.objectives.map(value => {
+				current.objectives.map((value) => {
 					if (!newObjectives.includes(value)) {
 						newObjectives.push(value);
 					}
