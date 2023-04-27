@@ -281,22 +281,30 @@ export interface SectionEnrollmentInput {
 
 export interface ModuleInput {
     name: string;
+    prefix?: Nullable<string>;
+    number?: Nullable<number>;
     content?: Nullable<string>;
     collection: string;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
     hours: number;
+    description?: Nullable<string>;
+    instructor?: Nullable<string>;
 }
 
 export interface ModuleFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
     content?: Nullable<string>;
     thread?: Nullable<string>;
     collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
     hours?: Nullable<number>;
+    description?: Nullable<string>;
+    instructor?: Nullable<string>;
 }
 
 export interface ProgressArgs {
@@ -746,6 +754,8 @@ export interface Collection {
 
 export interface Module {
     id: string;
+    prefix?: Nullable<string>;
+    number?: Nullable<number>;
     name: string;
     content?: Nullable<Nullable<Content>[]>;
     threads?: Nullable<Nullable<Thread>[]>;
@@ -756,6 +766,9 @@ export interface Module {
     moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
     hours: number;
+    description?: Nullable<string>;
+    instructor?: Nullable<InstructorProfile>;
+    instructorID?: Nullable<string>;
 }
 
 export interface Content {
@@ -852,6 +865,8 @@ export interface CollectionPath {
 export interface ModulePath {
     id: string;
     name: string;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
     content?: Nullable<Nullable<Content>[]>;
     threads?: Nullable<Nullable<Thread>[]>;
     collections?: Nullable<Nullable<Collection>[]>;
@@ -862,6 +877,9 @@ export interface ModulePath {
     objectives: string[];
     hours: number;
     enrollmentID?: Nullable<string>;
+    description?: Nullable<string>;
+    instructor?: Nullable<InstructorProfile>;
+    instructorID?: Nullable<string>;
 }
 
 export interface Progress {
