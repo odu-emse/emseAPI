@@ -57,6 +57,7 @@ model InstructorProfile {
   background                    String?
   researchInterest              String[] @default([])
   selectedPapersAndPublications String[] @default([])
+  instructedModules             Module[] @relation()
 }
 
 model PlanOfStudy {
@@ -148,15 +149,20 @@ model Collection {
 model Module {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
   name          String
+  prefix        String?      @default("")
+  number        Int?         @default(1)
   collections   Collection[] @relation(fields: [collectionIDs], references: [id])
   collectionIDs String[]     @default([]) @db.ObjectId
   position      Int          @default(0)
   objectives    String[]     @default([])
   hours         Float        @default(0.0)
+  description   String?      @default("")
 
-  content        Content[]
-  quizzes        Quiz[]
-  moduleProgress ModuleProgress[]
+  instructor          InstructorProfile? @relation(fields: [instructorProfileID], references: [id])
+  instructorProfileID String?            @default("") @db.ObjectId
+  content             Content[]
+  quizzes             Quiz[]
+  moduleProgress      ModuleProgress[]
 }
 
 model SectionFeedback {

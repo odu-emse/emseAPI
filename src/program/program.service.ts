@@ -212,12 +212,32 @@ export class ProgramService {
 							}
 						}
 					}
+				},
+				modules: {
+					include: {
+						instructor: {
+							include: {
+								account: true
+							}
+						},
+						moduleProgress: {
+							include: {
+								enrollment: true
+							}
+						}
+					}
 				}
 			}
 		},
 		moduleProgress: {
 			include: {
 				enrollment: true
+			}
+		},
+		instructor: {
+			include: {
+				account: true,
+				instructedModules: true
 			}
 		}
 	});

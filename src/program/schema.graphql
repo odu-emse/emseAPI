@@ -355,6 +355,8 @@ type Module {
 	document ID
 	"""
 	id: ID!
+    prefix: String
+    number: Int
 	"""
 	Module Name
 	"""
@@ -390,10 +392,13 @@ type Module {
 	A list of learning objectives being covered in this Section
 	"""
 	objectives: 	[String!]!
-  """
+    """
 	The number of carnige hours granted for completion of this Section
 	"""
 	hours: Float!
+    description: String
+    instructor: InstructorProfile
+    instructorID: ID
 }
 
 type Content {
@@ -600,6 +605,8 @@ type ModulePath {
     Module Name
     """
     name: String!
+    number: Int
+    prefix: String
     """
     The link/id of the actual content data itself
     """
@@ -636,6 +643,9 @@ type ModulePath {
     """
     hours: Float!
     enrollmentID: ID
+    description: String
+    instructor: InstructorProfile
+    instructorID: ID
 }
 
 input CreateLearningPathInput {
@@ -1010,6 +1020,8 @@ input ModuleInput {
 	Module Name
 	"""
 	name: String!
+    prefix: String
+    number: Int
 	"""
 	The link/id of the actual content data itself
 	"""
@@ -1031,6 +1043,8 @@ input ModuleInput {
 	The number of carnige hours granted for completing this Section
 	"""
 	hours: Float!
+    description: String
+    instructor: ID
 }
 
 input ModuleFields {
@@ -1042,6 +1056,8 @@ input ModuleFields {
 	Module Name
 	"""
 	name: String
+    number: Int
+    prefix: String
 	"""
 	The link/id of the actual content data itself
 	"""
@@ -1066,6 +1082,8 @@ input ModuleFields {
 	The number of carnige hours granted for completing this Section
 	"""
 	hours:	Float
+    description: String
+    instructor: ID
 }
 
 type Mutation {

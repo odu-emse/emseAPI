@@ -44,6 +44,7 @@ Table InstructorProfile {
   background String
   researchInterest String[] [not null]
   selectedPapersAndPublications String[] [not null]
+  instructedModules Module [not null]
 }
 
 Table PlanOfStudy {
@@ -124,11 +125,16 @@ Table Collection {
 Table Module {
   id String [pk]
   name String [not null]
+  prefix String [default: '']
+  number Int [default: 1]
   collections Collection [not null]
   collectionIDs String[] [not null]
   position Int [not null, default: 0]
   objectives String[] [not null]
   hours Float [not null, default: 0]
+  description String [default: '']
+  instructor InstructorProfile
+  instructorProfileID String [default: '']
   content Content [not null]
   quizzes Quiz [not null]
   moduleProgress ModuleProgress [not null]
@@ -384,6 +390,8 @@ Ref: Collection.moduleIDs > Module.id
 Ref: Collection.sectionID > Section.id [delete: Cascade]
 
 Ref: Module.collectionIDs > Collection.id
+
+Ref: Module.instructorProfileID > InstructorProfile.id
 
 Ref: SectionFeedback.studentId > User.id
 
