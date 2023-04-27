@@ -20,7 +20,8 @@ import {
 	NewSection,
 	CollectionFields,
 	CreateLearningPathInput,
-	PathInput
+	PathInput,
+	Module
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -123,6 +124,111 @@ export class ProgramResolver {
 					};
 				})
 		];
+	}
+
+	@Query("latestModuleProgress")
+	async moduleProgress(
+		@Args("planID") planID: string,
+		@Args("sectionID") sectionID: string,
+		@Args("moduleID") moduleID: string
+	) {
+		// we want to find the next collection of modules the student should be working on
+		// we can do this by finding the enrollment for the student in the section they are looking at
+		// and then finding the module progress for that enrollment
+		// we can then filter the module progress to find the latest progress for the module they are looking at
+		// if the module progress is empty, we can assume that the student has not started the module yet
+		// and we can return the first module in the collection
+
+		const enrollment = await this.programService.sectionEnrollment({
+			plan: planID
+		});
+
+		const filteredEnrollment = enrollment.filter((enrollment) => {
+			return enrollment.section.id === sectionID;
+		});
+
+		const modules = filteredEnrollment[0].section.collections.map(
+			(collection) =>
+				collection.modules.map((module) => {
+					return module;
+				})
+		);
+
+		const filteredModules = modules.flat().map((module) => {
+			return module.moduleProgress.filter((progress) => {
+				return progress.enrollment.id === filteredEnrollment[0].id;
+			});
+		});
+
+		const latestModuleProgress = filteredModules
+			.flat()
+			.filter((progress) => progress.moduleID === moduleID)
+			.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+
+		return latestModuleProgress;
+	}
+
+	@Query("modulesFromLearningPath")
+	async modulesFromLearningPath(@Args("planID") planID: string) {
+		// find enrollments for the student from planID
+		// find the learning path for the plan
+		// filter out inactive paths
+		// filter out modules with a completed progress status
+		// return the incomplete list of modules that match the student's learning path
+
+		const enrollment = await this.programService.sectionEnrollment({
+			plan: planID
+		});
+
+		const learningPath = await this.programService.learningPath(planID);
+
+		const filteredLearningPath = learningPath[0].paths.filter((path) => {
+			return path.status === "LIVE";
+		});
+
+		if (filteredLearningPath.length === 0) {
+			return [];
+		}
+
+		const modules: Module[] = filteredLearningPath[0].course.sections
+			.map((section) => {
+				return section.collections.map((collection) => {
+					return collection.modules.map((module) => {
+						return module;
+					});
+				});
+			})
+			.flat()
+			.flat();
+
+		const nonDuplicateModules = modules.filter((module, index, self) => {
+			return index === self.findIndex((m) => m.id === module.id);
+		});
+
+		const filteredModules = nonDuplicateModules.map((module) => {
+			// if there is no progress for the module, return the module
+			if (
+				module.moduleProgress?.length === 0 ||
+				module.moduleProgress === null ||
+				typeof module.moduleProgress === "undefined"
+			)
+				return module;
+			else {
+				// if there is progress for the module, filter out the progresses made by other students
+				// and return the module if there is no progress for the student
+				const filteredProgress = module.moduleProgress.filter((progress) => {
+					if (!progress) return false;
+					else
+						return (
+							progress.enrollment.id === enrollment[0].id || !progress.completed
+						);
+				});
+				if (filteredProgress.length === 0) return module;
+				else return null;
+			}
+		});
+
+		return filteredModules.filter((module) => module !== null);
 	}
 
 	@Query("collection")

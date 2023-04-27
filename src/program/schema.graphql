@@ -489,6 +489,10 @@ type Query {
     Retrieve a sepcific learning path based on the user's plan of study ID
     """
     learningPath(planID: ID!, pathID: ID): [LearningPath!]!
+
+    latestModuleProgress(planID: ID!, sectionID: ID!, moduleID: ID!): ModuleProgress
+
+    modulesFromLearningPath(planID: ID!): [Module!]
 }
 
 type SimpleLearningPath {
