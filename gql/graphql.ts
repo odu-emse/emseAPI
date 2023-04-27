@@ -590,6 +590,8 @@ export interface IQuery {
     module(input?: Nullable<ModuleFields>): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     learningPath(planID: string, pathID?: Nullable<string>): LearningPath[] | Promise<LearningPath[]>;
+    latestModuleProgress(planID: string, sectionID: string, moduleID: string): Nullable<ModuleProgress> | Promise<Nullable<ModuleProgress>>;
+    modulesFromLearningPath(planID: string): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
     quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
