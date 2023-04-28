@@ -287,8 +287,19 @@ export class ProgramResolver {
 
 	// // Add a Course to the db with a course name
 	@Mutation("addCourse")
-	async createCourse(@Args("input") args: CourseInput) {
-		return await this.programService.addCourse(args);
+	async createCourse(
+		@Args("input") args: CourseInput[],
+		@Args("many") many: boolean = false
+	) {
+		if (many && args.length > 1) {
+			return this.programService.addManyCourses(args);
+		} else if (args.length === 1) {
+			return await this.programService.addCourse(args[0]);
+		} else {
+			throw new Error(
+				"Input must be an array of CourseInput objects or a single CourseInput object"
+			);
+		}
 	}
 
 	// Update a course name

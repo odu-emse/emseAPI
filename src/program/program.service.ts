@@ -706,6 +706,25 @@ export class ProgramService {
 		});
 	}
 
+	async addManyCourses(data: CourseInput[]) {
+		const manyData = Prisma.validator<Prisma.CourseCreateManyArgs>()({
+			data: data.map((course) => {
+				return {
+					name: course.name,
+					...(course.number && { number: course.number }),
+					...(course.prefix && { prefix: course.prefix }),
+					...(course.carnegieHours && {
+						carnegieHours: course.carnegieHours
+					}),
+					...(course.required && { required: course.required })
+				};
+			})
+		});
+		return this.prisma.course.createMany({
+			data: manyData.data
+		});
+	}
+
 	async updateCourse(id: string, data: CourseInput) {
 		const { name, required, carnegieHours } = data;
 		return this.prisma.course.update({
