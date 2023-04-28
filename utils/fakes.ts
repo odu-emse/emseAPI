@@ -32,7 +32,11 @@ export function createRandomUser(): User {
 		isActive: faker.datatype.boolean(),
 		createdAt: faker.date.past(),
 		middleName: faker.name.middleName(),
-		watchedThreadIDs: [faker.database.mongodbObjectId()]
+		watchedThreadIDs: [faker.database.mongodbObjectId()],
+		biography: faker.lorem.lines(1),
+		phoneNumber: faker.phone.phoneNumber(),
+		upvotedThreadIDs: [faker.database.mongodbObjectId()],
+		groupMembershipIDs: [faker.database.mongodbObjectId()]
 	};
 }
 
@@ -44,13 +48,10 @@ export function createRandomInstructorProfile(
 		accountID: userAccountID ? userAccountID : faker.database.mongodbObjectId(),
 		background: faker.lorem.lines(1),
 		contactPolicy: faker.lorem.lines(1),
-		officeHours: faker.lorem.lines(1),
+		officeHours: [faker.lorem.lines(1)],
 		officeLocation: faker.lorem.lines(1),
-		personalWebsite: faker.lorem.lines(1),
-		philosophy: faker.lorem.lines(1),
-		phone: faker.lorem.lines(1),
-		researchInterest: faker.lorem.lines(1),
-		selectedPapersAndPublications: faker.lorem.lines(1),
+		researchInterest: [faker.lorem.lines(1)],
+		selectedPapersAndPublications: [faker.lorem.lines(1)],
 		title: faker.lorem.lines(1)
 	};
 }
@@ -78,7 +79,11 @@ export function createRandomCourse(): Course {
 	return {
 		id: faker.database.mongodbObjectId(),
 		sectionIDs: [faker.database.mongodbObjectId()],
-		name: faker.lorem.words(3)
+		name: faker.lorem.words(3),
+		carnegieHours: faker.datatype.number(),
+		number: faker.datatype.number(),
+		required: faker.datatype.boolean(),
+		prefix: faker.lorem.words(3)
 	};
 }
 
@@ -104,12 +109,17 @@ export function createRandomSection(): Section {
 export function createRandomModule(collectionID?: string): Module {
 	return {
 		id: faker.database.mongodbObjectId(),
-		collectionID: collectionID
-			? collectionID
-			: faker.database.mongodbObjectId(),
+		collectionIDs: collectionID
+			? [collectionID]
+			: [faker.database.mongodbObjectId()],
 		name: faker.lorem.words(3),
 		position: faker.datatype.number(),
-		transcript: faker.lorem.lines(5)
+		number: faker.datatype.number(),
+		description: faker.lorem.lines(1),
+		objectives: [faker.lorem.words(3)],
+		prefix: faker.lorem.words(3),
+		hours: faker.datatype.number(),
+		instructorProfileID: faker.database.mongodbObjectId()
 	};
 }
 
@@ -120,7 +130,8 @@ export function createRandomCollection(sectionID?: string): Collection {
 		sectionID: sectionID ? sectionID : faker.database.mongodbObjectId(),
 		name: faker.lorem.words(3),
 		position: faker.datatype.number(),
-		updatedAt: faker.date.past()
+		updatedAt: faker.date.past(),
+		moduleIDs: [faker.database.mongodbObjectId()]
 	};
 }
 
@@ -144,7 +155,10 @@ export function createRandomAssignment(sectionID?: string): Assignment {
 		id: faker.database.mongodbObjectId(),
 		sectionId: sectionID ? sectionID : faker.database.mongodbObjectId(),
 		name: faker.lorem.words(3),
-		updatedAt: faker.date.past()
+		updatedAt: faker.date.past(),
+		contentURL: faker.internet.url(),
+		contentType: faker.helpers.arrayElement(["QUIZ", "TEXT", "VIDEO"]),
+		acceptedTypes: faker.helpers.arrayElement(["DOC", "DOCX", "PDF"])
 	};
 }
 
@@ -162,7 +176,9 @@ export function createRandomAssignmentResult(
 		studentId: studentID ? studentID : faker.database.mongodbObjectId(),
 		result: faker.datatype.number(),
 		feedback: faker.lorem.lines(1),
-		submittedAt: faker.date.past()
+		submittedAt: faker.date.past(),
+		fileType: faker.helpers.arrayElement(["DOC", "DOCX", "PDF"]),
+		submissionURL: faker.internet.url()
 	};
 }
 
@@ -175,18 +191,16 @@ export function createRandomThread(
 	return {
 		id: faker.database.mongodbObjectId(),
 		authorID: authorID ? authorID : faker.database.mongodbObjectId(),
-		parentModuleID: parentModuleID
-			? parentModuleID
-			: faker.database.mongodbObjectId(),
 		parentThreadID: parentThreadID
 			? parentThreadID
 			: faker.database.mongodbObjectId(),
 		watcherID: watcherID ? [watcherID] : [faker.database.mongodbObjectId()],
 		title: faker.lorem.words(3),
 		body: faker.lorem.lines(1),
-		upvotes: faker.datatype.number(),
 		createdAt: faker.date.past(),
-		updatedAt: faker.date.past()
+		updatedAt: faker.date.past(),
+		upvoteUserIDs: [faker.database.mongodbObjectId()],
+		topics: [faker.lorem.words(3)]
 	};
 }
 
@@ -194,13 +208,14 @@ export function createRandomContent(parentID?: string): Content {
 	return {
 		id: faker.database.mongodbObjectId(),
 		parentID: parentID ? parentID : faker.database.mongodbObjectId(),
-		type: faker.helpers.arrayElement(["TEXT", "IMAGE", "VIDEO", "AUDIO"]),
-		link: faker.internet.url()
+		type: faker.helpers.arrayElement(["TEXT", "VIDEO", "QUIZ"]),
+		link: faker.internet.url(),
+		primary: faker.datatype.boolean()
 	};
 }
 
 export function createRandomQuiz(parentID?: string): Quiz {
-	const questions = faker.datatype.number({min: 5, max:15})
+	const questions = faker.datatype.number({ min: 5, max: 15 });
 	return {
 		id: faker.database.mongodbObjectId(),
 		totalPoints: questions,
@@ -210,18 +225,19 @@ export function createRandomQuiz(parentID?: string): Quiz {
 		numQuestions: questions,
 		minScore: faker.datatype.number(),
 		parentModuleID: parentID ? parentID : faker.database.mongodbObjectId()
-	}
+	};
 }
 
 export function createRandomQuestion(quizID?: string): Question {
 	return {
 		id: faker.database.mongodbObjectId(),
 		number: faker.datatype.number(),
-		variant: faker.datatype.number({min: 1, max: 5}),
-		parentID: quizID ?quizID : faker.database.mongodbObjectId(),
+		variant: faker.datatype.number({ min: 1, max: 5 }),
+		parentID: quizID ? quizID : faker.database.mongodbObjectId(),
 		text: faker.lorem.words(5),
 		points: faker.datatype.number(),
-	}
+		instanceIDs: [faker.database.mongodbObjectId()]
+	};
 }
 
 export function createRandomAnswer(questionID?: string): Answer {
@@ -232,7 +248,7 @@ export function createRandomAnswer(questionID?: string): Answer {
 		weight: faker.datatype.number(),
 		index: faker.datatype.string(1),
 		parentQuestionID: questionID ? questionID : faker.database.mongodbObjectId()
-	}
+	};
 }
 
 export function createRandomProgress(

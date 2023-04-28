@@ -58,7 +58,8 @@ export const createModule = async (
 ) => {
 	const data: ModuleInput = {
 		name: config.name,
-		collection: config.collectionID
+		collection: config.collectionIDs[0],
+		hours: config.hours
 	};
 	const module = await resolver.createModule({ ...data });
 	if (data) return module;
