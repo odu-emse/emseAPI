@@ -98,6 +98,8 @@ model Token {
 model Course {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String
+  number        Int?      @default(0)
+  prefix        String?   @default("")
   required      Boolean?  @default(false)
   carnegieHours Int?      @default(135)
   sectionIDs    String[]  @default([]) @db.ObjectId
