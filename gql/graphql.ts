@@ -164,6 +164,8 @@ export interface SectionFields {
 export interface CourseFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
     section?: Nullable<string>;
     required?: Nullable<boolean>;
     carnegieHours?: Nullable<number>;
@@ -248,9 +250,11 @@ export interface AssignmentInput {
 
 export interface CourseInput {
     name: string;
-    section: string;
-    required: boolean;
-    carnegieHours: number;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
+    section?: Nullable<string>;
+    required?: Nullable<boolean>;
+    carnegieHours?: Nullable<number>;
 }
 
 export interface SectionFeedbackInput {
@@ -519,7 +523,7 @@ export interface IMutation {
     addSection(input?: Nullable<NewSection>): Section | Promise<Section>;
     updateSection(input?: Nullable<UpdateSection>): Nullable<Section> | Promise<Nullable<Section>>;
     deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
-    addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
+    addCourse(input?: Nullable<CourseInput[]>, many?: Nullable<boolean>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
     addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
     addObjectives(id: string, input?: Nullable<string[]>): Nullable<Section> | Promise<Nullable<Section>>;
@@ -714,6 +718,8 @@ export interface SectionFeedback {
 export interface Course {
     id: string;
     name: string;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
     sectionIDs?: Nullable<Nullable<string>[]>;
     required: boolean;
     carnegieHours: number;

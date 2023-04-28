@@ -203,6 +203,8 @@ type Course {
 	Name of the course
 	"""
 	name: String!
+    number: Int
+    prefix: String
 	"""
 	Sections in the course
 	"""
@@ -767,6 +769,8 @@ input SectionFields {
 input CourseFields {
 	id: ID
 	name: String
+    number: Int
+    prefix: String
 	section: ID
 	required: Boolean
 	carnegieHours: Int
@@ -933,18 +937,20 @@ input CourseInput {
 	The name of the given Course
 	"""
 	name: String!
+    number: Int
+    prefix: String
 	"""
 	Additional section to be related to the course
 	"""
-	section: ID!
+	section: ID
 	"""
 	The boolean attribute to decide weather the course is part of core courses or electives
 	"""
-	required: Boolean!
+	required: Boolean
 	"""
 	The Carnegie Hours of the Course
 	"""
-	carnegieHours: Int!
+	carnegieHours: Int
 }
 
 input SectionFeedbackInput {
@@ -1105,9 +1111,9 @@ type Mutation {
     """
     deleteCourse(id: ID!): Course
     """
-    adds Courses
+    adds Courses to the database. If many is true, it will add all the courses in the array and if false, the input will still need to be an array but with only one element
     """
-    addCourse(input: CourseInput): Course!
+    addCourse(input: [CourseInput!], many: Boolean): Course!
     """
     Updates Courses
     """
