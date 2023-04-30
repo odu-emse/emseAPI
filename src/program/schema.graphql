@@ -500,6 +500,18 @@ type Query {
     latestModuleProgress(planID: ID!, sectionID: ID!, moduleID: ID!): ModuleProgress
 
     modulesFromLearningPath(planID: ID!): [Module!]
+
+    moduleFlowFromLearningPath(planID: ID!, moduleID: ID!): ModuleFlow
+}
+
+type ModuleFlow {
+    previousModule: Module
+    previousCollection: Collection
+    nextModule: Module
+    nextCollection: Collection
+    currentModule: Module
+    currentCollection: Collection
+    currentSection: Section
 }
 
 type SimpleLearningPath {

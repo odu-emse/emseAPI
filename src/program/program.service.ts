@@ -22,7 +22,9 @@ import {
 	CollectionFields,
 	CreateLearningPathInput,
 	PathInput,
-	Course
+	Course,
+	LearningPath,
+	Section
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
@@ -1242,6 +1244,7 @@ export class ProgramService {
 
 		const courses: Array<string> = [];
 		const modules: Array<string> = [];
+		const sections: Array<string> = [];
 
 		lps.map((lp) => {
 			lp.paths.map((path) => {
@@ -1252,12 +1255,14 @@ export class ProgramService {
 							modules.push(module.id);
 						});
 					});
+					sections.push(section.id);
 				});
 			});
 		});
 
 		const courseIDs = [...new Set(courses)];
 		const moduleIDs = [...new Set(modules)];
+		const sectionIDs = [...new Set(sections)];
 
 		const coursesData = await this.prisma.course.findMany({
 			where: {
@@ -1277,8 +1282,18 @@ export class ProgramService {
 			include: this.moduleInclude
 		});
 
+		const sectionsData = await this.prisma.section.findMany({
+			where: {
+				id: {
+					in: sectionIDs
+				}
+			},
+			include: this.sectionInclude
+		});
+
 		const courseMap = new Map();
 		const moduleMap = new Map();
+		const sectionMap = new Map();
 
 		coursesData.map((course) => {
 			courseMap.set(course.id, course);
@@ -1286,6 +1301,10 @@ export class ProgramService {
 
 		modulesData.map((module) => {
 			moduleMap.set(module.id, module);
+		});
+
+		sectionsData.map((section) => {
+			sectionMap.set(section.id, section);
 		});
 
 		const paths = lps.map((lp) => {
@@ -1296,8 +1315,10 @@ export class ProgramService {
 					course: {
 						...course,
 						sections: path.course.sections.map((section) => {
+							const sect = sectionMap.get(section.id) as Section;
 							return {
-								...section,
+								...sect,
+								name: sect.sectionName,
 								collections: section.collections.map((collection) => {
 									return {
 										...collection,
@@ -1319,7 +1340,7 @@ export class ProgramService {
 			};
 		});
 
-		return paths;
+		return paths as Array<LearningPath>;
 	}
 
 	async createLearningPath(planID: string, input: CreateLearningPathInput) {
