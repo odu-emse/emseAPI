@@ -830,9 +830,14 @@ export interface SimpleSection {
 }
 
 export interface SimpleCollection {
+    modules: SimpleModule[];
     id: string;
     name: string;
-    modules: SimpleModule[];
+    createdAt: Date;
+    updatedAt: Date;
+    section: Section;
+    sectionID: string;
+    position?: Nullable<number>;
 }
 
 export interface SimpleModule {
@@ -862,15 +867,33 @@ export interface Path {
 export interface CoursePath {
     id: string;
     name: string;
+    prefix?: Nullable<string>;
+    number?: Nullable<number>;
     required: boolean;
     carnegieHours: number;
     sections: SectionPath[];
 }
 
 export interface SectionPath {
-    id: string;
     name: string;
     collections: CollectionPath[];
+    id: string;
+    sectionNumber: number;
+    sectionName: string;
+    description: string;
+    duration: number;
+    intro: string;
+    numSlides: number;
+    keywords: string[];
+    objectives: string[];
+    createdAt: Date;
+    updatedAt: Date;
+    assignments: Assignment[];
+    members: SectionEnrollment[];
+    feedback: SectionFeedback[];
+    parentSections: Section[];
+    subSections: Section[];
+    courseIDs: string[];
 }
 
 export interface CollectionPath {

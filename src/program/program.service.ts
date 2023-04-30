@@ -24,7 +24,8 @@ import {
 	PathInput,
 	Course,
 	LearningPath,
-	Section
+	Section,
+	Collection
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
@@ -1245,6 +1246,7 @@ export class ProgramService {
 		const courses: Array<string> = [];
 		const modules: Array<string> = [];
 		const sections: Array<string> = [];
+		const collections: Array<string> = [];
 
 		lps.map((lp) => {
 			lp.paths.map((path) => {
@@ -1254,6 +1256,7 @@ export class ProgramService {
 						collection.modules.map((module) => {
 							modules.push(module.id);
 						});
+						collections.push(collection.id);
 					});
 					sections.push(section.id);
 				});
@@ -1263,6 +1266,7 @@ export class ProgramService {
 		const courseIDs = [...new Set(courses)];
 		const moduleIDs = [...new Set(modules)];
 		const sectionIDs = [...new Set(sections)];
+		const collectionIDs = [...new Set(collections)];
 
 		const coursesData = await this.prisma.course.findMany({
 			where: {
@@ -1291,9 +1295,18 @@ export class ProgramService {
 			include: this.sectionInclude
 		});
 
+		const collectionsData = await this.prisma.collection.findMany({
+			where: {
+				id: {
+					in: collectionIDs
+				}
+			}
+		});
+
 		const courseMap = new Map();
 		const moduleMap = new Map();
 		const sectionMap = new Map();
+		const collectionMap = new Map();
 
 		coursesData.map((course) => {
 			courseMap.set(course.id, course);
@@ -1305,6 +1318,10 @@ export class ProgramService {
 
 		sectionsData.map((section) => {
 			sectionMap.set(section.id, section);
+		});
+
+		collectionsData.map((collection) => {
+			collectionMap.set(collection.id, collection);
 		});
 
 		const paths = lps.map((lp) => {
@@ -1320,8 +1337,9 @@ export class ProgramService {
 								...sect,
 								name: sect.sectionName,
 								collections: section.collections.map((collection) => {
+									const col = collectionMap.get(collection.id) as Collection;
 									return {
-										...collection,
+										...col,
 										modules: collection.modules.map((module) => {
 											return {
 												...moduleMap.get(module.id)
