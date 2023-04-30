@@ -604,6 +604,7 @@ export interface IQuery {
     learningPath(planID: string, pathID?: Nullable<string>): LearningPath[] | Promise<LearningPath[]>;
     latestModuleProgress(planID: string, sectionID: string, moduleID: string): Nullable<ModuleProgress> | Promise<Nullable<ModuleProgress>>;
     modulesFromLearningPath(planID: string): Nullable<Module[]> | Promise<Nullable<Module[]>>;
+    moduleFlowFromLearningPath(planID: string, moduleID: string): Nullable<ModuleFlow> | Promise<Nullable<ModuleFlow>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
     quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
@@ -787,6 +788,16 @@ export interface Content {
 
 export interface Error {
     message?: Nullable<string>;
+}
+
+export interface ModuleFlow {
+    previousModule?: Nullable<Module>;
+    previousCollection?: Nullable<Collection>;
+    nextModule?: Nullable<Module>;
+    nextCollection?: Nullable<Collection>;
+    currentModule?: Nullable<Module>;
+    currentCollection?: Nullable<Collection>;
+    currentSection?: Nullable<Section>;
 }
 
 export interface SimpleLearningPath {

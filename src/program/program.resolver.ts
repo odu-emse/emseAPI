@@ -21,7 +21,8 @@ import {
 	CollectionFields,
 	CreateLearningPathInput,
 	PathInput,
-	Module
+	Module,
+	ModuleFlow
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -218,10 +219,8 @@ export class ProgramResolver {
 				// and return the module if there is no progress for the student
 				const filteredProgress = module.moduleProgress.filter((progress) => {
 					if (!progress) return false;
-					else
-						return (
-							progress.enrollment.id === enrollment[0].id || !progress.completed
-						);
+					else if (!progress.completed) return false;
+					else return progress.enrollment.id !== enrollment[0].id;
 				});
 				if (filteredProgress.length === 0) return module;
 				else return null;
@@ -229,6 +228,103 @@ export class ProgramResolver {
 		});
 
 		return filteredModules.filter((module) => module !== null);
+	}
+
+	@Query("moduleFlowFromLearningPath")
+	async moduleFlowFromLearningPath(
+		@Args("planID") planID: string,
+		@Args("moduleID") moduleID: string
+	) {
+		// get lp from plan
+		const learningPath = await this.programService.learningPath(planID);
+		if (!learningPath)
+			throw new Error("No learning paths found for inputted user");
+
+		// filter out non-live paths
+		const filteredLearningPath = learningPath[0].paths.filter((path) => {
+			return path.status === "LIVE";
+		});
+		if (filteredLearningPath.length === 0) return [];
+
+		const sections = filteredLearningPath[0].course.sections;
+
+		// find the collection that the requested module is in relative to the learning path
+		const collection = sections
+			.map((section) => {
+				return section.collections.find((collection) => {
+					return collection.modules.find((module) => {
+						return module.id === moduleID;
+					});
+				});
+			})
+			.flat()
+			.flat();
+
+		const filteredCollection = collection.filter(
+			(collection) => typeof collection !== "undefined"
+		)[0];
+
+		if (typeof filteredCollection === "undefined") return [];
+
+		const currentModuleIndex = filteredCollection.modules.findIndex(
+			(module) => module.id === moduleID
+		);
+
+		const currentSectionIndex = sections.findIndex((section) => {
+			return section.collections.find((collection) => {
+				return collection.id === filteredCollection.id;
+			});
+		});
+
+		let nextCollection = filteredCollection;
+
+		if (currentModuleIndex + 1 === filteredCollection.modules.length) {
+			// get the array of collections in the sections
+			// find the current collection in the array
+			// add 1 to the index to get the next collection
+			// get the first module in the next collection
+
+			const nextSection = sections[currentSectionIndex + 1];
+
+			nextCollection = nextSection?.collections[0];
+
+			// student has reached the end of the section
+			if (
+				typeof nextSection === "undefined" ||
+				typeof nextCollection === "undefined"
+			)
+				return {
+					currentModule: filteredCollection.modules[currentModuleIndex],
+					nextModule: null,
+					currentCollection: filteredCollection,
+					nextCollection: null,
+					previousModule: filteredCollection.modules[currentModuleIndex - 1],
+					previousCollection: filteredCollection,
+					currentSection: sections[currentSectionIndex]
+				};
+
+			return {
+				currentModule: filteredCollection.modules[currentModuleIndex],
+				nextModule: nextCollection.modules[0],
+				currentCollection: filteredCollection,
+				nextCollection: nextCollection,
+				previousModule: filteredCollection.modules[currentModuleIndex - 1],
+				previousCollection: filteredCollection,
+				currentSection: sections[currentSectionIndex]
+			};
+		}
+
+		const nextModule = filteredCollection.modules[currentModuleIndex + 1];
+
+		return {
+			currentModule: filteredCollection.modules[currentModuleIndex],
+			nextModule: nextModule,
+			currentCollection: filteredCollection,
+			nextCollection: filteredCollection,
+			previousModule: filteredCollection.modules[currentModuleIndex - 1],
+			previousCollection: filteredCollection,
+			currentSection: sections[currentSectionIndex]
+		};
 	}
 
 	@Query("collection")
