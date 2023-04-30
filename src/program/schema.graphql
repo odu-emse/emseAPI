@@ -544,9 +544,43 @@ type SimpleSection {
 }
 
 type SimpleCollection {
-    id: ID!
-    name: String!
+    """
+    List of modules in the collection
+    """
     modules: [SimpleModule!]!
+
+"""
+id of the collection
+"""
+id: ID!
+
+"""
+Name of the collection
+"""
+name: String!
+
+"""
+Date and Time of the collection created at
+"""
+createdAt: Date!
+
+"""
+Date and Time of the collection updated at
+"""
+updatedAt: Date!
+
+"""
+The Section that this collection belongs to
+"""
+section: Section!
+"""
+The Section's unique ID that this collection belongs to
+"""
+sectionID: ID!
+"""
+The position index of the collection in a Section
+"""
+position: Int
 }
 
 type SimpleModule {
@@ -587,6 +621,9 @@ type CoursePath {
     Name of the course
     """
     name: String!
+	prefix: String
+	number: Int
+
     """
     Boolean value to check if the course is required/core or an elective
     """
@@ -599,9 +636,94 @@ type CoursePath {
 }
 
 type SectionPath {
-    id:          ID!
     name: String!
+    """
+    A list of collections that have this Section's materials
+    """
     collections: [CollectionPath!]!
+"""
+Section Id
+"""
+id: ID!
+
+"""
+Number of the Section
+"""
+sectionNumber: Int!
+
+"""
+Name of hte Section
+"""
+sectionName: String!
+
+"""
+Description of the Section
+"""
+description: String!
+
+"""
+Duration of the Section
+"""
+duration: Float!
+
+"""
+Introduction of the Section
+"""
+intro: String!
+
+"""
+No of slides in the Section
+"""
+numSlides: Int!
+
+"""
+Keywords in the Sections
+"""
+keywords: [String!]!
+
+"""
+objectives in the Sections
+"""
+objectives: [String!]!
+
+"""
+Date and Time of the Section Created at
+"""
+createdAt: Date!
+
+"""
+Date and Time of the Section Updated at
+"""
+updatedAt: Date!
+
+"""
+Assignement in the Section
+"""
+assignments: [Assignment!]!
+
+"""
+Memebers enrolled in the Section
+"""
+members: [SectionEnrollment!]!
+
+"""
+Feedback of the Section
+"""
+feedback: [SectionFeedback!]!
+
+"""
+Parent Sections of the Section
+"""
+parentSections: [Section!]!
+
+"""
+Child Sections in the Section
+"""
+subSections: [Section!]!
+"""
+courseIDs set
+"""
+courseIDs: [ID!]!
 }
 
 type CollectionPath {
