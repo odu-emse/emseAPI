@@ -57,6 +57,7 @@ model InstructorProfile {
   background                    String?
   researchInterest              String[] @default([])
   selectedPapersAndPublications String[] @default([])
+  instructedModules             Module[] @relation()
 }
 
 model PlanOfStudy {
@@ -69,6 +70,7 @@ model PlanOfStudy {
   sections          SectionEnrollment[]
   assignmentResults AssignmentResult[]
   quizResults       QuizResult[]
+  learningPaths     LearningPath[]
 }
 
 model Social {
@@ -96,6 +98,8 @@ model Token {
 model Course {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String
+  number        Int?      @default(0)
+  prefix        String?   @default("")
   required      Boolean?  @default(false)
   carnegieHours Int?      @default(135)
   sectionIDs    String[]  @default([]) @db.ObjectId
@@ -138,23 +142,29 @@ model Collection {
   position  Int      @default(0)
 
   // Relation fields
-  modules   Module[]
+  modules   Module[] @relation(fields: [moduleIDs], references: [id])
+  moduleIDs String[] @default([]) @db.ObjectId
   section   Section  @relation(name: "collections", fields: [sectionID], references: [id], onDelete: Cascade)
   sectionID String   @db.ObjectId
 }
 
 model Module {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  collection   Collection @relation(fields: [collectionID], references: [id], onDelete: Cascade)
-  collectionID String     @db.ObjectId
-  position     Int        @default(0)
-  objectives   String[]   @default([])
-  hours        Float      @default(0.0)
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  prefix        String?      @default("")
+  number        Int?         @default(1)
+  collections   Collection[] @relation(fields: [collectionIDs], references: [id])
+  collectionIDs String[]     @default([]) @db.ObjectId
+  position      Int          @default(0)
+  objectives    String[]     @default([])
+  hours         Float        @default(0.0)
+  description   String?      @default("")
 
-  content        Content[]
-  quizzes        Quiz[]
-  moduleProgress ModuleProgress[]
+  instructor          InstructorProfile? @relation(fields: [instructorProfileID], references: [id])
+  instructorProfileID String?            @default("") @db.ObjectId
+  content             Content[]
+  quizzes             Quiz[]
+  moduleProgress      ModuleProgress[]
 }
 
 model SectionFeedback {
@@ -350,6 +360,48 @@ model QuizResult {
   quizInstance QuizInstance?
 }
 
+model LearningPath {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime    @default(now())
+  plan      PlanOfStudy @relation(fields: [planID], references: [id], onDelete: Cascade)
+  planID    String      @db.ObjectId
+  paths     Path[]
+
+  @@unique([planID])
+}
+
+type Path {
+  id               String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @default(now())
+  course           CoursePath
+  status           PathStatus? @default(DRAFT)
+  hoursSatisfies   Float?      @default(0.0)
+  learningOutcomes String[]    @default([])
+}
+
+type CoursePath {
+  id       String
+  sections SectionPath[]
+}
+
+type SectionPath {
+  id          String
+  name        String
+  collections CollectionPath[]
+}
+
+type CollectionPath {
+  id      String
+  name    String
+  modules ModulePath[]
+}
+
+type ModulePath {
+  id           String
+  enrollmentID String
+}
+
 enum UserRole {
   STUDENT
   TEACHER
@@ -378,6 +430,11 @@ enum FileType {
   PDF
   TTT
   TXT
+}
+
+enum PathStatus {
+  DRAFT
+  LIVE
 }
 
 // Dont need this anymore since we arent doing API Tokens

@@ -37,6 +37,11 @@ export enum FileType {
     TXT = "TXT"
 }
 
+export enum PathStatus {
+    DRAFT = "DRAFT",
+    LIVE = "LIVE"
+}
+
 export interface IThreadCreateInput {
     title?: Nullable<string>;
     body: string;
@@ -71,6 +76,40 @@ export interface PlanFields {
     section?: Nullable<string>;
     assignmentResult?: Nullable<string>;
     sectionsLeft?: Nullable<string>;
+}
+
+export interface CreateLearningPathInput {
+    path?: Nullable<PathInput>;
+    paths?: Nullable<PathInput[]>;
+}
+
+export interface PathInput {
+    course: CoursePathInput;
+    status?: Nullable<PathStatus>;
+    hoursSatisfies?: Nullable<number>;
+    learningOutcomes?: Nullable<string[]>;
+}
+
+export interface CoursePathInput {
+    id: string;
+    sections: SectionPathInput[];
+}
+
+export interface SectionPathInput {
+    id: string;
+    name: string;
+    collections: CollectionPathInput[];
+}
+
+export interface CollectionPathInput {
+    id: string;
+    name: string;
+    modules: ModulePathInput[];
+}
+
+export interface ModulePathInput {
+    id: string;
+    enrollmentID?: Nullable<string>;
 }
 
 export interface CreateContentArgs {
@@ -125,6 +164,8 @@ export interface SectionFields {
 export interface CourseFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
     section?: Nullable<string>;
     required?: Nullable<boolean>;
     carnegieHours?: Nullable<number>;
@@ -209,9 +250,11 @@ export interface AssignmentInput {
 
 export interface CourseInput {
     name: string;
-    section: string;
-    required: boolean;
-    carnegieHours: number;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
+    section?: Nullable<string>;
+    required?: Nullable<boolean>;
+    carnegieHours?: Nullable<number>;
 }
 
 export interface SectionFeedbackInput {
@@ -242,22 +285,30 @@ export interface SectionEnrollmentInput {
 
 export interface ModuleInput {
     name: string;
+    prefix?: Nullable<string>;
+    number?: Nullable<number>;
     content?: Nullable<string>;
     collection: string;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
     hours: number;
+    description?: Nullable<string>;
+    instructor?: Nullable<string>;
 }
 
 export interface ModuleFields {
     id?: Nullable<string>;
     name?: Nullable<string>;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
     content?: Nullable<string>;
     thread?: Nullable<string>;
     collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
     hours?: Nullable<number>;
+    description?: Nullable<string>;
+    instructor?: Nullable<string>;
 }
 
 export interface ProgressArgs {
@@ -472,7 +523,7 @@ export interface IMutation {
     addSection(input?: Nullable<NewSection>): Section | Promise<Section>;
     updateSection(input?: Nullable<UpdateSection>): Nullable<Section> | Promise<Nullable<Section>>;
     deleteCourse(id: string): Nullable<Course> | Promise<Nullable<Course>>;
-    addCourse(input?: Nullable<CourseInput>): Course | Promise<Course>;
+    addCourse(input?: Nullable<CourseInput[]>, many?: Nullable<boolean>): Course | Promise<Course>;
     updateCourse(id: string, input?: Nullable<CourseInput>): Nullable<Course> | Promise<Nullable<Course>>;
     addAssignment(input?: Nullable<NewAssignment>): Assignment | Promise<Assignment>;
     addObjectives(id: string, input?: Nullable<string[]>): Nullable<Section> | Promise<Nullable<Section>>;
@@ -497,6 +548,10 @@ export interface IMutation {
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
+    createLearningPath(planID: string, input: CreateLearningPathInput): LearningPath | Promise<LearningPath>;
+    createPath(planID: string, input: PathInput): SimpleLearningPath | Promise<SimpleLearningPath>;
+    updateLearningPath(planID: string, pathID: string, input: PathInput): LearningPath | Promise<LearningPath>;
+    deleteLearningPath(planID: string, pathID: string): LearningPath | Promise<LearningPath>;
     createProgress(input: ProgressArgs, enrollmentID: string): Progress | Promise<Progress>;
     waiveSection(args: ProgressWaiveArgs): Progress | Promise<Progress>;
     deleteProgress(id: string): boolean | Promise<boolean>;
@@ -542,10 +597,14 @@ export interface IQuery {
     sectionFeedback(input: ModFeedbackFields): Nullable<SectionFeedback[]> | Promise<Nullable<SectionFeedback[]>>;
     assignmentResult(input: AssignmentResFields): Nullable<AssignmentResult[]> | Promise<Nullable<AssignmentResult[]>>;
     sectionEnrollment(input: ModEnrollmentFields): Nullable<SectionEnrollment[]> | Promise<Nullable<SectionEnrollment[]>>;
-    modulesBySectionEnrollment(planID: string, SectionID: string): Nullable<Module[]> | Promise<Nullable<Module[]>>;
+    modulesBySectionEnrollment(planID: string, sectionID: string): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     collection(input?: Nullable<CollectionFields>): Nullable<Nullable<Collection>[]> | Promise<Nullable<Nullable<Collection>[]>>;
     module(input?: Nullable<ModuleFields>): Nullable<Module[]> | Promise<Nullable<Module[]>>;
     content(input?: Nullable<ContentFields>): Nullable<Content[]> | Promise<Nullable<Content[]>>;
+    learningPath(planID: string, pathID?: Nullable<string>): LearningPath[] | Promise<LearningPath[]>;
+    latestModuleProgress(planID: string, sectionID: string, moduleID: string): Nullable<ModuleProgress> | Promise<Nullable<ModuleProgress>>;
+    modulesFromLearningPath(planID: string): Nullable<Module[]> | Promise<Nullable<Module[]>>;
+    moduleFlowFromLearningPath(planID: string, moduleID: string): Nullable<ModuleFlow> | Promise<Nullable<ModuleFlow>>;
     progress(args: ProgressArgs): Nullable<Progress>[] | Promise<Nullable<Progress>[]>;
     quiz(args: QuizFields): Quiz[] | Promise<Quiz[]>;
     quizInstance(args: QuizInstanceFields): QuizInstance[] | Promise<QuizInstance[]>;
@@ -660,6 +719,8 @@ export interface SectionFeedback {
 export interface Course {
     id: string;
     name: string;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
     sectionIDs?: Nullable<Nullable<string>[]>;
     required: boolean;
     carnegieHours: number;
@@ -692,6 +753,7 @@ export interface Collection {
     createdAt: Date;
     updatedAt: Date;
     modules?: Nullable<Nullable<Module>[]>;
+    moduleIDs?: Nullable<string[]>;
     section: Section;
     sectionID: string;
     position?: Nullable<number>;
@@ -699,15 +761,21 @@ export interface Collection {
 
 export interface Module {
     id: string;
+    prefix?: Nullable<string>;
+    number?: Nullable<number>;
     name: string;
     content?: Nullable<Nullable<Content>[]>;
     threads?: Nullable<Nullable<Thread>[]>;
-    collection?: Nullable<Collection>;
+    collections?: Nullable<Nullable<Collection>[]>;
+    collectionIDs?: Nullable<string[]>;
     position?: Nullable<number>;
     quizzes?: Nullable<Quiz[]>;
     moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
     hours: number;
+    description?: Nullable<string>;
+    instructor?: Nullable<InstructorProfile>;
+    instructorID?: Nullable<string>;
 }
 
 export interface Content {
@@ -720,6 +788,138 @@ export interface Content {
 
 export interface Error {
     message?: Nullable<string>;
+}
+
+export interface ModuleFlow {
+    previousModule?: Nullable<Module>;
+    previousCollection?: Nullable<Collection>;
+    nextModule?: Nullable<Module>;
+    nextCollection?: Nullable<Collection>;
+    currentModule?: Nullable<Module>;
+    currentCollection?: Nullable<Collection>;
+    currentSection?: Nullable<Section>;
+}
+
+export interface SimpleLearningPath {
+    id: string;
+    createdAt: Date;
+    plan: PlanOfStudy;
+    planID: string;
+    paths: SimplePath[];
+}
+
+export interface SimplePath {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    course: SimpleCoursePath;
+    status: PathStatus;
+    hoursSatisfies: number;
+    learningOutcomes: string[];
+}
+
+export interface SimpleCoursePath {
+    id: string;
+    sections: SimpleSection[];
+}
+
+export interface SimpleSection {
+    id: string;
+    name: string;
+    collections: SimpleCollection[];
+}
+
+export interface SimpleCollection {
+    modules: SimpleModule[];
+    id: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    section: Section;
+    sectionID: string;
+    position?: Nullable<number>;
+}
+
+export interface SimpleModule {
+    id: string;
+    name: string;
+    collections: SimpleCollection[];
+}
+
+export interface LearningPath {
+    id: string;
+    createdAt: Date;
+    plan: PlanOfStudy;
+    planID: string;
+    paths: Path[];
+}
+
+export interface Path {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    course: CoursePath;
+    status: PathStatus;
+    hoursSatisfies: number;
+    learningOutcomes: string[];
+}
+
+export interface CoursePath {
+    id: string;
+    name: string;
+    prefix?: Nullable<string>;
+    number?: Nullable<number>;
+    required: boolean;
+    carnegieHours: number;
+    sections: SectionPath[];
+}
+
+export interface SectionPath {
+    name: string;
+    collections: CollectionPath[];
+    id: string;
+    sectionNumber: number;
+    sectionName: string;
+    description: string;
+    duration: number;
+    intro: string;
+    numSlides: number;
+    keywords: string[];
+    objectives: string[];
+    createdAt: Date;
+    updatedAt: Date;
+    assignments: Assignment[];
+    members: SectionEnrollment[];
+    feedback: SectionFeedback[];
+    parentSections: Section[];
+    subSections: Section[];
+    courseIDs: string[];
+}
+
+export interface CollectionPath {
+    id: string;
+    name: string;
+    modules: ModulePath[];
+}
+
+export interface ModulePath {
+    id: string;
+    name: string;
+    number?: Nullable<number>;
+    prefix?: Nullable<string>;
+    content?: Nullable<Nullable<Content>[]>;
+    threads?: Nullable<Nullable<Thread>[]>;
+    collections?: Nullable<Nullable<Collection>[]>;
+    collectionIDs?: Nullable<string[]>;
+    position?: Nullable<number>;
+    quizzes?: Nullable<Quiz[]>;
+    moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
+    objectives: string[];
+    hours: number;
+    enrollmentID?: Nullable<string>;
+    description?: Nullable<string>;
+    instructor?: Nullable<InstructorProfile>;
+    instructorID?: Nullable<string>;
 }
 
 export interface Progress {

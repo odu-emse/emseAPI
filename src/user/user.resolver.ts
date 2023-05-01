@@ -4,7 +4,8 @@ import {
 	SocialInput,
 	UserFields,
 	SocialFields,
-	User
+	User,
+	NewUser
 } from "@/types/graphql";
 import { UserService } from "./user.service";
 import { Prisma } from "@prisma/client";
@@ -42,6 +43,11 @@ export class UserResolver {
 		const usr = await this.user({ id });
 		if (usr instanceof Error) return new Error("User not found");
 		else return await this.userService.instructorProfile(usr[0].id);
+	}
+
+	@Mutation("createUser")
+	async create(@Args("input") args: NewUser) {
+		return await this.userService.createUser(args);
 	}
 
 	@Mutation("updateUser")

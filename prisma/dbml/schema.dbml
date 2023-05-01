@@ -44,6 +44,7 @@ Table InstructorProfile {
   background String
   researchInterest String[] [not null]
   selectedPapersAndPublications String[] [not null]
+  instructedModules Module [not null]
 }
 
 Table PlanOfStudy {
@@ -53,6 +54,7 @@ Table PlanOfStudy {
   sections SectionEnrollment [not null]
   assignmentResults AssignmentResult [not null]
   quizResults QuizResult [not null]
+  learningPaths LearningPath [not null]
 }
 
 Table Social {
@@ -78,6 +80,8 @@ Table Token {
 Table Course {
   id String [pk]
   name String [not null]
+  number Int [default: 0]
+  prefix String [default: '']
   required Boolean [default: false]
   carnegieHours Int [default: 135]
   sectionIDs String[] [not null]
@@ -115,6 +119,7 @@ Table Collection {
   updatedAt DateTime [default: `now()`, not null]
   position Int [not null, default: 0]
   modules Module [not null]
+  moduleIDs String[] [not null]
   section Section [not null]
   sectionID String [not null]
 }
@@ -122,11 +127,16 @@ Table Collection {
 Table Module {
   id String [pk]
   name String [not null]
-  collection Collection [not null]
-  collectionID String [not null]
+  prefix String [default: '']
+  number Int [default: 1]
+  collections Collection [not null]
+  collectionIDs String[] [not null]
   position Int [not null, default: 0]
   objectives String[] [not null]
   hours Float [not null, default: 0]
+  description String [default: '']
+  instructor InstructorProfile
+  instructorProfileID String [default: '']
   content Content [not null]
   quizzes Quiz [not null]
   moduleProgress ModuleProgress [not null]
@@ -312,6 +322,14 @@ Table QuizResult {
   quizInstance QuizInstance
 }
 
+Table LearningPath {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  plan PlanOfStudy [not null]
+  planID String [unique, not null]
+  paths Path[] [not null]
+}
+
 Enum UserRole {
   STUDENT
   TEACHER
@@ -342,6 +360,11 @@ Enum FileType {
   TXT
 }
 
+Enum PathStatus {
+  DRAFT
+  LIVE
+}
+
 Ref: User.watchedThreadIDs > Thread.id
 
 Ref: User.groupMembershipIDs > Group.id
@@ -364,9 +387,13 @@ Ref: Section.subSectionIDs > Section.id
 
 Ref: Section.courseIDs > Course.id
 
+Ref: Collection.moduleIDs > Module.id
+
 Ref: Collection.sectionID > Section.id [delete: Cascade]
 
-Ref: Module.collectionID > Collection.id [delete: Cascade]
+Ref: Module.collectionIDs > Collection.id
+
+Ref: Module.instructorProfileID > InstructorProfile.id
 
 Ref: SectionFeedback.studentId > User.id
 
@@ -423,3 +450,5 @@ Ref: Question.instanceIDs > QuizInstance.id
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 
 Ref: QuizResult.studentID > PlanOfStudy.id
+
+Ref: LearningPath.planID > PlanOfStudy.id [delete: Cascade]

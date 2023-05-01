@@ -27,7 +27,8 @@ export class DateScalar implements CustomScalar<string, Moment> {
 
 	//What we are sending to the client
 	serialize(value: MomentInput | unknown): string {
-		if (value instanceof Date) return moment(value).format("MM/DD/YYYY");
+		if (value instanceof Date)
+			return moment(value).format("MM/DD/YYYY HH:mm:ss");
 		return "";
 	}
 

@@ -19,11 +19,18 @@ import {
 	CreateContentArgs,
 	ContentFields,
 	NewSection,
-	CollectionFields
+	CollectionFields,
+	CreateLearningPathInput,
+	PathInput,
+	Course,
+	LearningPath,
+	Section,
+	Collection
 } from "@/types/graphql";
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
 import { Prisma } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 
 @Injectable()
 export class ProgramService {
@@ -141,6 +148,16 @@ export class ProgramService {
 					student: true
 				}
 			},
+			moduleProgress: {
+				include: {
+					enrollment: {
+						include: {
+							section: true
+						}
+					},
+					module: true
+				}
+			},
 			section: {
 				include: {
 					parentSections: true,
@@ -163,7 +180,7 @@ export class ProgramService {
 											enrollment: true
 										}
 									},
-									collection: {
+									collections: {
 										include: {
 											section: true
 										}
@@ -188,7 +205,7 @@ export class ProgramService {
 
 	private moduleInclude = Prisma.validator<Prisma.ModuleInclude>()({
 		content: true,
-		collection: {
+		collections: {
 			include: {
 				section: {
 					include: {
@@ -198,7 +215,40 @@ export class ProgramService {
 							}
 						}
 					}
+				},
+				modules: {
+					include: {
+						instructor: {
+							include: {
+								account: true
+							}
+						},
+						moduleProgress: {
+							include: {
+								enrollment: true
+							}
+						}
+					}
 				}
+			}
+		},
+		moduleProgress: {
+			include: {
+				enrollment: true
+			}
+		},
+		instructor: {
+			include: {
+				account: true,
+				instructedModules: true
+			}
+		}
+	});
+
+	private learningPathInclude = Prisma.validator<Prisma.LearningPathInclude>()({
+		plan: {
+			include: {
+				student: true
 			}
 		}
 	});
@@ -508,7 +558,7 @@ export class ProgramService {
 			...(id && { id }),
 			...(name && { name }),
 			...(position && { position }),
-			collection: { id: collection ? collection : undefined },
+			collections: { some: { id: collection ? collection : undefined } },
 			content: content ? { some: { id: content } } : undefined,
 			objectives: objectives ? { hasEvery: objectives } : undefined
 		});
@@ -656,6 +706,25 @@ export class ProgramService {
 				required: data.required
 			},
 			include: this.courseInclude
+		});
+	}
+
+	async addManyCourses(data: CourseInput[]) {
+		const manyData = Prisma.validator<Prisma.CourseCreateManyArgs>()({
+			data: data.map((course) => {
+				return {
+					name: course.name,
+					...(course.number && { number: course.number }),
+					...(course.prefix && { prefix: course.prefix }),
+					...(course.carnegieHours && {
+						carnegieHours: course.carnegieHours
+					}),
+					...(course.required && { required: course.required })
+				};
+			})
+		});
+		return this.prisma.course.createMany({
+			data: manyData.data
 		});
 	}
 
@@ -1001,7 +1070,7 @@ export class ProgramService {
 							}
 						}
 					}),
-				collection: {
+				collections: {
 					connect: {
 						id: input.collection ? input.collection : undefined
 					}
@@ -1065,7 +1134,9 @@ export class ProgramService {
 			},
 			data: {
 				name: payload.name,
-				collectionID: payload.collection,
+				collectionIDs: {
+					push: payload.collection
+				},
 				position: input.position ? input.position : undefined,
 				objectives: newObjectives ? newObjectives : undefined,
 				hours: payload.hours
@@ -1161,6 +1232,436 @@ export class ProgramService {
 					set: objectives
 				}
 			}
+		});
+	}
+
+	async learningPath(planID: string) {
+		const lps = await this.prisma.learningPath.findMany({
+			where: {
+				planID
+			},
+			include: this.learningPathInclude
+		});
+
+		const courses: Array<string> = [];
+		const modules: Array<string> = [];
+		const sections: Array<string> = [];
+		const collections: Array<string> = [];
+
+		lps.map((lp) => {
+			lp.paths.map((path) => {
+				courses.push(path.course.id);
+				path.course.sections.map((section) => {
+					section.collections.map((collection) => {
+						collection.modules.map((module) => {
+							modules.push(module.id);
+						});
+						collections.push(collection.id);
+					});
+					sections.push(section.id);
+				});
+			});
+		});
+
+		const courseIDs = [...new Set(courses)];
+		const moduleIDs = [...new Set(modules)];
+		const sectionIDs = [...new Set(sections)];
+		const collectionIDs = [...new Set(collections)];
+
+		const coursesData = await this.prisma.course.findMany({
+			where: {
+				id: {
+					in: courseIDs
+				}
+			},
+			include: this.courseInclude
+		});
+
+		const modulesData = await this.prisma.module.findMany({
+			where: {
+				id: {
+					in: moduleIDs
+				}
+			},
+			include: this.moduleInclude
+		});
+
+		const sectionsData = await this.prisma.section.findMany({
+			where: {
+				id: {
+					in: sectionIDs
+				}
+			},
+			include: this.sectionInclude
+		});
+
+		const collectionsData = await this.prisma.collection.findMany({
+			where: {
+				id: {
+					in: collectionIDs
+				}
+			}
+		});
+
+		const courseMap = new Map();
+		const moduleMap = new Map();
+		const sectionMap = new Map();
+		const collectionMap = new Map();
+
+		coursesData.map((course) => {
+			courseMap.set(course.id, course);
+		});
+
+		modulesData.map((module) => {
+			moduleMap.set(module.id, module);
+		});
+
+		sectionsData.map((section) => {
+			sectionMap.set(section.id, section);
+		});
+
+		collectionsData.map((collection) => {
+			collectionMap.set(collection.id, collection);
+		});
+
+		const paths = lps.map((lp) => {
+			const paths = lp.paths.map((path) => {
+				const course = courseMap.get(path.course.id) as Course;
+				return {
+					...path,
+					course: {
+						...course,
+						sections: path.course.sections.map((section) => {
+							const sect = sectionMap.get(section.id) as Section;
+							return {
+								...sect,
+								name: sect.sectionName,
+								collections: section.collections.map((collection) => {
+									const col = collectionMap.get(collection.id) as Collection;
+									return {
+										...col,
+										modules: collection.modules.map((module) => {
+											return {
+												...moduleMap.get(module.id)
+											};
+										})
+									};
+								})
+							};
+						})
+					}
+				};
+			});
+			return {
+				...lp,
+				paths
+			};
+		});
+
+		return paths as Array<LearningPath>;
+	}
+
+	async createLearningPath(planID: string, input: CreateLearningPathInput) {
+		// validate course ID passed in
+		// validate section IDs passed in
+		// validate collection IDs passed in
+		// validate module IDs passed in
+		// if all validations pass
+		// create module enrollment for each module in the learning path
+		// store the enrollment ID in the module composite type
+		// create learning path
+		// else return a validation error
+
+		const { path, paths } = input;
+
+		// handle multiple path creation
+		if (paths && !path) {
+			const courses = await this.prisma.course.findMany({
+				where: {
+					id: {
+						in: paths.map((path) => path.course.id)
+					}
+				}
+			});
+
+			if (courses.length !== paths.length) {
+				return new Error("Not all courses could be found");
+			}
+		}
+
+		// handle single path creation
+		if (path && !paths) {
+			const course = await this.prisma.course.findUnique({
+				where: {
+					id: path.course.id
+				}
+			});
+
+			if (!course) {
+				return new Error("Course not found");
+			}
+
+			const pathData = Prisma.validator<Prisma.LearningPathCreateInput>()({
+				plan: {
+					connect: {
+						id: planID
+					}
+				},
+				paths: {
+					id: faker.database.mongodbObjectId(),
+					learningOutcomes: path.learningOutcomes || [],
+					hoursSatisfies: path.hoursSatisfies || 1,
+					course: {
+						id: path.course.id,
+						sections: path.course.sections.map((section) => {
+							return {
+								id: section.id,
+								name: section.name,
+								collections: section.collections.map((collection) => {
+									return {
+										id: collection.id,
+										name: collection.name,
+										modules: collection.modules.map((module) => {
+											return {
+												id: module.id,
+												enrollmentID: ""
+											};
+										})
+									};
+								})
+							};
+						})
+					}
+				}
+			});
+
+			return this.prisma.learningPath.create({
+				data: pathData,
+				include: this.learningPathInclude
+			});
+		}
+	}
+
+	async createPath(planID: string, input: PathInput) {
+		// get base LP data so we can persist the old paths and add the new one
+		const LP = await this.prisma.learningPath.findMany({
+			where: {
+				planID
+			}
+		});
+
+		if (LP.length !== 1) {
+			return new Error("The learning path you choose could not be found");
+		}
+
+		const { status, course, learningOutcomes, hoursSatisfies } = input;
+
+		// getting the course data so we can validate and populate in the path
+		const courseData = await this.prisma.course.findMany({
+			where: {
+				id: course.id
+			}
+		});
+
+		if (courseData.length !== 1) {
+			return new Error("The course you choose could not be found");
+		}
+
+		const pathData = Prisma.validator<Prisma.PathCreateInput>()({
+			id: faker.database.mongodbObjectId(),
+			learningOutcomes: learningOutcomes || [],
+			hoursSatisfies: hoursSatisfies || 1,
+			status: status || "DRAFT",
+			course: {
+				id: course.id,
+				sections: course.sections.map((section) => {
+					return {
+						id: section.id,
+						name: section.name,
+						collections: section.collections.map((collection) => {
+							return {
+								id: collection.id,
+								name: collection.name,
+								modules: collection.modules.map((module) => {
+									return {
+										id: module.id,
+										enrollmentID: ""
+									};
+								})
+							};
+						})
+					};
+				})
+			}
+		});
+
+		const paths = [...LP[0].paths, pathData];
+
+		return this.prisma.learningPath.update({
+			where: {
+				planID
+			},
+			data: {
+				paths: paths
+			},
+			include: this.learningPathInclude
+		});
+	}
+
+	async updateLearningPath(planID: string, pathID: string, input: PathInput) {
+		const { status, course, learningOutcomes, hoursSatisfies } = input;
+
+		const courseData = await this.prisma.course.findMany({
+			where: {
+				id: course.id
+			}
+		});
+
+		if (courseData.length !== 1) {
+			return new Error("The course you choose could not be found");
+		}
+
+		// needed to include the select statement here since we only want to update those two fields
+		const lpData = await this.prisma.learningPath.findMany({
+			where: {
+				planID
+			},
+			select: {
+				createdAt: true,
+				paths: true
+			}
+		});
+
+		if (lpData.length !== 1) {
+			return new Error("The learning path you choose could not be found");
+		}
+
+		const pathData = lpData[0].paths.filter((path) => path.id === pathID)[0];
+
+		// by referencing the pathData here, we are able to save the old data that was present in the path
+		let pathPayload = {
+			...pathData,
+			...(hoursSatisfies && { hoursSatisfies }),
+			...(learningOutcomes && { learningOutcomes }),
+			...(status && { status })
+		} as Prisma.PathCreateInput;
+
+		const updatedSectionsArray = course.sections.map(
+			(section, sectionIndex) => {
+				if (section.id !== pathData.course.sections[sectionIndex].id) {
+					return {
+						id: section.id,
+						name: section.name,
+						collections: []
+					};
+				} else {
+					const updatedCollectionsArray = section.collections.map(
+						(collection, collectionIndex) => {
+							if (
+								collection.id !==
+								pathData.course.sections[sectionIndex].collections[
+									collectionIndex
+								].id
+							) {
+								return {
+									id: collection.id,
+									name: collection.name,
+									modules: []
+								};
+							} else {
+								const updatedModulesArray = collection.modules.map(
+									(module, moduleIndex) => {
+										if (
+											module.id !==
+											pathData.course.sections[sectionIndex].collections[
+												collectionIndex
+											].modules[moduleIndex].id
+										) {
+											return {
+												id: module.id,
+												enrollmentID: ""
+											};
+										} else {
+											return {
+												id: module.id,
+												enrollmentID:
+													pathData.course.sections[sectionIndex].collections[
+														collectionIndex
+													].modules[moduleIndex].enrollmentID
+											};
+										}
+									}
+								);
+								return {
+									id: collection.id,
+									name: collection.name,
+									modules: updatedModulesArray
+								};
+							}
+						}
+					);
+					return {
+						id: section.id,
+						name: section.name,
+						collections: updatedCollectionsArray
+					};
+				}
+			}
+		);
+
+		pathPayload = {
+			...pathPayload,
+			course: {
+				id: courseData[0].id,
+				sections: updatedSectionsArray
+			}
+		};
+
+		// we map over the existing learning paths and replace the one we are updating with the new data but keeping the old ones
+		const lpPayload = {
+			...lpData[0],
+			paths: lpData[0].paths.map((path) => {
+				if (path.id !== pathID) {
+					return path;
+				} else {
+					return pathPayload;
+				}
+			})
+		} as Prisma.LearningPathUpdateInput;
+
+		return this.prisma.learningPath.update({
+			where: {
+				planID
+			},
+			data: lpPayload
+		});
+	}
+
+	async deleteLearningPath(planID: string, pathID: string) {
+		const lpData = await this.prisma.learningPath.findMany({
+			where: {
+				planID
+			},
+			select: {
+				createdAt: true,
+				paths: true
+			}
+		});
+
+		if (lpData.length !== 1) {
+			return new Error("The learning path you choose could not be found");
+		}
+
+		const lpPayload = {
+			...lpData[0],
+			paths: lpData[0].paths.filter((path) => path.id !== pathID)
+		} as Prisma.LearningPathUpdateInput;
+
+		return this.prisma.learningPath.update({
+			where: {
+				planID
+			},
+			data: lpPayload
 		});
 	}
 }

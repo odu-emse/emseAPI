@@ -1,31 +1,31 @@
 enum UserRole {
-	STUDENT
-	TEACHER
-	GRADER
+    STUDENT
+    TEACHER
+    GRADER
 }
 
 enum EnrollmentStatus {
-	ACTIVE
-	INACTIVE
+    ACTIVE
+    INACTIVE
 }
 enum ContentType {
-	PDF
-	DOC
-	DOCX
-	VIDEO
-	CAPTION
-	TRANSCRIPT
-	QUIZ
-	TEXT
+    PDF
+    DOC
+    DOCX
+    VIDEO
+    CAPTION
+    TRANSCRIPT
+    QUIZ
+    TEXT
 }
 
 
 enum FileType {
-	DOCX
-	DOC
-	PDF
-	TTT
-	TXT
+    DOCX
+    DOC
+    PDF
+    TTT
+    TXT
 }
 
 type SectionEnrollment {
@@ -39,25 +39,25 @@ type SectionEnrollment {
 	"""
 	enrolledAt: Date!
 
-	"""
-	Role of the user:Either Student, Teacher or Grader
-	"""
-	role: UserRole!
+    """
+    Role of the user:Either Student, Teacher or Grader
+    """
+    role: UserRole!
 
-	"""
-	Status of the enrollment: Either Active or Inactive
-	"""
-	status: EnrollmentStatus!
+    """
+    Status of the enrollment: Either Active or Inactive
+    """
+    status: EnrollmentStatus!
 
 	"""
 	Current Section
 	"""
 	section: Section!
 
-	"""
-	Plan of study Chosen
-	"""
-	plan: PlanOfStudy
+    """
+    Plan of study Chosen
+    """
+    plan: PlanOfStudy
 
 	"""
 	Inactive plan of study
@@ -74,97 +74,97 @@ type SectionEnrollment {
 }
 
 type AssignmentResult {
-	"""
-	id of AssignmentResult
-	"""
-	id: ID!
+    """
+    id of AssignmentResult
+    """
+    id: ID!
 
-	"""
-	Time at which the Assignment Result is given
-	"""
-	submittedAt: Date!
+    """
+    Time at which the Assignment Result is given
+    """
+    submittedAt: Date!
 
-	"""
-	result of the Assignment
-	"""
-	result: Float!
+    """
+    result of the Assignment
+    """
+    result: Float!
 
-	"""
-	feedback given on the Assignment
-	"""
-	feedback: String
+    """
+    feedback given on the Assignment
+    """
+    feedback: String
 
-	"""
-	s3 id of the submitted file
-	"""
-	submissionURL: String
+    """
+    s3 id of the submitted file
+    """
+    submissionURL: String
 
-	"""
-	File type that the submission is in
-	"""
-	fileType: String
+    """
+    File type that the submission is in
+    """
+    fileType: String
 
-	"""
-	Assignment Result of the student
-	"""
-	student: PlanOfStudy
+    """
+    Assignment Result of the student
+    """
+    student: PlanOfStudy
 
-	"""
-	Assignment graded by the User
-	"""
-	gradedBy: User
+    """
+    Assignment graded by the User
+    """
+    gradedBy: User
 
-	"""
-	Assignment to which result is given
-	"""
-	assignment: Assignment
+    """
+    Assignment to which result is given
+    """
+    assignment: Assignment
 }
 
 type Assignment {
-	"""
-	Assignment id
-	"""
-	id: ID!
+    """
+    Assignment id
+    """
+    id: ID!
 
-	"""
-	date and time at which assignment is updated
-	"""
-	updatedAt: Date!
+    """
+    date and time at which assignment is updated
+    """
+    updatedAt: Date!
 
-	"""
-	Name of the assignment
-	"""
-	name: String!
+    """
+    Name of the assignment
+    """
+    name: String!
 
-	"""
-	due of the assignment
-	"""
-	dueAt: Date
+    """
+    due of the assignment
+    """
+    dueAt: Date
 
-	"""
-	s3 id of the content
-	"""
-	contentURL: String
+    """
+    s3 id of the content
+    """
+    contentURL: String
 
-	"""
-	File type that the assignment is submitted in
-	"""
-	contentType: String
+    """
+    File type that the assignment is submitted in
+    """
+    contentType: String
 
-	"""
-	Accepted file types for assignments
-	"""
-	acceptedTypes: FileType
+    """
+    Accepted file types for assignments
+    """
+    acceptedTypes: FileType
 
 	"""
 	Assignment belonging to the Section
 	"""
 	section: Section!
 
-	"""
-	Assignment Result
-	"""
-	assignmentResults: [AssignmentResult]
+    """
+    Assignment Result
+    """
+    assignmentResults: [AssignmentResult]
 }
 
 type SectionFeedback {
@@ -178,10 +178,10 @@ type SectionFeedback {
 	"""
 	feedback: String!
 
-	"""
-	Rating given in the feedback
-	"""
-	rating: Int!
+    """
+    Rating given in the feedback
+    """
+    rating: Int!
 
 	"""
 	Section feedback given by the student
@@ -203,6 +203,8 @@ type Course {
 	Name of the course
 	"""
 	name: String!
+    number: Int
+    prefix: String
 	"""
 	Sections in the course
 	"""
@@ -302,37 +304,39 @@ type Section {
 	"""
 	collections: [Collection!]!
 
-	"""
-	courseIDs set
-	"""
-	courseIDs: [ID!]!
+    """
+    courseIDs set
+    """
+    courseIDs: [ID!]!
 }
 
 type Collection {
-	"""
-	id of the collection
-	"""
-	id: ID!
+    """
+    id of the collection
+    """
+    id: ID!
 
-	"""
-	Name of the collection
-	"""
-	name: String!
+    """
+    Name of the collection
+    """
+    name: String!
 
-	"""
-	Date and Time of the collection created at
-	"""
-	createdAt: Date!
+    """
+    Date and Time of the collection created at
+    """
+    createdAt: Date!
 
-	"""
-	Date and Time of the collection updated at
-	"""
-	updatedAt: Date!
+    """
+    Date and Time of the collection updated at
+    """
+    updatedAt: Date!
 
 	"""
 	List of modules in the collection
 	"""
 	modules: [Module]
+
+    moduleIDs: [ID!]
 
 	"""
 	The Section that this collection belongs to
@@ -353,6 +357,8 @@ type Module {
 	document ID
 	"""
 	id: ID!
+    prefix: String
+    number: Int
 	"""
 	Module Name
 	"""
@@ -368,7 +374,9 @@ type Module {
 	"""
 	The collection that the module belongs to
 	"""
-	collection: Collection
+	collections: [Collection]
+
+    collectionIDs: [ID!]
 
 	"""
 	The position index of the module in the collection it belongs to.
@@ -386,27 +394,30 @@ type Module {
 	A list of learning objectives being covered in this Section
 	"""
 	objectives: 	[String!]!
-  """
+    """
 	The number of carnige hours granted for completion of this Section
 	"""
 	hours: Float!
+    description: String
+    instructor: InstructorProfile
+    instructorID: ID
 }
 
 type Content {
-	"""
-	Document ID for this content
-	"""
-	id: ID!
+    """
+    Document ID for this content
+    """
+    id: ID!
 
-	"""
-	The type of content that this link/id references
-	"""
-	type: ContentType!
+    """
+    The type of content that this link/id references
+    """
+    type: ContentType!
 
-	"""
-	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
-	"""
-	link: String!
+    """
+    The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
+    """
+    link: String!
 
 	"""
 	The module that this content belongs to.
@@ -421,10 +432,10 @@ type Content {
 }
 
 type Error {
-	"""
-	Error message
-	"""
-	message: String
+    """
+    Error message
+    """
+    message: String
 }
 
 type Query {
@@ -435,17 +446,17 @@ type Query {
 	"""
 	section(input: SectionFields!, memberRole: UserRole): [Section!]
 
-	"""
-	Get a list of courses given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
-	Parameters can be any of the fields that exist in a course
-	"""
-	course(input: CourseFields!): [Course!]
+    """
+    Get a list of courses given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+    Parameters can be any of the fields that exist in a course
+    """
+    course(input: CourseFields!): [Course!]
 
-	"""
-	Get a list of assignments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
-	Parameters can be any of the fields that exist in a assignment
-	"""
-	assignment(input: AssignmentFields!): [Assignment!]
+    """
+    Get a list of assignments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+    Parameters can be any of the fields that exist in a assignment
+    """
+    assignment(input: AssignmentFields!): [Assignment!]
 
 	"""
 	Get a list of SectionFeedbacks given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -453,11 +464,11 @@ type Query {
 	"""
 	sectionFeedback(input: ModFeedbackFields!): [SectionFeedback!]
 
-	"""
-	Get a list of assignmentResults given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
-	Parameters can be any of the fields that exist in a assignmentResult
-	"""
-	assignmentResult(input: AssignmentResFields!): [AssignmentResult!]
+    """
+    Get a list of assignmentResults given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
+    Parameters can be any of the fields that exist in a assignmentResult
+    """
+    assignmentResult(input: AssignmentResFields!): [AssignmentResult!]
 
 	"""
 	Get a list of SectionEnrollments given a set of parameters, passing an empty object in will recieve all and passing in an id will fetch a single document.
@@ -467,7 +478,7 @@ type Query {
 	"""
 	Get a list of modules given the plan ID and enrollment ID
 	"""
-	modulesBySectionEnrollment(planID: ID!, SectionID: ID!) : [Module!]
+	modulesBySectionEnrollment(planID: ID!, sectionID: ID!) : [Module!]
 	"""
 	Retrieve a specific collection based on document ID
 	"""
@@ -477,22 +488,346 @@ type Query {
 	"""
 	module(input: ModuleFields): [Module!]
 
-	"""
-	Retrieve Content Given a set of parameters
-	"""
-	content(input: ContentFields): [Content!]
+    """
+    Retrieve Content Given a set of parameters
+    """
+    content(input: ContentFields): [Content!]
+    """
+    Retrieve a sepcific learning path based on the user's plan of study ID
+    """
+    learningPath(planID: ID!, pathID: ID): [LearningPath!]!
+
+    latestModuleProgress(planID: ID!, sectionID: ID!, moduleID: ID!): ModuleProgress
+
+    modulesFromLearningPath(planID: ID!): [Module!]
+
+    moduleFlowFromLearningPath(planID: ID!, moduleID: ID!): ModuleFlow
+}
+
+type ModuleFlow {
+    previousModule: Module
+    previousCollection: Collection
+    nextModule: Module
+    nextCollection: Collection
+    currentModule: Module
+    currentCollection: Collection
+    currentSection: Section
+}
+
+type SimpleLearningPath {
+    id:        ID!
+    createdAt: Date!
+    plan:      PlanOfStudy!
+    planID:    ID!
+    paths:     [SimplePath!]!
+}
+
+type SimplePath {
+    id:        ID!
+    createdAt: Date!
+    updatedAt: Date!
+    course:    SimpleCoursePath!
+    status:    PathStatus!
+    hoursSatisfies: Float!
+    learningOutcomes: [String!]!
+}
+
+type SimpleCoursePath {
+    id: ID!
+    sections: [SimpleSection!]!
+}
+
+type SimpleSection {
+    id: ID!
+    name: String!
+    collections: [SimpleCollection!]!
+}
+
+type SimpleCollection {
+    """
+    List of modules in the collection
+    """
+    modules: [SimpleModule!]!
+
+"""
+id of the collection
+"""
+id: ID!
+
+"""
+Name of the collection
+"""
+name: String!
+
+"""
+Date and Time of the collection created at
+"""
+createdAt: Date!
+
+"""
+Date and Time of the collection updated at
+"""
+updatedAt: Date!
+
+"""
+The Section that this collection belongs to
+"""
+section: Section!
+"""
+The Section's unique ID that this collection belongs to
+"""
+sectionID: ID!
+"""
+The position index of the collection in a Section
+"""
+position: Int
+}
+
+type SimpleModule {
+    id: ID!
+    name: String!
+    collections: [SimpleCollection!]!
+}
+
+type LearningPath {
+    id:        ID!
+    createdAt: Date!
+    plan:      PlanOfStudy!
+    planID:    ID!
+    paths:     [Path!]!
+}
+
+type Path {
+    id:        ID!
+    createdAt: Date!
+    updatedAt: Date!
+    course:    CoursePath!
+    status:    PathStatus!
+    hoursSatisfies: Float!
+    learningOutcomes: [String!]!
+}
+
+enum PathStatus {
+    DRAFT
+    LIVE
+}
+
+type CoursePath {
+    """
+    course id
+    """
+    id:       ID!
+    """
+    Name of the course
+    """
+    name: String!
+	prefix: String
+	number: Int
+
+    """
+    Boolean value to check if the course is required/core or an elective
+    """
+    required: Boolean!
+    """
+    Number of Carnegie Unit and Student Hours that the course is worth
+    """
+    carnegieHours: Int!
+    sections: [SectionPath!]!
+}
+
+type SectionPath {
+    name: String!
+    """
+    A list of collections that have this Section's materials
+    """
+    collections: [CollectionPath!]!
+"""
+Section Id
+"""
+id: ID!
+
+"""
+Number of the Section
+"""
+sectionNumber: Int!
+
+"""
+Name of hte Section
+"""
+sectionName: String!
+
+"""
+Description of the Section
+"""
+description: String!
+
+"""
+Duration of the Section
+"""
+duration: Float!
+
+"""
+Introduction of the Section
+"""
+intro: String!
+
+"""
+No of slides in the Section
+"""
+numSlides: Int!
+
+"""
+Keywords in the Sections
+"""
+keywords: [String!]!
+
+"""
+objectives in the Sections
+"""
+objectives: [String!]!
+
+"""
+Date and Time of the Section Created at
+"""
+createdAt: Date!
+
+"""
+Date and Time of the Section Updated at
+"""
+updatedAt: Date!
+
+"""
+Assignement in the Section
+"""
+assignments: [Assignment!]!
+
+"""
+Memebers enrolled in the Section
+"""
+members: [SectionEnrollment!]!
+
+"""
+Feedback of the Section
+"""
+feedback: [SectionFeedback!]!
+
+"""
+Parent Sections of the Section
+"""
+parentSections: [Section!]!
+
+"""
+Child Sections in the Section
+"""
+subSections: [Section!]!
+"""
+courseIDs set
+"""
+courseIDs: [ID!]!
+}
+
+type CollectionPath {
+    id:      ID!
+    name: String!
+    modules: [ModulePath!]!
+}
+
+type ModulePath {
+    """
+    document ID
+    """
+    id: ID!
+    """
+    Module Name
+    """
+    name: String!
+    number: Int
+    prefix: String
+    """
+    The link/id of the actual content data itself
+    """
+    content: [Content]
+    """
+    The list of threads related to the module
+    """
+    threads: [Thread]
+    """
+    The collection that the module belongs to
+    """
+    collections: [Collection]
+
+    collectionIDs: [ID!]
+
+    """
+    The position index of the module in the collection it belongs to.
+    """
+    position: Int
+    """
+    The quizzes that belong to this module
+    """
+    quizzes: [Quiz!]
+    """
+    The progress model that is associated with this module
+    """
+    moduleProgress: [ModuleProgress]
+    """
+    A list of learning objectives being covered in this Section
+    """
+    objectives: 	[String!]!
+    """
+    The number of carnige hours granted for completion of this Section
+    """
+    hours: Float!
+    enrollmentID: ID
+    description: String
+    instructor: InstructorProfile
+    instructorID: ID
+}
+
+input CreateLearningPathInput {
+    path: PathInput
+    paths: [PathInput!]
+}
+
+input PathInput {
+    course: CoursePathInput!
+    status: PathStatus
+    hoursSatisfies: Float
+    learningOutcomes: [String!]
+}
+
+input CoursePathInput {
+    id: ID!
+    sections: [SectionPathInput!]!
+}
+
+input SectionPathInput {
+    id: ID!
+    name: String!
+    collections: [CollectionPathInput!]!
+}
+
+input CollectionPathInput {
+    id: ID!
+    name: String!
+    modules: [ModulePathInput!]!
+}
+
+input ModulePathInput {
+    id: ID!
+    enrollmentID: ID
 }
 
 input CreateContentArgs {
-	"""
-	The type of content that this link/id references
-	"""
-	type: ContentType!
+    """
+    The type of content that this link/id references
+    """
+    type: ContentType!
 
-	"""
-	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
-	"""
-	link: String!
+    """
+    The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
+    """
+    link: String!
 
 	"""
 	The module that this content belongs to.
@@ -506,20 +841,20 @@ input CreateContentArgs {
 }
 
 input ContentFields {
-	"""
-	Document ID for this content
-	"""
-	id: ID
+    """
+    Document ID for this content
+    """
+    id: ID
 
-	"""
-	The type of content that this link/id references
-	"""
-	type: ContentType
+    """
+    The type of content that this link/id references
+    """
+    type: ContentType
 
-	"""
-	The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
-	"""
-	link: String
+    """
+    The URL or other access point for the content being referenced. This will typically be an AWS s3 bucket ID
+    """
+    link: String
 
 	"""
 	The module that this content belongs to.
@@ -568,49 +903,51 @@ input SectionFields {
 input CourseFields {
 	id: ID
 	name: String
+    number: Int
+    prefix: String
 	section: ID
 	required: Boolean
 	carnegieHours: Int
 }
 
 input AssignmentFields {
-	id: ID
-	updatedAt: Date
-	name: String
-	dueAt: Date
-	contentURL: String
-	contentType: String
-	acceptedTypes: FileType
+    id: ID
+    updatedAt: Date
+    name: String
+    dueAt: Date
+    contentURL: String
+    contentType: String
+    acceptedTypes: FileType
 
 	section: ID
 	assignmentResult: ID
 }
 
 input ModFeedbackFields {
-	id: ID
-	feedback: String
-	rating: Int
+    id: ID
+    feedback: String
+    rating: Int
 
 	student: ID
 	section: ID
 }
 
 input AssignmentResFields {
-	id: ID
-	submittedAt: Date
-	result: Float
-	feedback: String
-	submissionURL: String
-	fileType: String
+    id: ID
+    submittedAt: Date
+    result: Float
+    feedback: String
+    submissionURL: String
+    fileType: String
 
-	student: ID
-	gradedBy: ID
-	assignment: ID
+    student: ID
+    gradedBy: ID
+    assignment: ID
 }
 
 input ModEnrollmentFields {
-	id: ID
-	enrolledAt: Date
+    id: ID
+    enrolledAt: Date
 
 	role: UserRole
 	section: ID
@@ -734,18 +1071,20 @@ input CourseInput {
 	The name of the given Course
 	"""
 	name: String!
+    number: Int
+    prefix: String
 	"""
 	Additional section to be related to the course
 	"""
-	section: ID!
+	section: ID
 	"""
 	The boolean attribute to decide weather the course is part of core courses or electives
 	"""
-	required: Boolean!
+	required: Boolean
 	"""
 	The Carnegie Hours of the Course
 	"""
-	carnegieHours: Int!
+	carnegieHours: Int
 }
 
 input SectionFeedbackInput {
@@ -771,30 +1110,30 @@ input SectionFeedbackUpdate {
 }
 
 input NewAssignmentResult {
-	"""
-	Relating assignment result to assignment
-	"""
-	assignment: ID!
-	"""
-	Relating Assignment Result to Student
-	"""
-	student: ID!
-	"""
-	Relating Assignment Result to Grader
-	"""
-	grader: ID!
-	"""
-	result of the NewAssignement
-	"""
-	result: Float!
-	"""
-	s3 id of the submitted file
-	"""
-	submissionURL: String!
-	"""
-	File type that the submission is in
-	"""
-	fileType: String!
+    """
+    Relating assignment result to assignment
+    """
+    assignment: ID!
+    """
+    Relating Assignment Result to Student
+    """
+    student: ID!
+    """
+    Relating Assignment Result to Grader
+    """
+    grader: ID!
+    """
+    result of the NewAssignement
+    """
+    result: Float!
+    """
+    s3 id of the submitted file
+    """
+    submissionURL: String!
+    """
+    File type that the submission is in
+    """
+    fileType: String!
 }
 
 input SectionEnrollmentInput {
@@ -821,6 +1160,8 @@ input ModuleInput {
 	Module Name
 	"""
 	name: String!
+    prefix: String
+    number: Int
 	"""
 	The link/id of the actual content data itself
 	"""
@@ -842,6 +1183,8 @@ input ModuleInput {
 	The number of carnige hours granted for completing this Section
 	"""
 	hours: Float!
+    description: String
+    instructor: ID
 }
 
 input ModuleFields {
@@ -853,6 +1196,8 @@ input ModuleFields {
 	Module Name
 	"""
 	name: String
+    number: Int
+    prefix: String
 	"""
 	The link/id of the actual content data itself
 	"""
@@ -877,6 +1222,8 @@ input ModuleFields {
 	The number of carnige hours granted for completing this Section
 	"""
 	hours:	Float
+    description: String
+    instructor: ID
 }
 
 type Mutation {
@@ -893,18 +1240,18 @@ type Mutation {
 	"""
 	updateSection(input: UpdateSection): Section
 
-	"""
-	deletes all Courses referring id
-	"""
-	deleteCourse(id: ID!): Course
-	"""
-	adds Courses
-	"""
-	addCourse(input: CourseInput): Course!
-	"""
-	Updates Courses
-	"""
-	updateCourse(id: ID!, input: CourseInput): Course
+    """
+    deletes all Courses referring id
+    """
+    deleteCourse(id: ID!): Course
+    """
+    adds Courses to the database. If many is true, it will add all the courses in the array and if false, the input will still need to be an array but with only one element
+    """
+    addCourse(input: [CourseInput!], many: Boolean): Course!
+    """
+    Updates Courses
+    """
+    updateCourse(id: ID!, input: CourseInput): Course
 
 	"""
 	adds assignement in Section
@@ -984,15 +1331,15 @@ type Mutation {
 	"""
 	unpairCourseSection(courseId: ID!, sectionId: ID!): Section
 
-	"""
-	Create a new collection
-	"""
-	createCollection(data: CreateCollectionArgs!): Collection!
+    """
+    Create a new collection
+    """
+    createCollection(data: CreateCollectionArgs!): Collection!
 
-	"""
-	Update a collection given its ID and the new data to update
-	"""
-	updateCollection(id: ID!, data: CollectionFields!): Collection!
+    """
+    Update a collection given its ID and the new data to update
+    """
+    updateCollection(id: ID!, data: CollectionFields!): Collection!
 
 	"""
 	Create a Module for an individual collection
@@ -1009,18 +1356,34 @@ type Mutation {
 
 	deleteModule(id: String!): Module
 
-	"""
-	Create a Content Record
-	"""
-	createContent(input: CreateContentArgs!): Content!
+    """
+    Create a Content Record
+    """
+    createContent(input: CreateContentArgs!): Content!
 
-	"""
-	Update a content Record
-	"""
-	updateContent(input: ContentFields!): [Content!]
+    """
+    Update a content Record
+    """
+    updateContent(input: ContentFields!): [Content!]
 
-	"""
-	Delete an existing content record
-	"""
-	deleteContent(contentID: ID!): Content
+    """
+    Delete an existing content record
+    """
+    deleteContent(contentID: ID!): Content
+    """
+    Create a new learning path model with the given program structure
+    """
+    createLearningPath(planID: ID!, input: CreateLearningPathInput!): LearningPath!
+    """
+    Add a new path to an existing learning path model
+    """
+    createPath(planID: ID!, input: PathInput!): SimpleLearningPath!
+    """
+    Update an existing learning path with the given program structure
+    """
+    updateLearningPath(planID: ID!, pathID: ID!, input: PathInput!): LearningPath!
+    """
+    Delete an existing learning path
+    """
+    deleteLearningPath(planID: ID!, pathID: ID!): LearningPath!
 }

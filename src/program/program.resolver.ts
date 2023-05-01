@@ -18,7 +18,11 @@ import {
 	CreateContentArgs,
 	ModEnrollmentFields,
 	NewSection,
-	CollectionFields
+	CollectionFields,
+	CreateLearningPathInput,
+	PathInput,
+	Module,
+	ModuleFlow
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -85,6 +89,8 @@ export class ProgramResolver {
 		@Args("planID") planID: string,
 		@Args("sectionID") sectionID: string
 	) {
+		// using the combination of the student's plan of study and the section they are looking at
+		// we can find the exact enrollment they are looking for as only one enrollment can exist for a student for a given section
 		const enrollment = await this.programService.sectionEnrollment({
 			plan: planID
 		});
@@ -121,6 +127,206 @@ export class ProgramResolver {
 		];
 	}
 
+	@Query("latestModuleProgress")
+	async moduleProgress(
+		@Args("planID") planID: string,
+		@Args("sectionID") sectionID: string,
+		@Args("moduleID") moduleID: string
+	) {
+		// we want to find the next collection of modules the student should be working on
+		// we can do this by finding the enrollment for the student in the section they are looking at
+		// and then finding the module progress for that enrollment
+		// we can then filter the module progress to find the latest progress for the module they are looking at
+		// if the module progress is empty, we can assume that the student has not started the module yet
+		// and we can return the first module in the collection
+
+		const enrollment = await this.programService.sectionEnrollment({
+			plan: planID
+		});
+
+		const filteredEnrollment = enrollment.filter((enrollment) => {
+			return enrollment.section.id === sectionID;
+		});
+
+		const modules = filteredEnrollment[0].section.collections.map(
+			(collection) =>
+				collection.modules.map((module) => {
+					return module;
+				})
+		);
+
+		const filteredModules = modules.flat().map((module) => {
+			return module.moduleProgress.filter((progress) => {
+				return progress.enrollment.id === filteredEnrollment[0].id;
+			});
+		});
+
+		const latestModuleProgress = filteredModules
+			.flat()
+			.filter((progress) => progress.moduleID === moduleID)
+			.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+
+		return latestModuleProgress;
+	}
+
+	@Query("modulesFromLearningPath")
+	async modulesFromLearningPath(@Args("planID") planID: string) {
+		// find enrollments for the student from planID
+		// find the learning path for the plan
+		// filter out inactive paths
+		// filter out modules with a completed progress status
+		// return the incomplete list of modules that match the student's learning path
+
+		const enrollment = await this.programService.sectionEnrollment({
+			plan: planID
+		});
+
+		const learningPath = await this.programService.learningPath(planID);
+
+		const filteredLearningPath = learningPath[0].paths.filter((path) => {
+			return path.status === "LIVE";
+		});
+
+		if (filteredLearningPath.length === 0) {
+			return [];
+		}
+
+		const modules: Module[] = filteredLearningPath[0].course.sections
+			.map((section) => {
+				return section.collections.map((collection) => {
+					return collection.modules.map((module) => {
+						return module;
+					});
+				});
+			})
+			.flat()
+			.flat();
+
+		const nonDuplicateModules = modules.filter((module, index, self) => {
+			return index === self.findIndex((m) => m.id === module.id);
+		});
+
+		const filteredModules = nonDuplicateModules.map((module) => {
+			// if there is no progress for the module, return the module
+			if (
+				module.moduleProgress?.length === 0 ||
+				module.moduleProgress === null ||
+				typeof module.moduleProgress === "undefined"
+			)
+				return module;
+			else {
+				// if there is progress for the module, filter out the progresses made by other students
+				// and return the module if there is no progress for the student
+				const filteredProgress = module.moduleProgress.filter((progress) => {
+					if (!progress) return false;
+					else if (!progress.completed) return false;
+					else return progress.enrollment.id !== enrollment[0].id;
+				});
+				if (filteredProgress.length === 0) return module;
+				else return null;
+			}
+		});
+
+		return filteredModules.filter((module) => module !== null);
+	}
+
+	@Query("moduleFlowFromLearningPath")
+	async moduleFlowFromLearningPath(
+		@Args("planID") planID: string,
+		@Args("moduleID") moduleID: string
+	) {
+		// get lp from plan
+		const learningPath = await this.programService.learningPath(planID);
+		if (!learningPath)
+			throw new Error("No learning paths found for inputted user");
+
+		// filter out non-live paths
+		const filteredLearningPath = learningPath[0].paths.filter((path) => {
+			return path.status === "LIVE";
+		});
+		if (filteredLearningPath.length === 0) return [];
+
+		const sections = filteredLearningPath[0].course.sections;
+
+		// find the collection that the requested module is in relative to the learning path
+		const collection = sections
+			.map((section) => {
+				return section.collections.find((collection) => {
+					return collection.modules.find((module) => {
+						return module.id === moduleID;
+					});
+				});
+			})
+			.flat()
+			.flat();
+
+		const filteredCollection = collection.filter(
+			(collection) => typeof collection !== "undefined"
+		)[0];
+
+		if (typeof filteredCollection === "undefined") return [];
+
+		const currentModuleIndex = filteredCollection.modules.findIndex(
+			(module) => module.id === moduleID
+		);
+
+		const currentSectionIndex = sections.findIndex((section) => {
+			return section.collections.find((collection) => {
+				return collection.id === filteredCollection.id;
+			});
+		});
+
+		let nextCollection = filteredCollection;
+
+		if (currentModuleIndex + 1 === filteredCollection.modules.length) {
+			// get the array of collections in the sections
+			// find the current collection in the array
+			// add 1 to the index to get the next collection
+			// get the first module in the next collection
+
+			const nextSection = sections[currentSectionIndex + 1];
+
+			nextCollection = nextSection?.collections[0];
+
+			// student has reached the end of the section
+			if (
+				typeof nextSection === "undefined" ||
+				typeof nextCollection === "undefined"
+			)
+				return {
+					currentModule: filteredCollection.modules[currentModuleIndex],
+					nextModule: null,
+					currentCollection: filteredCollection,
+					nextCollection: null,
+					previousModule: filteredCollection.modules[currentModuleIndex - 1],
+					previousCollection: filteredCollection,
+					currentSection: sections[currentSectionIndex]
+				};
+
+			return {
+				currentModule: filteredCollection.modules[currentModuleIndex],
+				nextModule: nextCollection.modules[0],
+				currentCollection: filteredCollection,
+				nextCollection: nextCollection,
+				previousModule: filteredCollection.modules[currentModuleIndex - 1],
+				previousCollection: filteredCollection,
+				currentSection: sections[currentSectionIndex]
+			};
+		}
+
+		const nextModule = filteredCollection.modules[currentModuleIndex + 1];
+
+		return {
+			currentModule: filteredCollection.modules[currentModuleIndex],
+			nextModule: nextModule,
+			currentCollection: filteredCollection,
+			nextCollection: filteredCollection,
+			previousModule: filteredCollection.modules[currentModuleIndex - 1],
+			previousCollection: filteredCollection,
+			currentSection: sections[currentSectionIndex]
+		};
+	}
+
 	@Query("collection")
 	async collection(@Args("input") args: CollectionFields | null = null) {
 		return await this.programService.collection(args);
@@ -134,6 +340,25 @@ export class ProgramResolver {
 	@Query("module")
 	async module(@Args("input") input: ModuleFields) {
 		return await this.programService.module(input);
+	}
+
+	@Query("learningPath")
+	async learningPath(
+		@Args("planID") planID: string,
+		@Args("pathID") pathID: string | null = null
+	) {
+		const lps = await this.programService.learningPath(planID);
+		if (!lps) throw new Error("No learning paths found for inputted user");
+		if (pathID !== null && typeof pathID !== "undefined") {
+			const lp = lps[0].paths.find((path) => path.id === pathID);
+			if (!lp) throw new Error("No learning path found with inputted ID");
+			const payload = {
+				...lps[0],
+				paths: [{ ...lp }]
+			};
+			return [payload];
+		}
+		return lps;
 	}
 
 	// Mutations
@@ -158,8 +383,19 @@ export class ProgramResolver {
 
 	// // Add a Course to the db with a course name
 	@Mutation("addCourse")
-	async createCourse(@Args("input") args: CourseInput) {
-		return await this.programService.addCourse(args);
+	async createCourse(
+		@Args("input") args: CourseInput[],
+		@Args("many") many: boolean = false
+	) {
+		if (many && args.length > 1) {
+			return this.programService.addManyCourses(args);
+		} else if (args.length === 1) {
+			return await this.programService.addCourse(args[0]);
+		} else {
+			throw new Error(
+				"Input must be an array of CourseInput objects or a single CourseInput object"
+			);
+		}
 	}
 
 	// Update a course name
@@ -410,5 +646,59 @@ export class ProgramResolver {
 	@Mutation("deleteContent")
 	async deleteContent(@Args("contentID") contentID: string) {
 		return await this.programService.deleteContent(contentID);
+	}
+
+	@Mutation("createLearningPath")
+	async createLearningPath(
+		@Args("planID") planID: string,
+		@Args("input") input: CreateLearningPathInput
+	) {
+		if (!input.path && !input.paths)
+			throw new Error(
+				"Either a single path object or a list of path objects is required"
+			);
+		const data = await this.programService.createLearningPath(planID, input);
+
+		if (!data)
+			return new Error("An error occurred while creating your learning path");
+		return data;
+	}
+
+	@Mutation("createPath")
+	async createPath(
+		@Args("planID") planID: string,
+		@Args("input") input: PathInput
+	) {
+		const data = await this.programService.createPath(planID, input);
+		if (data instanceof Error)
+			return new Error("An error occurred while creating your path");
+		return data;
+	}
+
+	@Mutation("updateLearningPath")
+	async updateLearningPath(
+		@Args("planID") planID: string,
+		@Args("pathID") pathID: string,
+		@Args("input") input: PathInput
+	) {
+		const data = await this.programService.updateLearningPath(
+			planID,
+			pathID,
+			input
+		);
+		if (data instanceof Error)
+			return new Error("An error occurred while updating your learning path");
+		return data;
+	}
+
+	@Mutation("deleteLearningPath")
+	async deleteLearningPath(
+		@Args("planID") planID: string,
+		@Args("pathID") pathID: string
+	) {
+		const data = await this.programService.deleteLearningPath(planID, pathID);
+		if (data instanceof Error)
+			return new Error("An error occurred while deleting your learning path");
+		return data;
 	}
 }
