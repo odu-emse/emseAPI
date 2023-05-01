@@ -800,6 +800,16 @@ export interface ModuleFlow {
     currentSection?: Nullable<Section>;
 }
 
+export interface SimpleModuleFlow {
+    previousModule?: Nullable<ModulePath>;
+    previousCollection?: Nullable<CollectionPath>;
+    nextModule?: Nullable<ModulePath>;
+    nextCollection?: Nullable<CollectionPath>;
+    currentModule?: Nullable<ModulePath>;
+    currentCollection?: Nullable<CollectionPath>;
+    currentSection?: Nullable<SectionPath>;
+}
+
 export interface SimpleLearningPath {
     id: string;
     createdAt: Date;

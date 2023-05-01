@@ -514,6 +514,16 @@ type ModuleFlow {
     currentSection: Section
 }
 
+type SimpleModuleFlow {
+	previousModule: ModulePath
+	previousCollection: CollectionPath
+	nextModule: ModulePath
+	nextCollection: CollectionPath
+	currentModule: ModulePath
+	currentCollection: CollectionPath
+	currentSection: SectionPath
+}
+
 type SimpleLearningPath {
     id:        ID!
     createdAt: Date!

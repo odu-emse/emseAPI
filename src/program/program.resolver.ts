@@ -22,7 +22,9 @@ import {
 	CreateLearningPathInput,
 	PathInput,
 	Module,
-	ModuleFlow
+	SimpleModuleFlow,
+	CollectionPath,
+	SectionPath
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -234,7 +236,7 @@ export class ProgramResolver {
 	async moduleFlowFromLearningPath(
 		@Args("planID") planID: string,
 		@Args("moduleID") moduleID: string
-	) {
+	): Promise<SimpleModuleFlow | Error> {
 		// get lp from plan
 		const learningPath = await this.programService.learningPath(planID);
 		if (!learningPath)
@@ -244,7 +246,8 @@ export class ProgramResolver {
 		const filteredLearningPath = learningPath[0].paths.filter((path) => {
 			return path.status === "LIVE";
 		});
-		if (filteredLearningPath.length === 0) return [];
+		if (filteredLearningPath.length === 0)
+			return new Error("No live learning paths found for inputted user");
 
 		const sections = filteredLearningPath[0].course.sections;
 
@@ -264,7 +267,8 @@ export class ProgramResolver {
 			(collection) => typeof collection !== "undefined"
 		)[0];
 
-		if (typeof filteredCollection === "undefined") return [];
+		if (typeof filteredCollection === "undefined")
+			return new Error("No collection found for inputted module");
 
 		const currentModuleIndex = filteredCollection.modules.findIndex(
 			(module) => module.id === moduleID
@@ -276,7 +280,30 @@ export class ProgramResolver {
 			});
 		});
 
-		let nextCollection = filteredCollection;
+		const currentCollectionIndex = sections[
+			currentSectionIndex
+		].collections.findIndex((collection) => {
+			return collection.id === filteredCollection.id;
+		});
+
+		let nextCollection: CollectionPath | null = filteredCollection;
+		let previousCollection: CollectionPath | null = filteredCollection;
+		const currentSection: SectionPath = sections[currentSectionIndex];
+
+		if (currentModuleIndex === 0) {
+			let previousSection = sections[currentSectionIndex - 1];
+			if (!previousSection) previousSection = currentSection;
+			previousCollection =
+				previousSection.collections[previousSection.collections.length - 1];
+		}
+
+		if (
+			currentModuleIndex === 0 &&
+			currentCollectionIndex === 0 &&
+			currentSectionIndex === 0
+		) {
+			previousCollection = null;
+		}
 
 		if (currentModuleIndex + 1 === filteredCollection.modules.length) {
 			// get the array of collections in the sections
@@ -299,18 +326,18 @@ export class ProgramResolver {
 					currentCollection: filteredCollection,
 					nextCollection: null,
 					previousModule: filteredCollection.modules[currentModuleIndex - 1],
-					previousCollection: filteredCollection,
-					currentSection: sections[currentSectionIndex]
+					previousCollection,
+					currentSection
 				};
 
 			return {
-				currentModule: filteredCollection.modules[currentModuleIndex],
 				nextModule: nextCollection.modules[0],
-				currentCollection: filteredCollection,
 				nextCollection: nextCollection,
+				currentModule: filteredCollection.modules[currentModuleIndex],
+				currentCollection: filteredCollection,
+				currentSection,
 				previousModule: filteredCollection.modules[currentModuleIndex - 1],
-				previousCollection: filteredCollection,
-				currentSection: sections[currentSectionIndex]
+				previousCollection
 			};
 		}
 
@@ -322,8 +349,8 @@ export class ProgramResolver {
 			currentCollection: filteredCollection,
 			nextCollection: filteredCollection,
 			previousModule: filteredCollection.modules[currentModuleIndex - 1],
-			previousCollection: filteredCollection,
-			currentSection: sections[currentSectionIndex]
+			previousCollection,
+			currentSection
 		};
 	}
 
