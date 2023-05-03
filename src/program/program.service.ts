@@ -1416,15 +1416,12 @@ export class ProgramService {
 						sections: path.course.sections.map((section) => {
 							return {
 								id: section.id,
-								name: section.name,
 								collections: section.collections.map((collection) => {
 									return {
 										id: collection.id,
-										name: collection.name,
 										modules: collection.modules.map((module) => {
 											return {
-												id: module.id,
-												enrollmentID: ""
+												id: module.id
 											};
 										})
 									};
@@ -1477,15 +1474,12 @@ export class ProgramService {
 				sections: course.sections.map((section) => {
 					return {
 						id: section.id,
-						name: section.name,
 						collections: section.collections.map((collection) => {
 							return {
 								id: collection.id,
-								name: collection.name,
 								modules: collection.modules.map((module) => {
 									return {
-										id: module.id,
-										enrollmentID: ""
+										id: module.id
 									};
 								})
 							};
@@ -1551,7 +1545,6 @@ export class ProgramService {
 				if (section.id !== pathData.course.sections[sectionIndex].id) {
 					return {
 						id: section.id,
-						name: section.name,
 						collections: []
 					};
 				} else {
@@ -1565,7 +1558,6 @@ export class ProgramService {
 							) {
 								return {
 									id: collection.id,
-									name: collection.name,
 									modules: []
 								};
 							} else {
@@ -1583,18 +1575,13 @@ export class ProgramService {
 											};
 										} else {
 											return {
-												id: module.id,
-												enrollmentID:
-													pathData.course.sections[sectionIndex].collections[
-														collectionIndex
-													].modules[moduleIndex].enrollmentID
+												id: module.id
 											};
 										}
 									}
 								);
 								return {
 									id: collection.id,
-									name: collection.name,
 									modules: updatedModulesArray
 								};
 							}
@@ -1602,7 +1589,6 @@ export class ProgramService {
 					);
 					return {
 						id: section.id,
-						name: section.name,
 						collections: updatedCollectionsArray
 					};
 				}
