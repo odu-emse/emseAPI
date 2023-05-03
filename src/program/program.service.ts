@@ -702,9 +702,9 @@ export class ProgramService {
 		return this.prisma.course.create({
 			data: {
 				name: data.name,
-				sectionIDs: data.section,
 				carnegieHours: data.carnegieHours,
-				required: data.required
+				required: data.required,
+				sections: data.section ? { connect: { id: data.section } } : undefined
 			},
 			include: this.courseInclude
 		});
