@@ -813,19 +813,16 @@ input CoursePathInput {
 
 input SectionPathInput {
     id: ID!
-    name: String!
     collections: [CollectionPathInput!]!
 }
 
 input CollectionPathInput {
     id: ID!
-    name: String!
     modules: [ModulePathInput!]!
 }
 
 input ModulePathInput {
     id: ID!
-    enrollmentID: ID
 }
 
 input CreateContentArgs {
