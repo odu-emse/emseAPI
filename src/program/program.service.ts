@@ -702,6 +702,7 @@ export class ProgramService {
 		return this.prisma.course.create({
 			data: {
 				name: data.name,
+				sectionIDs: data.section,
 				carnegieHours: data.carnegieHours,
 				required: data.required
 			},
@@ -729,13 +730,14 @@ export class ProgramService {
 	}
 
 	async updateCourse(id: string, data: CourseInput) {
-		const { name, required, carnegieHours } = data;
+		const { name, section, required, carnegieHours } = data;
 		return this.prisma.course.update({
 			where: {
 				id: id
 			},
 			data: {
 				...(name && { name }),
+				...(section && { section }),
 				...(required && { required }),
 				...(carnegieHours && { carnegieHours })
 			},
