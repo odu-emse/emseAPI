@@ -16,25 +16,25 @@ generator dbml {
 model User {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   openID      String    @unique
-  email       String
-  picURL      String?
+  email       String    
+  picURL      String?   
   createdAt   DateTime  @default(now())
-  firstName   String
-  lastName    String
-  middleName  String?
+  firstName   String    
+  lastName    String    
+  middleName  String?   
   dob         DateTime? @default(now())
   isAdmin     Boolean   @default(false)
   isActive    Boolean   @default(false)
-  biography   String?
-  phoneNumber String?
+  biography   String?   
+  phoneNumber String?   
 
   // Relation fields
   social             Social?            @relation(name: "social")
   plan               PlanOfStudy?       @relation(name: "plan")
-  tokens             Token[]
-  feedback           SectionFeedback[]
+  tokens             Token[]            
+  feedback           SectionFeedback[]  
   assignmentGraded   AssignmentResult[] @relation(name: "graded")
-  instructorProfile  InstructorProfile?
+  instructorProfile  InstructorProfile? 
   watchedThreads     Thread[]           @relation(fields: [watchedThreadIDs], references: [id])
   watchedThreadIDs   String[]           @default([]) @db.ObjectId
   createdThreads     Thread[]           @relation(name: "createdThreads")
@@ -50,11 +50,11 @@ model InstructorProfile {
   id                            String   @id @default(auto()) @map("_id") @db.ObjectId
   account                       User?    @relation(fields: [accountID], references: [id])
   accountID                     String?  @unique @db.ObjectId
-  title                         String?
-  officeLocation                String?
+  title                         String?  
+  officeLocation                String?  
   officeHours                   String[] @default([])
-  contactPolicy                 String?
-  background                    String?
+  contactPolicy                 String?  
+  background                    String?  
   researchInterest              String[] @default([])
   selectedPapersAndPublications String[] @default([])
   instructedModules             Module[] @relation()
@@ -67,19 +67,19 @@ model PlanOfStudy {
   // ill figure advisors out later, my brain needs a rest
   // advisor           User?              @relation(fields: [advisorId], references:[id])
   // advisorId         String?            @db.ObjectId
-  sections          SectionEnrollment[]
-  assignmentResults AssignmentResult[]
-  quizResults       QuizResult[]
-  learningPaths     LearningPath[]
+  sections          SectionEnrollment[] 
+  assignmentResults AssignmentResult[]  
+  quizResults       QuizResult[]        
+  learningPaths     LearningPath[]      
 }
 
 model Social {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  twitter   String?
-  github    String?
-  linkedin  String?
-  facebook  String?
-  portfolio String?
+  twitter   String? 
+  github    String? 
+  linkedin  String? 
+  facebook  String? 
+  portfolio String? 
   account   User?   @relation(name: "social", fields: [accountID], references: [id])
   accountID String? @unique @db.ObjectId
 }
@@ -88,7 +88,7 @@ model Token {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt  DateTime @default(now())
   valid      Boolean  @default(true)
-  expiration DateTime
+  expiration DateTime 
 
   // Relation fields
   user   User   @relation(fields: [userId], references: [id])
@@ -97,7 +97,7 @@ model Token {
 
 model Course {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
+  name          String    
   number        Int?      @default(0)
   prefix        String?   @default("")
   required      Boolean?  @default(false)
@@ -110,12 +110,12 @@ model Section {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   sectionNumber Int      @unique
   sectionName   String   @unique
-  description   String
-  duration      Float
-  intro         String
-  numSlides     Int
-  keywords      String[]
-  objectives    String[]
+  description   String   
+  duration      Float    
+  intro         String   
+  numSlides     Int      
+  keywords      String[] 
+  objectives    String[] 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 
@@ -136,7 +136,7 @@ model Section {
 
 model Collection {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
+  name      String   
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   position  Int      @default(0)
@@ -150,7 +150,7 @@ model Collection {
 
 model Module {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
+  name          String       
   prefix        String?      @default("")
   number        Int?         @default(1)
   collections   Collection[] @relation(fields: [collectionIDs], references: [id])
@@ -162,15 +162,15 @@ model Module {
 
   instructor          InstructorProfile? @relation(fields: [instructorProfileID], references: [id])
   instructorProfileID String?            @default("") @db.ObjectId
-  content             Content[]
-  quizzes             Quiz[]
-  moduleProgress      ModuleProgress[]
+  content             Content[]          
+  quizzes             Quiz[]             
+  moduleProgress      ModuleProgress[]   
 }
 
 model SectionFeedback {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
-  feedback String
-  rating   Int
+  feedback String 
+  rating   Int    
 
   studentId String  @db.ObjectId
   sectionId String  @db.ObjectId
@@ -181,7 +181,7 @@ model SectionFeedback {
 model SectionEnrollment {
   id         String           @id @default(auto()) @map("_id") @db.ObjectId
   enrolledAt DateTime         @default(now())
-  role       UserRole // Allow for instructors, graders and students to take part in the module.
+  role       UserRole         // Allow for instructors, graders and students to take part in the module.
   status     EnrollmentStatus @default(INACTIVE)
 
   // Relation Fields
@@ -189,32 +189,32 @@ model SectionEnrollment {
   sectionId      String           @db.ObjectId
   plan           PlanOfStudy?     @relation(fields: [planID], references: [id])
   planID         String?          @db.ObjectId
-  progress       Progress?
-  moduleProgress ModuleProgress[]
+  progress       Progress?        
+  moduleProgress ModuleProgress[] 
 }
 
 model Assignment {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   updatedAt     DateTime @default(now()) @updatedAt
-  name          String
-  dueAt         DateTime
-  contentURL    String
-  contentType   String
+  name          String   
+  dueAt         DateTime 
+  contentURL    String   
+  contentType   String   
   acceptedTypes FileType @default(DOC)
 
   // Relation Fields
   sectionId         String             @db.ObjectId
   section           Section            @relation(fields: [sectionId], references: [id])
-  assignmentResults AssignmentResult[]
+  assignmentResults AssignmentResult[] 
 }
 
 model AssignmentResult {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   submittedAt   DateTime @default(now())
-  result        Float
-  feedback      String?
-  submissionURL String
-  fileType      String
+  result        Float    
+  feedback      String?  
+  submissionURL String   
+  fileType      String   
 
   // Relation Fields
   studentId    String      @db.ObjectId
@@ -229,8 +229,8 @@ model Thread {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
-  title         String?
-  body          String
+  title         String?  
+  body          String   
   usersWatching User[]   @relation(fields: [watcherID], references: [id])
   watcherID     String[] @default([]) @db.ObjectId
   author        User     @relation(name: "createdThreads", fields: [authorID], references: [id])
@@ -247,18 +247,18 @@ model Thread {
 
 model Content {
   id       String      @id @default(auto()) @map("_id") @db.ObjectId
-  type     ContentType
-  link     String
+  type     ContentType 
+  link     String      
   parent   Module      @relation(fields: [parentID], references: [id], onDelete: Cascade)
   parentID String      @db.ObjectId
-  primary  Boolean
+  primary  Boolean     
 }
 
 model DirectMessage {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
-  body        String
+  body        String   
   author      User     @relation(name: "sentMessages", fields: [authorID], references: [id])
   authorID    String   @db.ObjectId
   recipient   User?    @relation(name: "receivedMessages", fields: [recipientID], references: [id])
@@ -271,7 +271,7 @@ model Group {
   id        String          @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime        @default(now())
   updatedAt DateTime        @default(now()) @updatedAt
-  name      String
+  name      String          
   public    Boolean         @default(false)
   members   User[]          @relation(name: "groupMemeberships", fields: [memberIDs], references: [id])
   memberIDs String[]        @default([]) @db.ObjectId
@@ -304,35 +304,34 @@ model ModuleProgress {
 
 model Quiz {
   id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  totalPoints    Float
-  instructions   String?
-  dueAt          DateTime?
-  timeLimit      Int?
-  numQuestions   Int
+  totalPoints    Float          
+  instructions   String?        
+  dueAt          DateTime?      
+  timeLimit      Int?           
+  numQuestions   Int            
   minScore       Float          @default(0.0)
   parentModule   Module         @relation(fields: [parentModuleID], references: [id], onDelete: Cascade)
   parentModuleID String         @db.ObjectId
-  questionPool   Question[]
-  instances      QuizInstance[]
+  questionPool   Question[]     
+  instances      QuizInstance[] 
 }
 
 model QuizInstance {
-  id           String      @id @default(auto()) @map("_id") @db.ObjectId
-  quiz         Quiz        @relation(fields: [quizID], references: [id], onDelete: Cascade)
-  quizID       String      @db.ObjectId
-  questions    Question[]  @relation(fields: [questionIDs], references: [id])
-  questionIDs  String[]    @default([]) @db.ObjectId
-  quizResult   QuizResult? @relation(fields: [quizResultID], references: [id])
-  quizResultID String?     @unique @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  quiz        Quiz         @relation(fields: [quizID], references: [id], onDelete: Cascade)
+  quizID      String       @db.ObjectId
+  questions   Question[]   @relation(fields: [questionIDs], references: [id])
+  questionIDs String[]     @default([]) @db.ObjectId
+  quizResult  QuizResult[] 
 }
 
 model Question {
   id          String         @id @default(auto()) @map("_id") @db.ObjectId
-  number      Int
+  number      Int            
   variant     Int            @default(1)
-  text        String
+  text        String         
   points      Float          @default(1.0)
-  answers     Answer[]
+  answers     Answer[]       
   parent      Quiz           @relation(fields: [parentID], references: [id], onDelete: Cascade)
   parentID    String         @db.ObjectId
   instances   QuizInstance[] @relation(fields: [instanceIDs], references: [id])
@@ -355,9 +354,10 @@ model QuizResult {
   // answers     String[]
   submittedAt DateTime @default(now())
 
-  student      PlanOfStudy   @relation(fields: [studentID], references: [id])
-  studentID    String        @db.ObjectId
-  quizInstance QuizInstance?
+  student        PlanOfStudy   @relation(fields: [studentID], references: [id])
+  studentID      String        @db.ObjectId
+  quizInstance   QuizInstance? @relation(fields: [quizInstanceID], references: [id])
+  quizInstanceID String?       @db.ObjectId
 }
 
 model LearningPath {

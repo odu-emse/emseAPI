@@ -286,8 +286,7 @@ Table QuizInstance {
   quizID String [not null]
   questions Question [not null]
   questionIDs String[] [not null]
-  quizResult QuizResult
-  quizResultID String [unique]
+  quizResult QuizResult [not null]
 }
 
 Table Question {
@@ -320,6 +319,7 @@ Table QuizResult {
   student PlanOfStudy [not null]
   studentID String [not null]
   quizInstance QuizInstance
+  quizInstanceID String
 }
 
 Table LearningPath {
@@ -441,8 +441,6 @@ Ref: QuizInstance.quizID > Quiz.id [delete: Cascade]
 
 Ref: QuizInstance.questionIDs > Question.id
 
-Ref: QuizInstance.quizResultID - QuizResult.id
-
 Ref: Question.parentID > Quiz.id [delete: Cascade]
 
 Ref: Question.instanceIDs > QuizInstance.id
@@ -450,5 +448,7 @@ Ref: Question.instanceIDs > QuizInstance.id
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 
 Ref: QuizResult.studentID > PlanOfStudy.id
+
+Ref: QuizResult.quizInstanceID > QuizInstance.id
 
 Ref: LearningPath.planID > PlanOfStudy.id [delete: Cascade]
