@@ -387,19 +387,16 @@ type CoursePath {
 
 type SectionPath {
   id          String
-  name        String
   collections CollectionPath[]
 }
 
 type CollectionPath {
   id      String
-  name    String
   modules ModulePath[]
 }
 
 type ModulePath {
-  id           String
-  enrollmentID String
+  id String
 }
 
 enum UserRole {

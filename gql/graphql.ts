@@ -97,19 +97,16 @@ export interface CoursePathInput {
 
 export interface SectionPathInput {
     id: string;
-    name: string;
     collections: CollectionPathInput[];
 }
 
 export interface CollectionPathInput {
     id: string;
-    name: string;
     modules: ModulePathInput[];
 }
 
 export interface ModulePathInput {
     id: string;
-    enrollmentID?: Nullable<string>;
 }
 
 export interface CreateContentArgs {
