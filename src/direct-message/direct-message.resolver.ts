@@ -11,13 +11,21 @@ export class DirectMessageResolver {
 	) {}
 
 	@Query("directMessages")
-	async directMessages(@Args("receiverID") receiverID: string) {
-		return await this.dmService.getConversation(receiverID);
+	async directMessages(
+		@Args("receiverID") receiverID: string,
+		@Args("senderID") senderID: string
+	) {
+		return await this.dmService.getConversation(receiverID, senderID);
 	}
 
 	@Query("groups")
 	async groups(@Args("userID") userID: string) {
 		return await this.dmService.getGroups(userID);
+	}
+
+	@Query("sentMessages")
+	async sentMessages(@Args("senderID") senderID: string) {
+		return await this.dmService.getSentMessages(senderID);
 	}
 
 	@Subscription("newDirectMessage", {

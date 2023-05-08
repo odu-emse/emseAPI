@@ -6,10 +6,19 @@ import { DirectMessage, Group, Prisma, User } from "@prisma/client";
 export class DirectMessageService {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async getConversation(receiverID) {
+	async getConversation(receiverID: string, senderID: string) {
 		const response = await this.prisma.directMessage.findMany({
 			where: {
-				recipientID: receiverID
+				OR: [
+					{
+						authorID: senderID,
+						recipientID: receiverID
+					},
+					{
+						recipientID: senderID,
+						authorID: receiverID
+					}
+				]
 			},
 			include: {
 				author: true,
@@ -20,7 +29,7 @@ export class DirectMessageService {
 		return response;
 	}
 
-	async getGroups(userID) {
+	async getGroups(userID: string) {
 		const response = await this.prisma.group.findMany({
 			where: {
 				members: {
@@ -43,7 +52,7 @@ export class DirectMessageService {
 		return response;
 	}
 
-	async send(senderID, recipientID, message) {
+	async send(senderID: string, recipientID: string, message: string) {
 		let response: DirectMessage & {
 			author: User;
 			recipient: (User | null) | (Group | null);
@@ -140,5 +149,25 @@ export class DirectMessageService {
 				return new Error(e);
 			}
 		}
+	}
+
+	async getSentMessages(senderID: string) {
+		const response = await this.prisma.directMessage.findMany({
+			where: {
+				authorID: senderID
+			},
+			include: {
+				author: true,
+				recipient: true,
+				group: {
+					include: {
+						messages: true,
+						members: true
+					}
+				}
+			}
+		});
+		if (!response) return new Error("Messages could not be found");
+		return response;
 	}
 }

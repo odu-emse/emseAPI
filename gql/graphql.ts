@@ -581,9 +581,10 @@ export interface IMutation {
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     thread(input?: Nullable<IThreadByParams>): Thread[] | Promise<Thread[]>;
-    directMessages(receiverID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
+    directMessages(receiverID: string, senderID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
     groups(userID: string): Group[] | Promise<Group[]>;
     groupMessages(groupID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
+    sentMessages(senderID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -649,7 +650,7 @@ export interface DirectMessageResponse {
     authorID: string;
     recipientID: string;
     author: User;
-    recipient: Members;
+    recipient: User;
 }
 
 export interface Group {
