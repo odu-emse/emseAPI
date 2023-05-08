@@ -168,6 +168,28 @@ export class DirectMessageService {
 			}
 		});
 		if (!response) return new Error("Messages could not be found");
-		return response;
+
+		// filter out duplicate recipients and keep the most recent one
+		console.log(response);
+
+		const sortedResponses = response.sort((a, b) => {
+			return b.createdAt.getTime() - a.createdAt.getTime();
+		});
+
+		const recipientIDs = new Set<string | null>();
+
+		const filteredResponses = sortedResponses.filter((response) => {
+			if (response.group) {
+				return true;
+			}
+			if (recipientIDs.has(response.recipientID)) {
+				return false;
+			} else {
+				recipientIDs.add(response.recipientID);
+				return true;
+			}
+		});
+
+		return filteredResponses;
 	}
 }
