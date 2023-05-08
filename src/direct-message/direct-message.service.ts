@@ -1,15 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { CreateMessageInput } from "@/types/graphql";
-import Redis from "ioredis";
 import { DirectMessage, Group, Prisma, User } from "@prisma/client";
 
 @Injectable()
 export class DirectMessageService {
-	constructor(
-		private readonly prisma: PrismaService,
-		@Inject("REDIS_CLIENT") private readonly redisClient: Redis
-	) {}
+	constructor(private readonly prisma: PrismaService) {}
 
 	async getConversation(receiverID) {
 		const response = await this.prisma.directMessage.findMany({

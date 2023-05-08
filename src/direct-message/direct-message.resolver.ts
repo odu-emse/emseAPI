@@ -1,12 +1,4 @@
-import {
-	Args,
-	Context,
-	GraphQLExecutionContext,
-	Mutation,
-	Query,
-	Resolver,
-	Subscription
-} from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { DirectMessageService } from "@/direct-message";
 import { PubSubService } from "@/pub-sub/pub-sub.service";
 import { DirectMessage } from "@prisma/client";
@@ -31,7 +23,6 @@ export class DirectMessageResolver {
 	@Subscription("newDirectMessage", {
 		resolve: (payload) => payload,
 		filter: (payload: DirectMessage, args: { receiverID: string }) => {
-			console.log(payload, args);
 			return payload.recipientID === args.receiverID;
 		}
 	})
@@ -41,7 +32,6 @@ export class DirectMessageResolver {
 	@Subscription("newGroupMessage", {
 		resolve: (payload) => payload,
 		filter: (payload, args) => {
-			console.log(payload, args);
 			return payload.groupID === args.groupID;
 		}
 	})
