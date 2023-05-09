@@ -83,4 +83,21 @@ export class DirectMessageResolver {
 			}
 		}
 	}
+
+	@Mutation("createGroup")
+	async createGroup(
+		@Args("name") name: string,
+		@Args("members") members: string[],
+		@Args("publicGroup") publicGroup: boolean = false
+	) {
+		const newGroup = await this.dmService.createGroup(
+			name,
+			members,
+			publicGroup
+		);
+		if (newGroup instanceof Error) return new Error(newGroup.message);
+		else {
+			return newGroup;
+		}
+	}
 }
