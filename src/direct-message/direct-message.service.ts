@@ -190,6 +190,37 @@ export class DirectMessageService {
 			}
 		});
 
-		return filteredResponses;
+		if (!payload) return new Error("Messages could not be found");
+		//@ts-ignore
+		return payload;
+	}
+
+	async createGroup(name: string, members: string[], publicGroup: boolean) {
+		const response = await this.prisma.group.create({
+			data: {
+				name,
+				members: {
+					connect: members.map((member) => {
+						return {
+							id: member
+						};
+					})
+				},
+				public: publicGroup
+			},
+			include: {
+				members: true,
+				messages: {
+					include: {
+						author: true,
+						group: true,
+						recipient: true
+					}
+				}
+			}
+		});
+
+		if (!response) return new Error("Group could not be created");
+		return response;
 	}
 }

@@ -33,6 +33,8 @@ type Mutation {
     """
     newGroupMessage(groupID: ID!, message: String!, senderID: ID!): Boolean!
 #    createChannel(groupID: ID!, name: String!, publicAccess: Boolean=false): Boolean!
+
+    createGroup(name: String!, members: [ID!]!, publicGroup: Boolean=false): Group!
 }
 
 type CreateMessageInput {
@@ -49,7 +51,7 @@ type DirectMessageResponse {
     authorID: ID!
     recipientID: ID!
     author: User!
-    recipient: User!
+    recipient: Members!
 }
 
 union Members = User | Group

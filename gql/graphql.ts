@@ -513,6 +513,7 @@ export interface IMutation {
     addUserAsWatcherToThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
     newGroupMessage(groupID: string, message: string, senderID: string): boolean | Promise<boolean>;
+    createGroup(name: string, members: string[], publicGroup?: Nullable<boolean>): Group | Promise<Group>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -650,7 +651,7 @@ export interface DirectMessageResponse {
     authorID: string;
     recipientID: string;
     author: User;
-    recipient: User;
+    recipient: Members;
 }
 
 export interface Group {
