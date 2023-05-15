@@ -1136,9 +1136,11 @@ export class ProgramService {
 			},
 			data: {
 				name: payload.name,
-				collectionIDs: {
-					push: payload.collection
-				},
+				collectionIDs: payload.collection
+					? {
+							push: payload.collection
+					  }
+					: undefined,
 				position: input.position ? input.position : undefined,
 				objectives: newObjectives ? newObjectives : undefined,
 				hours: payload.hours
