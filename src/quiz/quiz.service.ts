@@ -373,18 +373,26 @@ export class QuizService {
 			}
 		});
 
-		return Promise.all(results).then(() =>
-			this.prisma.quizResult.create({
-				data: {
-					score: score,
-					// answers: input.answers,
-					student: { connect: { id: plan } },
-					quizInstance: { connect: { id: input.quizInstance } }
-				}
-			})
-		);
+		const res = Promise.all(results)
+			.then(() =>
+				this.prisma.quizResult.create({
+					data: {
+						score: score,
+						// answers: input.answers,
+						student: { connect: { id: plan } },
+						quizInstance: { connect: { id: input.quizInstance } }
+					}
+				})
+			)
+			.catch((err) => {
+				return new Error(err.message);
+			});
 		//TODO: Add quiz grading logic
 		// const questions =
+
+		if (res instanceof Error) return new Error(res.message);
+
+		return res;
 	}
 
 	async updateQuizScore(id: string, newScore: number) {
