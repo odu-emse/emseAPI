@@ -1363,6 +1363,8 @@ type Mutation {
 
 	deleteModule(id: String!): Module
 
+	deleteManyModule(id: [String!]!): Boolean
+
     """
     Create a Content Record
     """

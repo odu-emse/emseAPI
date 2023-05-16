@@ -558,7 +558,7 @@ export class ProgramService {
 			...(id && { id }),
 			...(name && { name }),
 			...(position && { position }),
-			collections: { some: { id: collection ? collection : undefined } },
+			collections: collection ? { some: { id: collection } } : undefined,
 			content: content ? { some: { id: content } } : undefined,
 			objectives: objectives ? { hasEvery: objectives } : undefined
 		});
