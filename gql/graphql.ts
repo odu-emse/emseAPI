@@ -285,7 +285,7 @@ export interface ModuleInput {
     prefix?: Nullable<string>;
     number?: Nullable<number>;
     content?: Nullable<string>;
-    collection: string;
+    collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
     hours: number;

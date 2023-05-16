@@ -1072,14 +1072,18 @@ export class ProgramService {
 							}
 						}
 					}),
-				collections: {
-					connect: {
-						id: input.collection ? input.collection : undefined
-					}
-				},
+				collections: input.collection
+					? {
+							connect: {
+								id: input.collection
+							}
+					  }
+					: undefined,
 				position: input.position ? input.position : undefined,
 				objectives: input.objectives ? input.objectives : undefined,
-				hours: input.hours
+				hours: input.hours,
+				prefix: input.prefix ? input.prefix : undefined,
+				number: input.number ? input.number : undefined
 			},
 			include: this.moduleInclude
 		});

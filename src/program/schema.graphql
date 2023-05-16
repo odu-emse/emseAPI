@@ -1176,7 +1176,7 @@ input ModuleInput {
 	"""
 	The ID of the parent collection
 	"""
-	collection: ID!
+	collection: ID
 
 	"""
 	The index of the Module in the collection
