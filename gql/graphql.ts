@@ -288,6 +288,7 @@ export interface ModuleInput {
     collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
+    keywords?: Nullable<string[]>;
     hours: number;
     description?: Nullable<string>;
     instructor?: Nullable<string>;
@@ -303,6 +304,7 @@ export interface ModuleFields {
     collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
+    keywords?: Nullable<string[]>;
     hours?: Nullable<number>;
     description?: Nullable<string>;
     instructor?: Nullable<string>;
@@ -543,6 +545,7 @@ export interface IMutation {
     createModule(input: ModuleInput): Module | Promise<Module>;
     updateModule(input?: Nullable<ModuleFields>, replaceObj?: Nullable<boolean>): Nullable<Module> | Promise<Nullable<Module>>;
     deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
+    deleteManyModule(id: string[]): Nullable<boolean> | Promise<Nullable<boolean>>;
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
@@ -771,6 +774,7 @@ export interface Module {
     quizzes?: Nullable<Quiz[]>;
     moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
+    keywords: string[];
     hours: number;
     description?: Nullable<string>;
     instructor?: Nullable<InstructorProfile>;
@@ -924,6 +928,7 @@ export interface ModulePath {
     quizzes?: Nullable<Quiz[]>;
     moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
+    keywords: string[];
     hours: number;
     enrollmentID?: Nullable<string>;
     description?: Nullable<string>;

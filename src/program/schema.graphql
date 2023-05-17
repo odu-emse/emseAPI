@@ -394,6 +394,10 @@ type Module {
 	A list of learning objectives being covered in this Section
 	"""
 	objectives: 	[String!]!
+	"""
+	A list of keywords that most accurately describe the content of this Module
+	"""
+	keywords: 	[String!]!
     """
 	The number of carnige hours granted for completion of this Section
 	"""
@@ -784,6 +788,10 @@ type ModulePath {
     A list of learning objectives being covered in this Section
     """
     objectives: 	[String!]!
+    """
+    A list of keywords that most accurately describe the content of this Module
+    """
+    keywords: 	[String!]!
     """
     The number of carnige hours granted for completion of this Section
     """
@@ -1186,7 +1194,8 @@ input ModuleInput {
 	The list of learning objectives for this Section
 	"""
 	objectives: [String!]
-  """
+	keywords: [String!]
+  	"""
 	The number of carnige hours granted for completing this Section
 	"""
 	hours: Float!
@@ -1225,7 +1234,8 @@ input ModuleFields {
 	Learning objectives that are taught in this Section
 	"""
 	objectives: [String!]
-  """
+	keywords: [String!]
+  	"""
 	The number of carnige hours granted for completing this Section
 	"""
 	hours:	Float
