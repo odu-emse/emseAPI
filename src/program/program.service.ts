@@ -1083,7 +1083,8 @@ export class ProgramService {
 				objectives: input.objectives ? input.objectives : undefined,
 				hours: input.hours,
 				prefix: input.prefix ? input.prefix : undefined,
-				number: input.number ? input.number : undefined
+				number: input.number ? input.number : undefined,
+				keywords: input.keywords ? input.keywords : undefined
 			},
 			include: this.moduleInclude
 		});
