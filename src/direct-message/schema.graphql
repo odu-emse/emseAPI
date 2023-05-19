@@ -9,7 +9,7 @@ type Query {
     """
     Get all messages in a group.
     """
-    directMessages(receiverID: ID!): [DirectMessageResponse!]!
+    directMessages(receiverID: ID!, senderID: ID!): [DirectMessageResponse!]!
     """
     Get all groups for a user.
     """
@@ -18,6 +18,10 @@ type Query {
     Get all messages in a group. If the receiverID is not matched by the receiverID of the message, the message is not returned.
     """
     groupMessages(groupID: ID!): [DirectMessageResponse!]!
+    """
+    Get all messages sent by a user.
+    """
+    sentMessages(senderID: ID!): [DirectMessageResponse!]!
 }
 type Mutation {
     """
@@ -29,6 +33,8 @@ type Mutation {
     """
     newGroupMessage(groupID: ID!, message: String!, senderID: ID!): Boolean!
 #    createChannel(groupID: ID!, name: String!, publicAccess: Boolean=false): Boolean!
+
+    createGroup(name: String!, members: [ID!]!, publicGroup: Boolean=false): Group!
 }
 
 type CreateMessageInput {

@@ -6,16 +6,23 @@ import {
 	createAnswer,
 	createCollection,
 	createModule,
-	createModule,
+	createPlan,
 	createQuestion,
 	createQuiz,
+	createQuizInstance,
 	createRandomAnswer,
 	createRandomModule,
 	createRandomQuestion,
-	createRandomQuiz
+	createRandomQuiz,
+	createSection,
+	createUser
 } from "../../utils";
 import { ProgramResolver, ProgramService } from "@/program";
 import { faker } from "@faker-js/faker";
+import { UserService } from "@/user/user.service";
+import { UserResolver } from "@/user/user.resolver";
+import { PlanOfStudyResolver, PoSService } from "@/pos";
+import { QuizResult } from "@/types/graphql";
 
 describe("Quiz Services", () => {
 	// Init resolvers
@@ -24,20 +31,32 @@ describe("Quiz Services", () => {
 	const resolver: QuizResolver = new QuizResolver(service);
 	const progServ: ProgramService = new ProgramService(prisma);
 	const progResolver: ProgramResolver = new ProgramResolver(progServ);
+	const userService = new UserService(prisma);
+	const userResolver = new UserResolver(userService);
+	const planService = new PoSService(prisma);
+	const planResolver = new PlanOfStudyResolver(planService);
 
 	// Make mock models for testing against
-	const testingAccountStudentID = "63e51cbd14406c6ad63f73a7";
-	const testingAccountPlanID = "63e51cbd14406c6ad63f73a8";
-	let fakeModule;
 	let fakeCollection;
+	let fakeSection;
 	let fakeModule;
 	let fakeQuiz;
 	let fakeQuestion;
 	let fakeAnswer;
-	let fakeSubmission;
+	let fakeSubmission: QuizResult;
+	let fakeUser;
+	let fakePlan;
+	let fakeQuizInstance;
 
 	afterAll(async () => {
-		await progResolver.delete(fakeModule.id);
+		await progResolver.deleteModule(fakeModule.id);
+		await progResolver.delete(fakeSection.id);
+		await resolver.deleteQuiz(fakeQuiz.id);
+		await resolver.deleteQuestion(fakeQuestion.id);
+		await resolver.deleteAnswer(fakeAnswer.id);
+		await resolver.deleteQuizResult(fakeSubmission.id);
+		await userResolver.delete(fakeUser.id);
+		await planResolver.deletePlan(fakePlan.id);
 	});
 
 	test("should be defined", () => {
@@ -46,26 +65,60 @@ describe("Quiz Services", () => {
 	});
 
 	test("should create mock dependencies", async () => {
-		fakeModule = await createModule(progResolver, {
-			moduleName: "testing3",
-			moduleNumber: 1003,
-			description: "Stuff",
-			duration: 10.0,
-			intro: "Intro",
-			keywords: ["Word", "other"],
-			numSlides: 10
+		fakeUser = await createUser(userResolver, {
+			biography: faker.lorem.sentence(),
+			email: faker.internet.email(),
+			firstName: faker.name.firstName(),
+			openID: faker.datatype.uuid(),
+			lastName: faker.name.lastName(),
+			picURL: faker.image.imageUrl(),
+			middleName: faker.name.middleName(),
+			phoneNumber: faker.phone.number()
 		});
+
+		if (fakeUser instanceof Error) throw new Error(fakeUser.message);
+
+		fakePlan = await createPlan(planResolver, {
+			userID: fakeUser.id
+		});
+
+		if (fakePlan instanceof Error) throw new Error(fakePlan.message);
+
+		fakeModule = await createModule(progResolver, {
+			name: "testing3",
+			number: 1003,
+			description: "Stuff",
+			hours: faker.datatype.float({
+				min: 0.25,
+				max: 3,
+				precision: 2
+			}),
+			objectives: [faker.lorem.sentence()]
+		});
+
+		if (fakeModule instanceof Error) throw new Error(fakeModule.message);
+
+		fakeSection = await createSection(progResolver, {
+			description: faker.lorem.sentence(),
+			intro: faker.lorem.sentence(),
+			numSlides: faker.datatype.number({ min: 1, max: 10 }),
+			duration: faker.datatype.number({ min: 1, max: 10 }),
+			keywords: [faker.lorem.word()],
+			sectionName: faker.lorem.word(),
+			sectionNumber: faker.datatype.number({ min: 1000, max: 9000 })
+		});
+
+		if (fakeSection instanceof Error) throw new Error(fakeSection.message);
 
 		fakeCollection = await createCollection(progResolver, {
 			name: "test",
-			moduleID: fakeModule.id,
+			modules: [fakeModule.id],
+			sectionID: fakeSection.id,
 			positionIndex: 1
 		});
 
-		fakeModule = await createModule(
-			progResolver,
-			createRandomModule(fakeCollection.id)
-		);
+		if (fakeCollection instanceof Error)
+			throw new Error(fakeCollection.message);
 	});
 
 	describe("Creates", () => {
@@ -116,21 +169,27 @@ describe("Quiz Services", () => {
 				expect(end).toEqual(start + 1);
 			});
 		});
+		describe("Mutation.createQuizInstance", () => {
+			test("should create a QuizInstance record", async () => {
+				fakeQuizInstance = await createQuizInstance(resolver, fakeQuiz.id);
+				if (fakeQuizInstance instanceof Error)
+					throw new Error(fakeQuizInstance.message);
+				expect(fakeQuizInstance).toBeDefined();
+				expect(fakeQuizInstance.id).toBeDefined();
+				expect(fakeQuizInstance.quiz.id).toEqual(fakeQuiz.id);
+			});
+		});
 		describe("Mutation.submitQuiz", () => {
 			test("should create a QuizResult record", async () => {
-				const answers: string[] = [];
-				for (let i = 0; i < fakeQuiz.numQuestions; i++) {
-					answers.push(faker.datatype.string(1));
-				}
+				const answers: string[] = [fakeAnswer.id];
 				const result = await resolver.submitQuiz({
-					student: testingAccountStudentID,
-					quiz: fakeQuiz.id,
+					student: fakeUser.id,
+					quizInstance: fakeQuizInstance.id,
 					answers
 				});
 				if (result instanceof Error) return new Error(result.message);
 				fakeSubmission = result;
 				expect(result).toBeDefined();
-				expect(result.answers.length).toEqual(fakeQuiz.numQuestions);
 				expect(result.score).toBeGreaterThanOrEqual(0.0);
 				expect(result.score).toBeLessThanOrEqual(100.0);
 			});
@@ -206,7 +265,7 @@ describe("Quiz Services", () => {
 					variant: fakeQuestion.variant,
 					text: fakeQuestion.text,
 					points: fakeQuestion.points,
-					parentPool: fakeQuestion.parentID
+					parent: fakeQuestion.parentID
 				});
 				expect(questions).toBeDefined();
 				expect(questions.length).toBeGreaterThanOrEqual(1);
@@ -282,13 +341,13 @@ describe("Quiz Services", () => {
 				const results = await resolver.quizResult({
 					score: fakeSubmission.score,
 					student: fakeSubmission.studentID,
-					quiz: fakeSubmission.quizID
+					quizInstance: fakeSubmission.quizID
 				});
 				expect(results).toBeDefined();
 				results.map((result) => {
 					expect(result.score).toEqual(fakeSubmission.score);
 					expect(result.studentID).toEqual(fakeSubmission.studentID);
-					expect(result.quizID).toEqual(fakeSubmission.quizID);
+					expect(result.quizInstanceID).toEqual(fakeSubmission.quizID);
 				});
 			});
 		});

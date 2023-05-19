@@ -6,9 +6,9 @@ import { Progress } from "@prisma/client";
 import { test, describe, afterAll, expect } from "vitest";
 import {
 	createRandomModule,
-	createRandomModuleEnrollment,
 	createRandomPlanOfStudy,
 	createRandomProgress,
+	createRandomSectionEnrollment,
 	createRandomUser,
 	shuffle
 } from "../../utils";
@@ -153,7 +153,7 @@ describe("Progress", function () {
 
 	describe("Waive module progress", function () {
 		test("should waive a user's module and set it to completed", async function () {
-			const result = await resolver.waiveModule({
+			const result = await resolver.waiveSection({
 				enrollmentID: enrollment.id
 			});
 			if (result instanceof Error) throw new Error("Progress not waived.");
@@ -169,7 +169,7 @@ const initializeTest = () => {
 	const usr = createRandomUser();
 	const plan = createRandomPlanOfStudy(usr.id);
 	const module = createRandomModule();
-	const enrollment = createRandomModuleEnrollment(module.id, plan.id);
+	const enrollment = createRandomSectionEnrollment(module.id, plan.id);
 
 	return [usr, plan, module, enrollment];
 };

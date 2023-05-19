@@ -1,12 +1,4 @@
-import {
-	Args,
-	Context,
-	GraphQLExecutionContext,
-	Mutation,
-	Query,
-	Resolver,
-	Subscription
-} from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { DirectMessageService } from "@/direct-message";
 import { PubSubService } from "@/pub-sub/pub-sub.service";
 import { DirectMessage } from "@prisma/client";
@@ -19,8 +11,11 @@ export class DirectMessageResolver {
 	) {}
 
 	@Query("directMessages")
-	async directMessages(@Args("receiverID") receiverID: string) {
-		return await this.dmService.getConversation(receiverID);
+	async directMessages(
+		@Args("receiverID") receiverID: string,
+		@Args("senderID") senderID: string
+	) {
+		return await this.dmService.getConversation(receiverID, senderID);
 	}
 
 	@Query("groups")
@@ -28,10 +23,14 @@ export class DirectMessageResolver {
 		return await this.dmService.getGroups(userID);
 	}
 
+	@Query("sentMessages")
+	async sentMessages(@Args("senderID") senderID: string) {
+		return await this.dmService.getSentMessages(senderID);
+	}
+
 	@Subscription("newDirectMessage", {
 		resolve: (payload) => payload,
 		filter: (payload: DirectMessage, args: { receiverID: string }) => {
-			console.log(payload, args);
 			return payload.recipientID === args.receiverID;
 		}
 	})
@@ -41,7 +40,6 @@ export class DirectMessageResolver {
 	@Subscription("newGroupMessage", {
 		resolve: (payload) => payload,
 		filter: (payload, args) => {
-			console.log(payload, args);
 			return payload.groupID === args.groupID;
 		}
 	})
@@ -83,6 +81,23 @@ export class DirectMessageResolver {
 			} catch (e) {
 				return false;
 			}
+		}
+	}
+
+	@Mutation("createGroup")
+	async createGroup(
+		@Args("name") name: string,
+		@Args("members") members: string[],
+		@Args("publicGroup") publicGroup: boolean = false
+	) {
+		const newGroup = await this.dmService.createGroup(
+			name,
+			members,
+			publicGroup
+		);
+		if (newGroup instanceof Error) return new Error(newGroup.message);
+		else {
+			return newGroup;
 		}
 	}
 }

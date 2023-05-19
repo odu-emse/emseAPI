@@ -1,31 +1,87 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "@/prisma.service";
-import { CreateMessageInput } from "@/types/graphql";
-import Redis from "ioredis";
 import { DirectMessage, Group, Prisma, User } from "@prisma/client";
+import { DirectMessageResponse } from "@/types/graphql";
 
 @Injectable()
 export class DirectMessageService {
-	constructor(
-		private readonly prisma: PrismaService,
-		@Inject("REDIS_CLIENT") private readonly redisClient: Redis
-	) {}
+	constructor(private readonly prisma: PrismaService) {}
 
-	async getConversation(receiverID) {
-		const response = await this.prisma.directMessage.findMany({
+	async getConversation(receiverID: string, senderID: string) {
+		const group = await this.prisma.group.findFirst({
 			where: {
-				recipientID: receiverID
+				id: receiverID
 			},
 			include: {
-				author: true,
-				recipient: true
+				members: true
 			}
 		});
-		if (!response) return new Error("Conversation could not be found");
-		return response;
+		// if the recipient is a group
+		if (group) {
+			// check if the sender is a member of the group
+			const isMember = group.members.find((member) => member.id === senderID);
+			if (!isMember) return new Error("You are not a member of this group");
+			// if the sender is a member of the group, return the group's messages
+			else {
+				const response = await this.prisma.directMessage.findMany({
+					where: {
+						groupID: receiverID
+					},
+					include: {
+						author: true,
+						recipient: true,
+						group: true
+					}
+				});
+
+				if (response.length === 0)
+					return new Error("Conversation could not be found");
+
+				return response.map((message) => {
+					message.recipientID = message.groupID;
+					//@ts-ignore
+					message.recipient = {
+						...message.group,
+						__typename: "Group"
+					} as Group;
+					return message as DirectMessageResponse;
+				});
+			}
+		} else {
+			const response = await this.prisma.directMessage.findMany({
+				where: {
+					OR: [
+						{
+							authorID: senderID,
+							recipientID: receiverID
+						},
+						{
+							recipientID: senderID,
+							authorID: receiverID
+						}
+					]
+				},
+				include: {
+					author: true,
+					recipient: true
+				}
+			});
+			if (response.length === 0)
+				return new Error("Conversation could not be found");
+
+			const typedResponse = response.map((message) => {
+				message.recipient = {
+					...message.recipient,
+					__typename: "User"
+				} as User;
+				return message as DirectMessageResponse;
+			});
+
+			return typedResponse;
+		}
 	}
 
-	async getGroups(userID) {
+	async getGroups(userID: string) {
 		const response = await this.prisma.group.findMany({
 			where: {
 				members: {
@@ -48,7 +104,7 @@ export class DirectMessageService {
 		return response;
 	}
 
-	async send(senderID, recipientID, message) {
+	async send(senderID: string, recipientID: string, message: string) {
 		let response: DirectMessage & {
 			author: User;
 			recipient: (User | null) | (Group | null);
@@ -145,5 +201,118 @@ export class DirectMessageService {
 				return new Error(e);
 			}
 		}
+	}
+
+	async getSentMessages(
+		senderID: string
+	): Promise<Array<DirectMessageResponse> | Error> {
+		const response = await this.prisma.directMessage.findMany({
+			where: {
+				OR: [
+					{
+						authorID: senderID
+					},
+					{
+						recipientID: senderID
+					},
+					{
+						group: {
+							members: {
+								some: {
+									id: senderID
+								}
+							}
+						}
+					}
+				]
+			},
+			include: {
+				author: true,
+				recipient: true,
+				group: {
+					include: {
+						messages: true,
+						members: true
+					}
+				}
+			}
+		});
+		if (!response) return new Error("Messages could not be found");
+
+		const typedResponse = response.map((message) => {
+			if (!message.recipient && message.group) {
+				//@ts-ignore
+				message.recipient = {
+					...message.group,
+					__typename: "Group"
+				} as Group;
+				message.recipientID = message.group.id;
+			} else {
+				message.recipient = {
+					...message.recipient,
+					__typename: "User"
+				} as User;
+			}
+			return message;
+		});
+
+		// sort by most recent message
+		const sortedResponses = typedResponse.sort((a, b) => {
+			return b.createdAt.getTime() - a.createdAt.getTime();
+		});
+
+		const recipientIDs = new Set<string | null>();
+
+		// filter out duplicate recipients and keep the most recent one
+		const payload = sortedResponses.filter((response) => {
+			if (response.group) {
+				if (recipientIDs.has(response.group.id)) {
+					return false;
+				} else {
+					recipientIDs.add(response.group.id);
+					return true;
+				}
+			}
+			if (response.recipientID === senderID) return false;
+			if (recipientIDs.has(response.recipientID)) {
+				return false;
+			} else {
+				recipientIDs.add(response.recipientID);
+				return true;
+			}
+		});
+
+		if (!payload) return new Error("Messages could not be found");
+		//@ts-ignore
+		return payload;
+	}
+
+	async createGroup(name: string, members: string[], publicGroup: boolean) {
+		const response = await this.prisma.group.create({
+			data: {
+				name,
+				members: {
+					connect: members.map((member) => {
+						return {
+							id: member
+						};
+					})
+				},
+				public: publicGroup
+			},
+			include: {
+				members: true,
+				messages: {
+					include: {
+						author: true,
+						group: true,
+						recipient: true
+					}
+				}
+			}
+		});
+
+		if (!response) return new Error("Group could not be created");
+		return response;
 	}
 }

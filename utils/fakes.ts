@@ -34,7 +34,7 @@ export function createRandomUser(): User {
 		middleName: faker.name.middleName(),
 		watchedThreadIDs: [faker.database.mongodbObjectId()],
 		biography: faker.lorem.lines(1),
-		phoneNumber: faker.phone.phoneNumber(),
+		phoneNumber: faker.phone.number(),
 		upvotedThreadIDs: [faker.database.mongodbObjectId()],
 		groupMembershipIDs: [faker.database.mongodbObjectId()]
 	};

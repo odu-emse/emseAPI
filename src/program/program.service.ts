@@ -558,7 +558,7 @@ export class ProgramService {
 			...(id && { id }),
 			...(name && { name }),
 			...(position && { position }),
-			collections: { some: { id: collection ? collection : undefined } },
+			collections: collection ? { some: { id: collection } } : undefined,
 			content: content ? { some: { id: content } } : undefined,
 			objectives: objectives ? { hasEvery: objectives } : undefined
 		});
@@ -1072,14 +1072,19 @@ export class ProgramService {
 							}
 						}
 					}),
-				collections: {
-					connect: {
-						id: input.collection ? input.collection : undefined
-					}
-				},
+				collections: input.collection
+					? {
+							connect: {
+								id: input.collection
+							}
+					  }
+					: undefined,
 				position: input.position ? input.position : undefined,
 				objectives: input.objectives ? input.objectives : undefined,
-				hours: input.hours
+				hours: input.hours,
+				prefix: input.prefix ? input.prefix : undefined,
+				number: input.number ? input.number : undefined,
+				keywords: input.keywords ? input.keywords : undefined
 			},
 			include: this.moduleInclude
 		});
@@ -1136,9 +1141,11 @@ export class ProgramService {
 			},
 			data: {
 				name: payload.name,
-				collectionIDs: {
-					push: payload.collection
-				},
+				collectionIDs: payload.collection
+					? {
+							push: payload.collection
+					  }
+					: undefined,
 				position: input.position ? input.position : undefined,
 				objectives: newObjectives ? newObjectives : undefined,
 				hours: payload.hours

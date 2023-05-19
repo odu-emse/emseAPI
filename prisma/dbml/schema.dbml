@@ -133,6 +133,7 @@ Table Module {
   collectionIDs String[] [not null]
   position Int [not null, default: 0]
   objectives String[] [not null]
+  keywords String[] [not null]
   hours Float [not null, default: 0]
   description String [default: '']
   instructor InstructorProfile

@@ -579,6 +579,15 @@ export class ProgramResolver {
 		return await this.programService.deleteModule(id);
 	}
 
+	@Mutation("deleteManyModule")
+	async deleteManyModule(@Args("id") id: string[]) {
+		const payload = id.map(async (element) => {
+			return await this.programService.deleteModule(element);
+		});
+
+		return payload.length === id.length;
+	}
+
 	@Mutation("createContent")
 	async createContent(@Args("input") input: CreateContentArgs) {
 		// we get the module based on the parent ID of the content

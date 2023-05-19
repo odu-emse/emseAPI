@@ -285,9 +285,10 @@ export interface ModuleInput {
     prefix?: Nullable<string>;
     number?: Nullable<number>;
     content?: Nullable<string>;
-    collection: string;
+    collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
+    keywords?: Nullable<string[]>;
     hours: number;
     description?: Nullable<string>;
     instructor?: Nullable<string>;
@@ -303,6 +304,7 @@ export interface ModuleFields {
     collection?: Nullable<string>;
     position?: Nullable<number>;
     objectives?: Nullable<string[]>;
+    keywords?: Nullable<string[]>;
     hours?: Nullable<number>;
     description?: Nullable<string>;
     instructor?: Nullable<string>;
@@ -513,6 +515,7 @@ export interface IMutation {
     addUserAsWatcherToThread(id: string, userID: string): Nullable<Thread> | Promise<Nullable<Thread>>;
     createDirectMessage(receiverID: string, message: string, senderID: string): boolean | Promise<boolean>;
     newGroupMessage(groupID: string, message: string, senderID: string): boolean | Promise<boolean>;
+    createGroup(name: string, members: string[], publicGroup?: Nullable<boolean>): Group | Promise<Group>;
     addPlan(input?: Nullable<PlanInput>): PlanOfStudy | Promise<PlanOfStudy>;
     updatePlan(id: string, input?: Nullable<PlanInput>): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     deletePlan(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -542,6 +545,7 @@ export interface IMutation {
     createModule(input: ModuleInput): Module | Promise<Module>;
     updateModule(input?: Nullable<ModuleFields>, replaceObj?: Nullable<boolean>): Nullable<Module> | Promise<Nullable<Module>>;
     deleteModule(id: string): Nullable<Module> | Promise<Nullable<Module>>;
+    deleteManyModule(id: string[]): Nullable<boolean> | Promise<Nullable<boolean>>;
     createContent(input: CreateContentArgs): Content | Promise<Content>;
     updateContent(input: ContentFields): Nullable<Content[]> | Promise<Nullable<Content[]>>;
     deleteContent(contentID: string): Nullable<Content> | Promise<Nullable<Content>>;
@@ -581,9 +585,10 @@ export interface IMutation {
 export interface IQuery {
     refresh(token?: Nullable<string>): Nullable<string> | Promise<Nullable<string>>;
     thread(input?: Nullable<IThreadByParams>): Thread[] | Promise<Thread[]>;
-    directMessages(receiverID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
+    directMessages(receiverID: string, senderID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
     groups(userID: string): Group[] | Promise<Group[]>;
     groupMessages(groupID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
+    sentMessages(senderID: string): DirectMessageResponse[] | Promise<DirectMessageResponse[]>;
     plan(studentID: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
     plans(): Nullable<PlanOfStudy[]> | Promise<Nullable<PlanOfStudy[]>>;
     planByID(id: string): Nullable<PlanOfStudy> | Promise<Nullable<PlanOfStudy>>;
@@ -769,6 +774,7 @@ export interface Module {
     quizzes?: Nullable<Quiz[]>;
     moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
+    keywords: string[];
     hours: number;
     description?: Nullable<string>;
     instructor?: Nullable<InstructorProfile>;
@@ -922,6 +928,7 @@ export interface ModulePath {
     quizzes?: Nullable<Quiz[]>;
     moduleProgress?: Nullable<Nullable<ModuleProgress>[]>;
     objectives: string[];
+    keywords: string[];
     hours: number;
     enrollmentID?: Nullable<string>;
     description?: Nullable<string>;

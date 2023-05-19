@@ -7,10 +7,12 @@ import {
 	CreateQuiz,
 	EnrollmentStatus,
 	ModuleInput,
+	NewUser,
 	UserRole
 } from "@/types/graphql";
 import { QuizResolver } from "@/quiz/quiz.resolver";
-import { Answer, Module, Question, Quiz } from "@prisma/client";
+import { Answer, Question, Quiz } from "@prisma/client";
+import { UserResolver } from "@/user/user.resolver";
 
 export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -35,6 +37,12 @@ export const createPlan = async (
 	} else return self[0];
 };
 
+export const createUser = async (resolver: UserResolver, config: NewUser) => {
+	const user = await resolver.create({ ...config });
+	if (user) return user;
+	else return new Error("Failed to create user");
+};
+
 export const createSection = async (
 	resolver: ProgramResolver,
 	config: {
@@ -48,22 +56,17 @@ export const createSection = async (
 	}
 ) => {
 	const section = await resolver.create({ ...config });
-	if (section) return section;
-	else return new Error("Failed to create section");
+	if (!section) return new Error("Failed to create section");
+	return section;
 };
 
 export const createModule = async (
 	resolver: ProgramResolver,
-	config: Module
+	config: ModuleInput
 ) => {
-	const data: ModuleInput = {
-		name: config.name,
-		collection: config.collectionIDs[0],
-		hours: config.hours
-	};
-	const module = await resolver.createModule({ ...data });
-	if (data) return module;
-	else return new Error("Failed to create Module");
+	const module = await resolver.createModule({ ...config });
+	if (!module) return new Error("Failed to create Module");
+	return module;
 };
 
 export const createEnrollment = async (
@@ -102,6 +105,15 @@ export const createQuiz = async (resolver: QuizResolver, input: Quiz) => {
 	const quiz = await resolver.createQuiz(data);
 	if (quiz) return quiz;
 	else return new Error("Failed to create Quiz");
+};
+
+export const createQuizInstance = async (
+	resolver: QuizResolver,
+	quizID: string
+) => {
+	const quizInstance = await resolver.createQuizInstance(quizID);
+	if (quizInstance) return quizInstance;
+	else return new Error("Failed to create quiz instance");
 };
 
 export const createQuestion = async (

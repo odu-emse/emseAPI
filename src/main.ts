@@ -3,27 +3,7 @@ import { AppModule } from "./app.module";
 import cookieParser from "cookie-parser";
 import * as Sentry from "@sentry/node";
 import sourceMapSupport from "source-map-support";
-import { createServer } from "http";
 import { PrismaService } from "@/prisma.service";
-
-async function startWebSocketServer(app, port = 5000) {
-	const httpServer = createServer(app);
-
-	await httpServer.listen(port, async () => {
-		console.log(`🚀 Subscriptions ready at ws://localhost:${port}/graphql`);
-	});
-
-	httpServer.on("connection", (ws) => {
-		console.log("🚀 Connected to websocket");
-		ws.on("message", (message) => {
-			console.log("received: %s", message);
-		});
-		ws.on("close", () => {
-			console.log("🚀 Disconnected from websocket");
-		});
-		ws.on("error", console.error);
-	});
-}
 
 async function bootstrap() {
 	const app = await NestFactory;
@@ -69,6 +49,5 @@ async function bootstrap() {
 			`🚀 Server ready at http://localhost:${process.env.PORT}/graphql`
 		);
 	});
-	await startWebSocketServer(client);
 }
 bootstrap().catch((err) => console.error(err));
