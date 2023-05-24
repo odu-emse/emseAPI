@@ -24,7 +24,8 @@ import {
 	Module,
 	SimpleModuleFlow,
 	CollectionPath,
-	SectionPath
+	SectionPath,
+	PathStatus
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -171,20 +172,25 @@ export class ProgramResolver {
 		return latestModuleProgress;
 	}
 
+	/**
+	 * 1. find enrollments for the student from planID
+	 * 2. find the learning path for the plan
+	 * 3. filter out inactive paths
+	 * 4. filter out modules with a completed progress status
+	 * 5. return the incomplete list of modules that match the student's learning path
+	 * @param planID - the document ID of the plan of study that belongs to the student
+	 */
 	@Query("modulesFromLearningPath")
 	async modulesFromLearningPath(@Args("planID") planID: string) {
-		// find enrollments for the student from planID
-		// find the learning path for the plan
-		// filter out inactive paths
-		// filter out modules with a completed progress status
-		// return the incomplete list of modules that match the student's learning path
-
+		// fetch all enrollments by the given student
 		const enrollment = await this.programService.sectionEnrollment({
 			plan: planID
 		});
 
+		// fetch the LP model from the DB
 		const learningPath = await this.programService.learningPath(planID);
 
+		// retrieve all the live paths for the user's LP model
 		const filteredLearningPath = learningPath[0].paths.filter((path) => {
 			return path.status === "LIVE";
 		});
@@ -204,32 +210,40 @@ export class ProgramResolver {
 			.flat()
 			.flat();
 
-		const nonDuplicateModules = modules.filter((module, index, self) => {
-			return index === self.findIndex((m) => m.id === module.id);
-		});
+		const cleanedModulesList = modules.filter(
+			(module) => Object.keys(module).length !== 0
+		);
 
-		const filteredModules = nonDuplicateModules.map((module) => {
-			// if there is no progress for the module, return the module
-			if (
-				module.moduleProgress?.length === 0 ||
-				module.moduleProgress === null ||
-				typeof module.moduleProgress === "undefined"
-			)
-				return module;
-			else {
-				// if there is progress for the module, filter out the progresses made by other students
-				// and return the module if there is no progress for the student
-				const filteredProgress = module.moduleProgress.filter((progress) => {
-					if (!progress) return false;
-					else if (!progress.completed) return false;
-					else return progress.enrollment.id !== enrollment[0].id;
-				});
-				if (filteredProgress.length === 0) return module;
-				else return null;
+		const nonDuplicateModules = cleanedModulesList.filter(
+			(module, index, self) => {
+				return index === self.findIndex((m) => m.id === module.id);
 			}
-		});
+		);
 
-		return filteredModules.filter((module) => module !== null);
+		const filteredModules = nonDuplicateModules
+			.map((module) => {
+				// if there is no progress for the module, return the module
+				if (
+					module.moduleProgress?.length === 0 ||
+					module.moduleProgress === null ||
+					typeof module.moduleProgress === "undefined"
+				)
+					return module;
+				else {
+					// if there is progress for the module, filter out the progresses made by other students
+					// and return the module if there is no progress for the student
+					const filteredProgress = module.moduleProgress.filter((progress) => {
+						if (!progress) return false;
+						else if (!progress.completed) return false;
+						else return progress.enrollment.id !== enrollment[0].id;
+					});
+					if (filteredProgress.length === 0) return module;
+					else return null;
+				}
+			})
+			.filter((module) => module !== null);
+
+		return filteredModules;
 	}
 
 	@Query("moduleFlowFromLearningPath")
