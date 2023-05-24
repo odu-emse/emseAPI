@@ -25,7 +25,8 @@ import {
 	SimpleModuleFlow,
 	CollectionPath,
 	SectionPath,
-	PathStatus
+	PathStatus,
+	ModulePath
 } from "@/types/graphql";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ProgramService } from "./program.service";
@@ -303,6 +304,7 @@ export class ProgramResolver {
 		let nextCollection: CollectionPath | null = filteredCollection;
 		let previousCollection: CollectionPath | null = filteredCollection;
 		const currentSection: SectionPath = sections[currentSectionIndex];
+		let previousModule: ModulePath | null = null;
 
 		if (currentModuleIndex === 0) {
 			let previousSection = sections[currentSectionIndex - 1];
@@ -356,6 +358,16 @@ export class ProgramResolver {
 		}
 
 		const nextModule = filteredCollection.modules[currentModuleIndex + 1];
+
+		if (
+			filteredCollection.modules[currentModuleIndex - 1] === undefined &&
+			previousCollection !== null
+		) {
+			previousModule =
+				previousCollection.modules[previousCollection.modules.length - 1];
+		} else {
+			previousModule = filteredCollection.modules[currentModuleIndex - 1];
+		}
 
 		return {
 			currentModule: filteredCollection.modules[currentModuleIndex],
