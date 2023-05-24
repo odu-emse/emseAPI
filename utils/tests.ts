@@ -6,11 +6,13 @@ import {
 	CreateQuestion,
 	CreateQuiz,
 	EnrollmentStatus,
-	LessonInput,
+	ModuleInput,
+	NewUser,
 	UserRole
 } from "@/types/graphql";
 import { QuizResolver } from "@/quiz/quiz.resolver";
-import { Answer, Lesson, Question, Quiz } from "@prisma/client";
+import { Answer, Question, Quiz } from "@prisma/client";
+import { UserResolver } from "@/user/user.resolver";
 
 export const shuffle = (str: string) =>
 	[...str].sort(() => Math.random() - 0.5).join("");
@@ -35,11 +37,17 @@ export const createPlan = async (
 	} else return self[0];
 };
 
-export const createModule = async (
+export const createUser = async (resolver: UserResolver, config: NewUser) => {
+	const user = await resolver.create({ ...config });
+	if (user) return user;
+	else return new Error("Failed to create user");
+};
+
+export const createSection = async (
 	resolver: ProgramResolver,
 	config: {
-		moduleName: string;
-		moduleNumber: number;
+		sectionName: string;
+		sectionNumber: number;
 		description: string;
 		duration: number;
 		intro: string;
@@ -47,34 +55,30 @@ export const createModule = async (
 		numSlides: number;
 	}
 ) => {
-	const module = await resolver.create({ ...config });
-	if (module) return module;
-	else return new Error("Failed to create module");
+	const section = await resolver.create({ ...config });
+	if (!section) return new Error("Failed to create section");
+	return section;
 };
 
-export const createLesson = async (
+export const createModule = async (
 	resolver: ProgramResolver,
-	config: Lesson
+	config: ModuleInput
 ) => {
-	const data: LessonInput = {
-		name: config.name,
-		collection: config.collectionID
-	};
-	const lesson = await resolver.createLesson({ ...data });
-	if (data) return lesson;
-	else return new Error("Failed to create Lesson");
+	const module = await resolver.createModule({ ...config });
+	if (!module) return new Error("Failed to create Module");
+	return module;
 };
 
 export const createEnrollment = async (
 	resolver: ProgramResolver,
 	config: {
-		module: string;
+		section: string;
 		plan: string;
 		status: EnrollmentStatus;
 		role: UserRole;
 	}
 ) => {
-	const enrollment = await resolver.addModuleEnrollment({ ...config });
+	const enrollment = await resolver.addSectionEnrollment({ ...config });
 	if (enrollment) return enrollment;
 	else return new Error("Failed to create enrollment");
 };
@@ -91,15 +95,25 @@ export const createCollection = async (
 export const createQuiz = async (resolver: QuizResolver, input: Quiz) => {
 	const data: CreateQuiz = {
 		totalPoints: input.totalPoints,
+		instructions: input.instructions,
 		dueAt: input.dueAt,
 		timeLimit: input.timeLimit,
 		numQuestions: input.numQuestions,
 		minScore: input.minScore,
-		parentLesson: input.parentLessonID
+		parentModule: input.parentModuleID
 	};
 	const quiz = await resolver.createQuiz(data);
 	if (quiz) return quiz;
 	else return new Error("Failed to create Quiz");
+};
+
+export const createQuizInstance = async (
+	resolver: QuizResolver,
+	quizID: string
+) => {
+	const quizInstance = await resolver.createQuizInstance(quizID);
+	if (quizInstance) return quizInstance;
+	else return new Error("Failed to create quiz instance");
 };
 
 export const createQuestion = async (

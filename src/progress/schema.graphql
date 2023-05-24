@@ -22,7 +22,7 @@ type Progress {
     """
     The enrollment that this progress is associated with (one-to-one)
     """
-    enrollment: ModuleEnrollment!
+    enrollment: SectionEnrollment!
 }
 
 input ProgressArgs {
@@ -43,16 +43,16 @@ input ProgressWaiveArgs {
     """
     enrollmentID: ID
     """
-    The database defined ID of the module that holds the enrollment to be accredited.
+    The database defined ID of the section that holds the enrollment to be accredited.
     """
-    moduleID: ID
+    sectionID: ID
     """
     The database defined ID of the plan of study that holds the enrollment to be accredited.
     """
     planID: ID
 }
 
-type LessonProgress {
+type ModuleProgress {
     """
     The database defined ID of the progress document
     """
@@ -76,11 +76,11 @@ type LessonProgress {
     """
     The enrollment that this progress is associated with (one-to-one)
     """
-    enrollment: ModuleEnrollment!
+    enrollment: SectionEnrollment!
     """
-    The lesson that this progress is associated with (one-to-one)
+    The module that this progress is associated with (one-to-one)
     """
-    lesson: Lesson!
+    module: Module!
 }
 
 type Query {
@@ -101,7 +101,7 @@ type Mutation {
         enrollmentID: ID!
     ): Progress!
 
-    waiveModule(
+    waiveSection(
         args: ProgressWaiveArgs!
     ): Progress!
 

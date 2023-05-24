@@ -8,6 +8,10 @@ type Quiz {
 	"""
 	totalPoints: Float!
 	"""
+	The instruction field for this quiz
+	"""
+	instructions: String
+	"""
 	The time the Quiz is due
 	"""
 	dueAt: Date
@@ -24,9 +28,9 @@ type Quiz {
 	"""
 	minScore: Float!
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: Lesson!
+	parentModule: Module!
 	"""
 	The possible questions and variants of for this quiz
 	"""
@@ -156,6 +160,10 @@ input QuizFields {
 	"""
 	totalPoints: Float
 	"""
+	The instruction field for this quiz
+	"""
+	instructions: String
+	"""
 	The time the Quiz is due
 	"""
 	dueAt: Date
@@ -172,9 +180,9 @@ input QuizFields {
 	"""
 	minScore: Float
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: ID
+	parentModule: ID
 }
 
 input QuizInstanceFields {
@@ -300,6 +308,10 @@ input CreateQuiz {
 	"""
 	totalPoints: Float!
 	"""
+	The instruction field for this quiz
+	"""
+	instructions: String
+	"""
 	The time the Quiz is due
 	"""
 	dueAt: Date
@@ -316,9 +328,9 @@ input CreateQuiz {
 	"""
 	minScore: Float
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: ID!
+	parentModule: ID!
 }
 
 input UpdateQuiz {
@@ -326,6 +338,10 @@ input UpdateQuiz {
 	The total amount of points possible on this quiz
 	"""
 	totalPoints: Float
+	"""
+	The instruction field for this quiz
+	"""
+	instructions: String
 	"""
 	The time the Quiz is due
 	"""
@@ -343,9 +359,9 @@ input UpdateQuiz {
 	"""
 	minScore: Float
 	"""
-	The lesson that this quiz belongs to
+	The module that this quiz belongs to
 	"""
-	parentLesson: ID
+	parentModule: ID
 }
 
 input CreateQuestion {
@@ -458,7 +474,7 @@ input QuizSubmission {
 # TODO: Update documentation for update mutations
 type Mutation {
 	"""
-	Create a new quiz record and associate it with its parent Lesson
+	Create a new quiz record and associate it with its parent Module
 	"""
 	createQuiz(input: CreateQuiz): Quiz!
 	"""

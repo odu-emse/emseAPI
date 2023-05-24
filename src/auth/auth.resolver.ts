@@ -23,9 +23,13 @@ export class AuthResolver {
 
 		//Update the user data here
 		const data = await response.json();
-		await this.authService.updateUserData(data.id_token);
+		const account = await this.authService.updateUserData(data.id_token);
 
-		return data.id_token;
+		if (account instanceof Error) {
+			throw new Error("Error " + response.status + ": " + response.statusText);
+		} else {
+			return data.id_token;
+		}
 	}
 
 	@Query("refresh")

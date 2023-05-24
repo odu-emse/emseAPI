@@ -21,7 +21,7 @@ export class QuizService {
 	constructor(private prisma: PrismaService) {}
 
 	private quizInclude = Prisma.validator<Prisma.QuizInclude>()({
-		parentLesson: true,
+		parentModule: true,
 		questionPool: {
 			include: {
 				answers: true
@@ -33,7 +33,7 @@ export class QuizService {
 	private quizInstanceInclude = Prisma.validator<Prisma.QuizInstanceInclude>()({
 		quiz: {
 			include: {
-				parentLesson: true,
+				parentModule: true,
 				questionPool: {
 					include: {
 						answers: true
@@ -53,7 +53,7 @@ export class QuizService {
 		answers: true,
 		parent: {
 			include: {
-				parentLesson: true
+				parentModule: true
 			}
 		}
 	});
@@ -63,7 +63,7 @@ export class QuizService {
 			include: {
 				parent: {
 					include: {
-						parentLesson: true
+						parentModule: true
 					}
 				}
 			}
@@ -88,11 +88,12 @@ export class QuizService {
 		const where = Prisma.validator<Prisma.QuizWhereInput>()({
 			id: args.id ? args.id : undefined,
 			totalPoints: args.totalPoints ? args.totalPoints : undefined,
+			instructions: args.instructions ? args.instructions : undefined,
 			dueAt: args.dueAt ? args.dueAt : undefined,
 			timeLimit: args.timeLimit ? args.timeLimit : undefined,
 			numQuestions: args.numQuestions ? args.numQuestions : undefined,
 			minScore: args.minScore ? args.minScore : undefined,
-			parentLessonID: args.parentLesson ? args.parentLesson : undefined
+			parentModuleID: args.parentModule ? args.parentModule : undefined
 		});
 		return this.prisma.quiz.findMany({
 			where,
@@ -157,11 +158,12 @@ export class QuizService {
 	async createQuiz(input: CreateQuiz) {
 		const create = Prisma.validator<Prisma.QuizCreateInput>()({
 			totalPoints: input.totalPoints,
+			instructions: input.instructions ? input.instructions : undefined,
 			dueAt: input.dueAt ? input.dueAt : undefined,
 			timeLimit: input.timeLimit ? input.timeLimit : undefined,
 			numQuestions: input.numQuestions,
 			minScore: input.minScore ? input.minScore : undefined,
-			parentLesson: { connect: { id: input.parentLesson } }
+			parentModule: { connect: { id: input.parentModule } }
 		});
 		return this.prisma.quiz.create({
 			data: create,
@@ -173,12 +175,13 @@ export class QuizService {
 		const update = Prisma.validator<Prisma.QuizUpdateArgs>()({
 			data: {
 				totalPoints: values.totalPoints ? values.totalPoints : undefined,
+				instructions: values.instructions ? values.instructions : undefined,
 				dueAt: values.dueAt ? values.dueAt : undefined,
 				timeLimit: values.timeLimit ? values.timeLimit : undefined,
 				numQuestions: values.numQuestions ? values.numQuestions : undefined,
 				minScore: values.minScore ? values.minScore : undefined,
-				parentLesson: values.parentLesson
-					? { connect: { id: values.parentLesson } }
+				parentModule: values.parentModule
+					? { connect: { id: values.parentModule } }
 					: undefined
 			},
 			where: {
@@ -370,18 +373,26 @@ export class QuizService {
 			}
 		});
 
-		return Promise.all(results).then(() =>
-			this.prisma.quizResult.create({
-				data: {
-					score: score,
-					// answers: input.answers,
-					student: { connect: { id: plan } },
-					quizInstance: { connect: { id: input.quizInstance } }
-				}
-			})
-		);
+		const res = Promise.all(results)
+			.then(() =>
+				this.prisma.quizResult.create({
+					data: {
+						score: score,
+						// answers: input.answers,
+						student: { connect: { id: plan } },
+						quizInstance: { connect: { id: input.quizInstance } }
+					}
+				})
+			)
+			.catch((err) => {
+				return new Error(err.message);
+			});
 		//TODO: Add quiz grading logic
 		// const questions =
+
+		if (res instanceof Error) return new Error(res.message);
+
+		return res;
 	}
 
 	async updateQuizScore(id: string, newScore: number) {

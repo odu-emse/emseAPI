@@ -8,11 +8,11 @@ import {
 	ContentType,
 	CreateCollectionArgs,
 	CreateContentArgs,
-	LessonInput,
+	ModuleInput,
 	Module,
-	NewModule,
 	PlanOfStudy,
-	User
+	User,
+	NewSection
 } from "@/types/graphql";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { faker } from "@faker-js/faker";
@@ -89,20 +89,10 @@ describe("Plan services", () => {
 				expect(moduleFirst).toBeDefined();
 				if (moduleFirst) {
 					expect(moduleFirst.id).toBe(testingModuleID);
-					expect(moduleFirst.moduleName).toBeDefined();
-					expect(moduleFirst.moduleNumber).toBeDefined();
+					expect(moduleFirst.name).toBeDefined();
+					expect(moduleFirst.number).toBeDefined();
 					expect(moduleFirst.description).toBeDefined();
-					expect(moduleFirst.createdAt).toBeDefined();
-					expect(moment(moduleFirst.createdAt).isBefore(new Date())).toBe(true);
-					expect(moduleFirst.updatedAt).toBeDefined();
-					expect(moment(moduleFirst.updatedAt).isBefore(new Date())).toBe(true);
-					expect(moduleFirst.duration).toBeDefined();
-					expect(moduleFirst.numSlides).toBeDefined();
-
-					expect(moduleFirst.keywords).toBeInstanceOf(Array);
 					expect(moduleFirst.objectives).toBeInstanceOf(Array);
-					expect(moduleFirst.feedback).toBeInstanceOf(Array);
-					expect(moduleFirst.members).toBeInstanceOf(Array);
 				}
 			});
 		});
@@ -110,7 +100,7 @@ describe("Plan services", () => {
 	describe("Enrollment", () => {
 		describe("Query.moduleEnrollments()", () => {
 			test("should return an array of moduleEnrollments", async () => {
-				const moduleEnrollments = await resolver.moduleEnrollment({});
+				const moduleEnrollments = await resolver.sectionEnrollment({});
 				expect(moduleEnrollments).toBeDefined();
 				expect(moduleEnrollments.length).toBeGreaterThan(1);
 				moduleEnrollments.map((enrollments) => {
@@ -119,7 +109,7 @@ describe("Plan services", () => {
 			});
 			test("should not take longer than 1.5 seconds to return all moduleEnrollments", async () => {
 				const start = new Date();
-				const moduleEnrollments = await resolver.moduleEnrollment({});
+				const moduleEnrollments = await resolver.sectionEnrollment({});
 				expect(moduleEnrollments.length).toBeGreaterThan(1);
 				const end = new Date();
 				expect(end.getTime() - start.getTime()).toBeLessThan(1500);
@@ -140,9 +130,9 @@ describe("Plan services", () => {
 			test("should return modules related to the course", async () => {
 				const courses = await resolver.course({});
 				courses.map((course) => {
-					expect(course.module).toBeDefined();
-					expect(course.module).toBeInstanceOf(Array);
-					expect(course.module.length).toBeGreaterThanOrEqual(1);
+					expect(course.sections).toBeDefined();
+					expect(course.sections).toBeInstanceOf(Array);
+					expect(course.sections.length).toBeGreaterThanOrEqual(1);
 					testingCourseID = course.id;
 				});
 			});
@@ -159,7 +149,7 @@ describe("Plan services", () => {
 				expect(course[0]).toBeDefined();
 				expect(course[0].id).toBe(testingCourseID);
 				expect(course[0].name).toBeDefined();
-				expect(Array.isArray(course[0].module)).toBe(true);
+				expect(Array.isArray(course[0].sections)).toBe(true);
 			});
 		});
 	});
@@ -205,23 +195,23 @@ describe("Plan services", () => {
 				if (assignmentFirst) {
 					expect(assignmentFirst.id).toBe(testingAssignmentID);
 					expect(assignmentFirst.name).toBeDefined();
-					expect(assignmentFirst.moduleId).toBeDefined();
+					expect(assignmentFirst.section).toBeDefined();
 					expect(assignmentFirst.dueAt).toBeDefined();
 
 					// testing populated module field
-					const module = assignmentFirst.module;
-					expect(module.id).toBe(assignmentFirst.moduleId);
-					expect(module.moduleName).toBeDefined();
-					expect(module.moduleNumber).toBeDefined();
-					expect(module.duration).toBeDefined();
-					expect(module.intro).toBeDefined();
-					expect(module.numSlides).toBeDefined();
-					expect(module.createdAt).toBeDefined();
-					expect(moment(module.createdAt).isBefore(new Date())).toBe(true);
-					expect(module.updatedAt).toBeDefined();
-					expect(moment(module.updatedAt).isBefore(new Date())).toBe(true);
-					expect(module.description).toBeDefined();
-					expect(module.keywords).toBeDefined();
+					const section = assignmentFirst.section;
+					expect(section.id).toBe(assignmentFirst.sectionId);
+					expect(section.sectionName).toBeDefined();
+					expect(section.sectionNumber).toBeDefined();
+					expect(section.duration).toBeDefined();
+					expect(section.intro).toBeDefined();
+					expect(section.numSlides).toBeDefined();
+					expect(section.createdAt).toBeDefined();
+					expect(moment(section.createdAt).isBefore(new Date())).toBe(true);
+					expect(section.updatedAt).toBeDefined();
+					expect(moment(section.updatedAt).isBefore(new Date())).toBe(true);
+					expect(section.description).toBeDefined();
+					expect(section.keywords).toBeDefined();
 
 					// testing populated assignment results field
 					if (assignmentFirst.assignmentResults !== undefined) {
@@ -287,8 +277,8 @@ describe("Collection", () => {
 	const service = new ProgramService(prisma);
 	const resolver = new ProgramResolver(service);
 
-	const deleteModule = async (id: string) => {
-		return prisma.module.delete({
+	const deleteSection = async (id: string) => {
+		return prisma.section.delete({
 			where: { id }
 		});
 	};
@@ -299,8 +289,8 @@ describe("Collection", () => {
 		});
 	};
 
-	const deleteLesson = async (id: string) => {
-		return prisma.lesson.delete({
+	const deleteModule = async (id: string) => {
+		return prisma.module.delete({
 			where: { id }
 		});
 	};
@@ -309,32 +299,33 @@ describe("Collection", () => {
 		return resolver.createCollection(input);
 	};
 
-	const createModule = async (input: NewModule) => {
+	const createSection = async (input: NewSection) => {
 		return resolver.create(input);
 	};
 
-	const createLesson = async (input: LessonInput) => {
-		return resolver.createLesson(input);
+	const createModule = async (input: ModuleInput) => {
+		return resolver.createModule(input);
 	};
 
-	const createLessonContent = async (input: CreateContentArgs) => {
+	const createModuleContent = async (input: CreateContentArgs) => {
 		return resolver.createContent(input);
 	};
 
 	let testingContentID: string;
 	let testingCollectionID: string;
+	let testingSectionID: string;
 	let testingModuleID: string;
-	let testingLessonID: string;
 
 	afterAll(async () => {
-		await deleteLesson(testingLessonID);
+		await deleteModule(testingModuleID);
 		await deleteCollection(testingCollectionID);
 		await deleteModule(testingModuleID);
+		await deleteSection(testingSectionID);
 	});
 	test("should create dummy data structure", async () => {
-		const module = await createModule({
-			moduleName: "Test Module",
-			moduleNumber: faker.datatype.number({
+		const section = await createSection({
+			sectionName: "Test Module",
+			sectionNumber: faker.datatype.number({
 				min: 123,
 				max: 9999,
 				precision: 1
@@ -345,22 +336,23 @@ describe("Collection", () => {
 			description: "Test Description",
 			keywords: ["Test Keywords"]
 		});
-		testingModuleID = module.id;
+		testingSectionID = section.id;
 		const collection = await createCollection({
 			name: "Test Collection",
-			moduleID: testingModuleID,
-			positionIndex: 0
+			positionIndex: 0,
+			sectionID: testingSectionID
 		});
 		testingCollectionID = collection.id;
 
-		const lesson = await createLesson({
-			name: "Test Lesson",
-			collection: testingCollectionID
+		const module = await createModule({
+			name: "Test Module",
+			collection: testingCollectionID,
+			hours: 1
 		});
-		testingLessonID = lesson.id;
+		testingModuleID = module.id;
 
-		const content = await createLessonContent({
-			parent: testingLessonID,
+		const content = await createModuleContent({
+			parent: testingModuleID,
 			link: "",
 			primary: true,
 			type: ContentType.VIDEO
@@ -375,13 +367,13 @@ describe("Collection", () => {
 	});
 	test("should return a collection that belongs to the Module inputted", async () => {
 		const collection = await resolver.collection({
-			moduleID: testingModuleID
+			modules: [testingModuleID]
 		});
 		expect(collection).toBeInstanceOf(Array);
 		collection.map(async (col) => {
 			expect(col.id).toBe(testingCollectionID);
 			expect(col.name).toBeDefined();
-			expect(col.moduleID).toBe(testingModuleID);
+			expect(col.moduleIDs).toContain(testingModuleID);
 		});
 	});
 	test("should return a collection that partially matches the name passed in", async () => {
@@ -394,15 +386,15 @@ describe("Collection", () => {
 			expect(col.name).toMatch(/Test/);
 		});
 	});
-	test("should return a collection that has lessons with IDs matching the inputted one", async () => {
+	test("should return a collection that has modules with IDs matching the inputted one", async () => {
 		const collection = await resolver.collection({
-			lessons: [testingLessonID]
+			modules: [testingModuleID]
 		});
 		expect(collection).toBeInstanceOf(Array);
 		collection.map(async (col) => {
-			expect(col.lessons).toBeDefined();
-			col.lessons.map((lesson) => {
-				expect(lesson.id).toBe(testingLessonID);
+			expect(col.modules).toBeDefined();
+			col.modules.map((module) => {
+				expect(module.id).toBe(testingModuleID);
 			});
 		});
 	});
@@ -413,15 +405,15 @@ describe("Collection", () => {
 		expect(collection).toBeInstanceOf(Array);
 		expect(collection[0].position).toBe(0);
 	});
-	test("should match lesson position field to array index", async () => {
+	test("should match module position field to array index", async () => {
 		const coll = await resolver.collection({ id: testingCollectionID });
 		expect(coll).toBeInstanceOf(Array);
 		coll.map((c) => {
-			c.lessons.map((lesson) => {
-				expect(lesson.position === c.lessons[lesson.position].position).toBe(
+			c.modules.map((module) => {
+				expect(module.position === c.modules[module.position].position).toBe(
 					true
 				);
-				expect(lesson.collectionID === c.id).toBe(true);
+				expect(module.collectionIDs.includes(c.id)).toBe(true);
 			});
 		});
 	});
@@ -431,19 +423,19 @@ describe("Collection", () => {
 		expect(contents).toBeInstanceOf(Array);
 		expect(contents.length).toBeGreaterThan(0);
 	});
-	test("should return a content that belongs to the Lesson inputted", async () => {
+	test("should return a content that belongs to the Module inputted", async () => {
 		const contents = await resolver.content({
-			parent: testingLessonID
+			parent: testingModuleID
 		});
 		expect(contents).toBeInstanceOf(Array);
 		contents.map(async (content) => {
 			expect(content.id).toBeDefined();
-			expect(content.parentID).toBe(testingLessonID);
+			expect(content.parentID).toBe(testingModuleID);
 		});
 	});
-	test("should return a content array that has only one primary content within a lesson", async () => {
+	test("should return a content array that has only one primary content within a module", async () => {
 		const contents = await resolver.content({
-			parent: testingLessonID
+			parent: testingModuleID
 		});
 		expect(contents).toBeInstanceOf(Array);
 		expect(contents.filter((c) => c.primary).length).toBe(1);

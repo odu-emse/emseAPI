@@ -6,9 +6,9 @@ type PlanOfStudy {
 	student: User
 
 	"""
-	Modules that are enrolled by the Student
+	Sections that are enrolled by the Student
 	"""
-	modules: [ModuleEnrollment]
+	sections: [SectionEnrollment]
 
 	"""
 	Results obtained for the Assignement Taken
@@ -16,9 +16,9 @@ type PlanOfStudy {
 	assignmentResults: [AssignmentResult!]
 
 	"""
-	Modules to be completed
+	Sections to be completed
 	"""
-	modulesLeft:[ModuleEnrollment]
+	sectionsLeft:[SectionEnrollment]
 
 	"""
 	Results on quizzes taken
@@ -34,9 +34,9 @@ input PlanFields {
 	id: String
 	
 	student: String
-	module: String
+	section: String
 	assignmentResult: String
-	modulesLeft: String
+	sectionsLeft: String
 }
 
 type Query {

@@ -19,7 +19,7 @@ Table User {
   social Social
   plan PlanOfStudy
   tokens Token [not null]
-  feedback ModuleFeedback [not null]
+  feedback SectionFeedback [not null]
   assignmentGraded AssignmentResult [not null]
   instructorProfile InstructorProfile
   watchedThreads Thread [not null]
@@ -39,23 +39,22 @@ Table InstructorProfile {
   accountID String [unique]
   title String
   officeLocation String
-  officeHours String
+  officeHours String[] [not null]
   contactPolicy String
-  phone String
   background String
-  researchInterest String
+  researchInterest String[] [not null]
   selectedPapersAndPublications String[] [not null]
-  personalWebsite String
-  philosophy String
+  instructedModules Module [not null]
 }
 
 Table PlanOfStudy {
   id String [pk]
   student User
   studentID String [unique]
-  modules ModuleEnrollment [not null]
+  sections SectionEnrollment [not null]
   assignmentResults AssignmentResult [not null]
   quizResults QuizResult [not null]
+  learningPaths LearningPath [not null]
 }
 
 Table Social {
@@ -81,14 +80,18 @@ Table Token {
 Table Course {
   id String [pk]
   name String [not null]
-  moduleIDs String[] [not null]
-  module Module [not null]
+  number Int [default: 0]
+  prefix String [default: '']
+  required Boolean [default: false]
+  carnegieHours Int [default: 135]
+  sectionIDs String[] [not null]
+  sections Section [not null]
 }
 
-Table Module {
+Table Section {
   id String [pk]
-  moduleNumber Int [unique, not null]
-  moduleName String [unique, not null]
+  sectionNumber Int [unique, not null]
+  sectionName String [unique, not null]
   description String [not null]
   duration Float [not null]
   intro String [not null]
@@ -97,13 +100,13 @@ Table Module {
   objectives String[] [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
-  members ModuleEnrollment [not null]
+  members SectionEnrollment [not null]
   assignments Assignment [not null]
-  feedback ModuleFeedback [not null]
-  parentModules Module [not null]
-  parentModuleIDs String[] [not null]
-  subModules Module [not null]
-  subModuleIDs String[] [not null]
+  feedback SectionFeedback [not null]
+  parentSections Section [not null]
+  parentSectionIDs String[] [not null]
+  subSections Section [not null]
+  subSectionIDs String[] [not null]
   collections Collection [not null]
   courseIDs String[] [not null]
   course Course [not null]
@@ -115,44 +118,52 @@ Table Collection {
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
   position Int [not null, default: 0]
-  lessons Lesson [not null]
-  module Module [not null]
-  moduleID String [not null]
+  modules Module [not null]
+  moduleIDs String[] [not null]
+  section Section [not null]
+  sectionID String [not null]
 }
 
-Table Lesson {
+Table Module {
   id String [pk]
   name String [not null]
-  transcript String
-  collection Collection [not null]
-  collectionID String [not null]
+  prefix String [default: '']
+  number Int [default: 1]
+  collections Collection [not null]
+  collectionIDs String[] [not null]
   position Int [not null, default: 0]
+  objectives String[] [not null]
+  keywords String[] [not null]
+  hours Float [not null, default: 0]
+  description String [default: '']
+  instructor InstructorProfile
+  instructorProfileID String [default: '']
   content Content [not null]
   quizzes Quiz [not null]
-  lessonProgress LessonProgress [not null]
+  moduleProgress ModuleProgress [not null]
 }
 
-Table ModuleFeedback {
+Table SectionFeedback {
   id String [pk]
   feedback String [not null]
   rating Int [not null]
   studentId String [not null]
-  moduleId String [not null]
+  sectionId String [not null]
   student User [not null]
-  module Module [not null]
+  section Section [not null]
 }
 
-Table ModuleEnrollment {
+Table SectionEnrollment {
   id String [pk]
   enrolledAt DateTime [default: `now()`, not null]
   role UserRole [not null]
   status EnrollmentStatus [not null, default: 'INACTIVE']
-  module Module [not null]
-  moduleId String [not null]
+  section Section [not null]
+  sectionId String [not null]
   plan PlanOfStudy
   planID String
   progress Progress
-  lessonProgress LessonProgress [not null]
+  moduleProgress ModuleProgress [not null]
 }
 
 Table Assignment {
@@ -163,8 +174,8 @@ Table Assignment {
   contentURL String [not null]
   contentType String [not null]
   acceptedTypes FileType [not null, default: 'DOC']
-  moduleId String [not null]
-  module Module [not null]
+  sectionId String [not null]
+  section Section [not null]
   assignmentResults AssignmentResult [not null]
 }
 
@@ -205,7 +216,7 @@ Table Content {
   id String [pk]
   type ContentType [not null]
   link String [not null]
-  parent Lesson [not null]
+  parent Module [not null]
   parentID String [not null]
   primary Boolean [not null]
 }
@@ -240,31 +251,32 @@ Table Progress {
   updatedAt DateTime [default: `now()`, not null]
   status Float [not null, default: 0]
   completed Boolean [not null, default: false]
-  enrollment ModuleEnrollment [not null]
+  enrollment SectionEnrollment [not null]
   enrollmentID String [unique, not null]
 }
 
-Table LessonProgress {
+Table ModuleProgress {
   id String [pk]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [default: `now()`, not null]
   status Float [not null, default: 0]
   completed Boolean [not null, default: false]
-  lesson Lesson [not null]
-  lessonID String [not null]
-  enrollment ModuleEnrollment [not null]
+  module Module [not null]
+  moduleID String [not null]
+  enrollment SectionEnrollment [not null]
   enrollmentID String [unique, not null]
 }
 
 Table Quiz {
   id String [pk]
   totalPoints Float [not null]
+  instructions String
   dueAt DateTime
   timeLimit Int
   numQuestions Int [not null]
   minScore Float [not null, default: 0]
-  parentLesson Lesson [not null]
-  parentLessonID String [not null]
+  parentModule Module [not null]
+  parentModuleID String [not null]
   questionPool Question [not null]
   instances QuizInstance [not null]
 }
@@ -275,8 +287,7 @@ Table QuizInstance {
   quizID String [not null]
   questions Question [not null]
   questionIDs String[] [not null]
-  quizResult QuizResult
-  quizResultID String [unique]
+  quizResult QuizResult [not null]
 }
 
 Table Question {
@@ -309,6 +320,15 @@ Table QuizResult {
   student PlanOfStudy [not null]
   studentID String [not null]
   quizInstance QuizInstance
+  quizInstanceID String
+}
+
+Table LearningPath {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  plan PlanOfStudy [not null]
+  planID String [unique, not null]
+  paths Path[] [not null]
 }
 
 Enum UserRole {
@@ -330,6 +350,7 @@ Enum ContentType {
   CAPTION
   TRANSCRIPT
   QUIZ
+  TEXT
 }
 
 Enum FileType {
@@ -338,6 +359,11 @@ Enum FileType {
   PDF
   TTT
   TXT
+}
+
+Enum PathStatus {
+  DRAFT
+  LIVE
 }
 
 Ref: User.watchedThreadIDs > Thread.id
@@ -354,27 +380,31 @@ Ref: Social.accountID - User.id
 
 Ref: Token.userId > User.id
 
-Ref: Course.moduleIDs > Module.id
+Ref: Course.sectionIDs > Section.id
 
-Ref: Module.parentModuleIDs > Module.id
+Ref: Section.parentSectionIDs > Section.id
 
-Ref: Module.subModuleIDs > Module.id
+Ref: Section.subSectionIDs > Section.id
 
-Ref: Module.courseIDs > Course.id
+Ref: Section.courseIDs > Course.id
 
-Ref: Collection.moduleID > Module.id [delete: Cascade]
+Ref: Collection.moduleIDs > Module.id
 
-Ref: Lesson.collectionID > Collection.id [delete: Cascade]
+Ref: Collection.sectionID > Section.id [delete: Cascade]
 
-Ref: ModuleFeedback.studentId > User.id
+Ref: Module.collectionIDs > Collection.id
 
-Ref: ModuleFeedback.moduleId > Module.id
+Ref: Module.instructorProfileID > InstructorProfile.id
 
-Ref: ModuleEnrollment.moduleId > Module.id
+Ref: SectionFeedback.studentId > User.id
 
-Ref: ModuleEnrollment.planID > PlanOfStudy.id
+Ref: SectionFeedback.sectionId > Section.id
 
-Ref: Assignment.moduleId > Module.id
+Ref: SectionEnrollment.sectionId > Section.id
+
+Ref: SectionEnrollment.planID > PlanOfStudy.id
+
+Ref: Assignment.sectionId > Section.id
 
 Ref: AssignmentResult.studentId > PlanOfStudy.id
 
@@ -390,7 +420,7 @@ Ref: Thread.parentThreadID - Thread.id [delete: No Action]
 
 Ref: Thread.upvoteUserIDs > User.id
 
-Ref: Content.parentID > Lesson.id [delete: Cascade]
+Ref: Content.parentID > Module.id [delete: Cascade]
 
 Ref: DirectMessage.authorID > User.id
 
@@ -400,19 +430,17 @@ Ref: DirectMessage.groupID > Group.id
 
 Ref: Group.memberIDs > User.id
 
-Ref: Progress.enrollmentID - ModuleEnrollment.id [delete: Cascade]
+Ref: Progress.enrollmentID - SectionEnrollment.id [delete: Cascade]
 
-Ref: LessonProgress.lessonID > Lesson.id [delete: Cascade]
+Ref: ModuleProgress.moduleID > Module.id [delete: Cascade]
 
-Ref: LessonProgress.enrollmentID > ModuleEnrollment.id [delete: Cascade]
+Ref: ModuleProgress.enrollmentID > SectionEnrollment.id [delete: Cascade]
 
-Ref: Quiz.parentLessonID > Lesson.id [delete: Cascade]
+Ref: Quiz.parentModuleID > Module.id [delete: Cascade]
 
 Ref: QuizInstance.quizID > Quiz.id [delete: Cascade]
 
 Ref: QuizInstance.questionIDs > Question.id
-
-Ref: QuizInstance.quizResultID - QuizResult.id
 
 Ref: Question.parentID > Quiz.id [delete: Cascade]
 
@@ -421,3 +449,7 @@ Ref: Question.instanceIDs > QuizInstance.id
 Ref: Answer.parentQuestionID > Question.id [delete: Cascade]
 
 Ref: QuizResult.studentID > PlanOfStudy.id
+
+Ref: QuizResult.quizInstanceID > QuizInstance.id
+
+Ref: LearningPath.planID > PlanOfStudy.id [delete: Cascade]
