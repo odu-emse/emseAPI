@@ -374,7 +374,7 @@ export class ProgramResolver {
 			nextModule: nextModule,
 			currentCollection: filteredCollection,
 			nextCollection: filteredCollection,
-			previousModule: filteredCollection.modules[currentModuleIndex - 1],
+			previousModule,
 			previousCollection,
 			currentSection
 		};
